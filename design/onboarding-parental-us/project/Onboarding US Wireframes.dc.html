@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics="">
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&amp;family=Architects+Daughter&amp;display=swap" rel="stylesheet">
+<script src="./image-slot.js"></script>
+<style>
+body{margin:0;background:#f0eee9;font-family:'Patrick Hand',cursive}
+.dv-turn{padding:40px 44px 32px;border-bottom:1px solid rgba(0,0,0,.08)}
+.dv-thd{display:flex;align-items:baseline;gap:10px;margin:0 0 20px}
+.dv-tid{font:600 10px ui-monospace,Menlo,monospace;padding:3px 7px;background:#1a1a1a;color:#fff;border-radius:4px;text-decoration:none}
+.dv-tname{font:600 15px/1.2 'Patrick Hand',cursive;color:#1a1a1a}
+.dv-opts{display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start}
+.dv-opt{flex:none;display:flex;flex-direction:column;gap:9px;scroll-margin-top:16px}
+.dv-oid{font:600 10.5px ui-monospace,Menlo,monospace;padding:3px 7px;background:rgba(0,0,0,.08);color:#1a1a1a;border-radius:5px;text-decoration:none}
+.dv-olabel{display:flex;align-items:baseline;gap:8px;font:400 12px/1.3 'Patrick Hand',cursive;color:rgba(0,0,0,.55)}
+.dv-card{width:280px;height:560px;background:#fff;border:2px solid #1a1a1a;border-radius:22px;box-shadow:3px 3px 0 rgba(0,0,0,.15);overflow:hidden;position:relative;display:flex;flex-direction:column;padding:22px 18px;box-sizing:border-box}
+.dv-opt:target .dv-oid{background:#2D5E5A;color:#fff}
+.dv-next{margin:22px 0 0;font:15px/1.5 'Patrick Hand',cursive;color:rgba(0,0,0,.55)}
+.notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:90px;height:18px;background:#1a1a1a;border-radius:0 0 10px 10px}
+.sk-input{border:2px solid #1a1a1a;border-radius:10px;padding:12px 14px;font:16px 'Patrick Hand',cursive;color:#333;background:#fff}
+.sk-btn{border:2px solid #1a1a1a;border-radius:12px;padding:14px;text-align:center;font:18px 'Patrick Hand',cursive;background:#2D5E5A;color:#fff;box-shadow:2px 2px 0 rgba(0,0,0,.2)}
+.sk-btn-outline{border:2px solid #1a1a1a;border-radius:12px;padding:14px;text-align:center;font:18px 'Patrick Hand',cursive;color:#1a1a1a;background:#fff}
+.sk-toggle{display:flex;border:2px solid #1a1a1a;border-radius:10px;overflow:hidden}
+.sk-toggle > div{flex:1;padding:10px;text-align:center;font-size:15px}
+.sk-choice{border:2px solid #1a1a1a;border-radius:10px;padding:12px 14px;font-size:15px;display:flex;align-items:center;gap:10px}
+.sk-radio{width:16px;height:16px;border:2px solid #1a1a1a;border-radius:50%;flex:none}
+.sk-check{width:16px;height:16px;border:2px solid #1a1a1a;border-radius:4px;flex:none}
+.dots{display:flex;gap:6px;justify-content:center;margin-top:auto;padding-top:14px}
+.dot{width:7px;height:7px;border-radius:50%;background:#ddd;border:1px solid #1a1a1a}
+.dot.active{background:#2D5E5A}
+.pbar{width:100%;height:6px;flex:none;background:#eee;border:1px solid #1a1a1a;border-radius:4px;overflow:hidden;margin:10px 0 2px}
+.pbar-fill{height:100%;background:#2D5E5A}
+.title{font-size:22px;color:#1a1a1a;margin:14px 0 4px;line-height:1.15}
+.sub{font-size:14px;color:#777;margin:0 0 16px}
+.hint{font-size:12px;color:#999;text-align:center;margin-top:10px}
+.logo-mark{width:56px;height:56px;border-radius:16px;background:#2D5E5A;display:flex;align-items:center;justify-content:center;color:#fff;font-size:24px;margin:36px auto 8px}
+</style>
+</helmet>
+
+<section class="dv-turn" id="t1">
+<div class="dv-thd"><a class="dv-tid" href="#t1">1</a><span class="dv-tname">Onboarding "US" — parcours 6 écrans</span></div>
+<div class="dv-opts">
+
+<div class="dv-opt" id="1a">
+<div class="dv-olabel"><a class="dv-oid" href="#1a">1a</a>0 — Accueil / connexion</div>
+<div class="dv-card" style="background:#DCEEE8">
+<div class="notch"></div>
+<div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:6px">
+<div class="logo-mark">US</div>
+<div style="font-size:26px;color:#1a1a1a">US</div>
+<div style="font-size:14px;color:#777;max-width:200px">L'appli qui accompagne les deux parents, à chaque étape</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;margin-top:auto">
+<div class="sk-input">votre@email.com</div>
+<div class="sk-btn">Recevoir mon lien de connexion</div>
+<div class="hint">Aucune donnée personnelle requise.</div>
+</div>
+</div>
+</div>
+
+<div class="dv-opt" id="1b">
+<div class="dv-olabel"><a class="dv-oid" href="#1b">1b</a>1/5 — Arrivée du bébé</div>
+<div class="dv-card" style="background:#DCEEE8">
+<div class="notch"></div>
+<div style="font-size:13px;color:#999;margin-top:14px">Étape 1 / 5</div>
+<div class="pbar"><div class="pbar-fill" style="width:20%"></div></div>
+<div class="title">Quand votre bébé<br>arrive-t-il ?</div>
+<div class="sub">Date de naissance prévue ou réelle</div>
+<div class="sk-input" style="text-align:center;margin-bottom:18px">📅 12 / 10 / 2026</div>
+<div style="font-size:14px;color:#333;margin-bottom:8px">Est-ce votre premier enfant ?</div>
+<div class="sk-toggle"><div style="background:#2D5E5A;color:#fff">Oui</div><div>Non</div></div>
+<div style="margin-top:auto;display:flex;flex-direction:column;gap:10px">
+<div class="sk-btn">Continuer</div>
+<div class="dots"><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+</div>
+</div>
+</div>
+
+<div class="dv-opt" id="1c">
+<div class="dv-olabel"><a class="dv-oid" href="#1c">1c</a>2/5 — Statut professionnel</div>
+<div class="dv-card" style="background:#DCEEE8">
+<div class="notch"></div>
+<div style="font-size:13px;color:#999;margin-top:14px">Étape 2 / 5</div>
+<div class="pbar"><div class="pbar-fill" style="width:40%"></div></div>
+<div class="title">Quel est votre<br>statut professionnel ?</div>
+<div class="sub">Pour adapter vos démarches</div>
+<div style="display:flex;flex-direction:column;gap:9px">
+<div class="sk-choice"><div class="sk-radio" style="background:#2D5E5A"></div>Salarié·e secteur privé</div>
+<div class="sk-choice"><div class="sk-radio"></div>Fonctionnaire</div>
+<div class="sk-choice"><div class="sk-radio"></div>Indépendant·e</div>
+<div class="sk-choice"><div class="sk-radio"></div>Sans emploi actuellement</div>
+</div>
+<div class="sk-input" style="margin-top:14px">Région ou département</div>
+<div style="margin-top:auto;display:flex;flex-direction:column;gap:10px">
+<div class="sk-btn">Continuer</div>
+<div class="dots"><div class="dot"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+</div>
+</div>
+</div>
+
+<div class="dv-opt" id="1d">
+<div class="dv-olabel"><a class="dv-oid" href="#1d">1d</a>3/5 — Accompagnement</div>
+<div class="dv-card" style="background:#DCEEE8">
+<div class="notch"></div>
+<div style="font-size:13px;color:#999;margin-top:14px">Étape 3 / 5</div>
+<div class="pbar"><div class="pbar-fill" style="width:60%"></div></div>
+<div class="title">Qui vous accompagne<br>dans cette aventure ?</div>
+<div style="display:flex;flex-direction:column;gap:9px">
+<div class="sk-choice"><div class="sk-radio" style="background:#2D5E5A"></div>En couple</div>
+<div class="sk-choice"><div class="sk-radio"></div>Coparentalité sans vivre ensemble</div>
+<div class="sk-choice"><div class="sk-radio"></div>Seul·e</div>
+<div class="sk-choice"><div class="sk-radio"></div>Autre</div>
+</div>
+<div style="font-size:14px;color:#333;margin:16px 0 8px">Le co-parent utilisera-t-il aussi l'app ?</div>
+<div class="sk-toggle"><div style="background:#2D5E5A;color:#fff">Oui</div><div>Non</div></div>
+<div style="margin-top:auto;display:flex;flex-direction:column;gap:10px">
+<div class="sk-btn">Continuer</div>
+<div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot active"></div><div class="dot"></div><div class="dot"></div></div>
+</div>
+</div>
+</div>
+
+<div class="dv-opt" id="1e">
+<div class="dv-olabel"><a class="dv-oid" href="#1e">1e</a>4/5 — Priorités</div>
+<div class="dv-card" style="background:#DCEEE8">
+<div class="notch"></div>
+<div style="font-size:13px;color:#999;margin-top:14px">Étape 4 / 5</div>
+<div class="pbar"><div class="pbar-fill" style="width:80%"></div></div>
+<div class="title">Quelles sont<br>vos priorités ?</div>
+<div class="sub">Plusieurs choix possibles</div>
+<div style="display:flex;flex-direction:column;gap:9px">
+<div class="sk-choice"><div class="sk-check" style="background:#2D5E5A"></div>Démarches administratives</div>
+<div class="sk-choice"><div class="sk-check" style="background:#2D5E5A"></div>Bien-être et santé</div>
+<div class="sk-choice"><div class="sk-check"></div>Partage avec le co-parent</div>
+<div class="sk-choice"><div class="sk-check"></div>Dates et rendez-vous importants</div>
+</div>
+<div style="margin-top:auto;display:flex;flex-direction:column;gap:10px">
+<div class="sk-btn">Continuer</div>
+<div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot active"></div><div class="dot"></div></div>
+</div>
+</div>
+</div>
+
+<div class="dv-opt" id="1f">
+<div class="dv-olabel"><a class="dv-oid" href="#1f">1f</a>5/5 — Rythme des rappels</div>
+<div class="dv-card" style="background:#DCEEE8">
+<div class="notch"></div>
+<div style="font-size:13px;color:#999;margin-top:14px">Étape 5 / 5</div>
+<div class="pbar"><div class="pbar-fill" style="width:100%"></div></div>
+<div class="title">Quel rythme de rappels<br>préférez-vous ?</div>
+<div style="display:flex;flex-direction:column;gap:9px">
+<div class="sk-choice"><div class="sk-radio" style="background:#2D5E5A"></div>Au fil de l'eau</div>
+<div class="sk-choice"><div class="sk-radio"></div>Résumé hebdomadaire</div>
+</div>
+<div style="margin-top:auto;display:flex;flex-direction:column;gap:10px">
+<div class="sk-btn">Terminer</div>
+<div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot active"></div></div>
+</div>
+</div>
+</div>
+
+<div class="dv-opt" id="1g">
+<div class="dv-olabel"><a class="dv-oid" href="#1g">1g</a>Fin — Offre d'abonnement</div>
+<div class="dv-card" style="background:#DCEEE8">
+<div class="notch"></div>
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px;margin-top:24px">
+<div class="logo-mark">✓</div>
+<div class="title">Débloquez US en entier</div>
+<div class="sub" style="max-width:210px">Un seul paiement, accès à vie à toutes les fonctionnalités</div>
+<div style="border:2px solid #2D5E5A;border-radius:14px;padding:16px;width:100%;box-sizing:border-box;display:flex;flex-direction:column;gap:4px;text-align:left">
+<div style="font-size:18px;color:#1a1a1a">19,99 € — paiement unique</div>
+<div style="font-size:12px;color:#777">Pas d'abonnement, pas de renouvellement</div>
+<div style="height:1px;background:#2D5E5A;opacity:.2;margin:6px 0"></div>
+<div style="display:flex;flex-direction:column;gap:4px">
+<div style="font-size:12px;color:#333">✓ Suivi illimité des démarches</div>
+<div style="font-size:12px;color:#333">✓ Accès complet au bien-être et à la co-parentalité</div>
+<div style="font-size:12px;color:#333">✓ Rappels et notifications personnalisés</div>
+</div>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;margin-top:auto">
+<div class="sk-btn">Souscrire</div>
+<div class="sk-btn-outline">Plus tard</div>
+<div style="text-align:center;font-size:13px;color:#2D5E5A;text-decoration:underline">Carte cadeau</div>
+</div>
+<div style="display:flex;justify-content:center;gap:14px;margin-top:10px">
+<div style="font-size:10.5px;color:#999;text-decoration:underline">Politique de confidentialité</div>
+<div style="font-size:10.5px;color:#999;text-decoration:underline">Conditions d'utilisation</div>
+</div>
+</div>
+</div>
+
+</div>
+</section>
+
+<section class="dv-turn" id="t2">
+<div class="dv-thd"><a class="dv-tid" href="#t2">2</a><span class="dv-tname">Post-onboarding — hub d'accueil</span></div>
+<div class="dv-opts">
+
+<div class="dv-opt" id="2a">
+<div class="dv-olabel"><a class="dv-oid" href="#2a">2a</a>Transition</div>
+<div class="dv-card" style="background:#DCEEE8">
+<div class="notch"></div>
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:18px">
+<div style="width:40px;height:40px;border:3px solid #e5e5e5;border-top-color:#2D5E5A;border-radius:50%"></div>
+<div style="font-size:18px;color:#1a1a1a">On prépare votre espace...</div>
+</div>
+</div>
+</div>
+
+<div class="dv-opt" id="2b">
+<div class="dv-olabel"><a class="dv-oid" href="#2b">2b</a>Hub d'accueil</div>
+<div class="dv-card" style="background:#DCEEE8;padding:22px 16px">
+<div class="notch"></div>
+<div style="align-self:flex-end;margin-top:16px;background:#2D5E5A;color:#fff;font-size:10.5px;border-radius:20px;padding:6px 10px;display:flex;align-items:center;gap:4px">👶 Déclarer la naissance</div>
+<div style="font-size:20px;color:#1a1a1a;margin-top:8px">Bonjour</div>
+<div style="border:2px dashed #2D5E5A;border-radius:12px;padding:12px;margin-top:14px;display:flex;align-items:center;justify-content:space-between;gap:10px">
+<div style="font-size:13px;color:#333;line-height:1.3">Inviter Paul à rejoindre<br>votre espace</div>
+<div style="border:2px solid #1a1a1a;border-radius:8px;padding:6px 10px;font-size:13px;white-space:nowrap">Inviter</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;margin-top:18px">
+<div style="border:2px solid #1a1a1a;border-radius:14px;padding:16px;display:flex;align-items:center;gap:14px">
+<div style="width:40px;height:40px;border-radius:10px;background:#f0eee9;display:flex;align-items:center;justify-content:center;font-size:18px;flex:none">📄</div>
+<div style="display:flex;flex-direction:column;gap:2px">
+<div style="font-size:16px;color:#1a1a1a">Démarches</div>
+<div style="font-size:12.5px;color:#2D5E5A">2 démarches en attente</div>
+</div>
+</div>
+<div style="border:2px solid #1a1a1a;border-radius:14px;padding:16px;display:flex;align-items:center;gap:14px">
+<div style="width:40px;height:40px;border-radius:10px;background:#f0eee9;display:flex;align-items:center;justify-content:center;font-size:18px;flex:none">🤝</div>
+<div style="display:flex;flex-direction:column;gap:2px">
+<div style="font-size:16px;color:#1a1a1a">Ensemble</div>
+<div style="font-size:12.5px;color:#2D5E5A">Check-in du jour</div>
+</div>
+</div>
+<div style="border:2px solid #1a1a1a;border-radius:14px;padding:16px;display:flex;align-items:center;gap:14px">
+<div style="width:40px;height:40px;border-radius:10px;background:#f0eee9;display:flex;align-items:center;justify-content:center;font-size:18px;flex:none">🌙</div>
+<div style="display:flex;flex-direction:column;gap:2px">
+<div style="font-size:16px;color:#1a1a1a">Bien-être</div>
+<div style="font-size:12.5px;color:#2D5E5A">Journal du jour</div>
+</div>
+</div>
+</div>
+<div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid rgba(0,0,0,.08)">
+<div style="width:28px;height:28px;border-radius:50%;border:2px solid #1a1a1a;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px">🏠</div>
+<div style="width:28px;height:28px;border-radius:50%;border:2px solid #1a1a1a;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px">👤</div>
+<div style="width:28px;height:28px;border-radius:50%;border:2px solid #1a1a1a;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px">⋯</div>
+</div></div>
+</div>
+
+<div class="dv-opt" id="2d">
+<div class="dv-olabel"><a class="dv-oid" href="#2d">2d</a>Inviter Paul</div>
+<div class="dv-card" style="background:#DCEEE8;padding:22px 16px">
+<div class="notch"></div>
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px">
+<div style="width:64px;height:64px;border-radius:50%;background:#fff;border:2px solid #1a1a1a;display:flex;align-items:center;justify-content:center;font-size:26px">💌</div>
+<div class="title" style="margin:0">Inviter Paul</div>
+<div class="sub" style="max-width:210px;margin:0">Il pourra suivre les démarches, le bien-être et rester connecté à votre grossesse</div>
+<div class="sk-input" style="width:100%;box-sizing:border-box;margin-top:8px">Email ou numéro de Paul</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;margin-top:auto">
+<div class="sk-btn">Envoyer l'invitation</div>
+<div class="sk-btn-outline">Plus tard</div>
+</div>
+</div>
+</div>
+
+<div class="dv-opt" id="2c">
+<div class="dv-olabel"><a class="dv-oid" href="#2c">2c</a>Notification push</div>
+<div class="dv-card" style="background:#DCEEE8;justify-content:flex-start">
+<div class="notch"></div>
+<div style="margin-top:34px;background:rgba(245,245,245,.97);backdrop-filter:blur(2px);border:1px solid rgba(0,0,0,.1);border-radius:16px;padding:12px;display:flex;gap:10px;align-items:flex-start;box-shadow:0 2px 8px rgba(0,0,0,.08)">
+<div style="width:32px;height:32px;border-radius:8px;background:#2D5E5A;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;flex:none">US</div>
+<div style="flex:1">
+<div style="display:flex;justify-content:space-between;font-size:11px;color:#999"><span>US</span><span>maintenant</span></div>
+<div style="font-size:13.5px;color:#1a1a1a;line-height:1.35;margin-top:2px">Aujourd'hui : et si vous faisiez le point sur votre déclaration CAF ?</div>
+</div>
+</div>
+<div style="flex:1;display:flex;align-items:center;justify-content:center;color:#ccc;font-size:13px">Écran verrouillé</div>
+</div>
+</div>
+
+</div>
+</section>
+
+<section class="dv-turn" id="t3">
+<div class="dv-thd"><a class="dv-tid" href="#t3">3</a><span class="dv-tname">Pilier "Ensemble" — check-in co-parent</span></div>
+<div class="dv-opts">
+
+<div class="dv-opt" id="3c">
+<div class="dv-olabel"><a class="dv-oid" href="#3c">3c</a>Hub — vue femme enceinte</div>
+<div class="dv-card" style="background:#DCEEE8;padding:22px 16px">
+<div class="notch"></div>
+<div style="display:flex;justify-content:space-between;align-items:center;margin-top:16px;gap:8px">
+<div style="font-size:20px;color:#1a1a1a">Bonjour Camille</div>
+<div style="background:#2D5E5A;color:#fff;font-size:10px;border-radius:20px;padding:5px 8px;display:flex;align-items:center;gap:3px;white-space:nowrap;flex:none">👶</div>
+</div>
+<div style="border:2px solid #1a1a1a;border-radius:14px;padding:11px;margin-top:10px;display:flex;flex-direction:column;gap:8px;background:#fff">
+<div style="font-size:12px;color:#777">Paul aujourd'hui</div>
+<div style="display:flex;align-items:center;gap:10px">
+<div style="width:36px;height:36px;border-radius:50%;border:2px solid #1a1a1a;display:flex;align-items:center;justify-content:center;font-size:17px;flex:none">🙂</div>
+<div style="font-size:12.5px;color:#2D5E5A">Paul semble se sentir bien</div>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:6px;margin-top:8px">
+<div style="border:2px solid #1a1a1a;border-radius:14px;padding:11px;display:flex;align-items:center;gap:12px">
+<div style="width:36px;height:36px;border-radius:9px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;flex:none">📄</div>
+<div style="display:flex;flex-direction:column;gap:2px">
+<div style="font-size:16px;color:#1a1a1a">Démarches</div>
+<div style="font-size:12.5px;color:#2D5E5A">2 démarches en attente</div>
+</div>
+</div>
+<div style="border:2px solid #1a1a1a;border-radius:14px;padding:11px;display:flex;align-items:center;gap:12px">
+<div style="width:36px;height:36px;border-radius:9px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;flex:none">🤝</div>
+<div style="display:flex;flex-direction:column;gap:2px">
+<div style="font-size:16px;color:#1a1a1a">Ensemble</div>
+<div style="font-size:12.5px;color:#2D5E5A">Check-in du jour</div>
+</div>
+</div>
+<div style="border:2px solid #1a1a1a;border-radius:14px;padding:11px;display:flex;align-items:center;gap:12px">
+<div style="width:36px;height:36px;border-radius:9px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;flex:none">🌙</div>
+<div style="display:flex;flex-direction:column;gap:2px">
+<div style="font-size:16px;color:#1a1a1a">Bien-être</div>
+<div style="font-size:12.5px;color:#2D5E5A">Journal du jour</div>
+</div>
+</div>
+<div style="border:2px solid #1a1a1a;border-radius:14px;padding:11px;display:flex;align-items:center;gap:12px;background:#f5f0dc">
+<div style="width:36px;height:36px;border-radius:9px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;flex:none">💕</div>
+<div style="display:flex;flex-direction:column;gap:2px">
+<div style="font-size:16px;color:#1a1a1a">Avec Paul</div>
+<div style="font-size:12.5px;color:#2D5E5A">Voir son état cette semaine</div>
+</div>
+</div>
+</div>
+<div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid rgba(0,0,0,.08)">
+<div style="width:28px;height:28px;border-radius:50%;border:2px solid #1a1a1a;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px">🏠</div>
+<div style="width:28px;height:28px;border-radius:50%;border:2px solid #1a1a1a;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px">👤</div>
+<div style="width:28px;height:28px;border-radius:50%;border:2px solid #1a1a1a;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px">⋯</div>
+</div>
+</div>
+</div>
+
+<div class="dv-opt" id="3d">
+<div class="dv-olabel"><a class="dv-oid" href="#3d">3d</a>Hub — vue partenaire</div>
+<div class="dv-card" style="background:#FBF0C8;padding:22px 16px">
+<div class="notch"></div>
+<div style="display:flex;justify-content:space-between;align-items:center;margin-top:16px;gap:8px">
+<div style="font-size:20px;color:#1a1a1a">Bonjour Paul</div>
+<div style="background:#2D5E5A;color:#fff;font-size:10px;border-radius:20px;padding:5px 8px;display:flex;align-items:center;gap:3px;white-space:nowrap;flex:none">👶</div>
+</div>
+<div style="border:2px solid #1a1a1a;border-radius:14px;padding:11px;margin-top:10px;display:flex;flex-direction:column;gap:8px;background:#fff">
+<div style="font-size:12px;color:#777">Camille aujourd'hui</div>
+<div style="display:flex;align-items:center;gap:10px">
+<div style="width:36px;height:36px;border-radius:50%;border:2px solid #1a1a1a;display:flex;align-items:center;justify-content:center;font-size:17px;flex:none">😩</div>
+<div style="font-size:12.5px;color:#2D5E5A">Camille a besoin de câlins</div>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:6px;margin-top:8px">
+<div style="border:2px solid #1a1a1a;border-radius:14px;padding:11px;display:flex;align-items:center;gap:12px">
+<div style="width:36px;height:36px;border-radius:9px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;flex:none">📄</div>
+<div style="display:flex;flex-direction:column;gap:2px">
+<div style="font-size:16px;color:#1a1a1a">Démarches</div>
+<div style="font-size:12.5px;color:#2D5E5A">2 démarches en attente</div>
+</div>
+</div>
+<div style="border:2px solid #1a1a1a;border-radius:14px;padding:11px;display:flex;align-items:center;gap:12px">
+<div style="width:36px;height:36px;border-radius:9px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;flex:none">🤝</div>
+<div style="display:flex;flex-direction:column;gap:2px">
+<div style="font-size:16px;color:#1a1a1a">Ensemble</div>
+<div style="font-size:12.5px;color:#2D5E5A">Check-in du jour</div>
+</div>
+</div>
+<div style="border:2px solid #1a1a1a;border-radius:14px;padding:11px;display:flex;align-items:center;gap:12px">
+<div style="width:36px;height:36px;border-radius:9px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;flex:none">🌙</div>
+<div style="display:flex;flex-direction:column;gap:2px">
+<div style="font-size:16px;color:#1a1a1a">Bien-être</div>
+<div style="font-size:12.5px;color:#2D5E5A">Journal du jour</div>
+</div>
+</div>
+<div style="border:2px solid #1a1a1a;border-radius:14px;padding:11px;display:flex;align-items:center;gap:12px;background:#e4f0ec">
+<div style="width:36px;height:36px;border-radius:9px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;flex:none">💕</div>
+<div style="display:flex;flex-direction:column;gap:2px">
+<div style="font-size:16px;color:#1a1a1a">Avec Camille</div>
+<div style="font-size:12.5px;color:#2D5E5A">Voir son état cette semaine</div>
+</div>
+</div>
+</div>
+<div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid rgba(0,0,0,.08)">
+<div style="width:28px;height:28px;border-radius:50%;border:2px solid #1a1a1a;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px">🏠</div>
+<div style="width:28px;height:28px;border-radius:50%;border:2px solid #1a1a1a;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px">👤</div>
+<div style="width:28px;height:28px;border-radius:50%;border:2px solid #1a1a1a;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px">⋯</div>
+</div>
+</div>
+</div>
+
+<div class="dv-opt" id="3a">
+<div class="dv-olabel"><a class="dv-oid" href="#3a">3a</a>Écran principal</div>
+<div class="dv-card" style="background:#DCEEE8;padding:22px 16px">
+<div class="notch"></div>
+<div style="align-self:flex-end;margin-top:16px;background:#2D5E5A;color:#fff;font-size:10.5px;border-radius:20px;padding:6px 10px;display:flex;align-items:center;gap:4px">👶 Déclarer la naissance</div>
+<div style="font-size:20px;color:#1a1a1a;margin-top:8px">Ensemble</div>
+<div style="font-size:13px;color:#777;margin:6px 0 10px">Comment vous sentez-vous aujourd'hui ?</div>
+<div style="display:flex;justify-content:space-between;gap:6px">
+<div style="width:44px;height:44px;border-radius:50%;border:2px solid #1a1a1a;display:flex;align-items:center;justify-content:center;font-size:20px">😄</div>
+<div style="width:44px;height:44px;border-radius:50%;border:2px solid #1a1a1a;display:flex;align-items:center;justify-content:center;font-size:20px">🙂</div>
+<div style="width:44px;height:44px;border-radius:50%;border:2px solid #1a1a1a;display:flex;align-items:center;justify-content:center;font-size:20px">😐</div>
+<div style="width:44px;height:44px;border-radius:50%;border:2px solid #1a1a1a;display:flex;align-items:center;justify-content:center;font-size:20px">😩</div>
+<div style="width:44px;height:44px;border-radius:50%;border:2px solid #1a1a1a;display:flex;align-items:center;justify-content:center;font-size:20px">😢</div>
+</div>
+<div style="margin-top:20px">
+<div style="font-size:13px;color:#333;margin-bottom:8px">Vous semblez plutôt stable au niveau de votre humeur en cette 24ème semaine</div>
+<div style="display:flex;align-items:flex-end;gap:6px;height:36px">
+<div style="width:14px;height:60%;background:#2D5E5A;border-radius:3px"></div>
+<div style="width:14px;height:75%;background:#2D5E5A;border-radius:3px"></div>
+<div style="width:14px;height:50%;background:#2D5E5A;border-radius:3px"></div>
+<div style="width:14px;height:70%;background:#2D5E5A;border-radius:3px"></div>
+<div style="width:14px;height:65%;background:#2D5E5A;border-radius:3px"></div>
+<div style="width:14px;height:80%;background:#2D5E5A;border-radius:3px"></div>
+<div style="width:14px;height:60%;background:#2D5E5A;border-radius:3px"></div>
+</div>
+</div>
+<div style="margin-top:auto;border:2px solid #1a1a1a;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px;align-items:center;text-align:center">
+<div style="width:100%;height:80px;border-radius:10px;background:#f0eee9;display:flex;align-items:center;justify-content:center;font-size:30px">🌱</div>
+<div style="font-size:12px;color:#999">Geste du jour</div>
+<div style="font-size:14px;color:#1a1a1a;line-height:1.35">N'hésite pas à lui dire qu'il est important aux rendez-vous</div>
+</div>
+<div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid rgba(0,0,0,.08)">
+<div style="width:28px;height:28px;border-radius:50%;border:2px solid #1a1a1a;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px">🏠</div>
+<div style="width:28px;height:28px;border-radius:50%;border:2px solid #1a1a1a;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px">👤</div>
+<div style="width:28px;height:28px;border-radius:50%;border:2px solid #1a1a1a;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px">⋯</div>
+</div></div>
+</div>
+
+<div class="dv-opt" id="3b">
+<div class="dv-olabel"><a class="dv-oid" href="#3b">3b</a>Overlay "j'ai besoin de..."</div>
+<div class="dv-card" style="background:#DCEEE8;padding:0;justify-content:flex-end">
+<div class="notch"></div>
+<div style="background:rgba(0,0,0,.25);position:absolute;inset:0"></div>
+<div style="position:relative;background:#fff;border-radius:20px 20px 0 0;padding:22px 18px 26px;display:flex;flex-direction:column;gap:14px">
+<div style="width:36px;height:4px;background:#ddd;border-radius:2px;margin:0 auto 4px"></div>
+<div style="width:48px;height:48px;border-radius:50%;border:2px solid #1a1a1a;display:flex;align-items:center;justify-content:center;font-size:22px;margin:0 auto">😩</div>
+<div style="font-size:18px;color:#1a1a1a;text-align:center">Besoin de quelque chose ?</div>
+<div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center">
+<div style="border:2px solid #1a1a1a;border-radius:20px;padding:8px 14px;font-size:13px">Sommeil</div>
+<div style="border:2px solid #1a1a1a;border-radius:20px;padding:8px 14px;font-size:13px">Coup de main pratique</div>
+<div style="border:2px solid #2D5E5A;background:#2D5E5A;color:#fff;border-radius:20px;padding:8px 14px;font-size:13px">Câlin</div>
+<div style="border:2px solid #1a1a1a;border-radius:20px;padding:8px 14px;font-size:13px">Juste parler</div>
+</div>
+<div class="sk-input" style="font-size:13px;padding:9px 12px">Ou écrivez votre propre besoin...</div>
+<div class="sk-btn" style="margin-top:2px">Envoyer</div>
+<div style="text-align:center;font-size:13px;color:#999">Passer</div>
+</div>
+</div>
+</div>
+
+<div class="dv-opt" id="3e">
+<div class="dv-olabel"><a class="dv-oid" href="#3e">3e</a>Carte "Geste du jour" (détail)</div>
+<div class="dv-card" style="background:#FBF0C8">
+<div class="notch"></div>
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:18px;padding:0 8px">
+<div style="width:140px;height:140px;border-radius:50%;background:#f0eee9;display:flex;align-items:center;justify-content:center;font-size:56px">🌙</div>
+<div style="font-size:12px;color:#999;letter-spacing:.5px">GESTE DU JOUR</div>
+<div style="font-size:19px;color:#1a1a1a;line-height:1.4">Aujourd'hui, propose-lui de dormir 1h de plus.</div>
+</div>
+<div class="sk-btn-outline" style="margin-top:auto">Fermer</div>
+</div>
+</div>
+
+<div class="dv-opt" id="3g">
+<div class="dv-olabel"><a class="dv-oid" href="#3g">3g</a>Écran principal — vue Paul</div>
+<div class="dv-card" style="background:#FBF0C8;padding:22px 16px">
+<div class="notch"></div>
+<div style="align-self:flex-end;margin-top:16px;background:#2D5E5A;color:#fff;font-size:10.5px;border-radius:20px;padding:6px 10px;display:flex;align-items:center;gap:4px">👶 Déclarer la naissance</div>
+<div style="font-size:20px;color:#1a1a1a;margin-top:8px">Ensemble</div>
+<div style="font-size:13px;color:#777;margin:6px 0 10px">Comment vous sentez-vous aujourd'hui ?</div>
+<div style="display:flex;justify-content:space-between;gap:6px">
+<div style="width:44px;height:44px;border-radius:50%;border:2px solid #1a1a1a;display:flex;align-items:center;justify-content:center;font-size:20px">😄</div>
+<div style="width:44px;height:44px;border-radius:50%;border:2px solid #1a1a1a;display:flex;align-items:center;justify-content:center;font-size:20px">🙂</div>
+<div style="width:44px;height:44px;border-radius:50%;border:2px solid #1a1a1a;display:flex;align-items:center;justify-content:center;font-size:20px">😐</div>
+<div style="width:44px;height:44px;border-radius:50%;border:2px solid #1a1a1a;display:flex;align-items:center;justify-content:center;font-size:20px">😩</div>
+<div style="width:44px;height:44px;border-radius:50%;border:2px solid #1a1a1a;display:flex;align-items:center;justify-content:center;font-size:20px">😢</div>
+</div>
+<div style="margin-top:20px">
+<div style="font-size:13px;color:#333;margin-bottom:8px">Vous semblez plutôt stable au niveau de votre humeur en cette 24ème semaine</div>
+<div style="display:flex;align-items:flex-end;gap:6px;height:36px">
+<div style="width:14px;height:60%;background:#2D5E5A;border-radius:3px"></div>
+<div style="width:14px;height:75%;background:#2D5E5A;border-radius:3px"></div>
+<div style="width:14px;height:50%;background:#2D5E5A;border-radius:3px"></div>
+<div style="width:14px;height:70%;background:#2D5E5A;border-radius:3px"></div>
+<div style="width:14px;height:65%;background:#2D5E5A;border-radius:3px"></div>
+<div style="width:14px;height:80%;background:#2D5E5A;border-radius:3px"></div>
+<div style="width:14px;height:60%;background:#2D5E5A;border-radius:3px"></div>
+</div>
+</div>
+<div style="margin-top:auto;border:2px solid #1a1a1a;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px;align-items:center;text-align:center">
+<div style="width:100%;height:80px;border-radius:10px;background:#f0eee9;display:flex;align-items:center;justify-content:center;font-size:30px">💬</div>
+<div style="font-size:12px;color:#999">Geste du jour</div>
+<div style="font-size:14px;color:#1a1a1a;line-height:1.35">N'hésite pas à lui dire qu'elle est belle</div>
+</div>
+<div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid rgba(0,0,0,.08)">
+<div style="width:28px;height:28px;border-radius:50%;border:2px solid #1a1a1a;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px">🏠</div>
+<div style="width:28px;height:28px;border-radius:50%;border:2px solid #1a1a1a;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px">👤</div>
+<div style="width:28px;height:28px;border-radius:50%;border:2px solid #1a1a1a;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px">⋯</div>
+</div></div>
+</div>
+
+<div class="dv-opt" id="3f">
+<div class="dv-olabel"><a class="dv-oid" href="#3f">3f</a>Notification push</div>
+<div class="dv-card" style="background:#FBF0C8;justify-content:flex-start">
+<div class="notch"></div>
+<div style="margin-top:34px;background:rgba(245,245,245,.97);backdrop-filter:blur(2px);border:1px solid rgba(0,0,0,.1);border-radius:16px;padding:12px;display:flex;gap:10px;align-items:flex-start;box-shadow:0 2px 8px rgba(0,0,0,.08)">
+<div style="width:32px;height:32px;border-radius:8px;background:#2D5E5A;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;flex:none">US</div>
+<div style="flex:1">
+<div style="display:flex;justify-content:space-between;font-size:11px;color:#999"><span>US</span><span>maintenant</span></div>
+<div style="font-size:13.5px;color:#1a1a1a;line-height:1.35;margin-top:2px">Aujourd'hui, propose-lui de dormir 1h de plus.</div>
+</div>
+</div>
+<div style="flex:1;display:flex;align-items:center;justify-content:center;color:#ccc;font-size:13px">Écran verrouillé</div>
+</div>
+</div>
+
+<div class="dv-opt" id="3y">
+<div class="dv-olabel"><a class="dv-oid" href="#3y">3y</a>Mon profil</div>
+<div class="dv-card" style="background:linear-gradient(90deg, #DCEEE8 50%, #FBF0C8 50%);padding:22px 16px">
+<div class="notch"></div>
+<div style="font-size:20px;color:#1a1a1a;margin-top:16px">Mon profil</div>
+<div style="display:flex;flex-direction:column;gap:8px;margin-top:16px">
+<div style="border:2px solid #1a1a1a;border-radius:12px;padding:13px;display:flex;align-items:center;justify-content:space-between;background:#fff">
+<div style="font-size:14px;color:#1a1a1a">Informations importantes</div>
+<div style="font-size:14px;color:#999">›</div>
+</div>
+<div style="border:2px solid #1a1a1a;border-radius:12px;padding:13px;display:flex;align-items:center;justify-content:space-between;background:#fff">
+<div style="font-size:14px;color:#1a1a1a">Notifications</div>
+<div style="font-size:14px;color:#999">›</div>
+</div>
+<div style="border:2px solid #1a1a1a;border-radius:12px;padding:13px;display:flex;align-items:center;justify-content:space-between;background:#fff">
+<div style="font-size:14px;color:#1a1a1a">Confidentialité</div>
+<div style="font-size:14px;color:#999">›</div>
+</div>
+</div>
+<div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid rgba(0,0,0,.08)">
+<div style="width:28px;height:28px;border-radius:50%;border:2px solid #1a1a1a;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px">🏠</div>
+<div style="width:28px;height:28px;border-radius:50%;border:2px solid #1a1a1a;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px">👤</div>
+<div style="width:28px;height:28px;border-radius:50%;border:2px solid #1a1a1a;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px">⋯</div>
+</div></div>
+</div>
+
+<div class="dv-opt" id="3z">
+<div class="dv-olabel"><a class="dv-oid" href="#3z">3z</a>Infos importantes (partagé)</div>
+<div class="dv-card" style="background:linear-gradient(90deg, #DCEEE8 50%, #FBF0C8 50%);padding:22px 16px">
+<div class="notch"></div>
+<div style="align-self:flex-end;margin-top:16px;background:#2D5E5A;color:#fff;font-size:10.5px;border-radius:20px;padding:6px 10px;display:flex;align-items:center;gap:4px">👶 Déclarer la naissance</div>
+<div style="display:flex;align-items:center;gap:8px;margin-top:8px">
+<div style="font-size:20px;color:#1a1a1a">Infos importantes</div>
+<div style="width:26px;height:26px;border-radius:50%;border:2px solid #1a1a1a;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;flex:none">ℹ️</div>
+</div>
+<div style="font-size:11.5px;color:#777;margin:2px 0 5px">Partagé entre Camille et Paul</div>
+<div style="display:flex;flex-direction:column;gap:4px;overflow:hidden">
+<div style="border:2px solid #1a1a1a;border-radius:12px;padding:6px 12px;display:flex;flex-direction:column;gap:1px;background:#fff">
+<div style="font-size:11.5px;color:#777">Début de grossesse</div>
+<div style="font-size:14px;color:#1a1a1a">12 avril 2026</div>
+</div>
+<div style="border:2px solid #1a1a1a;border-radius:12px;padding:6px 12px;display:flex;flex-direction:column;gap:1px;background:#fff">
+<div style="font-size:11.5px;color:#777">Date prévisionnelle du terme</div>
+<div style="font-size:14px;color:#1a1a1a">17 janvier 2027</div>
+</div>
+<div style="border:2px solid #1a1a1a;border-radius:12px;padding:6px 12px;display:flex;flex-direction:column;gap:1px;background:#fff">
+<div style="font-size:11.5px;color:#777">Groupe sanguin de la mère</div>
+<div style="font-size:14px;color:#1a1a1a">O+</div>
+</div>
+<div style="border:2px solid #1a1a1a;border-radius:12px;padding:6px 12px;display:flex;flex-direction:column;gap:1px;background:#fff">
+<div style="font-size:11.5px;color:#777">Groupe sanguin du père</div>
+<div style="font-size:14px;color:#1a1a1a">A+</div>
+</div>
+<div style="border:2px solid #1a1a1a;border-radius:12px;padding:6px 12px;display:flex;flex-direction:column;gap:1px;background:#fff">
+<div style="font-size:11.5px;color:#777">Points de vigilance</div>
+<div style="font-size:14px;color:#1a1a1a">Diabète gestationnel, hypertension</div>
+</div>
+<div style="border:2px solid #1a1a1a;border-radius:12px;padding:6px 12px;display:flex;flex-direction:column;gap:1px;background:#fff">
+<div style="font-size:11.5px;color:#777">Maternité</div>
+<div style="font-size:14px;color:#1a1a1a">12 rue des Lilas, Paris — 01 23 45 67 89</div>
+</div>
+</div>
+<div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid rgba(0,0,0,.08)">
+<div style="width:28px;height:28px;border-radius:50%;border:2px solid #1a1a1a;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px">🏠</div>
+<div style="width:28px;height:28px;border-radius:50%;border:2px solid #1a1a1a;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px">👤</div>
+<div style="width:28px;height:28px;border-radius:50%;border:2px solid #1a1a1a;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px">⋯</div>
+</div></div>
+</div>
+
+</div>
+</section>
+
+<section class="dv-turn" id="t4">
+<div class="dv-thd"><a class="dv-tid" href="#t4">4</a><span class="dv-tname">Pilier "Bien-être" — santé partagée</span></div>
+<div class="dv-opts">
+
+<div class="dv-opt" id="4a">
+<div class="dv-olabel"><a class="dv-oid" href="#4a">4a</a>Journal du jour</div>
+<div class="dv-card" style="background:#DCEEE8;padding:20px 16px">
+<div class="notch"></div>
+<div style="align-self:flex-end;margin-top:16px;background:#2D5E5A;color:#fff;font-size:10.5px;border-radius:20px;padding:6px 10px;display:flex;align-items:center;gap:4px">👶 Déclarer la naissance</div>
+<div style="font-size:20px;color:#1a1a1a;margin-top:8px">Bien-être</div>
+<div style="display:flex;gap:6px;margin-top:10px;border-bottom:2px solid #1a1a1a">
+<div style="flex:1;text-align:center;padding:7px 4px;font-size:12px;color:#2D5E5A;border-bottom:3px solid #2D5E5A;margin-bottom:-2px">Journal</div>
+<div style="flex:1;text-align:center;padding:7px 4px;font-size:12px;color:#999">Rendez-vous</div>
+<div style="flex:1;text-align:center;padding:7px 4px;font-size:12px;color:#999">Contacts</div>
+<div style="flex:1;text-align:center;padding:7px 4px;font-size:12px;color:#999">Exercices</div>
+</div>
+<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-top:8px;text-align:center">
+<div style="font-size:9px;color:#999">L</div><div style="font-size:9px;color:#999">M</div><div style="font-size:9px;color:#999">M</div><div style="font-size:9px;color:#999">J</div><div style="font-size:9px;color:#999">V</div><div style="font-size:9px;color:#999">S</div><div style="font-size:9px;color:#999">D</div>
+<div style="font-size:11px;color:#999;position:relative">3<div style="width:3px;height:3px;background:#2D5E5A;border-radius:50%;margin:2px auto 0"></div></div>
+<div style="font-size:11px;color:#999">4</div>
+<div style="font-size:11px;color:#999;position:relative">5<div style="width:3px;height:3px;background:#2D5E5A;border-radius:50%;margin:2px auto 0"></div></div>
+<div style="font-size:11px;color:#999">6</div>
+<div style="font-size:11px;color:#999">7</div>
+<div style="font-size:11px;color:#999;position:relative">8<div style="width:3px;height:3px;background:#2D5E5A;border-radius:50%;margin:2px auto 0"></div></div>
+<div style="font-size:11px;color:#fff;background:#2D5E5A;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;margin:0 auto">9</div>
+</div>
+<div style="font-size:13px;color:#333;margin:10px 0 6px">Un symptôme aujourd'hui ?</div>
+<div style="display:flex;flex-direction:column;gap:6px">
+<div class="sk-choice" style="padding:7px 12px"><div class="sk-check" style="background:#2D5E5A"></div>Vomissements</div>
+<div class="sk-choice" style="padding:7px 12px"><div class="sk-check"></div>Vertiges</div>
+<div class="sk-choice" style="padding:7px 12px"><div class="sk-check" style="background:#2D5E5A"></div>Mal de dos</div>
+<div class="sk-choice" style="padding:7px 12px"><div class="sk-check"></div>Fatigue</div>
+<div class="sk-choice" style="padding:7px 12px"><div class="sk-check"></div>Autre</div>
+</div>
+
+<div class="sk-btn" style="margin-top:auto">Enregistrer</div>
+<div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid rgba(0,0,0,.08)">
+<div style="width:28px;height:28px;border-radius:50%;border:2px solid #1a1a1a;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px">🏠</div>
+<div style="width:28px;height:28px;border-radius:50%;border:2px solid #1a1a1a;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px">👤</div>
+<div style="width:28px;height:28px;border-radius:50%;border:2px solid #1a1a1a;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px">⋯</div>
+</div></div>
+</div>
+
+<div class="dv-opt" id="4b">
+<div class="dv-olabel"><a class="dv-oid" href="#4b">4b</a>Rendez-vous</div>
+<div class="dv-card" style="background:linear-gradient(90deg, #DCEEE8 50%, #FBF0C8 50%);padding:20px 16px">
+<div class="notch"></div>
+<div style="align-self:flex-end;margin-top:16px;background:#2D5E5A;color:#fff;font-size:10.5px;border-radius:20px;padding:6px 10px;display:flex;align-items:center;gap:4px">👶 Déclarer la naissance</div>
+<div style="font-size:20px;color:#1a1a1a;margin-top:8px">Bien-être</div>
+<div style="display:flex;gap:6px;margin-top:8px;border-bottom:2px solid #1a1a1a">
+<div style="flex:1;text-align:center;padding:6px 4px;font-size:12px;color:#999">Journal</div>
+<div style="flex:1;text-align:center;padding:6px 4px;font-size:12px;color:#2D5E5A;border-bottom:3px solid #2D5E5A;margin-bottom:-2px">Rendez-vous</div>
+<div style="flex:1;text-align:center;padding:6px 4px;font-size:12px;color:#999">Contacts</div>
+<div style="flex:1;text-align:center;padding:6px 4px;font-size:12px;color:#999">Exercices</div>
+</div>
+<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-top:6px;text-align:center">
+<div style="font-size:9px;color:#999">L</div><div style="font-size:9px;color:#999">M</div><div style="font-size:9px;color:#999">M</div><div style="font-size:9px;color:#999">J</div><div style="font-size:9px;color:#999">V</div><div style="font-size:9px;color:#999">S</div><div style="font-size:9px;color:#999">D</div>
+<div style="font-size:10px;color:#ccc"></div><div style="font-size:10px;color:#ccc"></div><div style="font-size:10px;color:#999">1</div><div style="font-size:10px;color:#999">2</div><div style="font-size:10px;color:#999">3</div><div style="font-size:10px;color:#999">4</div><div style="font-size:10px;color:#999">5</div>
+<div style="font-size:10px;color:#999">6</div><div style="font-size:10px;color:#999">7</div><div style="font-size:10px;color:#999">8</div><div style="font-size:10px;color:#fff;background:#2D5E5A;border-radius:50%;width:16px;height:16px;display:flex;align-items:center;justify-content:center;margin:0 auto">9</div><div style="font-size:10px;color:#999">10</div><div style="font-size:10px;color:#999">11</div><div style="font-size:10px;color:#999">12</div>
+<div style="font-size:10px;color:#999">13</div><div style="font-size:10px;color:#1a1a1a;border:2px solid #2D6EDB;border-radius:50%;width:16px;height:16px;display:flex;align-items:center;justify-content:center;margin:0 auto">14</div><div style="font-size:10px;color:#999">15</div><div style="font-size:10px;color:#999">16</div><div style="font-size:10px;color:#999">17</div><div style="font-size:10px;color:#999">18</div><div style="font-size:10px;color:#999">19</div>
+<div style="font-size:10px;color:#999">20</div><div style="font-size:10px;color:#1a1a1a;border:2px solid #c0392b;border-radius:50%;width:16px;height:16px;display:flex;align-items:center;justify-content:center;margin:0 auto">21</div><div style="font-size:10px;color:#999">22</div><div style="font-size:10px;color:#999">23</div><div style="font-size:10px;color:#999">24</div><div style="font-size:10px;color:#999">25</div><div style="font-size:10px;color:#999">26</div>
+<div style="font-size:10px;color:#999">27</div><div style="font-size:10px;color:#999">28</div><div style="font-size:10px;color:#999">29</div><div style="font-size:10px;color:#999">30</div>
+</div>
+<div style="font-size:12px;color:#333;margin-top:6px">Vos prochains rendez-vous</div>
+<div style="display:flex;flex-direction:column;gap:5px;margin-top:4px;overflow:hidden">
+<div style="border:2px solid #1a1a1a;border-radius:12px;padding:9px 12px;display:flex;flex-direction:column;gap:2px">
+<div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:14px;color:#1a1a1a">Écho T2</span><span style="font-size:10px;background:#2D6EDB;color:#fff;border-radius:6px;padding:2px 6px">Partagé</span></div>
+<div style="font-size:12px;color:#777">14 sept · 10h30 — Cabinet Dr Martin</div>
+</div>
+<div style="border:2px solid #1a1a1a;border-radius:12px;padding:9px 12px;display:flex;flex-direction:column;gap:2px">
+<div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:14px;color:#1a1a1a">Rendez gynéco</span><span style="font-size:10px;background:#c0392b;color:#fff;border-radius:6px;padding:2px 6px">Non partagé</span></div>
+<div style="font-size:12px;color:#777">2 oct · 9h00</div>
+</div>
+</div>
+<div class="sk-btn" style="margin-top:auto">+ Ajouter un rendez-vous</div>
+<div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid rgba(0,0,0,.08)">
+<div style="width:28px;height:28px;border-radius:50%;border:2px solid #1a1a1a;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px">🏠</div>
+<div style="width:28px;height:28px;border-radius:50%;border:2px solid #1a1a1a;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px">👤</div>
+<div style="width:28px;height:28px;border-radius:50%;border:2px solid #1a1a1a;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px">⋯</div>
+</div></div>
+</div>
+
+<div class="dv-opt" id="4g">
+<div class="dv-olabel"><a class="dv-oid" href="#4g">4g</a>Ajouter un rendez-vous</div>
+<div class="dv-card" style="background:linear-gradient(90deg, #DCEEE8 50%, #FBF0C8 50%);padding:0;justify-content:flex-end">
+<div class="notch"></div>
+<div style="background:rgba(0,0,0,.25);position:absolute;inset:0"></div>
+<div style="position:relative;background:#fff;border-radius:20px 20px 0 0;padding:22px 18px 26px;display:flex;flex-direction:column;gap:12px">
+<div style="width:36px;height:4px;background:#ddd;border-radius:2px;margin:0 auto 4px"></div>
+<div style="font-size:18px;color:#1a1a1a;text-align:center">Nouveau rendez-vous</div>
+<div class="sk-input" style="font-size:13px;padding:9px 12px">Titre — ex. Écho T2</div>
+<div class="sk-input" style="font-size:13px;padding:9px 12px">Date</div>
+<div class="sk-input" style="font-size:13px;padding:9px 12px">Heure</div>
+<div class="sk-input" style="font-size:13px;padding:9px 12px;height:38px">Adresse, notes...</div>
+<div style="display:flex;align-items:center;justify-content:space-between">
+<div style="font-size:13px;color:#333">Visible par les deux parents</div>
+<div class="sk-toggle" style="width:44px"><div style="background:#2D5E5A;color:#fff;padding:6px 0"></div><div style="padding:6px 0"></div></div>
+</div>
+<div class="sk-btn" style="margin-top:2px">Ajouter au calendrier</div>
+<div style="text-align:center;font-size:13px;color:#999">Annuler</div>
+</div>
+</div>
+</div>
+
+<div class="dv-opt" id="4c">
+<div class="dv-olabel"><a class="dv-oid" href="#4c">4c</a>Contacts</div>
+<div class="dv-card" style="background:linear-gradient(90deg, #DCEEE8 50%, #FBF0C8 50%);padding:20px 16px">
+<div class="notch"></div>
+<div style="align-self:flex-end;margin-top:16px;background:#2D5E5A;color:#fff;font-size:10.5px;border-radius:20px;padding:6px 10px;display:flex;align-items:center;gap:4px">👶 Déclarer la naissance</div>
+<div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+<div style="font-size:20px;color:#1a1a1a">Contacts</div>
+<div style="border:2px solid #1a1a1a;border-radius:8px;padding:6px 10px;font-size:12px">+ Ajouter</div>
+</div>
+<div style="display:flex;gap:6px;margin-top:10px;border-bottom:2px solid #1a1a1a">
+<div style="flex:1;text-align:center;padding:7px 4px;font-size:12px;color:#999">Journal</div>
+<div style="flex:1;text-align:center;padding:7px 4px;font-size:12px;color:#999">Rendez-vous</div>
+<div style="flex:1;text-align:center;padding:7px 4px;font-size:12px;color:#2D5E5A;border-bottom:3px solid #2D5E5A;margin-bottom:-2px">Contacts</div>
+<div style="flex:1;text-align:center;padding:7px 4px;font-size:12px;color:#999">Exercices</div>
+</div>
+<div style="font-size:11.5px;color:#999;margin:8px 0 8px">Partagé avec Camille</div>
+<div style="display:flex;flex-direction:column;gap:6px;overflow:hidden">
+<div style="border:2px solid #1a1a1a;border-radius:12px;padding:9px 12px;display:flex;align-items:center;gap:8px">
+<div style="font-size:14px;color:#bbb;flex:none">⠿</div>
+<div style="flex:1"><div style="font-size:14px;color:#1a1a1a">Dr Martin</div><div style="font-size:11.5px;color:#777">Gynécologue</div><div style="font-size:10.5px;color:#999">14 rue des Lilas, Paris</div></div>
+<div style="width:28px;height:28px;border-radius:50%;background:#2D5E5A;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;flex:none">📞</div>
+<div style="font-size:14px;color:#c0392b;flex:none">🗑</div>
+</div>
+<div style="border:2px solid #1a1a1a;border-radius:12px;padding:9px 12px;display:flex;align-items:center;gap:8px">
+<div style="font-size:14px;color:#bbb;flex:none">⠿</div>
+<div style="flex:1"><div style="font-size:14px;color:#1a1a1a">Sophie Durand</div><div style="font-size:11.5px;color:#777">Sage-femme</div><div style="font-size:10.5px;color:#999">8 avenue Victor Hugo, Paris</div></div>
+<div style="width:28px;height:28px;border-radius:50%;background:#2D5E5A;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;flex:none">📞</div>
+<div style="font-size:14px;color:#c0392b;flex:none">🗑</div>
+</div>
+<div style="border:2px solid #1a1a1a;border-radius:12px;padding:9px 12px;display:flex;align-items:center;gap:8px">
+<div style="font-size:14px;color:#bbb;flex:none">⠿</div>
+<div style="flex:1"><div style="font-size:14px;color:#1a1a1a">PMI du quartier</div><div style="font-size:11.5px;color:#777">Protection maternelle</div><div style="font-size:10.5px;color:#999">3 place de la Mairie, Paris</div></div>
+<div style="width:28px;height:28px;border-radius:50%;background:#2D5E5A;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;flex:none">📞</div>
+<div style="font-size:14px;color:#c0392b;flex:none">🗑</div>
+</div>
+<div style="border:2px solid #c0392b;border-radius:12px;padding:9px 12px;display:flex;align-items:center;gap:8px">
+<div style="font-size:14px;color:#ecc;flex:none">⠿</div>
+<div style="flex:1"><div style="font-size:14px;color:#c0392b">Urgences</div><div style="font-size:11.5px;color:#777">Numéro d'urgence</div></div>
+<div style="width:32px;height:32px;border-radius:50%;background:#c0392b;color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;flex:none">📞</div>
+<div style="font-size:14px;color:#c0392b;flex:none">🗑</div>
+</div>
+</div>
+<div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid rgba(0,0,0,.08)">
+<div style="width:28px;height:28px;border-radius:50%;border:2px solid #1a1a1a;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px">🏠</div>
+<div style="width:28px;height:28px;border-radius:50%;border:2px solid #1a1a1a;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px">👤</div>
+<div style="width:28px;height:28px;border-radius:50%;border:2px solid #1a1a1a;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px">⋯</div>
+</div></div>
+</div>
+
+<div class="dv-opt" id="4e">
+<div class="dv-olabel"><a class="dv-oid" href="#4e">4e</a>Navigation entre sous-sections</div>
+<div class="dv-card" style="background:linear-gradient(90deg, #DCEEE8 50%, #FBF0C8 50%);padding:20px 16px 0">
+<div class="notch"></div>
+<div style="align-self:flex-end;margin-top:16px;background:#2D5E5A;color:#fff;font-size:10.5px;border-radius:20px;padding:6px 10px;display:flex;align-items:center;gap:4px">👶 Déclarer la naissance</div>
+<div style="font-size:20px;color:#1a1a1a;margin-top:8px">Bien-être</div>
+<div style="display:flex;gap:6px;margin-top:12px;border-bottom:2px solid #1a1a1a;padding-bottom:0">
+<div style="flex:1;text-align:center;padding:8px 4px;font-size:12.5px;color:#2D5E5A;border-bottom:3px solid #2D5E5A;margin-bottom:-2px">Journal</div>
+<div style="flex:1;text-align:center;padding:8px 4px;font-size:12.5px;color:#999">Rendez-vous</div>
+<div style="flex:1;text-align:center;padding:8px 4px;font-size:12.5px;color:#999">Contacts</div>
+<div style="flex:1;text-align:center;padding:8px 4px;font-size:12.5px;color:#999">Exercices</div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#bbb;font-size:13px;margin:0 -16px">
+<div style="font-size:28px">📓</div>
+Contenu de l'onglet actif
+</div>
+</div>
+</div>
+
+<div class="dv-opt" id="4f">
+<div class="dv-olabel"><a class="dv-oid" href="#4f">4f</a>Exercices (partagé)</div>
+<div class="dv-card" style="background:linear-gradient(90deg, #DCEEE8 50%, #FBF0C8 50%);padding:20px 16px">
+<div class="notch"></div>
+<div style="align-self:flex-end;margin-top:16px;background:#2D5E5A;color:#fff;font-size:10.5px;border-radius:20px;padding:6px 10px;display:flex;align-items:center;gap:4px">👶 Déclarer la naissance</div>
+<div style="font-size:20px;color:#1a1a1a;margin-top:8px">Bien-être</div>
+<div style="display:flex;gap:6px;margin-top:10px;border-bottom:2px solid #1a1a1a">
+<div style="flex:1;text-align:center;padding:7px 4px;font-size:12px;color:#999">Journal</div>
+<div style="flex:1;text-align:center;padding:7px 4px;font-size:12px;color:#999">Rendez-vous</div>
+<div style="flex:1;text-align:center;padding:7px 4px;font-size:12px;color:#999">Contacts</div>
+<div style="flex:1;text-align:center;padding:7px 4px;font-size:12px;color:#2D5E5A;border-bottom:3px solid #2D5E5A;margin-bottom:-2px">Exercices</div>
+</div>
+<div style="font-size:11.5px;color:#999;margin:10px 0 8px">Adaptés à chaque trimestre</div>
+<div style="display:flex;flex-direction:column;gap:10px;overflow:hidden">
+<div style="border:2px solid #1a1a1a;border-radius:12px;padding:10px;display:flex;gap:10px;align-items:center;background:#fff">
+<div style="width:56px;height:56px;flex:none;border-radius:10px;background:#ccc"></div>
+<div><div style="font-size:14px;color:#1a1a1a">Étirement du dos</div><div style="font-size:11.5px;color:#777">5 min · assis</div></div>
+</div>
+<div style="border:2px solid #1a1a1a;border-radius:12px;padding:10px;display:flex;gap:10px;align-items:center;background:#fff">
+<div style="width:56px;height:56px;flex:none;border-radius:10px;background:#ccc"></div>
+<div><div style="font-size:14px;color:#1a1a1a">Respiration prénatale</div><div style="font-size:11.5px;color:#777">3 min · allongée</div></div>
+</div>
+<div style="border:2px solid #1a1a1a;border-radius:12px;padding:10px;display:flex;gap:10px;align-items:center;background:#fff">
+<div style="width:56px;height:56px;flex:none;border-radius:10px;background:#ccc"></div>
+<div><div style="font-size:14px;color:#1a1a1a">Marche douce</div><div style="font-size:11.5px;color:#777">15 min · extérieur</div></div>
+</div>
+</div>
+<div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid rgba(0,0,0,.08)">
+<div style="width:28px;height:28px;border-radius:50%;border:2px solid #1a1a1a;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px">🏠</div>
+<div style="width:28px;height:28px;border-radius:50%;border:2px solid #1a1a1a;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px">👤</div>
+<div style="width:28px;height:28px;border-radius:50%;border:2px solid #1a1a1a;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px">⋯</div>
+</div></div>
+</div>
+
+<div class="dv-opt" id="4d">
+<div class="dv-olabel"><a class="dv-oid" href="#4d">4d</a>Notification de réassurance</div>
+<div class="dv-card" style="background:linear-gradient(90deg, #DCEEE8 50%, #FBF0C8 50%);justify-content:flex-start">
+<div class="notch"></div>
+<div style="margin-top:34px;background:rgba(245,245,245,.97);backdrop-filter:blur(2px);border:1px solid rgba(0,0,0,.1);border-radius:16px;padding:12px;display:flex;gap:10px;align-items:flex-start;box-shadow:0 2px 8px rgba(0,0,0,.08)">
+<div style="width:32px;height:32px;border-radius:8px;background:#2D5E5A;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;flex:none">US</div>
+<div style="flex:1">
+<div style="display:flex;justify-content:space-between;font-size:11px;color:#999"><span>US</span><span>maintenant</span></div>
+<div style="font-size:13.5px;color:#1a1a1a;line-height:1.35;margin-top:2px">À ce stade, ce type de ressenti est fréquent.</div>
+</div>
+</div>
+<div style="flex:1;display:flex;align-items:center;justify-content:center;color:#ccc;font-size:13px">Écran verrouillé</div>
+</div>
+</div>
+
+</div>
+</section>
+
+<section class="dv-turn" id="t5">
+<div class="dv-thd"><a class="dv-tid" href="#t5">5</a><span class="dv-tname">Pilier "D\u00e9marches" — administratif</span></div>
+<div class="dv-opts">
+
+<div class="dv-opt" id="5a">
+<div class="dv-olabel"><a class="dv-oid" href="#5a">5a</a>Écran principal</div>
+<div class="dv-card" style="background:linear-gradient(90deg, #DCEEE8 50%, #FBF0C8 50%);padding:20px 16px">
+<div class="notch"></div>
+<div style="align-self:flex-end;margin-top:16px;background:#2D5E5A;color:#fff;font-size:10.5px;border-radius:20px;padding:6px 10px;display:flex;align-items:center;gap:4px">👶 Déclarer la naissance</div>
+<div style="font-size:20px;color:#1a1a1a;margin-top:8px">Démarches</div>
+<div style="font-size:12.5px;color:#777;margin:2px 0 8px">2 sur 6 complétées</div>
+<div style="display:flex;flex-direction:column;gap:5px;overflow:hidden">
+<div style="border:2px solid #1a1a1a;border-radius:12px;padding:8px 11px;display:flex;justify-content:space-between;align-items:center">
+<div><div style="font-size:13.5px;color:#1a1a1a">Déclaration de naissance</div><div style="font-size:11px;color:#c0392b">Échéance dans 3 jours</div></div>
+<div style="font-size:10px;background:#eee;color:#666;border-radius:6px;padding:3px 8px;white-space:nowrap">À faire</div>
+</div>
+<div style="border:2px solid #1a1a1a;border-radius:12px;padding:8px 11px;display:flex;justify-content:space-between;align-items:center">
+<div><div style="font-size:13.5px;color:#1a1a1a">CAF</div><div style="font-size:11px;color:#999">Prime et allocations</div></div>
+<div style="font-size:10px;background:#f5b942;color:#5a4200;border-radius:6px;padding:3px 8px;white-space:nowrap">En cours</div>
+</div>
+<div style="border:2px solid #1a1a1a;border-radius:12px;padding:8px 11px;display:flex;justify-content:space-between;align-items:center">
+<div><div style="font-size:13.5px;color:#1a1a1a">Sécurité sociale</div><div style="font-size:11px;color:#999">Rattachement bébé</div></div>
+<div style="font-size:10px;background:#2D5E5A;color:#fff;border-radius:6px;padding:3px 8px;white-space:nowrap">Fait</div>
+</div>
+<div style="border:2px solid #1a1a1a;border-radius:12px;padding:8px 11px;display:flex;justify-content:space-between;align-items:center">
+<div><div style="font-size:13.5px;color:#1a1a1a">Mutuelle</div><div style="font-size:11px;color:#999">Ajout de l'enfant</div></div>
+<div style="font-size:10px;background:#2D5E5A;color:#fff;border-radius:6px;padding:3px 8px;white-space:nowrap">Fait</div>
+</div>
+<div style="border:2px solid #1a1a1a;border-radius:12px;padding:8px 11px;display:flex;justify-content:space-between;align-items:center">
+<div><div style="font-size:13.5px;color:#1a1a1a">Congé employeur</div><div style="font-size:11px;color:#999">À planifier</div></div>
+<div style="font-size:10px;background:#eee;color:#666;border-radius:6px;padding:3px 8px;white-space:nowrap">À faire</div>
+</div>
+<div style="border:2px solid #1a1a1a;border-radius:12px;padding:8px 11px;display:flex;justify-content:space-between;align-items:center">
+<div><div style="font-size:13.5px;color:#1a1a1a">Mode de garde</div><div style="font-size:11px;color:#999">Anticipation</div></div>
+<div style="font-size:10px;background:#f5b942;color:#5a4200;border-radius:6px;padding:3px 8px;white-space:nowrap">En cours</div>
+</div>
+</div>
+<div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid rgba(0,0,0,.08)">
+<div style="width:28px;height:28px;border-radius:50%;border:2px solid #1a1a1a;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px">🏠</div>
+<div style="width:28px;height:28px;border-radius:50%;border:2px solid #1a1a1a;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px">👤</div>
+<div style="width:28px;height:28px;border-radius:50%;border:2px solid #1a1a1a;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px">⋯</div>
+</div></div>
+</div>
+
+<div class="dv-opt" id="5b">
+<div class="dv-olabel"><a class="dv-oid" href="#5b">5b</a>Détail d'une démarche</div>
+<div class="dv-card" style="background:linear-gradient(90deg, #DCEEE8 50%, #FBF0C8 50%);padding:20px 16px">
+<div class="notch"></div>
+<div style="align-self:flex-end;margin-top:16px;background:#2D5E5A;color:#fff;font-size:10.5px;border-radius:20px;padding:6px 10px;display:flex;align-items:center;gap:4px">👶 Déclarer la naissance</div>
+<div style="font-size:19px;color:#1a1a1a;margin-top:8px;line-height:1.2">Déclaration de naissance</div>
+<div style="font-size:12.5px;color:#c0392b;margin-top:4px">À faire dans les 5 jours suivant la naissance</div>
+<div style="font-size:12px;color:#333;margin:12px 0 6px">Statut</div>
+<div style="display:flex;border:2px solid #1a1a1a;border-radius:10px;overflow:hidden">
+<div style="flex:1;text-align:center;padding:8px 0;font-size:12.5px;background:#eee;color:#666">À faire</div>
+<div style="flex:1;text-align:center;padding:8px 0;font-size:12.5px;color:#999">En cours</div>
+<div style="flex:1;text-align:center;padding:8px 0;font-size:12.5px;color:#999">Fait</div>
+</div>
+<div style="font-size:12px;color:#333;margin:12px 0 6px">Documents à fournir</div>
+<div style="display:flex;flex-direction:column;gap:5px">
+<div style="display:flex;align-items:center;gap:7px;font-size:12.5px;color:#333"><div class="sk-check" style="width:13px;height:13px"></div>Carte d'identité (CNI)</div>
+<div style="display:flex;align-items:center;gap:7px;font-size:12.5px;color:#333"><div class="sk-check" style="width:13px;height:13px"></div>Livret de famille (si existant)</div>
+<div style="display:flex;align-items:center;gap:7px;font-size:12.5px;color:#333"><div class="sk-check" style="width:13px;height:13px"></div>Justificatif de domicile</div>
+<div style="display:flex;align-items:center;gap:7px;font-size:12.5px;color:#333"><div class="sk-check" style="width:13px;height:13px"></div>Certificat d'accouchement</div>
+</div>
+<div style="display:flex;align-items:center;justify-content:space-between;margin-top:12px">
+<div style="font-size:13px;color:#333">Me rappeler avant l'échéance</div>
+<div class="sk-toggle" style="width:44px"><div style="background:#2D5E5A;color:#fff;padding:6px 0"></div><div style="padding:6px 0"></div></div>
+</div>
+<div class="sk-btn" style="margin-top:auto">Accéder au téléservice officiel ↗</div>
+<div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid rgba(0,0,0,.08)">
+<div style="width:28px;height:28px;border-radius:50%;border:2px solid #1a1a1a;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px">🏠</div>
+<div style="width:28px;height:28px;border-radius:50%;border:2px solid #1a1a1a;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px">👤</div>
+<div style="width:28px;height:28px;border-radius:50%;border:2px solid #1a1a1a;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px">⋯</div>
+</div></div>
+</div>
+
+<div class="dv-opt" id="5c">
+<div class="dv-olabel"><a class="dv-oid" href="#5c">5c</a>Notification de rappel</div>
+<div class="dv-card" style="background:linear-gradient(90deg, #DCEEE8 50%, #FBF0C8 50%);justify-content:flex-start">
+<div class="notch"></div>
+<div style="margin-top:34px;background:rgba(245,245,245,.97);backdrop-filter:blur(2px);border:1px solid rgba(0,0,0,.1);border-radius:16px;padding:12px;display:flex;gap:10px;align-items:flex-start;box-shadow:0 2px 8px rgba(0,0,0,.08)">
+<div style="width:32px;height:32px;border-radius:8px;background:#2D5E5A;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;flex:none">US</div>
+<div style="flex:1">
+<div style="display:flex;justify-content:space-between;font-size:11px;color:#999"><span>US</span><span>maintenant</span></div>
+<div style="font-size:13.5px;color:#1a1a1a;line-height:1.35;margin-top:2px">Plus que 2 jours pour déclarer la naissance en mairie.</div>
+</div>
+</div>
+<div style="flex:1;display:flex;align-items:center;justify-content:center;color:#ccc;font-size:13px">Écran verrouillé</div>
+</div>
+</div>
+
+</div>
+<p class="dv-next">Essayez ensuite : "ajoute une variante plus visuelle pour <a class="dv-oid" href="#1e">1e</a>" · "montre une version sans indicateur de progression" · "explore une autre approche pour le choix multiple"</p>
+</section>
+
+<section class="dv-turn" id="t6">
+<div class="dv-thd"><a class="dv-tid" href="#t6">6</a><span class="dv-tname">Aujourd'hui — état du couple &amp; bébé</span></div>
+<div class="dv-opts">
+
+<div class="dv-opt" id="6a">
+<div class="dv-olabel"><a class="dv-oid" href="#6a">6a</a>État du jour — Camille</div>
+<div class="dv-card" style="background:#DCEEE8;padding:20px 16px">
+<div class="notch"></div>
+<div style="align-self:flex-end;margin-top:16px;background:#2D5E5A;color:#fff;font-size:10.5px;border-radius:20px;padding:6px 10px;display:flex;align-items:center;gap:4px">👶 Déclarer la naissance</div>
+<div style="font-size:20px;color:#1a1a1a;margin-top:8px">Aujourd'hui</div>
+<div style="border:2px solid #1a1a1a;border-radius:12px;padding:11px;display:flex;align-items:center;gap:10px;background:#fff;margin-top:12px">
+<div style="width:32px;height:32px;border-radius:50%;border:2px solid #1a1a1a;display:flex;align-items:center;justify-content:center;font-size:15px;flex:none">😐</div>
+<div><div style="font-size:13.5px;color:#1a1a1a">Paul</div><div style="font-size:11.5px;color:#777">Paul semble aller bien</div></div>
+</div>
+<div style="border:2px solid #1a1a1a;border-radius:12px;padding:11px;display:flex;align-items:center;gap:10px;background:#fff;margin-top:8px">
+<div style="width:32px;height:32px;border-radius:10px;background:#f0eee9;display:flex;align-items:center;justify-content:center;font-size:15px;flex:none">📅</div>
+<div><div style="font-size:13.5px;color:#1a1a1a">Prochain rendez-vous</div><div style="font-size:11.5px;color:#777">Sage-femme — 2 oct, 9h00</div></div>
+</div>
+<div style="margin-top:16px;border:2px solid #1a1a1a;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:8px;align-items:center;text-align:center;background:#fff">
+<div style="font-size:11px;color:#999;letter-spacing:.5px">TAILLE DU BÉBÉ CETTE SEMAINE</div>
+<div style="width:72px;height:72px;border-radius:50%;background:#f0eee9;display:flex;align-items:center;justify-content:center;font-size:34px">🥑</div>
+<div style="font-size:15px;color:#1a1a1a">Comme un avocat</div>
+<div style="font-size:11.5px;color:#777">Semaine 24 · environ 30 cm</div>
+</div>
+<div style="border:2px dashed #2D5E5A;border-radius:12px;padding:10px 12px;margin-top:10px;display:flex;gap:8px;align-items:flex-start;background:#fff">
+<div style="font-size:15px">💡</div>
+<div style="font-size:12px;color:#333;line-height:1.35">Faites participer votre conjoint à vos rendez-vous</div>
+</div>
+<div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid rgba(0,0,0,.08)">
+<div style="width:28px;height:28px;border-radius:50%;border:2px solid #1a1a1a;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px">🏠</div>
+<div style="width:28px;height:28px;border-radius:50%;border:2px solid #1a1a1a;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px">👤</div>
+<div style="width:28px;height:28px;border-radius:50%;border:2px solid #1a1a1a;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px">⋯</div>
+</div></div>
+</div>
+
+<div class="dv-opt" id="6b">
+<div class="dv-olabel"><a class="dv-oid" href="#6b">6b</a>État du jour — Paul</div>
+<div class="dv-card" style="background:#FBF0C8;padding:20px 16px">
+<div class="notch"></div>
+<div style="align-self:flex-end;margin-top:16px;background:#2D5E5A;color:#fff;font-size:10.5px;border-radius:20px;padding:6px 10px;display:flex;align-items:center;gap:4px">👶 Déclarer la naissance</div>
+<div style="font-size:20px;color:#1a1a1a;margin-top:8px">Aujourd'hui</div>
+<div style="border:2px solid #1a1a1a;border-radius:12px;padding:11px;display:flex;align-items:center;gap:10px;background:#fff;margin-top:12px">
+<div style="width:32px;height:32px;border-radius:50%;border:2px solid #1a1a1a;display:flex;align-items:center;justify-content:center;font-size:15px;flex:none">🙂</div>
+<div><div style="font-size:13.5px;color:#1a1a1a">Camille</div><div style="font-size:11.5px;color:#777">Camille semble ne pas avoir de symptôme aujourd'hui mais elle a un mal de dos</div></div>
+</div>
+<div style="border:2px solid #1a1a1a;border-radius:12px;padding:11px;display:flex;align-items:center;gap:10px;background:#fff;margin-top:8px">
+<div style="width:32px;height:32px;border-radius:10px;background:#f0eee9;display:flex;align-items:center;justify-content:center;font-size:15px;flex:none">📅</div>
+<div><div style="font-size:13.5px;color:#1a1a1a">Prochain rendez-vous</div><div style="font-size:11.5px;color:#777">Sage-femme — 2 oct, 9h00</div></div>
+</div>
+<div style="margin-top:16px;border:2px solid #1a1a1a;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:8px;align-items:center;text-align:center;background:#fff">
+<div style="font-size:11px;color:#999;letter-spacing:.5px">TAILLE DU BÉBÉ CETTE SEMAINE</div>
+<div style="width:72px;height:72px;border-radius:50%;background:#f0eee9;display:flex;align-items:center;justify-content:center;font-size:34px">🥑</div>
+<div style="font-size:15px;color:#1a1a1a">Comme un avocat</div>
+<div style="font-size:11.5px;color:#777">Semaine 24 · environ 30 cm</div>
+</div>
+<div style="border:2px dashed #2D5E5A;border-radius:12px;padding:10px 12px;margin-top:10px;display:flex;gap:8px;align-items:flex-start;background:#fff">
+<div style="font-size:15px">💡</div>
+<div style="font-size:12px;color:#333;line-height:1.35">Faites confiance à votre conjointe</div>
+</div>
+<div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid rgba(0,0,0,.08)">
+<div style="width:28px;height:28px;border-radius:50%;border:2px solid #1a1a1a;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px">🏠</div>
+<div style="width:28px;height:28px;border-radius:50%;border:2px solid #1a1a1a;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px">👤</div>
+<div style="width:28px;height:28px;border-radius:50%;border:2px solid #1a1a1a;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px">⋯</div>
+</div></div>
+</div>
+
+</div>
+<p class="dv-next">Essayez ensuite : "ajoute une variante plus visuelle pour <a class="dv-oid" href="#1e">1e</a>" · "montre une version sans indicateur de progression" · "explore une autre approche pour le choix multiple"</p>
+</section>
+
+<section class="dv-turn" id="t7">
+<div class="dv-thd"><a class="dv-tid" href="#t7">7</a><span class="dv-tname">Déclarer la naissance</span></div>
+<div class="dv-opts">
+
+<div class="dv-opt" id="7a">
+<div class="dv-olabel"><a class="dv-oid" href="#7a">7a</a>Déclarer la naissance</div>
+<div class="dv-card" style="background:linear-gradient(90deg, #DCEEE8 50%, #FBF0C8 50%);padding:22px 16px">
+<div class="notch"></div>
+<div style="font-size:20px;color:#1a1a1a;margin-top:16px">Déclarer la naissance</div>
+<div class="sub" style="margin-top:2px">Le grand jour est arrivé !</div>
+<div class="sk-input" style="text-align:center;margin-top:8px">📅 Date de naissance</div>
+<div class="sk-input" style="text-align:center;margin-top:10px">🕐 Heure de naissance</div>
+<div style="border:2px dashed #2D5E5A;border-radius:12px;padding:10px 12px;margin-top:16px;display:flex;gap:8px;align-items:flex-start;background:#fff">
+<div style="font-size:15px">ℹ️</div>
+<div style="font-size:12px;color:#333;line-height:1.35">Toutes les dates et échéances de vos démarches seront automatiquement mises à jour en fonction de cette date.</div>
+</div>
+<div class="sk-btn" style="margin-top:auto">Confirmer la naissance</div>
+</div>
+</div>
+
+</div>
+<p class="dv-next">Essayez ensuite : "ajoute une variante plus visuelle pour <a class="dv-oid" href="#1e">1e</a>" · "montre une version sans indicateur de progression" · "explore une autre approche pour le choix multiple"</p>
+</section>
+
+</x-dc>
+
+
+</body></html>

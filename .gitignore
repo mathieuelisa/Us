@@ -1,0 +1,17 @@
+# macOS
+.DS_Store
+
+# Node
+node_modules/
+
+# Expo
+.expo/
+dist/
+web-build/
+
+# Env
+.env
+.env.local
+
+# Logs
+*.log

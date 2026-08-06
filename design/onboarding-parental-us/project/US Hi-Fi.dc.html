@@ -1,0 +1,1639 @@
+<!DOCTYPE html>
+<html><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics="">
+<meta name="design_doc_mode" content="canvas">
+<style>
+body{margin:0;background:#efeee9;font-family:-apple-system,system-ui,sans-serif}
+.dv-turn{padding:40px 44px 32px;border-bottom:1px solid rgba(0,0,0,.08)}
+.dv-thd{display:flex;align-items:baseline;gap:10px;margin:0 0 20px}
+.dv-tid{font:600 10px ui-monospace,Menlo,monospace;padding:3px 7px;background:#1a1a1a;color:#fff;border-radius:4px;text-decoration:none}
+.dv-tname{font:600 15px/1.2 -apple-system,sans-serif;color:#1a1a1a}
+.dv-opts{display:flex;flex-wrap:wrap;gap:36px;align-items:flex-start}
+.dv-opt{flex:none;display:flex;flex-direction:column;gap:9px;scroll-margin-top:16px}
+.dv-oid{font:600 10.5px ui-monospace,Menlo,monospace;padding:3px 7px;background:rgba(0,0,0,.08);color:#1a1a1a;border-radius:5px;text-decoration:none}
+.dv-olabel{display:flex;align-items:baseline;gap:8px;font:400 12px/1.3 -apple-system,sans-serif;color:rgba(0,0,0,.55)}
+.dv-opt:target .dv-oid{background:#2D5E5A;color:#fff}
+.dv-next{margin:22px 0 0;font:14px/1.5 -apple-system,sans-serif;color:rgba(0,0,0,.55)}
+</style>
+</helmet>
+
+<section class="dv-turn" id="t1">
+<div class="dv-thd"><a class="dv-tid" href="#t1">1</a><span class="dv-tname">Onboarding "US" — hi-fi</span></div>
+<div class="dv-opts">
+
+<div class="dv-opt" id="1a">
+<div class="dv-olabel"><a class="dv-oid" href="#1a">1a</a>Accueil / connexion</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402,874">
+<div style="height:100%;display:flex;flex-direction:column;padding:80px 28px 40px;box-sizing:border-box;background:#fff">
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center">
+<div style="width:72px;height:72px;border-radius:20px;background:#2D5E5A;display:flex;align-items:center;justify-content:center;color:#fff;font-size:28px;font-weight:600;letter-spacing:.5px">US</div>
+<div style="font-size:28px;font-weight:700;color:#1a1a1a;letter-spacing:-.3px">US</div>
+<div style="font-size:15px;color:#6b6b6b;max-width:240px;line-height:1.4">Votre bébé a son carnet de santé. Vous, vous avez US.</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:14px">
+<input placeholder="votre@email.com" style="border:none;background:#F2F2F7;border-radius:14px;padding:16px 16px;font-size:16px;color:#1a1a1a;font-family:inherit;outline:none">
+<div style="background:#2D5E5A;color:#fff;border-radius:14px;padding:16px;text-align:center;font-size:16px;font-weight:600">Recevoir mon lien de connexion</div>
+<div style="text-align:center;font-size:12.5px;color:#9a9a9a;margin-top:2px">Aucune donnée personnelle requise.</div>
+</div>
+</div>
+</x-import>
+</div>
+
+<div class="dv-opt" id="1d">
+<div class="dv-olabel"><a class="dv-oid" href="#1d">1d</a>Étape 1/6 — Accompagnement</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402,874">
+<div style="height:100%;display:flex;flex-direction:column;padding:70px 24px 40px;box-sizing:border-box;background:#fff">
+<div style="font-size:13px;color:#9a9a9a;font-weight:500">Étape 1 sur 6</div>
+<div style="display:flex;gap:5px;margin-top:8px">
+<div style="height:5px;flex:1;border-radius:3px;background:#2D5E5A"></div><div style="height:5px;flex:1;border-radius:3px;background:#e6e6e6"></div><div style="height:5px;flex:1;border-radius:3px;background:#e6e6e6"></div><div style="height:5px;flex:1;border-radius:3px;background:#e6e6e6"></div><div style="height:5px;flex:1;border-radius:3px;background:#e6e6e6"></div><div style="height:5px;flex:1;border-radius:3px;background:#e6e6e6"></div>
+</div>
+<div style="font-size:26px;font-weight:700;color:#1a1a1a;margin-top:28px;line-height:1.2">Qui vous accompagne dans cette aventure ?</div>
+<div style="display:flex;flex-direction:column;gap:10px;margin-top:22px">
+<div style="display:flex;align-items:center;justify-content:space-between;background:#F2F2F7;border-radius:14px;padding:15px 16px">
+<div style="font-size:15.5px;color:#1a1a1a;font-weight:500">En couple</div>
+<div style="width:22px;height:22px;border-radius:50%;background:#2D5E5A;display:flex;align-items:center;justify-content:center"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><path d="M20 6L9 17l-5-5"></path></svg></div>
+</div>
+<div style="display:flex;align-items:center;justify-content:space-between;background:#F2F2F7;border-radius:14px;padding:15px 16px">
+<div style="font-size:15.5px;color:#1a1a1a">Coparentalité sans vivre ensemble</div>
+<div style="width:22px;height:22px;border-radius:50%;border:2px solid #d4d4d4;flex:none"></div>
+</div>
+<div style="display:flex;align-items:center;justify-content:space-between;background:#F2F2F7;border-radius:14px;padding:15px 16px">
+<div style="font-size:15.5px;color:#1a1a1a">Seul·e</div>
+<div style="width:22px;height:22px;border-radius:50%;border:2px solid #d4d4d4"></div>
+</div>
+<div style="display:flex;align-items:center;justify-content:space-between;background:#F2F2F7;border-radius:14px;padding:15px 16px">
+<div style="font-size:15.5px;color:#1a1a1a">Autre</div>
+<div style="width:22px;height:22px;border-radius:50%;border:2px solid #d4d4d4"></div>
+</div>
+</div>
+<div style="font-size:15px;color:#1a1a1a;font-weight:600;margin-top:24px">Le co-parent utilisera-t-il aussi l'app ?</div>
+<div style="display:flex;background:#F2F2F7;border-radius:12px;padding:3px;margin-top:12px">
+<div style="flex:1;text-align:center;padding:10px 0;background:#fff;border-radius:9px;font-size:15px;font-weight:600;color:#1a1a1a;box-shadow:0 1px 3px rgba(0,0,0,.12)">Oui</div>
+<div style="flex:1;text-align:center;padding:10px 0;font-size:15px;color:#8a8a8a">Non</div>
+</div>
+<div style="flex:1"></div>
+<div style="background:#2D5E5A;color:#fff;border-radius:14px;padding:16px;text-align:center;font-size:16px;font-weight:600">Continuer</div>
+</div>
+</x-import>
+</div>
+
+<div class="dv-opt" id="1z">
+<div class="dv-olabel"><a class="dv-oid" href="#1z">1z</a>Prénom</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402,874">
+<div style="height:100%;display:flex;flex-direction:column;padding:70px 24px 40px;box-sizing:border-box;background:#fff">
+<div style="font-size:13px;color:#9a9a9a;font-weight:500">Étape 2 sur 6</div>
+<div style="display:flex;gap:5px;margin-top:8px">
+<div style="height:5px;flex:1;border-radius:3px;background:#2D5E5A"></div><div style="height:5px;flex:1;border-radius:3px;background:#2D5E5A"></div><div style="height:5px;flex:1;border-radius:3px;background:#e6e6e6"></div><div style="height:5px;flex:1;border-radius:3px;background:#e6e6e6"></div><div style="height:5px;flex:1;border-radius:3px;background:#e6e6e6"></div><div style="height:5px;flex:1;border-radius:3px;background:#e6e6e6"></div>
+</div>
+<div style="font-size:26px;font-weight:700;color:#1a1a1a;line-height:1.2;margin-top:28px">Petit à petit, faisons connaissance 👋</div>
+<div style="font-size:14.5px;color:#8a8a8a;margin-top:6px;line-height:1.4">Ces prénoms nous servent uniquement à personnaliser votre espace — jamais utilisés pour vous identifier.</div>
+<input placeholder="Votre prénom" style="border:none;background:#F2F2F7;border-radius:14px;padding:16px;font-size:16px;color:#1a1a1a;font-family:inherit;outline:none;margin-top:24px" />
+<input placeholder="Prénom du co-parent (facultatif)" style="border:none;background:#F2F2F7;border-radius:14px;padding:16px;font-size:16px;color:#1a1a1a;font-family:inherit;outline:none;margin-top:10px" />
+<div style="flex:1"></div>
+<div style="background:#2D5E5A;color:#fff;border-radius:14px;padding:16px;text-align:center;font-size:16px;font-weight:600">Continuer</div>
+<div style="text-align:center;font-size:13.5px;color:#9a9a9a;margin-top:10px">Passer cette étape</div>
+</div>
+</x-import>
+</div>
+
+<div class="dv-opt" id="1b">
+<div class="dv-olabel"><a class="dv-oid" href="#1b">1b</a>Étape 3/6 — Arrivée du bébé</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402,874">
+<div style="height:100%;display:flex;flex-direction:column;padding:70px 24px 40px;box-sizing:border-box;background:#fff">
+<div style="font-size:13px;color:#9a9a9a;font-weight:500">Étape 3 sur 6</div>
+<div style="display:flex;gap:5px;margin-top:8px">
+<div style="height:5px;flex:1;border-radius:3px;background:#2D5E5A"></div><div style="height:5px;flex:1;border-radius:3px;background:#2D5E5A"></div><div style="height:5px;flex:1;border-radius:3px;background:#2D5E5A"></div><div style="height:5px;flex:1;border-radius:3px;background:#e6e6e6"></div><div style="height:5px;flex:1;border-radius:3px;background:#e6e6e6"></div><div style="height:5px;flex:1;border-radius:3px;background:#e6e6e6"></div>
+</div>
+<div style="font-size:26px;font-weight:700;color:#1a1a1a;margin-top:28px;line-height:1.2">Quand votre bébé arrive-t-il ?</div>
+<div style="font-size:14.5px;color:#8a8a8a;margin-top:6px">Date de naissance prévue ou réelle</div>
+<div style="background:#F2F2F7;border-radius:14px;margin-top:24px;padding:10px 0;display:flex;align-items:center;justify-content:center;position:relative;height:150px;overflow:hidden">
+<div style="position:absolute;top:50%;left:8px;right:8px;height:34px;transform:translateY(-50%);background:#e2e2e2;border-radius:8px"></div>
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;position:relative">
+<div style="font-size:14px;color:#c4c4c4;opacity:.35">août</div>
+<div style="font-size:15px;color:#b0b0b0;opacity:.6">sept.</div>
+<div style="font-size:17px;color:#1a1a1a;font-weight:500;height:34px;display:flex;align-items:center">octobre</div>
+<div style="font-size:15px;color:#b0b0b0;opacity:.6">nov.</div>
+<div style="font-size:14px;color:#c4c4c4;opacity:.35">déc.</div>
+</div>
+<div style="flex:0.7;display:flex;flex-direction:column;align-items:center;gap:2px;position:relative">
+<div style="font-size:14px;color:#c4c4c4;opacity:.35">10</div>
+<div style="font-size:15px;color:#b0b0b0;opacity:.6">11</div>
+<div style="font-size:17px;color:#1a1a1a;font-weight:500;height:34px;display:flex;align-items:center">12</div>
+<div style="font-size:15px;color:#b0b0b0;opacity:.6">13</div>
+<div style="font-size:14px;color:#c4c4c4;opacity:.35">14</div>
+</div>
+<div style="flex:0.9;display:flex;flex-direction:column;align-items:center;gap:2px;position:relative">
+<div style="font-size:14px;color:#c4c4c4;opacity:.35">2024</div>
+<div style="font-size:15px;color:#b0b0b0;opacity:.6">2025</div>
+<div style="font-size:17px;color:#1a1a1a;font-weight:500;height:34px;display:flex;align-items:center">2026</div>
+<div style="font-size:15px;color:#b0b0b0;opacity:.6">2027</div>
+<div style="font-size:14px;color:#c4c4c4;opacity:.35">2028</div>
+</div>
+</div>
+<div style="font-size:15px;color:#1a1a1a;font-weight:600;margin-top:32px">Est-ce votre premier enfant ?</div>
+<div style="display:flex;background:#F2F2F7;border-radius:12px;padding:3px;margin-top:12px">
+<div style="flex:1;text-align:center;padding:10px 0;background:#fff;border-radius:9px;font-size:15px;font-weight:600;color:#1a1a1a;box-shadow:0 1px 3px rgba(0,0,0,.12)">Oui</div>
+<div style="flex:1;text-align:center;padding:10px 0;font-size:15px;color:#8a8a8a">Non</div>
+</div>
+<div style="flex:1"></div>
+<div style="background:#2D5E5A;color:#fff;border-radius:14px;padding:16px;text-align:center;font-size:16px;font-weight:600">Continuer</div>
+</div>
+</x-import>
+</div>
+
+<div class="dv-opt" id="1c">
+<div class="dv-olabel"><a class="dv-oid" href="#1c">1c</a>Étape 4/6 — Statut professionnel</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402,874">
+<div style="height:100%;display:flex;flex-direction:column;padding:70px 24px 40px;box-sizing:border-box;background:#fff">
+<div style="font-size:13px;color:#9a9a9a;font-weight:500">Étape 4 sur 6</div>
+<div style="display:flex;gap:5px;margin-top:8px">
+<div style="height:5px;flex:1;border-radius:3px;background:#2D5E5A"></div><div style="height:5px;flex:1;border-radius:3px;background:#2D5E5A"></div><div style="height:5px;flex:1;border-radius:3px;background:#2D5E5A"></div><div style="height:5px;flex:1;border-radius:3px;background:#2D5E5A"></div><div style="height:5px;flex:1;border-radius:3px;background:#e6e6e6"></div><div style="height:5px;flex:1;border-radius:3px;background:#e6e6e6"></div>
+</div>
+<div style="font-size:26px;font-weight:700;color:#1a1a1a;margin-top:28px;line-height:1.2">Quel est votre statut professionnel ?</div>
+<div style="font-size:14.5px;color:#8a8a8a;margin-top:6px">Pour adapter vos démarches</div>
+<div style="display:flex;flex-direction:column;gap:10px;margin-top:22px">
+<div style="display:flex;align-items:center;justify-content:space-between;background:#F2F2F7;border-radius:14px;padding:15px 16px">
+<div style="font-size:15.5px;color:#1a1a1a;font-weight:500">Salarié·e secteur privé</div>
+<div style="width:22px;height:22px;border-radius:50%;background:#2D5E5A;display:flex;align-items:center;justify-content:center"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><path d="M20 6L9 17l-5-5"></path></svg></div>
+</div>
+<div style="display:flex;align-items:center;justify-content:space-between;background:#F2F2F7;border-radius:14px;padding:15px 16px">
+<div style="font-size:15.5px;color:#1a1a1a">Fonctionnaire</div>
+<div style="width:22px;height:22px;border-radius:50%;border:2px solid #d4d4d4"></div>
+</div>
+<div style="display:flex;align-items:center;justify-content:space-between;background:#F2F2F7;border-radius:14px;padding:15px 16px">
+<div style="font-size:15.5px;color:#1a1a1a">Indépendant·e</div>
+<div style="width:22px;height:22px;border-radius:50%;border:2px solid #d4d4d4"></div>
+</div>
+<div style="display:flex;align-items:center;justify-content:space-between;background:#F2F2F7;border-radius:14px;padding:15px 16px">
+<div style="font-size:15.5px;color:#1a1a1a">Sans emploi actuellement</div>
+<div style="width:22px;height:22px;border-radius:50%;border:2px solid #d4d4d4"></div>
+</div>
+</div>
+<input placeholder="Région ou département" style="border:none;background:#F2F2F7;border-radius:14px;padding:16px;font-size:15.5px;color:#1a1a1a;font-family:inherit;outline:none;margin-top:18px">
+<div style="flex:1"></div>
+<div style="background:#2D5E5A;color:#fff;border-radius:14px;padding:16px;text-align:center;font-size:16px;font-weight:600">Continuer</div>
+</div>
+</x-import>
+</div>
+
+<div class="dv-opt" id="1e">
+<div class="dv-olabel"><a class="dv-oid" href="#1e">1e</a>Étape 5/6 — Priorités</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402,874">
+<div style="height:100%;display:flex;flex-direction:column;padding:70px 24px 40px;box-sizing:border-box;background:#fff">
+<div style="font-size:13px;color:#9a9a9a;font-weight:500">Étape 5 sur 6</div>
+<div style="display:flex;gap:5px;margin-top:8px">
+<div style="height:5px;flex:1;border-radius:3px;background:#2D5E5A"></div><div style="height:5px;flex:1;border-radius:3px;background:#2D5E5A"></div><div style="height:5px;flex:1;border-radius:3px;background:#2D5E5A"></div><div style="height:5px;flex:1;border-radius:3px;background:#2D5E5A"></div><div style="height:5px;flex:1;border-radius:3px;background:#2D5E5A"></div><div style="height:5px;flex:1;border-radius:3px;background:#e6e6e6"></div>
+</div>
+<div style="font-size:26px;font-weight:700;color:#1a1a1a;margin-top:28px;line-height:1.2">Quelles sont vos priorités ?</div>
+<div style="font-size:14.5px;color:#8a8a8a;margin-top:6px">Plusieurs choix possibles</div>
+<div style="display:flex;flex-direction:column;gap:10px;margin-top:22px">
+<div style="display:flex;align-items:center;justify-content:space-between;background:#F2F2F7;border-radius:14px;padding:15px 16px">
+<div style="font-size:15.5px;color:#1a1a1a;font-weight:500">Démarches administratives</div>
+<div style="width:22px;height:22px;border-radius:7px;background:#2D5E5A;display:flex;align-items:center;justify-content:center;flex:none"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><path d="M20 6L9 17l-5-5"></path></svg></div>
+</div>
+<div style="display:flex;align-items:center;justify-content:space-between;background:#F2F2F7;border-radius:14px;padding:15px 16px">
+<div style="font-size:15.5px;color:#1a1a1a;font-weight:500">Suivi santé</div>
+<div style="width:22px;height:22px;border-radius:7px;background:#2D5E5A;display:flex;align-items:center;justify-content:center;flex:none"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><path d="M20 6L9 17l-5-5"></path></svg></div>
+</div>
+<div style="display:flex;align-items:center;justify-content:space-between;background:#F2F2F7;border-radius:14px;padding:15px 16px">
+<div style="font-size:15.5px;color:#1a1a1a">Partage avec le co-parent</div>
+<div style="width:22px;height:22px;border-radius:7px;border:2px solid #d4d4d4;flex:none"></div>
+</div>
+<div style="display:flex;align-items:center;justify-content:space-between;background:#F2F2F7;border-radius:14px;padding:15px 16px">
+<div style="font-size:15.5px;color:#1a1a1a">Dates et rendez-vous importants</div>
+<div style="width:22px;height:22px;border-radius:7px;border:2px solid #d4d4d4;flex:none"></div>
+</div>
+</div>
+<div style="flex:1"></div>
+<div style="background:#2D5E5A;color:#fff;border-radius:14px;padding:16px;text-align:center;font-size:16px;font-weight:600">Continuer</div>
+</div>
+</x-import>
+</div>
+
+<div class="dv-opt" id="1f">
+<div class="dv-olabel"><a class="dv-oid" href="#1f">1f</a>Étape 6/6 — Rythme des rappels</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402,874">
+<div style="height:100%;display:flex;flex-direction:column;padding:70px 24px 40px;box-sizing:border-box;background:#fff">
+<div style="font-size:13px;color:#9a9a9a;font-weight:500">Étape 6 sur 6</div>
+<div style="display:flex;gap:5px;margin-top:8px">
+<div style="height:5px;flex:1;border-radius:3px;background:#2D5E5A"></div><div style="height:5px;flex:1;border-radius:3px;background:#2D5E5A"></div><div style="height:5px;flex:1;border-radius:3px;background:#2D5E5A"></div><div style="height:5px;flex:1;border-radius:3px;background:#2D5E5A"></div><div style="height:5px;flex:1;border-radius:3px;background:#2D5E5A"></div><div style="height:5px;flex:1;border-radius:3px;background:#2D5E5A"></div>
+</div>
+<div style="font-size:26px;font-weight:700;color:#1a1a1a;margin-top:28px;line-height:1.2">Quel rythme de rappels préférez-vous ?</div>
+<div style="display:flex;flex-direction:column;gap:10px;margin-top:24px">
+<div style="display:flex;align-items:center;justify-content:space-between;background:#F2F2F7;border-radius:14px;padding:16px">
+<div><div style="font-size:15.5px;color:#1a1a1a;font-weight:600">Au fil de l'eau</div><div style="font-size:13px;color:#8a8a8a;margin-top:2px">Une notification à chaque étape</div></div>
+<div style="width:22px;height:22px;border-radius:50%;background:#2D5E5A;display:flex;align-items:center;justify-content:center;flex:none"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><path d="M20 6L9 17l-5-5"></path></svg></div>
+</div>
+<div style="display:flex;align-items:center;justify-content:space-between;background:#F2F2F7;border-radius:14px;padding:16px">
+<div><div style="font-size:15.5px;color:#1a1a1a">Résumé hebdomadaire</div><div style="font-size:13px;color:#8a8a8a;margin-top:2px">Un récap chaque semaine</div></div>
+<div style="width:22px;height:22px;border-radius:50%;border:2px solid #d4d4d4;flex:none"></div>
+</div>
+</div>
+<div style="flex:1"></div>
+<div style="background:#2D5E5A;color:#fff;border-radius:14px;padding:16px;text-align:center;font-size:16px;font-weight:600">Terminer</div>
+</div>
+</x-import>
+</div>
+
+<div class="dv-opt" id="1y">
+<div class="dv-olabel"><a class="dv-oid" href="#1y">1y</a>Vous avez fait le bon choix</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402,874">
+<div style="height:100%;display:flex;flex-direction:column;padding:70px 24px 40px;box-sizing:border-box;background:#fff;text-align:center">
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px">
+<div style="width:64px;height:64px;border-radius:50%;background:#EAF5F0;display:flex;align-items:center;justify-content:center;font-size:28px">🎉</div>
+<div style="font-size:24px;font-weight:700;color:#1a1a1a;line-height:1.25">Vous avez fait le bon choix</div>
+<div style="font-size:14.5px;color:#8a8a8a;max-width:260px;line-height:1.4">Des milliers de parents utilisent déjà US pour vivre cette étape sereinement</div>
+<div style="display:flex;gap:12px;width:100%;margin-top:8px">
+<div style="flex:1;background:#F7F9F8;border-radius:16px;padding:16px 10px">
+<div style="font-size:22px;font-weight:700;color:#2D5E5A">50 000+</div>
+<div style="font-size:11.5px;color:#8a8a8a;margin-top:2px">Téléchargements</div>
+</div>
+<div style="flex:1;background:#F7F9F8;border-radius:16px;padding:16px 10px">
+<div style="font-size:22px;font-weight:700;color:#2D5E5A">4,8 ★</div>
+<div style="font-size:11.5px;color:#8a8a8a;margin-top:2px">Note moyenne</div>
+</div>
+</div>
+</div>
+<div style="background:#2D5E5A;color:#fff;border-radius:14px;padding:16px;text-align:center;font-size:16px;font-weight:600">Continuer</div>
+</div>
+</x-import>
+</div>
+
+<div class="dv-opt" id="1g">
+<div class="dv-olabel"><a class="dv-oid" href="#1g">1g</a>Débloquer US en entier</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402,874">
+<div style="height:100%;display:flex;flex-direction:column;padding:70px 24px 40px;box-sizing:border-box;background:#fff;text-align:center">
+<div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+<div style="width:56px;height:56px;border-radius:50%;background:#2D5E5A;display:flex;align-items:center;justify-content:center"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M20 6L9 17l-5-5"></path></svg></div>
+<div style="font-size:22px;font-weight:700;color:#1a1a1a;line-height:1.25">Débloquez le suivi complet de bébé</div>
+<div style="font-size:14.5px;color:#8a8a8a">Un seul paiement, accès à vie</div>
+</div>
+<div style="background:#F7F9F8;border:1.5px solid #2D5E5A;border-radius:16px;padding:18px;margin-top:22px;text-align:left">
+<div style="font-size:19px;font-weight:700;color:#1a1a1a">14,99 € — paiement unique</div>
+<div style="font-size:12.5px;color:#8a8a8a;margin-top:2px">Pas d'abonnement, pas de renouvellement</div>
+<div style="height:1px;background:#2D5E5A;opacity:.15;margin:12px 0"></div>
+<div style="display:flex;flex-direction:column;gap:7px">
+<div style="font-size:13.5px;color:#333;display:flex;gap:8px;align-items:center"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="3" style="flex:none"><path d="M20 6L9 17l-5-5"></path></svg>Suivi alimentation de bébé (rythme, quantité)</div>
+<div style="font-size:13.5px;color:#333;display:flex;gap:8px;align-items:center"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="3" style="flex:none"><path d="M20 6L9 17l-5-5"></path></svg>Suivi du rythme de sommeil de bébé</div>
+<div style="font-size:13.5px;color:#333;display:flex;gap:8px;align-items:center"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="3" style="flex:none"><path d="M20 6L9 17l-5-5"></path></svg>Mesures de bébé (poids, taille) avec courbe de croissance</div>
+<div style="font-size:13.5px;color:#333;display:flex;gap:8px;align-items:center"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="3" style="flex:none"><path d="M20 6L9 17l-5-5"></path></svg>Suivi du bain et des soins du jour</div>
+<div style="font-size:13.5px;color:#333;display:flex;gap:8px;align-items:center"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="3" style="flex:none"><path d="M20 6L9 17l-5-5"></path></svg>Calendrier des vaccins et rappels</div>
+<div style="font-size:13.5px;color:#333;display:flex;gap:8px;align-items:center"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="3" style="flex:none"><path d="M20 6L9 17l-5-5"></path></svg>Compteur de contractions</div>
+<div style="font-size:13.5px;color:#333;display:flex;gap:8px;align-items:center"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="3" style="flex:none"><path d="M20 6L9 17l-5-5"></path></svg>Informations partagées avec le co-parent</div>
+</div>
+</div>
+<div style="font-size:12.5px;color:#2D5E5A;font-weight:600;text-decoration:underline;margin-top:12px">J'ai un code de réduction</div>
+<div style="flex:1"></div>
+<div style="display:flex;flex-direction:column;gap:10px">
+<div style="background:#2D5E5A;color:#fff;border-radius:14px;padding:16px;font-size:16px;font-weight:600">Débloquer</div>
+<div style="border:1.5px solid #d4d4d4;color:#1a1a1a;border-radius:14px;padding:16px;font-size:16px;font-weight:600">Plus tard</div>
+</div>
+<div style="font-size:11.5px;color:#c4c4c4;text-decoration:underline;margin-top:14px">Restaurer mon achat</div>
+<div style="display:flex;justify-content:center;gap:6px;margin-top:6px">
+<div style="font-size:11px;color:#c4c4c4;text-decoration:underline">Conditions d'utilisation</div>
+<div style="font-size:11px;color:#c4c4c4">·</div>
+<div style="font-size:11px;color:#c4c4c4;text-decoration:underline">Politique de confidentialité</div>
+</div>
+</div>
+</x-import>
+</div>
+
+</div>
+<p class="dv-next">Ensuite : "fais la partie 2 (hub post-onboarding)" · "ajuste les couleurs de 1g" · "explore une variante plus visuelle pour 1a"</p>
+</section>
+
+<section class="dv-turn" id="t2">
+<div class="dv-thd"><a class="dv-tid" href="#t2">2</a><span class="dv-tname">Post-onboarding — hub d'accueil</span></div>
+<div class="dv-opts">
+
+<div class="dv-opt" id="2a">
+<div class="dv-olabel"><a class="dv-oid" href="#2a">2a</a>Transition</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402,874">
+<div style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:#fff">
+<div style="width:40px;height:40px;border:3px solid #eee;border-top-color:#2D5E5A;border-radius:50%"></div>
+<div style="font-size:17px;color:#1a1a1a;font-weight:500">Nous préparons votre espace…</div>
+</div>
+</x-import>
+</div>
+
+<div class="dv-opt" id="2b">
+<div class="dv-olabel"><a class="dv-oid" href="#2b">2b</a>Hub d'accueil</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402,874">
+<div style="height:100%;display:flex;flex-direction:column;padding:70px 20px 0;box-sizing:border-box;background:#EAF5F0">
+<div style="font-size:26px;font-weight:700;color:#1a1a1a">Bonjour Camille</div>
+<div style="border:1.5px dashed #2D5E5A;border-radius:16px;padding:14px 16px;margin-top:16px;display:flex;align-items:center;justify-content:space-between;gap:10px">
+<div style="font-size:13.5px;color:#333;line-height:1.35">Inviter Paul à rejoindre<br>votre espace ?</div>
+<div style="background:#2D5E5A;color:#fff;border-radius:10px;padding:8px 14px;font-size:13px;font-weight:600;white-space:nowrap">Inviter</div>
+</div>
+<div style="font-size:11.5px;color:#6a6a6a;font-weight:600;letter-spacing:.4px;margin-top:18px">VOS SECTIONS</div>
+<div style="display:flex;flex-direction:column;gap:12px;margin-top:8px">
+<div style="border:1px solid #eee;box-shadow:0 1px 4px rgba(0,0,0,.04);border-radius:16px;padding:16px;display:flex;align-items:center;gap:14px">
+<div style="width:44px;height:44px;border-radius:12px;background:#EAF5F0;display:flex;align-items:center;justify-content:center;flex:none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="1.8"><path d="M7 3h7l5 5v13H7z"></path><path d="M14 3v5h5"></path></svg></div>
+<div><div style="font-size:16px;color:#1a1a1a;font-weight:600">Démarches</div><div style="font-size:13px;color:#2D5E5A;margin-top:2px">2 démarches en attente</div></div>
+</div>
+<div style="border:1px solid #eee;box-shadow:0 1px 4px rgba(0,0,0,.04);border-radius:16px;padding:16px;display:flex;align-items:center;gap:14px">
+<div style="width:44px;height:44px;border-radius:12px;background:#EAF5F0;display:flex;align-items:center;justify-content:center;flex:none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="1.8"><path d="M12 21s-7-4.35-9.5-9A5.5 5.5 0 0112 6a5.5 5.5 0 019.5 6C19 16.65 12 21 12 21z"></path></svg></div>
+<div><div style="font-size:16px;color:#1a1a1a;font-weight:600">Ensemble</div><div style="font-size:13px;color:#2D5E5A;margin-top:2px">Check-in du jour</div></div>
+</div>
+<div style="border:1px solid #eee;box-shadow:0 1px 4px rgba(0,0,0,.04);border-radius:16px;padding:16px;display:flex;align-items:center;gap:14px">
+<div style="width:44px;height:44px;border-radius:12px;background:#EAF5F0;display:flex;align-items:center;justify-content:center;flex:none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="1.8"><path d="M21 12.5A8.5 8.5 0 1111.5 3 7 7 0 0021 12.5z"></path></svg></div>
+<div><div style="font-size:16px;color:#1a1a1a;font-weight:600">Suivi santé</div><div style="font-size:13px;color:#2D5E5A;margin-top:2px">Journal du jour</div></div>
+</div>
+<div style="background:linear-gradient(135deg,#1a1a1a,#2d2d2d);border-radius:16px;padding:16px;display:flex;align-items:center;gap:14px;position:relative">
+<div style="width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;flex:none;font-size:19px">👶</div>
+<div style="flex:1"><div style="font-size:16px;color:#fff;font-weight:600">Votre bébé</div><div style="font-size:13px;color:#e8c874;margin-top:2px">Courbe de croissance</div></div>
+<div style="font-size:9.5px;font-weight:700;letter-spacing:.4px;color:#1a1a1a;background:#e8c874;border-radius:6px;padding:4px 7px;white-space:nowrap">PREMIUM</div>
+</div>
+</div>
+<div style="flex:1"></div>
+<div style="display:flex;align-items:center;justify-content:space-between;padding:14px 8px;border-top:1px solid #f0f0f0">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="1.8"><path d="M3 11l9-8 9 8"></path><path d="M5 10v10h14V10"></path></svg>
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#bbb" stroke-width="1.8"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 4-6 8-6s8 2 8 6"></path></svg>
+<svg width="22" height="22" viewBox="0 0 24 24" fill="#bbb"><circle cx="5" cy="12" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="19" cy="12" r="2"></circle></svg>
+</div>
+</div>
+</x-import>
+</div>
+
+<div class="dv-opt" id="2d">
+<div class="dv-olabel"><a class="dv-oid" href="#2d">2d</a>Inviter Paul</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402,874">
+<div style="height:100%;display:flex;flex-direction:column;padding:70px 24px 40px;box-sizing:border-box;background:#EAF5F0;text-align:center">
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px">
+<div style="width:64px;height:64px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="1.8"><path d="M3 8l9 6 9-6"></path><rect x="3" y="5" width="18" height="14" rx="2"></rect></svg></div>
+<div style="font-size:22px;font-weight:700;color:#1a1a1a">Inviter Paul</div>
+<div style="font-size:14px;color:#8a8a8a;max-width:250px;line-height:1.4">Il pourra suivre les démarches, les infos concernant son bébé et rester connecté à votre grossesse</div>
+<input placeholder="Email ou numéro de Paul" style="border:none;background:#F2F2F7;border-radius:14px;padding:16px;font-size:15.5px;color:#1a1a1a;font-family:inherit;outline:none;margin-top:8px;width:100%;box-sizing:border-box">
+</div>
+<div style="display:flex;flex-direction:column;gap:10px">
+<div style="background:#2D5E5A;color:#fff;border-radius:14px;padding:16px;font-size:16px;font-weight:600">Envoyer l'invitation</div>
+<div style="border:1.5px solid #d4d4d4;color:#1a1a1a;border-radius:14px;padding:16px;font-size:16px;font-weight:600">Plus tard</div>
+</div>
+</div>
+</x-import>
+</div>
+
+<div class="dv-opt" id="2c">
+<div class="dv-olabel"><a class="dv-oid" href="#2c">2c</a>Notification push</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402,874">
+<div style="height:100%;background:#efeee9;padding-top:70px;box-sizing:border-box">
+<div style="margin:0 12px;background:rgba(255,255,255,.85);backdrop-filter:blur(20px);border-radius:18px;padding:13px;display:flex;gap:10px;align-items:flex-start;box-shadow:0 6px 20px rgba(0,0,0,.12)">
+<div style="width:34px;height:34px;border-radius:9px;background:#2D5E5A;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex:none">US</div>
+<div style="flex:1">
+<div style="display:flex;justify-content:space-between;font-size:11.5px;color:#8a8a8a;font-weight:600"><span>US</span><span>maintenant</span></div>
+<div style="font-size:14px;color:#1a1a1a;line-height:1.35;margin-top:2px">Aujourd'hui : et si vous faisiez le point sur votre déclaration CAF ?</div>
+</div>
+</div>
+</div>
+</x-import>
+</div>
+
+</div>
+<p class="dv-next">Ensuite : "fais la partie 3 (pilier Ensemble)"</p>
+</section>
+
+<section class="dv-turn" id="t3">
+<div class="dv-thd"><a class="dv-tid" href="#t3">3</a><span class="dv-tname">Pilier "Ensemble" — check-in co-parent</span></div>
+<div class="dv-opts">
+
+<div class="dv-opt" id="3c">
+<div class="dv-olabel"><a class="dv-oid" href="#3c">3c</a>Hub — vue femme enceinte</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402,874">
+<div style="height:100%;display:flex;flex-direction:column;padding:70px 20px 0;box-sizing:border-box;background:#EAF5F0">
+<div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+<div style="font-size:22px;font-weight:700;color:#1a1a1a;white-space:nowrap;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis">Bonjour Camille</div>
+<a href="#7a" style="display:flex;align-items:center;gap:5px;background:#2D5E5A;color:#fff;font-size:11px;font-weight:600;border-radius:20px;padding:6px 10px;white-space:nowrap;text-decoration:none;flex:none"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M12 2c-1.5 3-1.5 6 0 9M12 11c2.5-1 4.5-3 5.5-6M12 11c-2.5-1-4.5-3-5.5-6M12 11v10M9 21h6"></path></svg>J'ai accouché</a>
+</div>
+<div style="font-size:11.5px;color:#9a9a9a;font-weight:600;letter-spacing:.4px;margin-top:14px">HUMEUR DU JOUR</div>
+<div style="background:#fff;border-radius:16px;padding:14px;margin-top:6px;display:flex;align-items:center;gap:12px">
+<div style="font-size:26px">🙂</div>
+<div><div style="font-size:12px;color:#8a8a8a">Paul aujourd'hui</div><div style="font-size:14px;color:#1a1a1a;font-weight:600">Paul semble se sentir bien</div></div>
+</div>
+<div style="font-size:11.5px;color:#9a9a9a;font-weight:600;letter-spacing:.4px;margin-top:16px">VOS SECTIONS</div>
+<div style="display:flex;flex-direction:column;gap:10px;margin-top:6px">
+<div style="background:#fff;border-radius:16px;padding:15px;display:flex;align-items:center;gap:13px">
+<div style="width:40px;height:40px;border-radius:11px;background:#EAF5F0;display:flex;align-items:center;justify-content:center;flex:none"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="1.8"><path d="M7 3h7l5 5v13H7z"></path><path d="M14 3v5h5"></path></svg></div>
+<div><div style="font-size:15px;color:#1a1a1a;font-weight:600">Démarches</div><div style="font-size:12.5px;color:#2D5E5A">2 en attente</div></div>
+</div>
+<div style="background:#fff;border-radius:16px;padding:15px;display:flex;align-items:center;gap:13px">
+<div style="width:40px;height:40px;border-radius:11px;background:#EAF5F0;display:flex;align-items:center;justify-content:center;flex:none"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="1.8"><path d="M12 21s-7-4.35-9.5-9A5.5 5.5 0 0112 6a5.5 5.5 0 019.5 6C19 16.65 12 21 12 21z"></path></svg></div>
+<div><div style="font-size:15px;color:#1a1a1a;font-weight:600">Ensemble</div><div style="font-size:12.5px;color:#2D5E5A">Check-in du jour</div></div>
+</div>
+<div style="background:#fff;border-radius:16px;padding:15px;display:flex;align-items:center;gap:13px">
+<div style="width:40px;height:40px;border-radius:11px;background:#EAF5F0;display:flex;align-items:center;justify-content:center;flex:none"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="1.8"><path d="M21 12.5A8.5 8.5 0 1111.5 3 7 7 0 0021 12.5z"></path></svg></div>
+<div><div style="font-size:15px;color:#1a1a1a;font-weight:600">Suivi santé</div><div style="font-size:12.5px;color:#2D5E5A">Journal du jour</div></div>
+</div>
+<div style="background:linear-gradient(135deg,#1a1a1a,#2d2d2d);border-radius:16px;padding:15px;display:flex;align-items:center;gap:13px">
+<div style="width:40px;height:40px;border-radius:11px;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:17px;flex:none">👶</div>
+<div style="flex:1"><div style="font-size:15px;color:#fff;font-weight:600">Votre bébé</div><div style="font-size:12.5px;color:#e8c874">Courbe de croissance</div></div>
+<div style="font-size:9.5px;font-weight:700;letter-spacing:.4px;color:#1a1a1a;background:#e8c874;border-radius:6px;padding:4px 7px;white-space:nowrap">PREMIUM</div>
+</div>
+<div style="font-size:11.5px;color:#9a9a9a;font-weight:600;letter-spacing:.4px;margin-top:32px">MON PARTENAIRE</div>
+<div style="background:#fdf6e3;border-radius:16px;padding:15px;display:flex;align-items:center;gap:13px;margin-top:10px">
+<div style="width:40px;height:40px;border-radius:11px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:17px;flex:none">💕</div>
+<div><div style="font-size:15px;color:#1a1a1a;font-weight:600">Avec Paul</div><div style="font-size:12.5px;color:#2D5E5A">Voir son état cette semaine</div></div>
+</div>
+</div>
+<div style="flex:1"></div>
+<div style="display:flex;align-items:center;justify-content:space-between;padding:14px 8px;border-top:1px solid rgba(0,0,0,.06)">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="1.8"><path d="M3 11l9-8 9 8"></path><path d="M5 10v10h14V10"></path></svg>
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8a8a8a" stroke-width="1.8"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 4-6 8-6s8 2 8 6"></path></svg>
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8a8a8a" stroke-width="1.8"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"></path></svg>
+</div>
+</div>
+</x-import>
+</div>
+
+<div class="dv-opt" id="3d">
+<div class="dv-olabel"><a class="dv-oid" href="#3d">3d</a>Hub — vue partenaire</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402,874">
+<div style="height:100%;display:flex;flex-direction:column;padding:70px 20px 0;box-sizing:border-box;background:#FDF6E3">
+<div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+<div style="font-size:22px;font-weight:700;color:#1a1a1a;white-space:nowrap;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis">Bonjour Paul</div>
+<a href="#7a" style="display:flex;align-items:center;gap:5px;background:#2D5E5A;color:#fff;font-size:11px;font-weight:600;border-radius:20px;padding:6px 10px;white-space:nowrap;text-decoration:none;flex:none"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M12 2c-1.5 3-1.5 6 0 9M12 11c2.5-1 4.5-3 5.5-6M12 11c-2.5-1-4.5-3-5.5-6M12 11v10M9 21h6"></path></svg>J'ai accouché</a>
+</div>
+<div style="font-size:11.5px;color:#9a9a9a;font-weight:600;letter-spacing:.4px;margin-top:14px">HUMEUR DU JOUR</div>
+<div style="background:#fff;border-radius:16px;padding:14px;margin-top:6px;display:flex;align-items:center;gap:12px">
+<div style="font-size:26px">😩</div>
+<div><div style="font-size:12px;color:#8a8a8a">Camille aujourd'hui</div><div style="font-size:14px;color:#1a1a1a;font-weight:600">Camille a besoin de câlins</div></div>
+</div>
+<div style="font-size:11.5px;color:#9a9a9a;font-weight:600;letter-spacing:.4px;margin-top:16px">VOS SECTIONS</div>
+<div style="display:flex;flex-direction:column;gap:10px;margin-top:6px">
+<div style="background:#fff;border-radius:16px;padding:15px;display:flex;align-items:center;gap:13px">
+<div style="width:40px;height:40px;border-radius:11px;background:#FDF6E3;display:flex;align-items:center;justify-content:center;flex:none"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="1.8"><path d="M7 3h7l5 5v13H7z"></path><path d="M14 3v5h5"></path></svg></div>
+<div><div style="font-size:15px;color:#1a1a1a;font-weight:600">Démarches</div><div style="font-size:12.5px;color:#2D5E5A">2 en attente</div></div>
+</div>
+<div style="background:#fff;border-radius:16px;padding:15px;display:flex;align-items:center;gap:13px">
+<div style="width:40px;height:40px;border-radius:11px;background:#FDF6E3;display:flex;align-items:center;justify-content:center;flex:none"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="1.8"><path d="M12 21s-7-4.35-9.5-9A5.5 5.5 0 0112 6a5.5 5.5 0 019.5 6C19 16.65 12 21 12 21z"></path></svg></div>
+<div><div style="font-size:15px;color:#1a1a1a;font-weight:600">Ensemble</div><div style="font-size:12.5px;color:#2D5E5A">Check-in du jour</div></div>
+</div>
+<div style="background:#fff;border-radius:16px;padding:15px;display:flex;align-items:center;gap:13px">
+<div style="width:40px;height:40px;border-radius:11px;background:#FDF6E3;display:flex;align-items:center;justify-content:center;flex:none"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="1.8"><path d="M21 12.5A8.5 8.5 0 1111.5 3 7 7 0 0021 12.5z"></path></svg></div>
+<div><div style="font-size:15px;color:#1a1a1a;font-weight:600">Suivi santé</div><div style="font-size:12.5px;color:#2D5E5A">Journal du jour</div></div>
+</div>
+<div style="background:linear-gradient(135deg,#1a1a1a,#2d2d2d);border-radius:16px;padding:15px;display:flex;align-items:center;gap:13px">
+<div style="width:40px;height:40px;border-radius:11px;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:17px;flex:none">👶</div>
+<div style="flex:1"><div style="font-size:15px;color:#fff;font-weight:600">Votre bébé</div><div style="font-size:12.5px;color:#e8c874">Courbe de croissance</div></div>
+<div style="font-size:9.5px;font-weight:700;letter-spacing:.4px;color:#1a1a1a;background:#e8c874;border-radius:6px;padding:4px 7px;white-space:nowrap">PREMIUM</div>
+</div>
+<div style="font-size:11.5px;color:#9a9a9a;font-weight:600;letter-spacing:.4px;margin-top:32px">MON PARTENAIRE</div>
+<div style="background:#eaf5f0;border-radius:16px;padding:15px;display:flex;align-items:center;gap:13px;margin-top:10px">
+<div style="width:40px;height:40px;border-radius:11px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:17px;flex:none">💕</div>
+<div><div style="font-size:15px;color:#1a1a1a;font-weight:600">Avec Camille</div><div style="font-size:12.5px;color:#2D5E5A">Voir son état cette semaine</div></div>
+</div>
+</div>
+<div style="flex:1"></div>
+<div style="display:flex;align-items:center;justify-content:space-between;padding:14px 8px;border-top:1px solid rgba(0,0,0,.06)">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="1.8"><path d="M3 11l9-8 9 8"></path><path d="M5 10v10h14V10"></path></svg>
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8a8a8a" stroke-width="1.8"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 4-6 8-6s8 2 8 6"></path></svg>
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8a8a8a" stroke-width="1.8"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"></path></svg>
+</div>
+</div>
+</x-import>
+</div>
+
+<div class="dv-opt" id="3a">
+<div class="dv-olabel"><a class="dv-oid" href="#3a">3a</a>Check-in — Camille</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402,874">
+<div style="height:100%;display:flex;flex-direction:column;padding:70px 20px 0;box-sizing:border-box;background:#EAF5F0">
+<a href="#3c" style="display:flex;align-items:center;gap:6px;color:#2D5E5A;font-size:14px;font-weight:600;text-decoration:none;margin-bottom:6px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="2.2"><path d="M15 18l-6-6 6-6"></path></svg>Accueil</a>
+<div style="display:flex;justify-content:space-between;align-items:center">
+<div style="font-size:22px;font-weight:700;color:#1a1a1a">Ensemble</div>
+<a href="#7a" style="display:flex;align-items:center;gap:4px;background:#2D5E5A;color:#fff;font-size:11px;font-weight:600;border-radius:20px;padding:6px 10px;white-space:nowrap;text-decoration:none;flex:none"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M12 2c-1.5 3-1.5 6 0 9M12 11c2.5-1 4.5-3 5.5-6M12 11c-2.5-1-4.5-3-5.5-6M12 11v10M9 21h6"></path></svg>J'ai accouché</a>
+</div>
+<div style="font-size:14px;color:#6b6b6b;margin-top:6px">Comment vous sentez-vous aujourd'hui ?</div>
+<div style="display:flex;justify-content:space-between;margin-top:16px">
+<div style="width:46px;height:46px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:22px">😄</div>
+<div style="width:46px;height:46px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:22px">🙂</div>
+<div style="width:46px;height:46px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:22px">😐</div>
+<div style="width:46px;height:46px;border-radius:50%;background:#2D5E5A;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 3px 8px rgba(45,94,90,.35)">😩</div>
+<div style="width:46px;height:46px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:22px">😢</div>
+</div>
+<div style="display:flex;align-items:center;justify-content:space-between;margin-top:16px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="2.2"><path d="M15 18l-6-6 6-6"></path></svg><div style="font-size:13px;font-weight:600;color:#1a1a1a">Du 7 au 13 septembre</div><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="2.2"><path d="M9 18l6-6-6-6"></path></svg></div>
+<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:8px;text-align:center">
+<div style="font-size:10px;color:#9a9a9a;font-weight:600">L</div><div style="font-size:10px;color:#9a9a9a;font-weight:600">M</div><div style="font-size:10px;color:#9a9a9a;font-weight:600">M</div><div style="font-size:10px;color:#9a9a9a;font-weight:600">J</div><div style="font-size:10px;color:#9a9a9a;font-weight:600">V</div><div style="font-size:10px;color:#9a9a9a;font-weight:600">S</div><div style="font-size:10px;color:#9a9a9a;font-weight:600">D</div>
+<div style="font-size:16px">🙂</div><div style="font-size:16px">😄</div><div style="font-size:16px">😐</div><div style="font-size:16px">🙂</div><div style="font-size:16px">😩</div><div style="font-size:16px">😐</div><div style="font-size:16px;background:#2D5E5A;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;margin:0 auto">😩</div>
+</div>
+<div style="background:#fff;border-radius:16px;padding:16px;margin-top:20px">
+<div style="font-size:13.5px;color:#333;margin-bottom:10px">Vous semblez plutôt stable au niveau de votre humeur en cette 24ème semaine d'aménorrhée</div>
+<div style="display:flex;align-items:flex-end;gap:6px;height:34px">
+<div style="width:12px;height:60%;background:#2D5E5A;border-radius:3px"></div><div style="width:12px;height:75%;background:#2D5E5A;border-radius:3px"></div><div style="width:12px;height:50%;background:#2D5E5A;border-radius:3px"></div><div style="width:12px;height:70%;background:#2D5E5A;border-radius:3px"></div><div style="width:12px;height:65%;background:#2D5E5A;border-radius:3px"></div><div style="width:12px;height:80%;background:#2D5E5A;border-radius:3px"></div><div style="width:12px;height:60%;background:#2D5E5A;border-radius:3px"></div>
+</div>
+</div>
+<div style="flex:1"></div>
+<div style="background:#fff;border-radius:16px;padding:16px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;margin-bottom:14px">
+<div style="width:100%;height:70px;border-radius:12px;background:#F2F2F7;display:flex;align-items:center;justify-content:center;font-size:26px">💬</div>
+<div style="font-size:11px;color:#9a9a9a;letter-spacing:.4px">GESTE DU JOUR</div>
+<div style="font-size:13.5px;color:#1a1a1a;line-height:1.35">N'hésite pas à lui dire qu'il est important aux rendez-vous</div>
+</div>
+<div style="display:flex;align-items:center;justify-content:space-between;padding:14px 8px 18px;border-top:1px solid rgba(0,0,0,.06);flex:none">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="1.8"><path d="M3 11l9-8 9 8"></path><path d="M5 10v10h14V10"></path></svg>
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8a8a8a" stroke-width="1.8"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 4-6 8-6s8 2 8 6"></path></svg>
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8a8a8a" stroke-width="1.8"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"></path></svg>
+</div></div>
+</x-import>
+</div>
+
+<div class="dv-opt" id="3b">
+<div class="dv-olabel"><a class="dv-oid" href="#3b">3b</a>Overlay "j'ai besoin de…"</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402,874">
+<div style="height:100%;position:relative;background:rgba(0,0,0,.35)">
+<div style="position:absolute;bottom:0;left:0;right:0;background:#fff;border-radius:24px 24px 0 0;padding:22px 22px 30px;display:flex;flex-direction:column;gap:14px">
+<div style="width:36px;height:4px;background:#ddd;border-radius:2px;margin:0 auto 4px"></div>
+<div style="width:52px;height:52px;border-radius:50%;background:#EAF5F0;display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto">😩</div>
+<div style="font-size:19px;font-weight:700;color:#1a1a1a;text-align:center">Besoin de quelque chose ?</div>
+<div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center">
+<div style="border:1.5px solid #e2e2e2;border-radius:20px;padding:9px 15px;font-size:13.5px;color:#1a1a1a">Sommeil</div>
+<div style="border:1.5px solid #e2e2e2;border-radius:20px;padding:9px 15px;font-size:13.5px;color:#1a1a1a">Coup de main pratique</div>
+<div style="background:#2D5E5A;border-radius:20px;padding:9px 15px;font-size:13.5px;color:#fff;font-weight:600">Câlin</div>
+<div style="border:1.5px solid #e2e2e2;border-radius:20px;padding:9px 15px;font-size:13.5px;color:#1a1a1a">Juste parler</div>
+</div>
+<input placeholder="Ou écrivez votre propre besoin…" style="border:none;background:#F2F2F7;border-radius:14px;padding:14px;font-size:14px;color:#1a1a1a;font-family:inherit;outline:none">
+<div style="background:#2D5E5A;color:#fff;border-radius:14px;padding:15px;text-align:center;font-size:15.5px;font-weight:600">Envoyer</div>
+<div style="text-align:center;font-size:13.5px;color:#9a9a9a">Passer</div>
+</div>
+</div>
+</x-import>
+</div>
+
+<div class="dv-opt" id="3e">
+<div class="dv-olabel"><a class="dv-oid" href="#3e">3e</a>Geste du jour (détail)</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402,874">
+<div style="height:100%;display:flex;flex-direction:column;padding:70px 24px 40px;box-sizing:border-box;background:#FDF6E3;text-align:center">
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px">
+<div style="width:130px;height:130px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:50px">🌙</div>
+<div style="font-size:11.5px;color:#9a9a9a;letter-spacing:.5px;font-weight:600">GESTE DU JOUR</div>
+<div style="font-size:20px;color:#1a1a1a;font-weight:600;line-height:1.4;max-width:260px">Aujourd'hui, propose-lui de dormir 1h de plus.</div>
+</div>
+<div style="border:1.5px solid #d4d4d4;color:#1a1a1a;border-radius:14px;padding:16px;font-size:16px;font-weight:600">Fermer</div>
+</div>
+</x-import>
+</div>
+
+<div class="dv-opt" id="3g">
+<div class="dv-olabel"><a class="dv-oid" href="#3g">3g</a>Check-in — Paul</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402,874">
+<div style="height:100%;display:flex;flex-direction:column;padding:70px 20px 0;box-sizing:border-box;background:#FDF6E3">
+<a href="#3d" style="display:flex;align-items:center;gap:6px;color:#2D5E5A;font-size:14px;font-weight:600;text-decoration:none;margin-bottom:6px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="2.2"><path d="M15 18l-6-6 6-6"></path></svg>Accueil</a>
+<div style="display:flex;justify-content:space-between;align-items:center">
+<div style="font-size:22px;font-weight:700;color:#1a1a1a">Ensemble</div>
+<a href="#7a" style="display:flex;align-items:center;gap:4px;background:#2D5E5A;color:#fff;font-size:11px;font-weight:600;border-radius:20px;padding:6px 10px;white-space:nowrap;text-decoration:none;flex:none"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M12 2c-1.5 3-1.5 6 0 9M12 11c2.5-1 4.5-3 5.5-6M12 11c-2.5-1-4.5-3-5.5-6M12 11v10M9 21h6"></path></svg>J'ai accouché</a>
+</div>
+<div style="font-size:14px;color:#6b6b6b;margin-top:6px">Comment vous sentez-vous aujourd'hui ?</div>
+<div style="display:flex;justify-content:space-between;margin-top:16px">
+<div style="width:46px;height:46px;border-radius:50%;background:#2D5E5A;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 3px 8px rgba(45,94,90,.35)">😄</div>
+<div style="width:46px;height:46px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:22px">🙂</div>
+<div style="width:46px;height:46px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:22px">😐</div>
+<div style="width:46px;height:46px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:22px">😩</div>
+<div style="width:46px;height:46px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:22px">😢</div>
+</div>
+<div style="display:flex;align-items:center;justify-content:space-between;margin-top:16px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="2.2"><path d="M15 18l-6-6 6-6"></path></svg><div style="font-size:13px;font-weight:600;color:#1a1a1a">Du 7 au 13 septembre</div><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="2.2"><path d="M9 18l6-6-6-6"></path></svg></div>
+<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:8px;text-align:center">
+<div style="font-size:10px;color:#9a9a9a;font-weight:600">L</div><div style="font-size:10px;color:#9a9a9a;font-weight:600">M</div><div style="font-size:10px;color:#9a9a9a;font-weight:600">M</div><div style="font-size:10px;color:#9a9a9a;font-weight:600">J</div><div style="font-size:10px;color:#9a9a9a;font-weight:600">V</div><div style="font-size:10px;color:#9a9a9a;font-weight:600">S</div><div style="font-size:10px;color:#9a9a9a;font-weight:600">D</div>
+<div style="font-size:16px">😄</div><div style="font-size:16px">🙂</div><div style="font-size:16px">😐</div><div style="font-size:16px">😄</div><div style="font-size:16px">🙂</div><div style="font-size:16px">😐</div><div style="font-size:16px;background:#2D5E5A;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;margin:0 auto">😄</div>
+</div>
+<div style="background:#fff;border-radius:16px;padding:16px;margin-top:20px">
+<div style="font-size:13.5px;color:#333;margin-bottom:10px">Vous semblez plutôt stable au niveau de votre humeur en cette 24ème semaine</div>
+<div style="display:flex;align-items:flex-end;gap:6px;height:34px">
+<div style="width:12px;height:60%;background:#2D5E5A;border-radius:3px"></div><div style="width:12px;height:75%;background:#2D5E5A;border-radius:3px"></div><div style="width:12px;height:50%;background:#2D5E5A;border-radius:3px"></div><div style="width:12px;height:70%;background:#2D5E5A;border-radius:3px"></div><div style="width:12px;height:65%;background:#2D5E5A;border-radius:3px"></div><div style="width:12px;height:80%;background:#2D5E5A;border-radius:3px"></div><div style="width:12px;height:60%;background:#2D5E5A;border-radius:3px"></div>
+</div>
+</div>
+<div style="flex:1"></div>
+<div style="background:#fff;border-radius:16px;padding:16px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;margin-bottom:14px">
+<div style="width:100%;height:70px;border-radius:12px;background:#F2F2F7;display:flex;align-items:center;justify-content:center;font-size:26px">💬</div>
+<div style="font-size:11px;color:#9a9a9a;letter-spacing:.4px">GESTE DU JOUR</div>
+<div style="font-size:13.5px;color:#1a1a1a;line-height:1.35">N'hésite pas à lui dire qu'elle est belle</div>
+</div>
+<div style="display:flex;align-items:center;justify-content:space-between;padding:14px 8px 18px;border-top:1px solid rgba(0,0,0,.06);flex:none">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="1.8"><path d="M3 11l9-8 9 8"></path><path d="M5 10v10h14V10"></path></svg>
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8a8a8a" stroke-width="1.8"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 4-6 8-6s8 2 8 6"></path></svg>
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8a8a8a" stroke-width="1.8"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"></path></svg>
+</div></div>
+</x-import>
+</div>
+
+<div class="dv-opt" id="3f">
+<div class="dv-olabel"><a class="dv-oid" href="#3f">3f</a>Notification push</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402,874">
+<div style="height:100%;background:#efeee9;padding-top:70px;box-sizing:border-box">
+<div style="margin:0 12px;background:rgba(255,255,255,.85);backdrop-filter:blur(20px);border-radius:18px;padding:13px;display:flex;gap:10px;align-items:flex-start;box-shadow:0 6px 20px rgba(0,0,0,.12)">
+<div style="width:34px;height:34px;border-radius:9px;background:#2D5E5A;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex:none">US</div>
+<div style="flex:1">
+<div style="display:flex;justify-content:space-between;font-size:11.5px;color:#8a8a8a;font-weight:600"><span>US</span><span>maintenant</span></div>
+<div style="font-size:14px;color:#1a1a1a;line-height:1.35;margin-top:2px">Aujourd'hui, propose-lui de dormir 1h de plus.</div>
+</div>
+</div>
+</div>
+</x-import>
+</div>
+
+<div class="dv-opt" id="3y">
+<div class="dv-olabel"><a class="dv-oid" href="#3y">3y</a>Mon profil</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402,874">
+<div style="height:100%;display:flex;flex-direction:column;padding:70px 20px 0;box-sizing:border-box;background:#FDF6E3">
+<div style="font-size:24px;font-weight:700;color:#1a1a1a">Mon profil</div>
+<div style="font-size:11.5px;color:#9a9a9a;font-weight:600;letter-spacing:.4px;margin:18px 0 8px">VOTRE PRÉNOM</div>
+<input value="Camille" style="border:none;background:#fff;border-radius:14px;padding:14px 16px;font-size:15px;color:#1a1a1a;font-family:inherit;outline:none" />
+<div style="flex:1"></div>
+<div style="background:#2D5E5A;color:#fff;border-radius:14px;padding:15px;text-align:center;font-size:15.5px;font-weight:600;margin-bottom:14px">Sauvegarder</div>
+<div style="display:flex;align-items:center;justify-content:space-between;padding:14px 8px 18px;border-top:1px solid rgba(0,0,0,.06);flex:none">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8a8a8a" stroke-width="1.8"><path d="M3 11l9-8 9 8"></path><path d="M5 10v10h14V10"></path></svg>
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="1.8"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 4-6 8-6s8 2 8 6"></path></svg>
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8a8a8a" stroke-width="1.8"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"></path></svg>
+</div></div>
+</x-import>
+</div>
+
+<div class="dv-opt" id="3z">
+<div class="dv-olabel"><a class="dv-oid" href="#3z">3z</a>Infos importantes</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402,874">
+<div style="height:100%;display:flex;flex-direction:column;padding:70px 20px 0;box-sizing:border-box;background:#FDF6E3">
+<div style="font-size:22px;font-weight:700;color:#1a1a1a">Infos importantes</div>
+<div style="font-size:12.5px;color:#8a8a8a;margin-top:4px">Partagé entre Camille et Paul</div>
+<div style="display:flex;flex-direction:column;gap:8px;margin-top:16px">
+<div style="background:#F2F2F7;border-radius:14px;padding:9px 12px"><div style="font-size:11.5px;color:#8a8a8a">Début de grossesse</div><div style="font-size:14.5px;color:#1a1a1a;font-weight:600">12 avril 2026</div></div>
+<div style="background:#F2F2F7;border-radius:14px;padding:9px 12px"><div style="font-size:11.5px;color:#8a8a8a">Terme prévu</div><div style="font-size:14.5px;color:#1a1a1a;font-weight:600">17 janvier 2027</div></div>
+<div style="background:#F2F2F7;border-radius:14px;padding:9px 12px"><div style="font-size:11.5px;color:#8a8a8a">Groupe sanguin de la mère</div><div style="font-size:14.5px;color:#1a1a1a;font-weight:600">O+</div></div>
+<div style="background:#F2F2F7;border-radius:14px;padding:9px 12px"><div style="font-size:11.5px;color:#8a8a8a">Groupe sanguin du père</div><div style="font-size:14.5px;color:#1a1a1a;font-weight:600">A+</div></div>
+<div style="background:#F2F2F7;border-radius:14px;padding:9px 12px"><div style="font-size:11.5px;color:#8a8a8a">Points de vigilance</div><div style="font-size:14.5px;color:#1a1a1a;font-weight:600">Diabète gestationnel, hypertension</div></div>
+<div style="background:#F2F2F7;border-radius:14px;padding:9px 12px"><div style="font-size:11.5px;color:#8a8a8a">Allergies</div><div style="font-size:14.5px;color:#1a1a1a;font-weight:600">Pénicilline</div></div>
+<div style="background:#F2F2F7;border-radius:14px;padding:9px 12px"><div style="font-size:11.5px;color:#8a8a8a">Numéro de sécurité sociale</div><div style="font-size:14.5px;color:#1a1a1a;font-weight:600">2 96 04 75 108 042 15</div></div>
+<div style="background:#F2F2F7;border-radius:14px;padding:9px 12px"><div style="font-size:11.5px;color:#8a8a8a">Numéro de la sage-femme</div><div style="font-size:14.5px;color:#1a1a1a;font-weight:600">06 12 34 56 78</div></div>
+<div style="background:#F2F2F7;border-radius:14px;padding:9px 12px"><div style="font-size:11.5px;color:#8a8a8a">Maternité</div><div style="font-size:14.5px;color:#1a1a1a;font-weight:600">12 rue des Lilas, Paris — 01 23 45 67 89</div></div>
+</div>
+<div style="flex:1"></div><div style="display:flex;align-items:center;justify-content:space-between;padding:14px 8px 18px;border-top:1px solid rgba(0,0,0,.06);flex:none">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8a8a8a" stroke-width="1.8"><path d="M3 11l9-8 9 8"></path><path d="M5 10v10h14V10"></path></svg>
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8a8a8a" stroke-width="1.8"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 4-6 8-6s8 2 8 6"></path></svg>
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8a8a8a" stroke-width="1.8"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"></path></svg>
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="1.8"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4M12 8h.01"></path></svg>
+</div></div>
+</x-import>
+</div>
+
+</div>
+<p class="dv-next">Ensuite : "fais la partie 4 (pilier Suivi santé)"</p>
+</section>
+
+<section class="dv-turn" id="t4">
+<div class="dv-thd"><a class="dv-tid" href="#t4">4</a><span class="dv-tname">Pilier "Suivi santé" — santé partagée</span></div>
+<div class="dv-opts">
+
+<div class="dv-opt" id="4a">
+<div class="dv-olabel"><a class="dv-oid" href="#4a">4a</a>Journal du jour</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402,874" >
+<div style="height:100%;display:flex;flex-direction:column;padding:70px 20px 0;box-sizing:border-box;background:#EAF5F0">
+<a href="#2b" style="display:flex;align-items:center;gap:6px;color:#2D5E5A;font-size:14px;font-weight:600;text-decoration:none;margin-bottom:8px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="2.2"><path d="M15 18l-6-6 6-6"></path></svg>Accueil</a>
+<div style="display:flex;justify-content:space-between;align-items:center"><div style="font-size:22px;font-weight:700;color:#1a1a1a">Suivi santé</div><a href="#7a" style="display:flex;align-items:center;gap:5px;background:#2D5E5A;color:#fff;font-size:11px;font-weight:600;border-radius:20px;padding:6px 10px;white-space:nowrap;text-decoration:none;flex:none"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M12 2c-1.5 3-1.5 6 0 9M12 11c2.5-1 4.5-3 5.5-6M12 11c-2.5-1-4.5-3-5.5-6M12 11v10M9 21h6"></path></svg>J'ai accouché</a></div>
+<div style="display:flex;gap:4px;margin-top:12px;border-bottom:1.5px solid rgba(0,0,0,.08)">
+<div style="flex:1;text-align:center;padding:5px 2px;font-size:12.5px;font-weight:600;color:#2D5E5A;border-bottom:2.5px solid #2D5E5A;margin-bottom:-1.5px">Journal</div>
+<div style="flex:1;text-align:center;padding:5px 2px;font-size:12.5px;color:#9a9a9a">Rendez-vous</div>
+<div style="flex:1;text-align:center;padding:5px 2px;font-size:12.5px;color:#9a9a9a">Contacts</div>
+<div style="flex:1;text-align:center;padding:5px 2px;font-size:12.5px;color:#9a9a9a">Exercices</div>
+</div>
+<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-top:8px;text-align:center">
+<div style="font-size:10px;color:#9a9a9a;font-weight:600">L</div><div style="font-size:10px;color:#9a9a9a;font-weight:600">M</div><div style="font-size:10px;color:#9a9a9a;font-weight:600">M</div><div style="font-size:10px;color:#9a9a9a;font-weight:600">J</div><div style="font-size:10px;color:#9a9a9a;font-weight:600">V</div><div style="font-size:10px;color:#9a9a9a;font-weight:600">S</div><div style="font-size:10px;color:#9a9a9a;font-weight:600">D</div>
+<div style="font-size:11px;color:#9a9a9a;position:relative;padding:4px 0">3<div style="width:3px;height:3px;background:#2D5E5A;border-radius:50%;margin:2px auto 0"></div></div>
+<div style="font-size:11px;color:#9a9a9a;padding:4px 0">4</div>
+<div style="font-size:11px;color:#9a9a9a;position:relative;padding:4px 0">5<div style="width:3px;height:3px;background:#2D5E5A;border-radius:50%;margin:2px auto 0"></div></div>
+<div style="font-size:11px;color:#9a9a9a;padding:4px 0">6</div>
+<div style="font-size:11px;color:#9a9a9a;padding:4px 0">7</div>
+<div style="font-size:11px;color:#9a9a9a;position:relative;padding:4px 0">8<div style="width:3px;height:3px;background:#2D5E5A;border-radius:50%;margin:2px auto 0"></div></div>
+<div style="font-size:11px;color:#fff;background:#2D5E5A;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;margin:0 auto;font-weight:600">9</div>
+</div>
+<div style="font-size:13px;color:#1a1a1a;font-weight:600;margin-top:10px">Un symptôme aujourd'hui ?</div>
+<div style="display:flex;flex-direction:column;gap:5px;margin-top:6px">
+<div style="background:#fff;border-radius:12px;padding:8px 14px;display:flex;align-items:center;justify-content:space-between"><div style="font-size:14px;color:#1a1a1a">Vomissements</div><div style="width:20px;height:20px;border-radius:6px;background:#2D5E5A"></div></div>
+<div style="background:#fff;border-radius:12px;padding:8px 14px;display:flex;align-items:center;justify-content:space-between"><div style="font-size:14px;color:#1a1a1a">Vertiges</div><div style="width:20px;height:20px;border-radius:6px;border:2px solid #d4d4d4"></div></div>
+<div style="background:#fff;border-radius:12px;padding:8px 14px;display:flex;align-items:center;justify-content:space-between"><div style="font-size:14px;color:#1a1a1a">Mal de dos</div><div style="width:20px;height:20px;border-radius:6px;background:#2D5E5A"></div></div>
+<div style="background:#fff;border-radius:12px;padding:8px 14px;display:flex;align-items:center;justify-content:space-between"><div style="font-size:14px;color:#1a1a1a">Fatigue</div><div style="width:20px;height:20px;border-radius:6px;border:2px solid #d4d4d4"></div></div>
+</div>
+<div style="flex:1"></div>
+<div style="background:#2D5E5A;color:#fff;border-radius:14px;padding:15px;text-align:center;font-size:15.5px;font-weight:600;margin-bottom:10px">Enregistrer</div>
+<div style="display:flex;align-items:center;justify-content:space-between;padding:14px 8px 18px;border-top:1px solid rgba(0,0,0,.06);flex:none">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="1.8"><path d="M3 11l9-8 9 8"></path><path d="M5 10v10h14V10"></path></svg>
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8a8a8a" stroke-width="1.8"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 4-6 8-6s8 2 8 6"></path></svg>
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8a8a8a" stroke-width="1.8"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"></path></svg>
+</div>
+</x-import>
+</div>
+</div>
+
+<div class="dv-opt" id="4z">
+<div class="dv-olabel"><a class="dv-oid" href="#4z">4z</a>Suivi santé — vue Paul</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402,874" >
+<div style="height:100%;display:flex;flex-direction:column;padding:70px 20px 0;box-sizing:border-box;background:#FDF6E3">
+<a href="#2b" style="display:flex;align-items:center;gap:6px;color:#2D5E5A;font-size:14px;font-weight:600;text-decoration:none;margin-bottom:8px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="2.2"><path d="M15 18l-6-6 6-6"></path></svg>Accueil</a>
+<div style="display:flex;justify-content:space-between;align-items:center"><div style="font-size:22px;font-weight:700;color:#1a1a1a">Suivi santé</div><a href="#7a" style="display:flex;align-items:center;gap:5px;background:#2D5E5A;color:#fff;font-size:11px;font-weight:600;border-radius:20px;padding:6px 10px;white-space:nowrap;text-decoration:none;flex:none"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M12 2c-1.5 3-1.5 6 0 9M12 11c2.5-1 4.5-3 5.5-6M12 11c-2.5-1-4.5-3-5.5-6M12 11v10M9 21h6"></path></svg>J'ai accouché</a></div>
+<div style="display:flex;gap:4px;margin-top:12px;border-bottom:1.5px solid #f0f0f0">
+<div style="flex:1;text-align:center;padding:5px 2px;font-size:12.5px;font-weight:600;color:#2D5E5A;border-bottom:2.5px solid #2D5E5A;margin-bottom:-1.5px">Rendez-vous</div>
+<div style="flex:1;text-align:center;padding:5px 2px;font-size:12.5px;color:#9a9a9a">Contacts</div>
+<div style="flex:1;text-align:center;padding:5px 2px;font-size:12.5px;color:#9a9a9a">Exercices</div>
+</div>
+<div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="2"><path d="M15 18l-6-6 6-6"></path></svg><div style="font-size:14px;font-weight:700;color:#1a1a1a">Septembre 2026</div><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="2"><path d="M9 18l6-6-6-6"></path></svg></div>
+<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-top:6px;text-align:center">
+<div style="font-size:10px;color:#9a9a9a;font-weight:600">L</div><div style="font-size:10px;color:#9a9a9a;font-weight:600">M</div><div style="font-size:10px;color:#9a9a9a;font-weight:600">M</div><div style="font-size:10px;color:#9a9a9a;font-weight:600">J</div><div style="font-size:10px;color:#9a9a9a;font-weight:600">V</div><div style="font-size:10px;color:#9a9a9a;font-weight:600">S</div><div style="font-size:10px;color:#9a9a9a;font-weight:600">D</div>
+<div style="font-size:10px;color:#ddd;padding:3px 0"></div><div style="font-size:10px;color:#ddd;padding:3px 0"></div><div style="font-size:9.5px;color:#9a9a9a;padding:2px 0">1</div><div style="font-size:9.5px;color:#9a9a9a;padding:2px 0">2</div><div style="font-size:9.5px;color:#9a9a9a;padding:2px 0">3</div><div style="font-size:9.5px;color:#9a9a9a;padding:2px 0">4</div><div style="font-size:9.5px;color:#9a9a9a;padding:2px 0">5</div>
+<div style="font-size:9.5px;color:#9a9a9a;padding:2px 0">6</div><div style="font-size:9.5px;color:#9a9a9a;padding:2px 0">7</div><div style="font-size:9.5px;color:#9a9a9a;padding:2px 0">8</div><div style="font-size:9.5px;color:#fff;background:#2D5E5A;border-radius:50%;width:17px;height:17px;display:flex;align-items:center;justify-content:center;margin:0 auto;font-weight:600">9</div><div style="font-size:9.5px;color:#9a9a9a;padding:2px 0">10</div><div style="font-size:9.5px;color:#9a9a9a;padding:2px 0">11</div><div style="font-size:9.5px;color:#9a9a9a;padding:2px 0">12</div>
+<div style="font-size:9.5px;color:#9a9a9a;padding:2px 0">13</div><div style="font-size:9.5px;color:#1a1a1a;border:2px solid #2D6EDB;border-radius:50%;width:17px;height:17px;display:flex;align-items:center;justify-content:center;margin:0 auto">14</div><div style="font-size:9.5px;color:#9a9a9a;padding:2px 0">15</div><div style="font-size:9.5px;color:#9a9a9a;padding:2px 0">16</div><div style="font-size:9.5px;color:#9a9a9a;padding:2px 0">17</div><div style="font-size:9.5px;color:#9a9a9a;padding:2px 0">18</div><div style="font-size:9.5px;color:#9a9a9a;padding:2px 0">19</div>
+<div style="font-size:9.5px;color:#9a9a9a;padding:2px 0">20</div><div style="font-size:9.5px;color:#1a1a1a;border:2px solid #c0392b;border-radius:50%;width:17px;height:17px;display:flex;align-items:center;justify-content:center;margin:0 auto">21</div><div style="font-size:9.5px;color:#9a9a9a;padding:2px 0">22</div><div style="font-size:9.5px;color:#9a9a9a;padding:2px 0">23</div><div style="font-size:9.5px;color:#9a9a9a;padding:2px 0">24</div><div style="font-size:9.5px;color:#9a9a9a;padding:2px 0">25</div><div style="font-size:9.5px;color:#9a9a9a;padding:2px 0">26</div>
+</div>
+<div style="font-size:12.5px;color:#8a8a8a;margin-top:8px;line-height:1.35">Suivez les rendez-vous, contacts et exercices de Camille — le journal quotidien de symptômes n'est rempli que par elle.</div>
+<div style="font-size:12px;color:#1a1a1a;font-weight:600;margin-top:8px">Vos prochains rendez-vous</div>
+<div style="display:flex;flex-direction:column;gap:6px;margin-top:6px">
+<div style="border:1px solid #f0f0f0;box-shadow:0 1px 3px rgba(0,0,0,.04);border-radius:14px;padding:9px 12px">
+<div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:14.5px;color:#1a1a1a;font-weight:600">Écho T2</span><span style="font-size:10.5px;background:#2D6EDB;color:#fff;border-radius:8px;padding:3px 8px;font-weight:600">Partagé</span></div>
+<div style="font-size:12px;color:#8a8a8a;margin-top:2px">14 sept · 10h30 — Cabinet Dr Martin</div>
+</div>
+<div style="border:1px solid #f0f0f0;box-shadow:0 1px 3px rgba(0,0,0,.04);border-radius:14px;padding:9px 12px">
+<div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:14.5px;color:#1a1a1a;font-weight:600">Rendez gynéco</span><span style="font-size:10.5px;background:#c0392b;color:#fff;border-radius:8px;padding:3px 8px;font-weight:600">Non partagé</span></div>
+<div style="font-size:12px;color:#8a8a8a;margin-top:2px">2 oct · 9h00</div>
+</div>
+</div>
+<div style="flex:1"></div>
+<div style="display:flex;align-items:center;justify-content:space-between;padding:14px 8px 18px;border-top:1px solid rgba(0,0,0,.06);flex:none">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="1.8"><path d="M3 11l9-8 9 8"></path><path d="M5 10v10h14V10"></path></svg>
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8a8a8a" stroke-width="1.8"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 4-6 8-6s8 2 8 6"></path></svg>
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8a8a8a" stroke-width="1.8"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"></path></svg>
+</div>
+</div>
+</x-import>
+</div>
+
+<div class="dv-opt" id="4b">
+<div class="dv-olabel"><a class="dv-oid" href="#4b">4b</a>Rendez-vous</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402,874" >
+<div style="height:100%;display:flex;flex-direction:column;padding:70px 20px 0;box-sizing:border-box;background:#EAF5F0">
+<a href="#2b" style="display:flex;align-items:center;gap:6px;color:#2D5E5A;font-size:14px;font-weight:600;text-decoration:none;margin-bottom:8px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="2.2"><path d="M15 18l-6-6 6-6"></path></svg>Accueil</a>
+<div style="display:flex;justify-content:space-between;align-items:center"><div style="font-size:22px;font-weight:700;color:#1a1a1a">Suivi santé</div><a href="#7a" style="display:flex;align-items:center;gap:5px;background:#2D5E5A;color:#fff;font-size:11px;font-weight:600;border-radius:20px;padding:6px 10px;white-space:nowrap;text-decoration:none;flex:none"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M12 2c-1.5 3-1.5 6 0 9M12 11c2.5-1 4.5-3 5.5-6M12 11c-2.5-1-4.5-3-5.5-6M12 11v10M9 21h6"></path></svg>J'ai accouché</a></div>
+<div style="display:flex;gap:4px;margin-top:12px;border-bottom:1.5px solid #f0f0f0">
+<div style="flex:1;text-align:center;padding:5px 2px;font-size:12.5px;color:#9a9a9a">Journal</div>
+<div style="flex:1;text-align:center;padding:5px 2px;font-size:12.5px;font-weight:600;color:#2D5E5A;border-bottom:2.5px solid #2D5E5A;margin-bottom:-1.5px">Rendez-vous</div>
+<div style="flex:1;text-align:center;padding:5px 2px;font-size:12.5px;color:#9a9a9a">Contacts</div>
+<div style="flex:1;text-align:center;padding:5px 2px;font-size:12.5px;color:#9a9a9a">Exercices</div>
+</div>
+<div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="2"><path d="M15 18l-6-6 6-6"></path></svg><div style="font-size:14px;font-weight:700;color:#1a1a1a">Septembre 2026</div><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="2"><path d="M9 18l6-6-6-6"></path></svg></div>
+<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-top:6px;text-align:center">
+<div style="font-size:10px;color:#9a9a9a;font-weight:600">L</div><div style="font-size:10px;color:#9a9a9a;font-weight:600">M</div><div style="font-size:10px;color:#9a9a9a;font-weight:600">M</div><div style="font-size:10px;color:#9a9a9a;font-weight:600">J</div><div style="font-size:10px;color:#9a9a9a;font-weight:600">V</div><div style="font-size:10px;color:#9a9a9a;font-weight:600">S</div><div style="font-size:10px;color:#9a9a9a;font-weight:600">D</div>
+<div style="font-size:10px;color:#ddd;padding:3px 0"></div><div style="font-size:10px;color:#ddd;padding:3px 0"></div><div style="font-size:9.5px;color:#9a9a9a;padding:2px 0">1</div><div style="font-size:9.5px;color:#9a9a9a;padding:2px 0">2</div><div style="font-size:9.5px;color:#9a9a9a;padding:2px 0">3</div><div style="font-size:9.5px;color:#9a9a9a;padding:2px 0">4</div><div style="font-size:9.5px;color:#9a9a9a;padding:2px 0">5</div>
+<div style="font-size:9.5px;color:#9a9a9a;padding:2px 0">6</div><div style="font-size:9.5px;color:#9a9a9a;padding:2px 0">7</div><div style="font-size:9.5px;color:#9a9a9a;padding:2px 0">8</div><div style="font-size:9.5px;color:#fff;background:#2D5E5A;border-radius:50%;width:17px;height:17px;display:flex;align-items:center;justify-content:center;margin:0 auto;font-weight:600">9</div><div style="font-size:9.5px;color:#9a9a9a;padding:2px 0">10</div><div style="font-size:9.5px;color:#9a9a9a;padding:2px 0">11</div><div style="font-size:9.5px;color:#9a9a9a;padding:2px 0">12</div>
+<div style="font-size:9.5px;color:#9a9a9a;padding:2px 0">13</div><div style="font-size:9.5px;color:#1a1a1a;border:2px solid #2D6EDB;border-radius:50%;width:17px;height:17px;display:flex;align-items:center;justify-content:center;margin:0 auto">14</div><div style="font-size:9.5px;color:#9a9a9a;padding:2px 0">15</div><div style="font-size:9.5px;color:#9a9a9a;padding:2px 0">16</div><div style="font-size:9.5px;color:#9a9a9a;padding:2px 0">17</div><div style="font-size:9.5px;color:#9a9a9a;padding:2px 0">18</div><div style="font-size:9.5px;color:#9a9a9a;padding:2px 0">19</div>
+<div style="font-size:9.5px;color:#9a9a9a;padding:2px 0">20</div><div style="font-size:9.5px;color:#1a1a1a;border:2px solid #c0392b;border-radius:50%;width:17px;height:17px;display:flex;align-items:center;justify-content:center;margin:0 auto">21</div><div style="font-size:9.5px;color:#9a9a9a;padding:2px 0">22</div><div style="font-size:9.5px;color:#9a9a9a;padding:2px 0">23</div><div style="font-size:9.5px;color:#9a9a9a;padding:2px 0">24</div><div style="font-size:9.5px;color:#9a9a9a;padding:2px 0">25</div><div style="font-size:9.5px;color:#9a9a9a;padding:2px 0">26</div>
+</div>
+<div style="font-size:12px;color:#1a1a1a;font-weight:600;margin-top:8px">Vos prochains rendez-vous</div>
+<div style="display:flex;flex-direction:column;gap:6px;margin-top:6px">
+<div style="border:1px solid #f0f0f0;box-shadow:0 1px 3px rgba(0,0,0,.04);border-radius:14px;padding:9px 12px">
+<div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:14.5px;color:#1a1a1a;font-weight:600">Écho T2</span><span style="font-size:10.5px;background:#2D6EDB;color:#fff;border-radius:8px;padding:3px 8px;font-weight:600">Partagé</span></div>
+<div style="font-size:12px;color:#8a8a8a;margin-top:2px">14 sept · 10h30 — Cabinet Dr Martin</div>
+</div>
+<div style="border:1px solid #f0f0f0;box-shadow:0 1px 3px rgba(0,0,0,.04);border-radius:14px;padding:9px 12px">
+<div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:14.5px;color:#1a1a1a;font-weight:600">Rendez gynéco</span><span style="font-size:10.5px;background:#c0392b;color:#fff;border-radius:8px;padding:3px 8px;font-weight:600">Non partagé</span></div>
+<div style="font-size:12px;color:#8a8a8a;margin-top:2px">2 oct · 9h00</div>
+</div>
+</div>
+<div style="flex:1"></div>
+<div style="background:#2D5E5A;color:#fff;border-radius:14px;padding:15px;text-align:center;font-size:15px;font-weight:600;margin-bottom:14px">+ Ajouter un rendez-vous</div>
+<div style="display:flex;align-items:center;justify-content:space-between;padding:14px 8px 18px;border-top:1px solid rgba(0,0,0,.06);flex:none">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="1.8"><path d="M3 11l9-8 9 8"></path><path d="M5 10v10h14V10"></path></svg>
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8a8a8a" stroke-width="1.8"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 4-6 8-6s8 2 8 6"></path></svg>
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8a8a8a" stroke-width="1.8"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"></path></svg>
+</div></div>
+</x-import>
+</div>
+
+<div class="dv-opt" id="4g">
+<div class="dv-olabel"><a class="dv-oid" href="#4g">4g</a>Ajouter un rendez-vous</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402,874" >
+<div style="height:100%;position:relative;background:rgba(0,0,0,.35)">
+<div style="position:absolute;bottom:0;left:0;right:0;background:#fff;border-radius:24px 24px 0 0;padding:22px 22px 30px;display:flex;flex-direction:column;gap:11px">
+<div style="width:36px;height:4px;background:#ddd;border-radius:2px;margin:0 auto 4px"></div>
+<div style="font-size:18px;font-weight:700;color:#1a1a1a;text-align:center">Nouveau rendez-vous</div>
+<input placeholder="Titre — ex. Écho T2" style="border:none;background:#F2F2F7;border-radius:14px;padding:14px;font-size:14.5px;color:#1a1a1a;font-family:inherit;outline:none">
+<input placeholder="Date" style="border:none;background:#F2F2F7;border-radius:14px;padding:14px;font-size:14.5px;color:#1a1a1a;font-family:inherit;outline:none">
+<input placeholder="Heure" style="border:none;background:#F2F2F7;border-radius:14px;padding:14px;font-size:14.5px;color:#1a1a1a;font-family:inherit;outline:none">
+<input placeholder="Adresse, notes…" style="border:none;background:#F2F2F7;border-radius:14px;padding:14px;font-size:14.5px;color:#1a1a1a;font-family:inherit;outline:none">
+<div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px">
+<div style="font-size:14px;color:#1a1a1a">Visible par les deux parents</div>
+<div style="width:44px;height:26px;border-radius:13px;background:#2D5E5A;position:relative"><div style="width:22px;height:22px;border-radius:50%;background:#fff;position:absolute;top:2px;right:2px"></div></div>
+</div>
+<div style="background:#2D5E5A;color:#fff;border-radius:14px;padding:15px;text-align:center;font-size:15.5px;font-weight:600;margin-top:4px">Ajouter au calendrier</div>
+<div style="text-align:center;font-size:13.5px;color:#9a9a9a">Annuler</div>
+</div>
+</div>
+</x-import>
+</div>
+
+<div class="dv-opt" id="4c">
+<div class="dv-olabel"><a class="dv-oid" href="#4c">4c</a>Contacts</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402,874" >
+<div style="height:100%;display:flex;flex-direction:column;padding:70px 20px 0;box-sizing:border-box;background:#EAF5F0">
+<a href="#2b" style="display:flex;align-items:center;gap:6px;color:#2D5E5A;font-size:14px;font-weight:600;text-decoration:none;margin-bottom:8px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="2.2"><path d="M15 18l-6-6 6-6"></path></svg>Accueil</a>
+<div style="display:flex;justify-content:space-between;align-items:center">
+<div style="font-size:22px;font-weight:700;color:#1a1a1a">Contacts</div>
+<div style="border:1.5px solid #2D5E5A;color:#2D5E5A;border-radius:10px;padding:7px 12px;font-size:12.5px;font-weight:600">+ Ajouter</div><a href="#7a" style="display:flex;align-items:center;gap:5px;background:#2D5E5A;color:#fff;font-size:11px;font-weight:600;border-radius:20px;padding:6px 10px;white-space:nowrap;text-decoration:none;flex:none"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M12 2c-1.5 3-1.5 6 0 9M12 11c2.5-1 4.5-3 5.5-6M12 11c-2.5-1-4.5-3-5.5-6M12 11v10M9 21h6"></path></svg>J'ai accouché</a>
+</div>
+<div style="display:flex;gap:4px;margin-top:12px;border-bottom:1.5px solid #f0f0f0">
+<div style="flex:1;text-align:center;padding:5px 2px;font-size:12.5px;color:#9a9a9a">Journal</div>
+<div style="flex:1;text-align:center;padding:5px 2px;font-size:12.5px;color:#9a9a9a">Rendez-vous</div>
+<div style="flex:1;text-align:center;padding:5px 2px;font-size:12.5px;font-weight:600;color:#2D5E5A;border-bottom:2.5px solid #2D5E5A;margin-bottom:-1.5px">Contacts</div>
+<div style="flex:1;text-align:center;padding:5px 2px;font-size:12.5px;color:#9a9a9a">Exercices</div>
+</div>
+<div style="font-size:11.5px;color:#9a9a9a;margin:6px 0">Partagé avec Camille</div>
+<div style="display:flex;flex-direction:column;gap:6px">
+<div style="border:1px solid #f0f0f0;box-shadow:0 1px 3px rgba(0,0,0,.04);border-radius:14px;padding:8px 12px;display:flex;align-items:center;gap:6px">
+<div style="color:#ccc;font-size:14px">⠿</div>
+<div style="flex:1"><div style="font-size:14px;color:#1a1a1a;font-weight:600">Dr Martin</div><div style="font-size:11.5px;color:#8a8a8a">Gynécologue · 14 rue des Lilas, Paris</div></div>
+<div style="width:30px;height:30px;border-radius:50%;background:#2D5E5A;display:flex;align-items:center;justify-content:center;flex:none"><svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.2.2 2.4.6 3.6.1.3 0 .7-.2 1z"></path></svg></div>
+<div style="color:#c0392b;font-size:14px">🗑</div>
+</div>
+<div style="border:1px solid #f0f0f0;box-shadow:0 1px 3px rgba(0,0,0,.04);border-radius:14px;padding:8px 12px;display:flex;align-items:center;gap:6px">
+<div style="color:#ccc;font-size:14px">⠿</div>
+<div style="flex:1"><div style="font-size:14px;color:#1a1a1a;font-weight:600">Sophie Durand</div><div style="font-size:11.5px;color:#8a8a8a">Sage-femme · 8 av. Victor Hugo</div></div>
+<div style="width:30px;height:30px;border-radius:50%;background:#2D5E5A;display:flex;align-items:center;justify-content:center;flex:none"><svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.2.2 2.4.6 3.6.1.3 0 .7-.2 1z"></path></svg></div>
+<div style="color:#c0392b;font-size:14px">🗑</div>
+</div>
+<div style="border:1.5px solid #f7d9d9;background:#fff8f8;border-radius:14px;padding:8px 12px;display:flex;align-items:center;gap:6px">
+<div style="color:#ecc;font-size:14px">⠿</div>
+<div style="flex:1"><div style="font-size:14px;color:#c0392b;font-weight:600">Urgences</div><div style="font-size:11.5px;color:#8a8a8a">Numéro d'urgence</div></div>
+<div style="width:30px;height:30px;border-radius:50%;background:#c0392b;display:flex;align-items:center;justify-content:center;flex:none"><svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.2.2 2.4.6 3.6.1.3 0 .7-.2 1z"></path></svg></div>
+</div>
+</div>
+<div style="flex:1"></div><div style="display:flex;align-items:center;justify-content:space-between;padding:14px 8px 18px;border-top:1px solid rgba(0,0,0,.06);flex:none">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="1.8"><path d="M3 11l9-8 9 8"></path><path d="M5 10v10h14V10"></path></svg>
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8a8a8a" stroke-width="1.8"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 4-6 8-6s8 2 8 6"></path></svg>
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8a8a8a" stroke-width="1.8"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"></path></svg>
+</div></div>
+</x-import>
+</div>
+
+<div class="dv-opt" id="4f">
+<div class="dv-olabel"><a class="dv-oid" href="#4f">4f</a>Exercices</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402,874" >
+<div style="height:100%;display:flex;flex-direction:column;padding:70px 20px 0;box-sizing:border-box;background:#EAF5F0">
+<a href="#2b" style="display:flex;align-items:center;gap:6px;color:#2D5E5A;font-size:14px;font-weight:600;text-decoration:none;margin-bottom:8px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="2.2"><path d="M15 18l-6-6 6-6"></path></svg>Accueil</a>
+<div style="display:flex;justify-content:space-between;align-items:center"><div style="font-size:22px;font-weight:700;color:#1a1a1a">Suivi santé</div><a href="#7a" style="display:flex;align-items:center;gap:5px;background:#2D5E5A;color:#fff;font-size:11px;font-weight:600;border-radius:20px;padding:6px 10px;white-space:nowrap;text-decoration:none;flex:none"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M12 2c-1.5 3-1.5 6 0 9M12 11c2.5-1 4.5-3 5.5-6M12 11c-2.5-1-4.5-3-5.5-6M12 11v10M9 21h6"></path></svg>J'ai accouché</a></div>
+<div style="display:flex;gap:4px;margin-top:12px;border-bottom:1.5px solid #f0f0f0">
+<div style="flex:1;text-align:center;padding:5px 2px;font-size:12.5px;color:#9a9a9a">Journal</div>
+<div style="flex:1;text-align:center;padding:5px 2px;font-size:12.5px;color:#9a9a9a">Rendez-vous</div>
+<div style="flex:1;text-align:center;padding:5px 2px;font-size:12.5px;color:#9a9a9a">Contacts</div>
+<div style="flex:1;text-align:center;padding:5px 2px;font-size:12.5px;font-weight:600;color:#2D5E5A;border-bottom:2.5px solid #2D5E5A;margin-bottom:-1.5px">Exercices</div>
+</div>
+<div style="font-size:11.5px;color:#9a9a9a;margin:8px 0 6px">Adaptés à chaque trimestre</div>
+<div style="font-size:12px;color:#1a1a1a;font-weight:700;margin-bottom:5px">1er trimestre</div>
+<div style="display:flex;flex-direction:column;gap:7px">
+<div style="border:1px solid #f0f0f0;box-shadow:0 1px 3px rgba(0,0,0,.04);border-radius:14px;padding:8px;display:flex;gap:10px;align-items:center">
+<div style="width:42px;height:42px;border-radius:12px;background:#e2e2e2;flex:none"></div>
+<div><div style="font-size:14.5px;color:#1a1a1a;font-weight:600">Étirement du dos</div><div style="font-size:12px;color:#8a8a8a">5 min · assis</div></div>
+</div>
+<div style="border:1px solid #f0f0f0;box-shadow:0 1px 3px rgba(0,0,0,.04);border-radius:14px;padding:8px;display:flex;gap:10px;align-items:center">
+<div style="width:42px;height:42px;border-radius:12px;background:#e2e2e2;flex:none"></div>
+<div><div style="font-size:14.5px;color:#1a1a1a;font-weight:600">Respiration prénatale</div><div style="font-size:12px;color:#8a8a8a">3 min · allongée</div></div>
+</div>
+</div>
+<div style="font-size:12px;color:#1a1a1a;font-weight:700;margin:8px 0 5px">2ème trimestre</div>
+<div style="display:flex;flex-direction:column;gap:7px">
+<div style="border:1px solid #f0f0f0;box-shadow:0 1px 3px rgba(0,0,0,.04);border-radius:14px;padding:8px;display:flex;gap:10px;align-items:center">
+<div style="width:42px;height:42px;border-radius:12px;background:#e2e2e2;flex:none"></div>
+<div><div style="font-size:14.5px;color:#1a1a1a;font-weight:600">Yoga prénatal doux</div><div style="font-size:12px;color:#8a8a8a">10 min · tapis</div></div>
+</div>
+</div>
+<div style="font-size:12px;color:#1a1a1a;font-weight:700;margin:8px 0 5px">3ème trimestre</div>
+<div style="display:flex;flex-direction:column;gap:7px">
+<div style="border:1px solid #f0f0f0;box-shadow:0 1px 3px rgba(0,0,0,.04);border-radius:14px;padding:8px;display:flex;gap:10px;align-items:center">
+<div style="width:42px;height:42px;border-radius:12px;background:#e2e2e2;flex:none"></div>
+<div><div style="font-size:14.5px;color:#1a1a1a;font-weight:600">Marche douce</div><div style="font-size:12px;color:#8a8a8a">15 min · extérieur</div></div>
+</div>
+</div>
+<div style="flex:1"></div><div style="display:flex;align-items:center;justify-content:space-between;padding:14px 8px 18px;border-top:1px solid rgba(0,0,0,.06);flex:none">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="1.8"><path d="M3 11l9-8 9 8"></path><path d="M5 10v10h14V10"></path></svg>
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8a8a8a" stroke-width="1.8"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 4-6 8-6s8 2 8 6"></path></svg>
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8a8a8a" stroke-width="1.8"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"></path></svg>
+</div></div>
+</x-import>
+</div>
+
+<div class="dv-opt" id="4d">
+<div class="dv-olabel"><a class="dv-oid" href="#4d">4d</a>Notification de réassurance</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402,874" >
+<div style="height:100%;background:#efeee9;padding-top:70px;box-sizing:border-box">
+<div style="margin:0 12px;background:rgba(255,255,255,.85);backdrop-filter:blur(20px);border-radius:18px;padding:13px;display:flex;gap:10px;align-items:flex-start;box-shadow:0 6px 20px rgba(0,0,0,.12)">
+<div style="width:34px;height:34px;border-radius:9px;background:#2D5E5A;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex:none">US</div>
+<div style="flex:1">
+<div style="display:flex;justify-content:space-between;font-size:11.5px;color:#8a8a8a;font-weight:600"><span>US</span><span>maintenant</span></div>
+<div style="font-size:14px;color:#1a1a1a;line-height:1.35;margin-top:2px">À ce stade, ce type de ressenti est fréquent.</div>
+</div>
+</div>
+</div>
+</x-import>
+</div>
+
+</div>
+<p class="dv-next">Ensuite : "fais la partie 5 (pilier Démarches)"</p>
+</section>
+
+<section class="dv-turn" id="t5">
+<div class="dv-thd"><a class="dv-tid" href="#t5">5</a><span class="dv-tname">Pilier "Démarches" — administratif</span></div>
+<div class="dv-opts">
+
+<div class="dv-opt" id="5a">
+<div class="dv-olabel"><a class="dv-oid" href="#5a">5a</a>Écran principal</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402,874">
+<div style="height:100%;display:flex;flex-direction:column;padding:70px 20px 0;box-sizing:border-box;background:#EAF5F0">
+<a href="#2b" style="display:flex;align-items:center;gap:6px;color:#2D5E5A;font-size:14px;font-weight:600;text-decoration:none;margin-bottom:8px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="2.2"><path d="M15 18l-6-6 6-6"></path></svg>Accueil</a>
+<div style="display:flex;justify-content:space-between;align-items:center"><div style="font-size:22px;font-weight:700;color:#1a1a1a">Démarches</div><a href="#7a" style="display:flex;align-items:center;gap:5px;background:#2D5E5A;color:#fff;font-size:11px;font-weight:600;border-radius:20px;padding:6px 10px;white-space:nowrap;text-decoration:none;flex:none"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M12 2c-1.5 3-1.5 6 0 9M12 11c2.5-1 4.5-3 5.5-6M12 11c-2.5-1-4.5-3-5.5-6M12 11v10M9 21h6"></path></svg>J'ai accouché</a></div>
+<div style="font-size:13px;color:#8a8a8a;margin:4px 0 12px">2 sur 6 complétées</div>
+<div style="display:flex;flex-direction:column;gap:7px">
+<div style="border:1px solid #f0f0f0;box-shadow:0 1px 3px rgba(0,0,0,.04);border-radius:14px;padding:12px 13px;display:flex;justify-content:space-between;align-items:center">
+<div><div style="font-size:14px;color:#1a1a1a;font-weight:600">Déclaration de naissance</div><div style="font-size:11.5px;color:#c0392b;margin-top:1px">Échéance dans 3 jours</div></div>
+<div style="font-size:10.5px;background:#eee;color:#666;border-radius:8px;padding:4px 9px;white-space:nowrap;font-weight:600">À faire</div>
+</div>
+<div style="border:1px solid #f0f0f0;box-shadow:0 1px 3px rgba(0,0,0,.04);border-radius:14px;padding:12px 13px;display:flex;justify-content:space-between;align-items:center">
+<div><div style="font-size:14px;color:#1a1a1a;font-weight:600">CAF</div><div style="font-size:11.5px;color:#9a9a9a;margin-top:1px">Prime et allocations</div></div>
+<div style="font-size:10.5px;background:#f5b942;color:#5a4200;border-radius:8px;padding:4px 9px;white-space:nowrap;font-weight:600">En cours</div>
+</div>
+<div style="border:1px solid #f0f0f0;box-shadow:0 1px 3px rgba(0,0,0,.04);border-radius:14px;padding:12px 13px;display:flex;justify-content:space-between;align-items:center">
+<div><div style="font-size:14px;color:#1a1a1a;font-weight:600">Sécurité sociale</div><div style="font-size:11.5px;color:#9a9a9a;margin-top:1px">Rattachement bébé</div></div>
+<div style="font-size:10.5px;background:#2D5E5A;color:#fff;border-radius:8px;padding:4px 9px;white-space:nowrap;font-weight:600">Fait</div>
+</div>
+<div style="border:1px solid #f0f0f0;box-shadow:0 1px 3px rgba(0,0,0,.04);border-radius:14px;padding:12px 13px;display:flex;justify-content:space-between;align-items:center">
+<div><div style="font-size:14px;color:#1a1a1a;font-weight:600">Mutuelle</div><div style="font-size:11.5px;color:#9a9a9a;margin-top:1px">Ajout de l'enfant</div></div>
+<div style="font-size:10.5px;background:#2D5E5A;color:#fff;border-radius:8px;padding:4px 9px;white-space:nowrap;font-weight:600">Fait</div>
+</div>
+<div style="border:1px solid #f0f0f0;box-shadow:0 1px 3px rgba(0,0,0,.04);border-radius:14px;padding:12px 13px;display:flex;justify-content:space-between;align-items:center">
+<div><div style="font-size:14px;color:#1a1a1a;font-weight:600">Congé employeur</div><div style="font-size:11.5px;color:#9a9a9a;margin-top:1px">À planifier</div></div>
+<div style="font-size:10.5px;background:#eee;color:#666;border-radius:8px;padding:4px 9px;white-space:nowrap;font-weight:600">À faire</div>
+</div>
+<div style="border:1px solid #f0f0f0;box-shadow:0 1px 3px rgba(0,0,0,.04);border-radius:14px;padding:12px 13px;display:flex;justify-content:space-between;align-items:center">
+<div><div style="font-size:14px;color:#1a1a1a;font-weight:600">Mode de garde</div><div style="font-size:11.5px;color:#9a9a9a;margin-top:1px">Anticipation</div></div>
+<div style="font-size:10.5px;background:#f5b942;color:#5a4200;border-radius:8px;padding:4px 9px;white-space:nowrap;font-weight:600">En cours</div>
+</div>
+</div>
+<div style="flex:1"></div><div style="display:flex;align-items:center;justify-content:space-between;padding:14px 8px 18px;border-top:1px solid rgba(0,0,0,.06);flex:none">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="1.8"><path d="M3 11l9-8 9 8"></path><path d="M5 10v10h14V10"></path></svg>
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8a8a8a" stroke-width="1.8"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 4-6 8-6s8 2 8 6"></path></svg>
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8a8a8a" stroke-width="1.8"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"></path></svg>
+</div></div>
+</x-import>
+</div>
+
+<div class="dv-opt" id="5b">
+<div class="dv-olabel"><a class="dv-oid" href="#5b">5b</a>Détail d'une démarche</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402,874">
+<div style="height:100%;display:flex;flex-direction:column;padding:70px 20px 0;box-sizing:border-box;background:#EAF5F0">
+<a href="#5a" style="display:flex;align-items:center;gap:6px;color:#2D5E5A;font-size:14px;font-weight:600;text-decoration:none;margin-bottom:10px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="2.2"><path d="M15 18l-6-6 6-6"></path></svg>Démarches</a>
+<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px"><div style="font-size:20px;font-weight:700;color:#1a1a1a;line-height:1.25">Déclaration de naissance</div><a href="#7a" style="display:flex;align-items:center;gap:5px;background:#2D5E5A;color:#fff;font-size:11px;font-weight:600;border-radius:20px;padding:6px 10px;white-space:nowrap;text-decoration:none;flex:none"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M12 2c-1.5 3-1.5 6 0 9M12 11c2.5-1 4.5-3 5.5-6M12 11c-2.5-1-4.5-3-5.5-6M12 11v10M9 21h6"></path></svg>J'ai accouché</a></div>
+<div style="font-size:12.5px;color:#c0392b;margin-top:6px;font-weight:600">À faire dans les 5 jours suivant la naissance</div>
+<div style="font-size:13.5px;color:#666;line-height:1.5;margin-top:12px">La déclaration de naissance se fait à la mairie du lieu de naissance de l'enfant. C'est cette démarche qui donne officiellement son état civil au bébé et permet ensuite toutes les autres inscriptions administratives. Elle doit être réalisée par l'un des parents, en présentant les documents ci-dessous.</div>
+<div style="font-size:12.5px;color:#1a1a1a;font-weight:600;margin:16px 0 8px">Statut</div>
+<div style="display:flex;background:#F2F2F7;border-radius:12px;padding:3px">
+<div style="flex:1;text-align:center;padding:9px 0;background:#fff;border-radius:9px;font-size:13.5px;font-weight:600;color:#1a1a1a;box-shadow:0 1px 3px rgba(0,0,0,.12)">À faire</div>
+<div style="flex:1;text-align:center;padding:9px 0;font-size:13.5px;color:#8a8a8a">En cours</div>
+<div style="flex:1;text-align:center;padding:9px 0;font-size:13.5px;color:#8a8a8a">Fait</div>
+</div>
+<div style="font-size:12.5px;color:#1a1a1a;font-weight:600;margin:16px 0 8px">Documents à fournir</div>
+<div style="display:flex;flex-direction:column;gap:6px">
+<div style="display:flex;align-items:center;gap:8px;font-size:13.5px;color:#333"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="2.5"><path d="M20 6L9 17l-5-5"></path></svg>Carte d'identité (CNI)</div>
+<div style="display:flex;align-items:center;gap:8px;font-size:13.5px;color:#333"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="2.5"><path d="M20 6L9 17l-5-5"></path></svg>Livret de famille (si existant)</div>
+<div style="display:flex;align-items:center;gap:8px;font-size:13.5px;color:#333"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="2.5"><path d="M20 6L9 17l-5-5"></path></svg>Justificatif de domicile</div>
+<div style="display:flex;align-items:center;gap:8px;font-size:13.5px;color:#333"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="2.5"><path d="M20 6L9 17l-5-5"></path></svg>Certificat d'accouchement</div>
+</div>
+<div style="display:flex;align-items:center;justify-content:space-between;margin-top:16px">
+<div style="font-size:14px;color:#1a1a1a">Me rappeler avant l'échéance</div>
+<div style="width:44px;height:26px;border-radius:13px;background:#2D5E5A;position:relative"><div style="width:22px;height:22px;border-radius:50%;background:#fff;position:absolute;top:2px;right:2px"></div></div>
+</div>
+<div style="flex:1"></div>
+<div style="background:#2D5E5A;color:#fff;border-radius:14px;padding:16px;text-align:center;font-size:15.5px;font-weight:600;margin-bottom:14px">Accéder au téléservice officiel ↗</div>
+<div style="display:flex;align-items:center;justify-content:space-between;padding:14px 8px 18px;border-top:1px solid rgba(0,0,0,.06);flex:none">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="1.8"><path d="M3 11l9-8 9 8"></path><path d="M5 10v10h14V10"></path></svg>
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8a8a8a" stroke-width="1.8"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 4-6 8-6s8 2 8 6"></path></svg>
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8a8a8a" stroke-width="1.8"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"></path></svg>
+</div></div>
+</x-import>
+</div>
+
+<div class="dv-opt" id="5c">
+<div class="dv-olabel"><a class="dv-oid" href="#5c">5c</a>Notification de rappel</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402,874">
+<div style="height:100%;background:#efeee9;padding-top:70px;box-sizing:border-box">
+<div style="margin:0 12px;background:rgba(255,255,255,.85);backdrop-filter:blur(20px);border-radius:18px;padding:13px;display:flex;gap:10px;align-items:flex-start;box-shadow:0 6px 20px rgba(0,0,0,.12)">
+<div style="width:34px;height:34px;border-radius:9px;background:#2D5E5A;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex:none">US</div>
+<div style="flex:1">
+<div style="display:flex;justify-content:space-between;font-size:11.5px;color:#8a8a8a;font-weight:600"><span>US</span><span>maintenant</span></div>
+<div style="font-size:14px;color:#1a1a1a;line-height:1.35;margin-top:2px">Plus que 2 jours pour déclarer la naissance en mairie.</div>
+</div>
+</div>
+</div>
+</x-import>
+</div>
+
+</div>
+<p class="dv-next">Ensuite : "fais la partie 6 (Aujourd'hui)"</p>
+</section>
+
+<section class="dv-turn" id="t6">
+<div class="dv-thd"><a class="dv-tid" href="#t6">6</a><span class="dv-tname">Aujourd'hui — état du couple &amp; bébé</span></div>
+<div class="dv-opts">
+
+<div class="dv-opt" id="6a">
+<div class="dv-olabel"><a class="dv-oid" href="#6a">6a</a>État du jour — Camille</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402,874">
+<div style="height:100%;display:flex;flex-direction:column;padding:70px 20px 0;box-sizing:border-box;background:#EAF5F0">
+<a href="#3c" style="display:flex;align-items:center;gap:6px;color:#2D5E5A;font-size:14px;font-weight:600;text-decoration:none;margin-bottom:8px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="2.2"><path d="M15 18l-6-6 6-6"></path></svg>Accueil</a>
+<div style="display:flex;justify-content:space-between;align-items:center"><div style="font-size:22px;font-weight:700;color:#1a1a1a">Avec Paul</div><a href="#7a" style="display:flex;align-items:center;gap:5px;background:#2D5E5A;color:#fff;font-size:11px;font-weight:600;border-radius:20px;padding:6px 10px;white-space:nowrap;text-decoration:none;flex:none"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M12 2c-1.5 3-1.5 6 0 9M12 11c2.5-1 4.5-3 5.5-6M12 11c-2.5-1-4.5-3-5.5-6M12 11v10M9 21h6"></path></svg>J'ai accouché</a></div>
+<div style="background:#fff;border-radius:14px;padding:13px;display:flex;align-items:center;gap:12px;margin-top:14px">
+<div style="font-size:24px">🙂</div>
+<div><div style="font-size:12px;color:#8a8a8a">Sur cette semaine...</div><div style="font-size:13.5px;color:#1a1a1a;font-weight:600">Paul semble aller bien</div></div>
+</div>
+<div style="font-size:11.5px;color:#9a9a9a;font-weight:600;letter-spacing:.4px;margin-top:16px">VOS PROCHAINS RENDEZ-VOUS</div>
+<div style="background:#fff;border-radius:14px;padding:13px;display:flex;align-items:center;gap:12px;margin-top:8px">
+<div style="width:32px;height:32px;border-radius:9px;background:#EAF5F0;display:flex;align-items:center;justify-content:center;flex:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="3"></rect><path d="M8 3v4M16 3v4M3 10h18"></path></svg></div>
+<div><div style="font-size:13.5px;color:#1a1a1a;font-weight:600">Prochain rendez-vous</div><div style="font-size:12px;color:#8a8a8a">Sage-femme — 2 oct, 9h00</div></div>
+</div>
+<div style="background:#fff;border-radius:14px;padding:13px;display:flex;align-items:center;gap:12px;margin-top:8px">
+<div style="width:32px;height:32px;border-radius:9px;background:#EAF5F0;display:flex;align-items:center;justify-content:center;flex:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="3"></rect><path d="M8 3v4M16 3v4M3 10h18"></path></svg></div>
+<div><div style="font-size:13.5px;color:#1a1a1a;font-weight:600">Rendez-vous gynéco</div><div style="font-size:12px;color:#8a8a8a">23 oct, 16h00</div></div>
+</div>
+<div style="background:#fff;border-radius:14px;padding:16px;margin-top:16px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center">
+<div style="font-size:11px;color:#9a9a9a;letter-spacing:.5px;font-weight:600">TAILLE DU BÉBÉ CETTE SEMAINE</div>
+<div style="width:76px;height:76px;border-radius:50%;background:#F2F2F7;display:flex;align-items:center;justify-content:center;font-size:34px">🥑</div>
+<div style="font-size:16px;color:#1a1a1a;font-weight:700">Comme un avocat</div>
+<div style="font-size:12px;color:#8a8a8a">Semaine 24 · environ 30 cm</div>
+</div>
+<div style="border:1.5px dashed #2D5E5A;border-radius:14px;padding:12px 13px;margin-top:10px;display:flex;gap:9px;align-items:flex-start;background:#fff">
+<div style="font-size:15px">💡</div>
+<div style="font-size:12.5px;color:#333;line-height:1.35">Faites participer votre conjoint à vos rendez-vous</div>
+</div>
+<div style="flex:1"></div><div style="display:flex;align-items:center;justify-content:space-between;padding:14px 8px 18px;border-top:1px solid rgba(0,0,0,.06);flex:none">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="1.8"><path d="M3 11l9-8 9 8"></path><path d="M5 10v10h14V10"></path></svg>
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8a8a8a" stroke-width="1.8"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 4-6 8-6s8 2 8 6"></path></svg>
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8a8a8a" stroke-width="1.8"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"></path></svg>
+</div></div>
+</x-import>
+</div>
+
+<div class="dv-opt" id="6b">
+<div class="dv-olabel"><a class="dv-oid" href="#6b">6b</a>État du jour — Paul</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402,874">
+<div style="height:100%;display:flex;flex-direction:column;padding:70px 20px 0;box-sizing:border-box;background:#FDF6E3">
+<a href="#3d" style="display:flex;align-items:center;gap:6px;color:#2D5E5A;font-size:14px;font-weight:600;text-decoration:none;margin-bottom:8px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="2.2"><path d="M15 18l-6-6 6-6"></path></svg>Accueil</a>
+<div style="display:flex;justify-content:space-between;align-items:center"><div style="font-size:22px;font-weight:700;color:#1a1a1a">Avec Camille</div><a href="#7a" style="display:flex;align-items:center;gap:5px;background:#2D5E5A;color:#fff;font-size:11px;font-weight:600;border-radius:20px;padding:6px 10px;white-space:nowrap;text-decoration:none;flex:none"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M12 2c-1.5 3-1.5 6 0 9M12 11c2.5-1 4.5-3 5.5-6M12 11c-2.5-1-4.5-3-5.5-6M12 11v10M9 21h6"></path></svg>J'ai accouché</a></div>
+<div style="background:#fff;border-radius:14px;padding:13px;display:flex;align-items:center;gap:12px;margin-top:14px">
+<div style="font-size:24px">😐</div>
+<div><div style="font-size:12px;color:#8a8a8a">Sur cette semaine...</div><div style="font-size:13.5px;color:#1a1a1a;font-weight:600">Camille semble être un peu triste</div></div>
+</div>
+<div style="border:1.5px dashed #2D5E5A;border-radius:14px;padding:12px 13px;margin-top:10px;display:flex;gap:9px;align-items:flex-start;background:#fff">
+<div style="font-size:15px">💡</div>
+<div style="font-size:12.5px;color:#333;line-height:1.35">Un petit moment rien que pour elle pourrait l'aider — proposez-lui une pause ou un câlin ce soir</div>
+</div>
+<div style="font-size:11.5px;color:#9a9a9a;font-weight:600;letter-spacing:.4px;margin-top:16px">SYMPTÔMES DU JOUR POUR CAMILLE</div>
+<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px">
+<div style="background:#fff;border-radius:20px;padding:8px 14px;font-size:13px;color:#1a1a1a;font-weight:600">Vomissements</div>
+<div style="background:#fff;border-radius:20px;padding:8px 14px;font-size:13px;color:#1a1a1a;font-weight:600">Mal de dos</div>
+</div>
+<div style="font-size:11.5px;color:#9a9a9a;font-weight:600;letter-spacing:.4px;margin-top:16px">VOS PROCHAINS RENDEZ-VOUS</div>
+<div style="background:#fff;border-radius:14px;padding:13px;display:flex;align-items:center;gap:12px;margin-top:8px">
+<div style="width:32px;height:32px;border-radius:9px;background:#FDF6E3;display:flex;align-items:center;justify-content:center;flex:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="3"></rect><path d="M8 3v4M16 3v4M3 10h18"></path></svg></div>
+<div><div style="font-size:13.5px;color:#1a1a1a;font-weight:600">Prochain rendez-vous</div><div style="font-size:12px;color:#8a8a8a">Sage-femme — 2 oct, 9h00</div></div>
+</div>
+<div style="background:#fff;border-radius:14px;padding:13px;display:flex;align-items:center;gap:12px;margin-top:8px">
+<div style="width:32px;height:32px;border-radius:9px;background:#FDF6E3;display:flex;align-items:center;justify-content:center;flex:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="3"></rect><path d="M8 3v4M16 3v4M3 10h18"></path></svg></div>
+<div><div style="font-size:13.5px;color:#1a1a1a;font-weight:600">Rendez-vous gynéco</div><div style="font-size:12px;color:#8a8a8a">23 oct, 16h00</div></div>
+</div>
+<div style="background:#fff;border-radius:14px;padding:16px;margin-top:16px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center">
+<div style="font-size:11px;color:#9a9a9a;letter-spacing:.5px;font-weight:600">TAILLE DU BÉBÉ CETTE SEMAINE</div>
+<div style="width:76px;height:76px;border-radius:50%;background:#F2F2F7;display:flex;align-items:center;justify-content:center;font-size:34px">🥑</div>
+<div style="font-size:16px;color:#1a1a1a;font-weight:700">Comme un avocat</div>
+<div style="font-size:12px;color:#8a8a8a">Semaine 24 · environ 30 cm</div>
+</div>
+<div style="border:1.5px dashed #2D5E5A;border-radius:14px;padding:12px 13px;margin-top:10px;display:flex;gap:9px;align-items:flex-start;background:#fff">
+<div style="font-size:15px">💡</div>
+<div style="font-size:12.5px;color:#333;line-height:1.35">Faites confiance à votre conjointe</div>
+</div>
+<div style="flex:1"></div><div style="display:flex;align-items:center;justify-content:space-between;padding:14px 8px 18px;border-top:1px solid rgba(0,0,0,.06);flex:none">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="1.8"><path d="M3 11l9-8 9 8"></path><path d="M5 10v10h14V10"></path></svg>
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8a8a8a" stroke-width="1.8"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 4-6 8-6s8 2 8 6"></path></svg>
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8a8a8a" stroke-width="1.8"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"></path></svg>
+</div></div>
+</x-import>
+</div>
+
+</div>
+<p class="dv-next">Ensuite : "fais la partie 7 (déclarer la naissance)"</p>
+</section>
+
+<section class="dv-turn" id="t7">
+<div class="dv-thd"><a class="dv-tid" href="#t7">7</a><span class="dv-tname">Déclarer la naissance</span></div>
+<div class="dv-opts">
+
+<div class="dv-opt" id="7a">
+<div class="dv-olabel"><a class="dv-oid" href="#7a">7a</a>Déclarer la naissance</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402,874">
+<div style="height:100%;display:flex;flex-direction:column;padding:70px 20px 0;box-sizing:border-box;background:#EAF5F0">
+<a href="#2b" style="display:flex;align-items:center;gap:6px;color:#2D5E5A;font-size:14px;font-weight:600;text-decoration:none;margin-bottom:8px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="2.2"><path d="M15 18l-6-6 6-6"></path></svg>Accueil</a>
+<div style="display:flex;align-items:center;gap:8px"><svg width="22" height="22" viewBox="0 0 24 24" fill="#2D5E5A" stroke="none"><path d="M12 21s-7-4.35-9.5-9A5.5 5.5 0 0112 6a5.5 5.5 0 019.5 6C19 16.65 12 21 12 21z"></path></svg><div style="font-size:23px;font-weight:700;color:#1a1a1a">J'ai accouché</div></div>
+<div style="font-size:14px;color:#8a8a8a;margin-top:4px">Le grand jour est arrivé !</div>
+<div style="font-size:14.5px;color:#1a1a1a;font-weight:600;margin-top:20px">Date de naissance</div>
+<div style="background:#F2F2F7;border-radius:14px;margin-top:10px;padding:10px 0;display:flex;align-items:center;justify-content:center;position:relative;height:150px;overflow:hidden">
+<div style="position:absolute;top:50%;left:8px;right:8px;height:34px;transform:translateY(-50%);background:#e2e2e2;border-radius:8px"></div>
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;position:relative">
+<div style="font-size:14px;color:#c4c4c4;opacity:.35">sept.</div>
+<div style="font-size:15px;color:#b0b0b0;opacity:.6">oct.</div>
+<div style="font-size:17px;color:#1a1a1a;font-weight:500;height:34px;display:flex;align-items:center">novembre</div>
+<div style="font-size:15px;color:#b0b0b0;opacity:.6">déc.</div>
+<div style="font-size:14px;color:#c4c4c4;opacity:.35">janv.</div>
+</div>
+<div style="flex:0.7;display:flex;flex-direction:column;align-items:center;gap:2px;position:relative">
+<div style="font-size:14px;color:#c4c4c4;opacity:.35">12</div>
+<div style="font-size:15px;color:#b0b0b0;opacity:.6">13</div>
+<div style="font-size:17px;color:#1a1a1a;font-weight:500;height:34px;display:flex;align-items:center">14</div>
+<div style="font-size:15px;color:#b0b0b0;opacity:.6">15</div>
+<div style="font-size:14px;color:#c4c4c4;opacity:.35">16</div>
+</div>
+<div style="flex:0.9;display:flex;flex-direction:column;align-items:center;gap:2px;position:relative">
+<div style="font-size:14px;color:#c4c4c4;opacity:.35">2024</div>
+<div style="font-size:15px;color:#b0b0b0;opacity:.6">2025</div>
+<div style="font-size:17px;color:#1a1a1a;font-weight:500;height:34px;display:flex;align-items:center">2026</div>
+<div style="font-size:15px;color:#b0b0b0;opacity:.6">2027</div>
+<div style="font-size:14px;color:#c4c4c4;opacity:.35">2028</div>
+</div>
+</div>
+<div style="border:1.5px dashed #2D5E5A;border-radius:14px;padding:13px;margin-top:20px;display:flex;gap:9px;align-items:flex-start;background:#F7F9F8">
+<div style="font-size:16px">ℹ️</div>
+<div style="font-size:13px;color:#333;line-height:1.4">Toutes les dates et échéances de vos démarches seront automatiquement mises à jour en fonction de cette date.</div>
+</div>
+<div style="flex:1"></div>
+<div style="background:#2D5E5A;color:#fff;border-radius:14px;padding:16px;text-align:center;font-size:16px;font-weight:600;margin-bottom:14px">Confirmer la naissance</div>
+<div style="display:flex;align-items:center;justify-content:space-between;padding:14px 8px 18px;border-top:1px solid rgba(0,0,0,.06);flex:none">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="1.8"><path d="M3 11l9-8 9 8"></path><path d="M5 10v10h14V10"></path></svg>
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8a8a8a" stroke-width="1.8"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 4-6 8-6s8 2 8 6"></path></svg>
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8a8a8a" stroke-width="1.8"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"></path></svg>
+</div>
+</div>
+</x-import>
+</div>
+
+</div>
+<p class="dv-next">Ensuite : "fais la partie 8 (Votre bébé)"</p>
+</section>
+
+<section class="dv-turn" id="t8">
+<div class="dv-thd"><a class="dv-tid" href="#t8">8</a><span class="dv-tname">"Votre bébé" — favoris personnalisables</span></div>
+<div class="dv-opts">
+
+<div class="dv-opt" id="8y">
+<div class="dv-olabel"><a class="dv-oid" href="#8y">8y</a>Premier accès — choisir ses sections</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402,874">
+<div style="height:100%;display:flex;flex-direction:column;padding:70px 20px 0;box-sizing:border-box;background:#fff;text-align:center">
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px">
+<div style="width:72px;height:72px;border-radius:50%;background:#EAF5F0;display:flex;align-items:center;justify-content:center;font-size:32px">👶</div>
+<div style="font-size:23px;font-weight:700;color:#1a1a1a;line-height:1.25">Personnalisez votre suivi bébé</div>
+<div style="font-size:14.5px;color:#8a8a8a;max-width:260px;line-height:1.4">Choisissez les sections que vous voulez suivre au quotidien — vous pourrez les modifier à tout moment</div>
+</div>
+<div style="background:#2D5E5A;color:#fff;border-radius:14px;padding:16px;text-align:center;font-size:16px;font-weight:600;margin-bottom:14px">Choisir mes sections</div>
+<div style="display:flex;align-items:center;justify-content:space-between;padding:14px 8px 18px;border-top:1px solid rgba(0,0,0,.06);flex:none">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="1.8"><path d="M3 11l9-8 9 8"></path><path d="M5 10v10h14V10"></path></svg>
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8a8a8a" stroke-width="1.8"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 4-6 8-6s8 2 8 6"></path></svg>
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8a8a8a" stroke-width="1.8"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"></path></svg>
+</div>
+</div>
+</x-import>
+</div>
+
+<div class="dv-opt" id="8a">
+<div class="dv-olabel"><a class="dv-oid" href="#8a">8a</a>Gérer mes favoris</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402,874">
+<div style="height:100%;display:flex;flex-direction:column;padding:70px 20px 0;box-sizing:border-box;background:#EAF5F0">
+<a href="#8b" style="display:flex;align-items:center;gap:6px;color:#2D5E5A;font-size:14px;font-weight:600;text-decoration:none;margin-bottom:8px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="2.2"><path d="M15 18l-6-6 6-6"></path></svg>Votre bébé</a>
+<div style="font-size:22px;font-weight:700;color:#1a1a1a">Votre bébé</div>
+<div style="font-size:13px;color:#8a8a8a;margin-top:2px">Personnalisez vos suivis favoris</div>
+<div style="font-size:11.5px;color:#9a9a9a;font-weight:600;letter-spacing:.4px;margin-top:18px">MES FAVORIS</div>
+<div style="display:flex;flex-direction:column;gap:6px;margin-top:6px">
+<div style="border:1px solid #f0f0f0;box-shadow:0 1px 3px rgba(0,0,0,.04);border-radius:14px;padding:11px 12px;display:flex;align-items:center;gap:10px">
+<div style="color:#e07a7a;font-size:17px;line-height:1">⊖</div>
+<div style="width:38px;height:38px;border-radius:50%;background:#EAF5F0;display:flex;align-items:center;justify-content:center;font-size:17px;flex:none">🍼</div>
+<div style="flex:1;font-size:14.5px;color:#1a1a1a;font-weight:600">Biberon</div>
+<div style="color:#c4c4c4;font-size:15px">⠿</div>
+</div>
+<div style="border:1px solid #f0f0f0;box-shadow:0 1px 3px rgba(0,0,0,.04);border-radius:14px;padding:11px 12px;display:flex;align-items:center;gap:10px">
+<div style="color:#e07a7a;font-size:17px;line-height:1">⊖</div>
+<div style="width:38px;height:38px;border-radius:50%;background:#EAF5F0;display:flex;align-items:center;justify-content:center;font-size:17px;flex:none">🛁</div>
+<div style="flex:1;font-size:14.5px;color:#1a1a1a;font-weight:600">Bain</div>
+<div style="color:#c4c4c4;font-size:15px">⠿</div>
+</div>
+<div style="border:1px solid #f0f0f0;box-shadow:0 1px 3px rgba(0,0,0,.04);border-radius:14px;padding:11px 12px;display:flex;align-items:center;gap:10px">
+<div style="color:#e07a7a;font-size:17px;line-height:1">⊖</div>
+<div style="width:38px;height:38px;border-radius:50%;background:#EAF5F0;display:flex;align-items:center;justify-content:center;font-size:17px;flex:none">📏</div>
+<div style="flex:1;font-size:14.5px;color:#1a1a1a;font-weight:600">Mesures</div>
+<div style="color:#c4c4c4;font-size:15px">⠿</div>
+</div>
+</div>
+<div style="height:1px;background:#f0f0f0;margin:16px 0"></div>
+<div style="font-size:11.5px;color:#9a9a9a;font-weight:600;letter-spacing:.4px">AUTRES SUIVIS</div>
+<div style="display:flex;flex-direction:column;gap:6px;margin-top:6px">
+<div style="border:1px solid #f0f0f0;border-radius:14px;padding:11px 12px;display:flex;align-items:center;gap:10px;opacity:.75">
+<div style="color:#2D5E5A;font-size:17px;line-height:1">⊕</div>
+<div style="width:38px;height:38px;border-radius:50%;background:#F2F2F7;display:flex;align-items:center;justify-content:center;font-size:17px;flex:none">😴</div>
+<div style="flex:1;font-size:14.5px;color:#1a1a1a">Sommeil</div>
+</div>
+<div style="border:1px solid #f0f0f0;border-radius:14px;padding:11px 12px;display:flex;align-items:center;gap:10px;opacity:.75">
+<div style="color:#2D5E5A;font-size:17px;line-height:1">⊕</div>
+<div style="width:38px;height:38px;border-radius:50%;background:#F2F2F7;display:flex;align-items:center;justify-content:center;font-size:17px;flex:none">🧷</div>
+<div style="flex:1;font-size:14.5px;color:#1a1a1a">Couche</div>
+</div>
+<div style="border:1px solid #f0f0f0;border-radius:14px;padding:11px 12px;display:flex;align-items:center;gap:10px;opacity:.75">
+<div style="color:#2D5E5A;font-size:17px;line-height:1">⊕</div>
+<div style="width:38px;height:38px;border-radius:50%;background:#F2F2F7;display:flex;align-items:center;justify-content:center;font-size:17px;flex:none">🩺</div>
+<div style="flex:1;font-size:14.5px;color:#1a1a1a">Visite médecin</div>
+</div>
+</div>
+<div style="flex:1"></div>
+<div style="background:#2D5E5A;color:#fff;border-radius:14px;padding:15px;text-align:center;font-size:15.5px;font-weight:600;margin-bottom:14px">Sauvegarder</div>
+<div style="display:flex;align-items:center;justify-content:space-between;padding:14px 8px 18px;border-top:1px solid rgba(0,0,0,.06);flex:none">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="1.8"><path d="M3 11l9-8 9 8"></path><path d="M5 10v10h14V10"></path></svg>
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8a8a8a" stroke-width="1.8"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 4-6 8-6s8 2 8 6"></path></svg>
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8a8a8a" stroke-width="1.8"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"></path></svg>
+</div>
+</div>
+</x-import>
+</div>
+
+<div class="dv-opt" id="8b">
+<div class="dv-olabel"><a class="dv-oid" href="#8b">8b</a>Votre bébé — écran principal</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402,874">
+<div style="height:100%;display:flex;flex-direction:column;padding:70px 20px 0;box-sizing:border-box;background:#EAF5F0">
+<div style="display:flex;justify-content:space-between;align-items:center">
+<div style="font-size:22px;font-weight:700;color:#1a1a1a">Votre bébé</div>
+<div style="font-size:12px;color:#2D5E5A;font-weight:600">Gérer</div>
+</div>
+<div style="border:1px solid #f0f0f0;box-shadow:0 1px 3px rgba(0,0,0,.04);border-radius:16px;padding:18px;margin-top:16px;display:flex;align-items:center;gap:14px">
+<div style="width:56px;height:56px;border-radius:16px;background:#EAF5F0;display:flex;align-items:center;justify-content:center;font-size:26px;flex:none">👶</div>
+<div style="flex:1;display:flex;justify-content:space-around">
+<div style="text-align:center"><div style="font-size:11px;color:#8a8a8a">Taille</div><div style="font-size:17px;color:#1a1a1a;font-weight:700">51 cm</div></div>
+<div style="text-align:center"><div style="font-size:11px;color:#8a8a8a">Poids</div><div style="font-size:17px;color:#1a1a1a;font-weight:700">3,4 kg</div></div>
+</div>
+</div>
+<div style="font-size:11.5px;color:#9a9a9a;font-weight:600;letter-spacing:.4px;margin-top:20px">VOS SUIVIS</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px">
+<div style="border:1.5px solid #2D5E5A;box-shadow:0 1px 3px rgba(0,0,0,.04);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:8px;align-items:center;text-align:center">
+<div style="width:44px;height:44px;border-radius:12px;background:#2D5E5A;display:flex;align-items:center;justify-content:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M3 20V10M9 20V4M15 20v-7M21 20V8"></path></svg></div>
+<div style="font-size:14.5px;color:#1a1a1a;font-weight:600">Courbe de croissance</div>
+<div style="font-size:11.5px;color:#2D5E5A">Voir le graphique</div>
+</div>
+<div style="border:1px solid #f0f0f0;box-shadow:0 1px 3px rgba(0,0,0,.04);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:8px;align-items:center;text-align:center">
+<div style="width:44px;height:44px;border-radius:12px;background:#EAF5F0;display:flex;align-items:center;justify-content:center;font-size:20px">🍼</div>
+<div style="font-size:14.5px;color:#1a1a1a;font-weight:600">Biberon</div>
+<div style="font-size:11.5px;color:#8a8a8a">Dernier à 14h20</div>
+</div>
+<div style="border:1px solid #f0f0f0;box-shadow:0 1px 3px rgba(0,0,0,.04);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:8px;align-items:center;text-align:center">
+<div style="width:44px;height:44px;border-radius:12px;background:#EAF5F0;display:flex;align-items:center;justify-content:center;font-size:20px">🛁</div>
+<div style="font-size:14.5px;color:#1a1a1a;font-weight:600">Bain</div>
+<div style="font-size:11.5px;color:#8a8a8a">Hier soir</div>
+</div>
+<div style="border:1px solid #f0f0f0;box-shadow:0 1px 3px rgba(0,0,0,.04);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:8px;align-items:center;text-align:center">
+<div style="width:44px;height:44px;border-radius:12px;background:#EAF5F0;display:flex;align-items:center;justify-content:center;font-size:20px">📏</div>
+<div style="font-size:14.5px;color:#1a1a1a;font-weight:600">Mesures</div>
+<div style="font-size:11.5px;color:#8a8a8a">Ajouter une mesure</div>
+</div>
+<div style="border:1.5px dashed #c4c4c4;border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:8px;align-items:center;text-align:center;justify-content:center">
+<div style="width:44px;height:44px;border-radius:12px;background:#F2F2F7;display:flex;align-items:center;justify-content:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8a8a8a" stroke-width="2"><path d="M12 5v14M5 12h14"></path></svg></div>
+<div style="font-size:14.5px;color:#8a8a8a;font-weight:600">Ajouter</div>
+</div>
+</div>
+<div style="flex:1"></div>
+<div style="display:flex;align-items:center;justify-content:space-between;padding:14px 8px 18px;border-top:1px solid rgba(0,0,0,.06);flex:none">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="1.8"><path d="M3 11l9-8 9 8"></path><path d="M5 10v10h14V10"></path></svg>
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8a8a8a" stroke-width="1.8"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 4-6 8-6s8 2 8 6"></path></svg>
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8a8a8a" stroke-width="1.8"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"></path></svg>
+</div>
+</div>
+</x-import>
+</div>
+
+<div class="dv-opt" id="8c">
+<div class="dv-olabel"><a class="dv-oid" href="#8c">8c</a>Courbe de croissance</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402,874">
+<div style="height:100%;display:flex;flex-direction:column;padding:70px 20px 0;box-sizing:border-box;background:#EAF5F0">
+<a href="#8b" style="display:flex;align-items:center;gap:6px;color:#2D5E5A;font-size:14px;font-weight:600;text-decoration:none;margin-bottom:8px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="2.2"><path d="M15 18l-6-6 6-6"></path></svg>Votre bébé</a>
+<div style="font-size:22px;font-weight:700;color:#1a1a1a">Courbe de croissance</div>
+<div style="display:flex;gap:8px;margin-top:14px">
+<div style="flex:1;text-align:center;padding:8px 0;background:#2D5E5A;border-radius:10px;font-size:12.5px;font-weight:600;color:#fff">Taille</div>
+<div style="flex:1;text-align:center;padding:8px 0;background:#F2F2F7;border-radius:10px;font-size:12.5px;color:#8a8a8a">Poids</div>
+</div>
+<div style="border:1px solid #f0f0f0;border-radius:16px;padding:16px;margin-top:16px">
+<svg viewBox="0 0 280 120" width="100%" height="120" preserveAspectRatio="none">
+<polyline points="10,85 75,65 140,52 205,32 270,15" fill="none" stroke="#2D5E5A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></polyline>
+<circle cx="10" cy="85" r="4" fill="#2D5E5A"></circle>
+<circle cx="75" cy="65" r="4" fill="#2D5E5A"></circle>
+<circle cx="140" cy="52" r="4" fill="#2D5E5A"></circle>
+<circle cx="205" cy="32" r="4" fill="#2D5E5A"></circle>
+<circle cx="270" cy="15" r="5" fill="#2D5E5A" stroke="#fff" stroke-width="2"></circle>
+</svg>
+<div style="display:flex;gap:10px;margin-top:6px">
+<div style="flex:1;text-align:center;font-size:10.5px;color:#9a9a9a">S1</div>
+<div style="flex:1;text-align:center;font-size:10.5px;color:#9a9a9a">S2</div>
+<div style="flex:1;text-align:center;font-size:10.5px;color:#9a9a9a">S3</div>
+<div style="flex:1;text-align:center;font-size:10.5px;color:#9a9a9a">S4</div>
+<div style="flex:1;text-align:center;font-size:10.5px;color:#9a9a9a;font-weight:600">S5</div>
+</div>
+</div>
+<div style="font-size:11.5px;color:#9a9a9a;font-weight:600;letter-spacing:.4px;margin-top:20px">HISTORIQUE</div>
+<div style="display:flex;flex-direction:column;gap:6px;margin-top:6px">
+<div style="border:1px solid #f0f0f0;border-radius:14px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center">
+<span style="font-size:13.5px;color:#1a1a1a;font-weight:600">51 cm</span><span style="font-size:12px;color:#8a8a8a">Aujourd'hui</span>
+</div>
+<div style="border:1px solid #f0f0f0;border-radius:14px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center">
+<span style="font-size:13.5px;color:#1a1a1a;font-weight:600">49 cm</span><span style="font-size:12px;color:#8a8a8a">Il y a 1 semaine</span>
+</div>
+</div>
+<div style="flex:1"></div>
+<div style="background:#2D5E5A;color:#fff;border-radius:14px;padding:15px;text-align:center;font-size:15.5px;font-weight:600;margin-bottom:14px">+ Ajouter une mesure</div>
+<div style="display:flex;align-items:center;justify-content:space-between;padding:14px 8px 18px;border-top:1px solid rgba(0,0,0,.06);flex:none">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="1.8"><path d="M3 11l9-8 9 8"></path><path d="M5 10v10h14V10"></path></svg>
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8a8a8a" stroke-width="1.8"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 4-6 8-6s8 2 8 6"></path></svg>
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8a8a8a" stroke-width="1.8"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"></path></svg>
+</div>
+</div>
+</x-import>
+</div>
+
+<div class="dv-opt" id="8d">
+<div class="dv-olabel"><a class="dv-oid" href="#8d">8d</a>Ajouter une mesure</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402,874">
+<div style="height:100%;position:relative;background:rgba(0,0,0,.35)">
+<div style="position:absolute;bottom:0;left:0;right:0;background:#fff;border-radius:24px 24px 0 0;padding:22px 22px 30px;display:flex;flex-direction:column;gap:12px">
+<div style="width:36px;height:4px;background:#ddd;border-radius:2px;margin:0 auto 4px"></div>
+<div style="font-size:18px;font-weight:700;color:#1a1a1a;text-align:center">Ajouter une mesure</div>
+<div style="display:flex;align-items:center;gap:10px;background:#F2F2F7;border-radius:14px;padding:14px">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="3"></rect><path d="M8 3v4M16 3v4M3 10h18"></path></svg>
+<div style="font-size:14.5px;color:#1a1a1a;font-weight:500">Aujourd'hui, 29 juillet</div>
+</div>
+<input placeholder="Taille (cm)" style="border:none;background:#F2F2F7;border-radius:14px;padding:14px;font-size:14.5px;color:#1a1a1a;font-family:inherit;outline:none" />
+<input placeholder="Poids (kg)" style="border:none;background:#F2F2F7;border-radius:14px;padding:14px;font-size:14.5px;color:#1a1a1a;font-family:inherit;outline:none" />
+<textarea placeholder="Commentaire (facultatif)" style="border:none;background:#F2F2F7;border-radius:14px;padding:14px;font-size:14px;color:#1a1a1a;font-family:inherit;outline:none;height:64px;resize:none"></textarea>
+<div style="background:#2D5E5A;color:#fff;border-radius:14px;padding:15px;text-align:center;font-size:15.5px;font-weight:600;margin-top:4px">Enregistrer</div>
+<div style="text-align:center;font-size:13.5px;color:#9a9a9a">Annuler</div>
+</div>
+</div>
+</x-import>
+</div>
+
+<div class="dv-opt" id="8f">
+<div class="dv-olabel"><a class="dv-oid" href="#8f">8f</a>Ajouter un bain</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402,874">
+<div style="height:100%;position:relative;background:rgba(0,0,0,.35)">
+<div style="position:absolute;bottom:0;left:0;right:0;background:#fff;border-radius:24px 24px 0 0;padding:22px 22px 30px;display:flex;flex-direction:column;gap:12px">
+<div style="width:36px;height:4px;background:#ddd;border-radius:2px;margin:0 auto 4px"></div>
+<div style="font-size:18px;font-weight:700;color:#1a1a1a;text-align:center">Ajouter un bain</div>
+<div style="display:flex;align-items:center;gap:10px;background:#F2F2F7;border-radius:14px;padding:14px">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="3"></rect><path d="M8 3v4M16 3v4M3 10h18"></path></svg>
+<div style="font-size:14.5px;color:#1a1a1a;font-weight:500">Aujourd'hui, 29 juillet</div>
+</div>
+<textarea placeholder="Commentaire (facultatif)" style="border:none;background:#F2F2F7;border-radius:14px;padding:14px;font-size:14px;color:#1a1a1a;font-family:inherit;outline:none;height:64px;resize:none"></textarea>
+<div style="background:#2D5E5A;color:#fff;border-radius:14px;padding:15px;text-align:center;font-size:15.5px;font-weight:600;margin-top:4px">Enregistrer</div>
+<div style="text-align:center;font-size:13.5px;color:#9a9a9a">Annuler</div>
+</div>
+</div>
+</x-import>
+</div>
+
+<div class="dv-opt" id="8e">
+<input placeholder="Quantité (ml)" style="border:none;background:#F2F2F7;border-radius:14px;padding:14px;font-size:14.5px;color:#1a1a1a;font-family:inherit;outline:none" />
+<textarea placeholder="Commentaire (facultatif)" style="border:none;background:#F2F2F7;border-radius:14px;padding:14px;font-size:14px;color:#1a1a1a;font-family:inherit;outline:none;height:64px;resize:none"></textarea>
+<div style="background:#2D5E5A;color:#fff;border-radius:14px;padding:15px;text-align:center;font-size:15.5px;font-weight:600;margin-top:4px">Enregistrer</div>
+<div style="text-align:center;font-size:13.5px;color:#9a9a9a">Annuler</div>
+</div>
+</div>
+</x-import>
+</div>
+
+<div class="dv-opt" id="8g">
+<div class="dv-olabel"><a class="dv-oid" href="#8g">8g</a>Ajouter un allaitement</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402,874">
+<div style="height:100%;position:relative;background:rgba(0,0,0,.35)">
+<div style="position:absolute;bottom:0;left:0;right:0;background:#fff;border-radius:24px 24px 0 0;padding:22px 22px 30px;display:flex;flex-direction:column;gap:12px">
+<div style="width:36px;height:4px;background:#ddd;border-radius:2px;margin:0 auto 4px"></div>
+<div style="font-size:18px;font-weight:700;color:#1a1a1a;text-align:center">Ajouter un allaitement</div>
+<div style="display:flex;background:#F2F2F7;border-radius:12px;padding:3px">
+<div style="flex:1;text-align:center;padding:10px 0;font-size:13.5px;color:#8a8a8a">Lait maternel</div>
+<div style="flex:1;text-align:center;padding:10px 0;font-size:13.5px;color:#8a8a8a">Lait infantile</div>
+<div style="flex:1;text-align:center;padding:10px 0;background:#fff;border-radius:9px;font-size:13.5px;font-weight:600;color:#1a1a1a;box-shadow:0 1px 3px rgba(0,0,0,.12)">Allaitement</div>
+</div>
+<div style="display:flex;gap:10px">
+<div style="flex:1;display:flex;align-items:center;gap:8px;background:#F2F2F7;border-radius:14px;padding:14px">
+<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="3"></rect><path d="M8 3v4M16 3v4M3 10h18"></path></svg>
+<div style="font-size:13.5px;color:#1a1a1a;font-weight:500">Aujourd'hui</div>
+</div>
+<div style="flex:1;display:flex;align-items:center;gap:8px;background:#F2F2F7;border-radius:14px;padding:14px">
+<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="1.8"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 3"></path></svg>
+<div style="font-size:13.5px;color:#1a1a1a;font-weight:500">14h20</div>
+</div>
+</div>
+<div style="display:flex;background:#F2F2F7;border-radius:12px;padding:3px">
+<div style="flex:1;text-align:center;padding:10px 0;background:#fff;border-radius:9px;font-size:13.5px;font-weight:600;color:#1a1a1a;box-shadow:0 1px 3px rgba(0,0,0,.12)">Sein gauche</div>
+<div style="flex:1;text-align:center;padding:10px 0;font-size:13.5px;color:#8a8a8a">Sein droit</div>
+<div style="flex:1;text-align:center;padding:10px 0;font-size:13.5px;color:#8a8a8a">Les deux</div>
+</div>
+<div style="display:flex;flex-direction:column;align-items:center;gap:8px;background:#F2F2F7;border-radius:14px;padding:20px">
+<div style="font-size:34px;font-weight:700;color:#1a1a1a;font-variant-numeric:tabular-nums">12:45</div>
+<div style="width:46px;height:46px;border-radius:50%;background:#2D5E5A;display:flex;align-items:center;justify-content:center"><svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><rect x="6" y="5" width="4" height="14"></rect><rect x="14" y="5" width="4" height="14"></rect></svg></div>
+</div>
+<textarea placeholder="Commentaire (facultatif)" style="border:none;background:#F2F2F7;border-radius:14px;padding:14px;font-size:14px;color:#1a1a1a;font-family:inherit;outline:none;height:64px;resize:none"></textarea>
+<div style="background:#2D5E5A;color:#fff;border-radius:14px;padding:15px;text-align:center;font-size:15.5px;font-weight:600;margin-top:4px">Enregistrer</div>
+<div style="text-align:center;font-size:13.5px;color:#9a9a9a">Annuler</div>
+</div>
+</div>
+</x-import>
+</div>
+
+<div class="dv-opt" id="8h">
+<div class="dv-olabel"><a class="dv-oid" href="#8h">8h</a>Ajouter un biberon — lait infantile</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402,874">
+<div style="height:100%;position:relative;background:rgba(0,0,0,.35)">
+<div style="position:absolute;bottom:0;left:0;right:0;background:#fff;border-radius:24px 24px 0 0;padding:22px 22px 30px;display:flex;flex-direction:column;gap:12px">
+<div style="width:36px;height:4px;background:#ddd;border-radius:2px;margin:0 auto 4px"></div>
+<div style="font-size:18px;font-weight:700;color:#1a1a1a;text-align:center">Ajouter un biberon</div>
+<div style="display:flex;background:#F2F2F7;border-radius:12px;padding:3px">
+<div style="flex:1;text-align:center;padding:10px 0;font-size:13.5px;color:#8a8a8a">Lait maternel</div>
+<div style="flex:1;text-align:center;padding:10px 0;background:#fff;border-radius:9px;font-size:13.5px;font-weight:600;color:#1a1a1a;box-shadow:0 1px 3px rgba(0,0,0,.12)">Lait infantile</div>
+<div style="flex:1;text-align:center;padding:10px 0;font-size:13.5px;color:#8a8a8a">Allaitement</div>
+</div>
+<div style="display:flex;gap:10px">
+<div style="flex:1;display:flex;align-items:center;gap:8px;background:#F2F2F7;border-radius:14px;padding:14px">
+<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="3"></rect><path d="M8 3v4M16 3v4M3 10h18"></path></svg>
+<div style="font-size:13.5px;color:#1a1a1a;font-weight:500">Aujourd'hui</div>
+</div>
+<div style="flex:1;display:flex;align-items:center;gap:8px;background:#F2F2F7;border-radius:14px;padding:14px">
+<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="1.8"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 3"></path></svg>
+<div style="font-size:13.5px;color:#1a1a1a;font-weight:500">14h20</div>
+</div>
+</div>
+<input placeholder="Quantité (ml)" style="border:none;background:#F2F2F7;border-radius:14px;padding:14px;font-size:14.5px;color:#1a1a1a;font-family:inherit;outline:none" />
+<textarea placeholder="Commentaire (facultatif)" style="border:none;background:#F2F2F7;border-radius:14px;padding:14px;font-size:14px;color:#1a1a1a;font-family:inherit;outline:none;height:64px;resize:none"></textarea>
+<div style="background:#2D5E5A;color:#fff;border-radius:14px;padding:15px;text-align:center;font-size:15.5px;font-weight:600;margin-top:4px">Enregistrer</div>
+<div style="text-align:center;font-size:13.5px;color:#9a9a9a">Annuler</div>
+</div>
+</div>
+</x-import>
+</div>
+
+</div>
+<p class="dv-next">Ensuite : "fais la partie 9 (avis app)"</p>
+</section>
+
+<section class="dv-turn" id="t9">
+<div class="dv-thd"><a class="dv-tid" href="#t9">9</a><span class="dv-tname">Demande d'avis sur l'app</span></div>
+<div class="dv-opts">
+
+<div class="dv-opt" id="9a">
+<div class="dv-olabel"><a class="dv-oid" href="#9a">9a</a>Hub — bannière d'avis</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402,874">
+<div style="height:100%;display:flex;flex-direction:column;padding:70px 20px 0;box-sizing:border-box;background:#EAF5F0">
+<div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+<div style="font-size:22px;font-weight:700;color:#1a1a1a;white-space:nowrap;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis">Bonjour Camille</div>
+<a href="#7a" style="display:flex;align-items:center;gap:5px;background:#2D5E5A;color:#fff;font-size:11px;font-weight:600;border-radius:20px;padding:6px 10px;white-space:nowrap;text-decoration:none;flex:none"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M12 2c-1.5 3-1.5 6 0 9M12 11c2.5-1 4.5-3 5.5-6M12 11c-2.5-1-4.5-3-5.5-6M12 11v10M9 21h6"></path></svg>J'ai accouché</a>
+</div>
+<div style="font-size:11.5px;color:#9a9a9a;font-weight:600;letter-spacing:.4px;margin-top:14px">HUMEUR DU JOUR</div>
+<div style="background:#fff;border-radius:16px;padding:14px;margin-top:6px;display:flex;align-items:center;gap:12px">
+<div style="font-size:26px">🙂</div>
+<div><div style="font-size:12px;color:#8a8a8a">Paul aujourd'hui</div><div style="font-size:14px;color:#1a1a1a;font-weight:600">Paul semble se sentir bien</div></div>
+</div>
+<div style="font-size:11.5px;color:#9a9a9a;font-weight:600;letter-spacing:.4px;margin-top:16px">VOS SECTIONS</div>
+<div style="display:flex;flex-direction:column;gap:10px;margin-top:6px">
+<div style="background:#fff;border-radius:16px;padding:15px;display:flex;align-items:center;gap:13px">
+<div style="width:40px;height:40px;border-radius:11px;background:#EAF5F0;display:flex;align-items:center;justify-content:center;flex:none"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="1.8"><path d="M7 3h7l5 5v13H7z"></path><path d="M14 3v5h5"></path></svg></div>
+<div><div style="font-size:15px;color:#1a1a1a;font-weight:600">Démarches</div><div style="font-size:12.5px;color:#2D5E5A">2 en attente</div></div>
+</div>
+<div style="background:#fff;border-radius:16px;padding:15px;display:flex;align-items:center;gap:13px">
+<div style="width:40px;height:40px;border-radius:11px;background:#EAF5F0;display:flex;align-items:center;justify-content:center;flex:none"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="1.8"><path d="M12 21s-7-4.35-9.5-9A5.5 5.5 0 0112 6a5.5 5.5 0 019.5 6C19 16.65 12 21 12 21z"></path></svg></div>
+<div><div style="font-size:15px;color:#1a1a1a;font-weight:600">Ensemble</div><div style="font-size:12.5px;color:#2D5E5A">Check-in du jour</div></div>
+</div>
+<div style="background:#fff;border-radius:16px;padding:15px;display:flex;align-items:center;gap:13px">
+<div style="width:40px;height:40px;border-radius:11px;background:#EAF5F0;display:flex;align-items:center;justify-content:center;flex:none"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="1.8"><path d="M21 12.5A8.5 8.5 0 1111.5 3 7 7 0 0021 12.5z"></path></svg></div>
+<div><div style="font-size:15px;color:#1a1a1a;font-weight:600">Suivi santé</div><div style="font-size:12.5px;color:#2D5E5A">Journal du jour</div></div>
+</div>
+<div style="background:linear-gradient(135deg,#1a1a1a,#2d2d2d);border-radius:16px;padding:15px;display:flex;align-items:center;gap:13px">
+<div style="width:40px;height:40px;border-radius:11px;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:17px;flex:none">👶</div>
+<div style="flex:1"><div style="font-size:15px;color:#fff;font-weight:600">Votre bébé</div><div style="font-size:12.5px;color:#e8c874">Courbe de croissance</div></div>
+<div style="font-size:9.5px;font-weight:700;letter-spacing:.4px;color:#1a1a1a;background:#e8c874;border-radius:6px;padding:4px 7px;white-space:nowrap">PREMIUM</div>
+</div>
+<div style="font-size:11.5px;color:#9a9a9a;font-weight:600;letter-spacing:.4px;margin-top:32px">MON PARTENAIRE</div>
+<div style="background:#fdf6e3;border-radius:16px;padding:15px;display:flex;align-items:center;gap:13px;margin-top:10px">
+<div style="width:40px;height:40px;border-radius:11px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:17px;flex:none">💕</div>
+<div><div style="font-size:15px;color:#1a1a1a;font-weight:600">Avec Paul</div><div style="font-size:12.5px;color:#2D5E5A">Voir son état cette semaine</div></div>
+</div>
+</div>
+<div style="background:#fff;border:1.5px solid #2D5E5A;border-radius:16px;padding:16px;margin-top:44px;display:flex;flex-direction:column;gap:10px">
+<div style="font-size:14.5px;color:#1a1a1a;font-weight:600;text-align:center">Vous aimez US ?</div>
+<div style="display:flex;justify-content:center;gap:14px">
+<div style="width:42px;height:42px;border-radius:50%;background:#F2F2F7;display:flex;align-items:center;justify-content:center;font-size:19px">👎</div>
+<div style="width:42px;height:42px;border-radius:50%;background:#2D5E5A;display:flex;align-items:center;justify-content:center;font-size:19px;box-shadow:0 3px 8px rgba(45,94,90,.35)">👍</div>
+</div>
+</div>
+<div style="flex:1"></div>
+<div style="display:flex;align-items:center;justify-content:space-between;padding:14px 8px 18px;border-top:1px solid rgba(0,0,0,.06);flex:none">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="1.8"><path d="M3 11l9-8 9 8"></path><path d="M5 10v10h14V10"></path></svg>
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8a8a8a" stroke-width="1.8"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 4-6 8-6s8 2 8 6"></path></svg>
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8a8a8a" stroke-width="1.8"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"></path></svg>
+</div>
+</div>
+</x-import>
+</div>
+
+<div class="dv-opt" id="9b">
+<div class="dv-olabel"><a class="dv-oid" href="#9b">9b</a>Note et retour</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402,874">
+<div style="height:100%;position:relative;background:rgba(0,0,0,.35)">
+<div style="position:absolute;bottom:0;left:0;right:0;background:#fff;border-radius:24px 24px 0 0;padding:26px 22px 30px;display:flex;flex-direction:column;gap:14px">
+<div style="width:36px;height:4px;background:#ddd;border-radius:2px;margin:0 auto 4px"></div>
+<div style="font-size:18px;font-weight:700;color:#1a1a1a;text-align:center">Notez votre expérience</div>
+<div style="display:flex;justify-content:center;gap:10px">
+<svg width="30" height="30" viewBox="0 0 24 24" fill="#2D5E5A"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"></path></svg>
+<svg width="30" height="30" viewBox="0 0 24 24" fill="#2D5E5A"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"></path></svg>
+<svg width="30" height="30" viewBox="0 0 24 24" fill="#2D5E5A"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"></path></svg>
+<svg width="30" height="30" viewBox="0 0 24 24" fill="#e2e2e2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"></path></svg>
+<svg width="30" height="30" viewBox="0 0 24 24" fill="#e2e2e2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"></path></svg>
+</div>
+<div style="font-size:13.5px;color:#8a8a8a;text-align:center;line-height:1.4">Un mot pour nous aider à nous améliorer ?</div>
+<textarea placeholder="Partagez ce que vous aimez chez US…" style="border:none;background:#F2F2F7;border-radius:14px;padding:14px;font-size:14px;color:#1a1a1a;font-family:inherit;outline:none;height:90px;resize:none"></textarea>
+<div style="background:#2D5E5A;color:#fff;border-radius:14px;padding:15px;text-align:center;font-size:15.5px;font-weight:600">Envoyer</div>
+<div style="text-align:center;font-size:13.5px;color:#9a9a9a">Passer</div>
+</div>
+</div>
+</x-import>
+</div>
+
+</div>
+<p class="dv-next">Ensuite : "fais la partie 10 (réglages)"</p>
+</section>
+
+<section class="dv-turn" id="t10">
+<div class="dv-thd"><a class="dv-tid" href="#t10">10</a><span class="dv-tname">Réglages</span></div>
+<div class="dv-opts">
+
+<div class="dv-opt" id="10a">
+<div class="dv-olabel"><a class="dv-oid" href="#10a">10a</a>Réglages</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402,874">
+<div style="height:100%;display:flex;flex-direction:column;padding:70px 20px 0;box-sizing:border-box;background:#EAF5F0">
+<div style="font-size:24px;font-weight:700;color:#1a1a1a">Réglages</div>
+<div style="font-size:11.5px;color:#9a9a9a;font-weight:600;letter-spacing:.4px;margin:18px 0 8px">APPARENCE</div>
+<div style="display:flex;flex-direction:column;gap:12px;border-radius:16px;border:1px solid #f0f0f0;padding:14px">
+<div style="display:flex;align-items:center;justify-content:space-between">
+<div style="font-size:15px;color:#1a1a1a">Langue</div>
+<div style="display:flex;background:#F2F2F7;border-radius:10px;padding:3px">
+<div style="padding:6px 12px;background:#fff;border-radius:7px;font-size:12.5px;font-weight:600;color:#1a1a1a;box-shadow:0 1px 3px rgba(0,0,0,.12)">FR</div>
+<div style="padding:6px 12px;font-size:12.5px;color:#8a8a8a">EN</div>
+</div>
+</div>
+<div style="height:1px;background:#f0f0f0"></div>
+<div style="display:flex;align-items:center;justify-content:space-between">
+<div style="font-size:15px;color:#1a1a1a">Thème sombre</div>
+<div style="width:44px;height:26px;border-radius:13px;background:#e2e2e2;position:relative"><div style="width:22px;height:22px;border-radius:50%;background:#fff;position:absolute;top:2px;left:2px;box-shadow:0 1px 2px rgba(0,0,0,.2)"></div></div>
+</div>
+<div style="height:1px;background:#f0f0f0"></div>
+<div style="font-size:15px;color:#1a1a1a">Couleur d'accent</div>
+<div style="display:flex;gap:12px">
+<div style="width:32px;height:32px;border-radius:50%;background:#2D5E5A;border:2.5px solid #2D5E5A;display:flex;align-items:center;justify-content:center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><path d="M20 6L9 17l-5-5"></path></svg></div>
+<div style="width:32px;height:32px;border-radius:50%;background:#8a8f94;border:2px solid transparent"></div>
+<div style="width:32px;height:32px;border-radius:50%;background:#d98a9c;border:2px solid transparent"></div>
+<div style="width:32px;height:32px;border-radius:50%;background:#6f9bd9;border:2px solid transparent"></div>
+</div>
+</div>
+<div style="font-size:11.5px;color:#9a9a9a;font-weight:600;letter-spacing:.4px;margin:18px 0 8px">COMPTE</div>
+<div style="display:flex;flex-direction:column;border-radius:16px;overflow:hidden;border:1px solid #f0f0f0">
+<div style="background:#fff;padding:16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #f0f0f0"><div style="font-size:15px;color:#1a1a1a">Informations importantes</div><div style="color:#c4c4c4;font-size:18px">›</div></div>
+<div style="background:#fff;padding:16px;display:flex;align-items:center;justify-content:space-between"><div style="font-size:15px;color:#1a1a1a">Notifications</div><div style="color:#c4c4c4;font-size:18px">›</div></div>
+</div>
+<div style="font-size:11.5px;color:#9a9a9a;font-weight:600;letter-spacing:.4px;margin:18px 0 8px">SOUTIEN</div>
+<div style="display:flex;flex-direction:column;border-radius:16px;overflow:hidden;border:1px solid #f0f0f0">
+<div style="background:#fff;padding:16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #f0f0f0"><div style="font-size:15px;color:#1a1a1a">Noter l'application</div><div style="color:#e8b74d;font-size:15px">★★★★★</div></div>
+<div style="background:#fff;padding:16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #f0f0f0"><div style="font-size:15px;color:#1a1a1a">Aide &amp; support</div><div style="color:#c4c4c4;font-size:18px">›</div></div>
+<div style="background:#fff;padding:16px;display:flex;align-items:center;justify-content:space-between"><div style="font-size:15px;color:#1a1a1a">Exporter mes données</div><div style="color:#c4c4c4;font-size:18px">›</div></div>
+</div>
+<div style="font-size:11.5px;color:#9a9a9a;font-weight:600;letter-spacing:.4px;margin:18px 0 8px">LÉGAL</div>
+<div style="display:flex;flex-direction:column;border-radius:16px;overflow:hidden;border:1px solid #f0f0f0">
+<div style="background:#fff;padding:16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #f0f0f0"><div style="font-size:15px;color:#1a1a1a">Politique de confidentialité</div><div style="color:#c4c4c4;font-size:18px">›</div></div>
+<div style="background:#fff;padding:16px;display:flex;align-items:center;justify-content:space-between"><div style="font-size:15px;color:#1a1a1a">Conditions d'utilisation</div><div style="color:#c4c4c4;font-size:18px">›</div></div>
+</div>
+<div style="flex:1"></div>
+<div style="display:flex;align-items:center;justify-content:space-between;padding:14px 8px 18px;border-top:1px solid rgba(0,0,0,.06);flex:none">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8a8a8a" stroke-width="1.8"><path d="M3 11l9-8 9 8"></path><path d="M5 10v10h14V10"></path></svg>
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8a8a8a" stroke-width="1.8"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 4-6 8-6s8 2 8 6"></path></svg>
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D5E5A" stroke-width="1.8"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"></path></svg>
+</div>
+</div>
+</x-import>
+</div>
+
+</div>
+<p class="dv-next">C'est toutes les parties ! Dis-moi ce que tu veux ajuster.</p>
+</section>
+
+</x-dc>
+
+
+</body></html>
