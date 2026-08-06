@@ -47,15 +47,19 @@ sections du design.
 
 ### 1.1 Coquille de navigation
 
-- [ ] Barre de navigation basse à **4 onglets fixes** (et non 3) : **Home**
+- [x] Barre de navigation basse à **4 onglets fixes** (et non 3) : **Home**
       (hub) / **User** (profil personnel) / **Information** (infos
       importantes partagées) / **Setting** (réglages) — cf. `CONCEPT.md`
-- [ ] Onglet **User** : écran de profil propre à chaque utilisateur (nom
+- [x] Onglet **User** : écran de profil propre à chaque utilisateur (nom
       affiché modifiable ; avatar = fonctionnalité future, ne pas bloquer dessus)
-- [ ] Onglet **Information** : fiche partagée et modifiable par les deux
+- [x] Onglet **Information** : fiche partagée et modifiable par les deux
       parents (groupe sanguin, allergies, n° sécu, adresse maternité...),
-      **réorganisable par drag-and-drop** — ⚠️ données de santé, RLS stricte
-      dès l'implémentation
+      **réorganisable** — ⚠️ données de santé, RLS stricte dès
+      l'implémentation (déjà en place depuis la migration
+      `household_info_items`). Réordonnancement implémenté via boutons
+      haut/bas (persisté en base) plutôt qu'un vrai geste de
+      glisser-déposer — à remplacer par un geste tactile (Reanimated +
+      Gesture Handler) dans une passe dédiée si le besoin se confirme.
 
 ### 1.2 Onboarding et mise en place de l'espace partagé
 

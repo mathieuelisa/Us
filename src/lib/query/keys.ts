@@ -4,11 +4,16 @@
  * invalidates every query under that domain. Add a new domain here as each
  * feature lands (see DOCS/02-ACTION-PLAN.md) instead of inlining query keys
  * in components.
- *
- * Example once the household domain exists:
- *   household: {
- *     all: ['household'] as const,
- *     detail: (householdId: string) => ['household', householdId] as const,
- *   },
  */
-export const queryKeys = {} as const;
+export const queryKeys = {
+  profile: {
+    all: ['profile'] as const,
+    mine: ['profile', 'mine'] as const,
+  },
+  household: {
+    all: ['household'] as const,
+    mine: ['household', 'mine'] as const,
+    infoItems: (householdId: string) =>
+      ['household', householdId, 'info-items'] as const,
+  },
+} as const;

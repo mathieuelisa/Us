@@ -1,9 +1,12 @@
 import { Button, Input, TextField } from 'heroui-native';
 import { useState } from 'react';
 import { Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
+import { withUniwind } from 'uniwind';
 
 import { supabase } from '@/lib/supabase/client';
+
+const SafeAreaView = withUniwind(RNSafeAreaView);
 
 type Status = 'idle' | 'sending' | 'sent' | 'error';
 
