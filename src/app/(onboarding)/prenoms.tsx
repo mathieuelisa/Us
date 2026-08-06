@@ -16,8 +16,10 @@ import { onboardingDraftAtom } from '@/lib/atoms/onboarding';
  * alors que CONCEPT.md dit « prénoms des deux parents (obligatoire pour
  * personnaliser l'application) ». CLAUDE.md tranche : CONCEPT.md fait foi.
  * On rend donc les deux prénoms obligatoires — mais uniquement quand il y a
- * effectivement un co-parent (demander le prénom d'un co-parent inexistant
- * à un parent « seul·e » n'aurait pas de sens).
+ * effectivement un co-parent : le champ disparaît si l'utilisateur a répondu
+ * « Seul·e », ou que le co-parent n'utilisera pas l'app (cf.
+ * `shouldInvitePartner`). Demander le prénom d'un co-parent inexistant
+ * n'aurait pas de sens.
  *
  * ⚠️ État local plutôt que TanStack Form (que DOCS/04-ARCHITECTURE.md
  * impose) : la réactivité de TanStack Form v1 ne fonctionne pas dans cette

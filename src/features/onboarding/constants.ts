@@ -56,17 +56,25 @@ export const REMINDER_OPTIONS: {
 ];
 
 /**
- * Le co-parent n'est invité que si le mode d'accompagnement implique
- * quelqu'un d'autre ET que ce quelqu'un compte utiliser l'app (question
- * posée à l'étape 1). Sinon l'étape d'invitation est sautée — déduit de
- * CONCEPT.md, non spécifié explicitement par les maquettes.
+ * Y a-t-il un co-parent à qui demander un prénom (étape 2) et à qui envoyer
+ * une invitation (écran 2d) ?
+ *
+ * Deux conditions, dans cet ordre :
+ *  - « Seul·e » exclut par définition un co-parent, quelle que soit la
+ *    réponse à la question suivante ;
+ *  - sinon, c'est la réponse à « Le co-parent utilisera-t-il aussi l'app ? »
+ *    qui décide.
+ *
+ * « Autre » est donc traité comme les modes avec co-parent : on ne sait pas
+ * ce qu'il recouvre, et c'est l'utilisateur qui tranche en répondant Oui/Non
+ * — plutôt que de décider à sa place qu'il n'a personne.
+ *
+ * Déduit de CONCEPT.md, non spécifié explicitement par les maquettes.
  */
 export function shouldInvitePartner(
   accompanimentType: AccompanimentType | null,
   partnerUsesApp: boolean,
 ): boolean {
-  if (!partnerUsesApp) return false;
-  return (
-    accompanimentType === 'couple' || accompanimentType === 'coparentalite'
-  );
+  if (accompanimentType === null || accompanimentType === 'seul') return false;
+  return partnerUsesApp;
 }
