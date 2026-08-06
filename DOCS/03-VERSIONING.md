@@ -7,7 +7,10 @@ title: Plan de versionning — US
 > Ce document définit **comment** on découpe les livraisons. Le contenu
 > détaillé de chaque version vit dans [`versions/`](./versions/). Ce plan est
 > le pendant "quoi livrer et quand" du [Plan d'action](./02-ACTION-PLAN.md),
-> qui est le pendant "comment on construit techniquement".
+> qui est le pendant "comment on construit techniquement". Le contenu
+> fonctionnel des deux documents s'appuie sur [`CONCEPT.md`](./CONCEPT.md)
+> (référence produit prioritaire) et sur le
+> [Design Overview](./01-DESIGN-OVERVIEW.md) pour le détail visuel des écrans.
 
 ## Convention de nommage
 
@@ -41,6 +44,15 @@ notifications). Séparer MVP et V1 permet de :
 - garder V2 comme un backlog de finition qui peut être réordonné selon les
   retours utilisateurs du MVP/V1 sans remettre en cause l'architecture.
 
+**Un principe transverse ne suit pas ce découpage** : `CONCEPT.md` établit
+qu'il n'existe qu'**un seul jeu de données par couple**, synchronisé sans
+étape visible pour les deux parents. Ce n'est pas une feature qu'on ajoute
+en V2 — c'est structurant dès la Phase 0 du plan d'action (choix de la
+stratégie de synchronisation temps réel) et dès le MVP pour les surfaces
+partagées critiques (humeur, rendez-vous partagés, statuts de démarches).
+Le bullet Realtime de [V2.md](./versions/V2.md) ne concerne que
+l'**extension** de ce mécanisme aux surfaces restantes, pas son introduction.
+
 ## Correspondance avec le plan d'action
 
 Le [Plan d'action](./02-ACTION-PLAN.md) est organisé en phases techniques
@@ -49,7 +61,7 @@ Le [Plan d'action](./02-ACTION-PLAN.md) est organisé en phases techniques
 | Phase du plan d'action | Version(s) livrée(s) |
 |---|---|
 | Phase 0 — Socle technique | (prérequis, pas de version livrable seule) |
-| Phase 1 — Auth, onboarding, hub, 3 piliers | [MVP](./versions/MVP.md) |
+| Phase 1 — Navigation, onboarding, hub, 3 piliers | [MVP](./versions/MVP.md) |
 | Phase 2 — Déclaration de naissance & finitions MVP | [MVP](./versions/MVP.md) |
 | Phase 3 — Paiement & module bébé | [V1](./versions/V1.md) |
 | Phase 4 — Notifications push réelles | [V1](./versions/V1.md) |
@@ -59,6 +71,19 @@ Concrètement : quand la Phase 1 et la Phase 2 du plan d'action sont
 "Done", le contenu de `MVP.md` doit être entièrement cochable. Si ce n'est
 pas le cas, c'est que le découpage des phases doit être ajusté — les deux
 documents doivent rester synchronisés.
+
+## Points ouverts à trancher avec l'utilisateur
+
+Ces écarts entre `CONCEPT.md` et les maquettes Hi-Fi ont un impact sur le
+périmètre exact du MVP et de V1 — à confirmer avant que les phases
+correspondantes du plan d'action soient considérées "prêtes à coder" :
+
+- **Bouton "J'ai accouché"** — `CONCEPT.md` dit qu'il n'apparaît que sur le
+  hub ; les maquettes le montrent sur presque tous les écrans. Impacte le
+  périmètre exact de la Phase 1 (MVP).
+- **Favoris "Votre bébé" au-delà des 4 confirmés** (sommeil, couche, visite
+  médecin visibles dans la maquette 8a mais absents de `CONCEPT.md`) —
+  impacte le périmètre exact de V1 (Phase 3).
 
 ## Versionning technique (numéros de build)
 

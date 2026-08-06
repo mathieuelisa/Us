@@ -31,15 +31,21 @@ React Native, pas à copier tel quel (c'est du HTML/CSS de prototype).
 - État serveur → TanStack Query uniquement. État UI éphémère → Jotai. Formulaires → TanStack Form.
 - Toute nouvelle table Supabase doit avoir sa policy RLS écrite dans le même changement, jamais différée
 
-## Commandes (à adapter une fois le scaffold posé)
+## Commandes
 
 ```
-pnpm install
-pnpm lint        # biome check
-pnpm typecheck   # tsc --noEmit
-pnpm test
-pnpm db:types    # régénère les types Supabase
+npm install
+npm run lint        # biome check .
+npm run lint:fix    # biome check --write .
+npm run typecheck   # tsc --noEmit
+npm run start        # expo start
+npm run db:start     # supabase start (local, requiert Docker)
+npm run db:types     # régénère src/lib/supabase/database.types.ts
 ```
+
+Copier `.env.example` en `.env` et renseigner les clés Supabase avant de
+tester l'auth (magic link) ou toute requête réseau — voir
+[`DOCS/04-ARCHITECTURE.md`](./DOCS/04-ARCHITECTURE.md#supabase--points-de-vigilance).
 
 ## Périmètre
 
