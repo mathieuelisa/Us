@@ -6,6 +6,7 @@ grossesse et les premiers mois du bébé.
 
 ## Sommaire
 
+0. [Concept produit](./CONCEPT.md) — référence produit prioritaire (règles de visibilité par rôle, structure du hub, etc.)
 1. [Synthèse du design](./01-DESIGN-OVERVIEW.md) — ce que contiennent les maquettes Claude Design (10 sections, ~45 écrans), modèle de données inféré
 2. [Plan d'action de développement](./02-ACTION-PLAN.md) — découpage en phases techniques
 3. [Plan de versionning](./03-VERSIONING.md) — MVP → V1 → V2, et convention pour les versions suivantes
@@ -13,6 +14,9 @@ grossesse et les premiers mois du bébé.
 
 Le contenu détaillé de chaque version livrable vit dans [`versions/`](./versions/) :
 [MVP](./versions/MVP.md), [V1](./versions/V1.md), [V2](./versions/V2.md).
+
+Le catalogue des migrations SQL (schéma Supabase, RLS) vit dans
+[`migrations/README.md`](./migrations/README.md).
 
 ## Comment ces documents se relient
 

@@ -33,14 +33,18 @@ React Native, pas à copier tel quel (c'est du HTML/CSS de prototype).
 
 ## Commandes
 
+Gestionnaire de paquets : **bun** (`.nvmrc` pointe la version Node LTS à
+utiliser en parallèle — bun gère les paquets, certains sous-processus
+d'Expo/Metro s'appuient encore sur Node).
+
 ```
-npm install
-npm run lint        # biome check .
-npm run lint:fix    # biome check --write .
-npm run typecheck   # tsc --noEmit
-npm run start        # expo start
-npm run db:start     # supabase start (local, requiert Docker)
-npm run db:types     # régénère src/lib/supabase/database.types.ts
+bun install
+bun run lint        # biome check .
+bun run lint:fix    # biome check --write .
+bun run typecheck   # tsc --noEmit
+bun run start        # expo start
+bun run db:start     # supabase start (local, requiert Docker)
+bun run db:types     # régénère src/lib/supabase/database.types.ts
 ```
 
 Copier `.env.example` en `.env` et renseigner les clés Supabase avant de

@@ -22,7 +22,8 @@ title: Architecture technique — US
 | Paiement premium | À trancher en phase MVP+1 (RevenueCat recommandé pour achat unique + restauration cross-plateforme) |
 | Notifications push | Expo Notifications + Supabase Edge Functions (scheduling) |
 | Styles / theming | Tailwind v4 via [Uniwind](https://docs.uniwind.dev) — Hero UI Native est bâti dessus, `className` sur les composants plutôt que `StyleSheet.create` pour tout ce que le kit ne fournit pas déjà |
-| Gestionnaire de paquets | npm |
+| Gestionnaire de paquets | [bun](https://bun.sh) (lockfile `bun.lock`) |
+| Runtime Node | Version LTS active (`.nvmrc`) — bun gère les paquets, certains sous-processus Expo/Metro/Husky s'appuient encore sur `node` |
 
 L'app vit sous `src/` (convention du scaffold Expo par défaut : `src/app`,
 `src/components`, `src/constants`, `src/hooks`, `src/lib`) plutôt qu'à la
@@ -84,10 +85,10 @@ Posé en Phase 0 : `src/lib/supabase/client.ts`, `src/lib/query/query-client.ts`
 
 ## Supabase — points de vigilance
 
-- **RLS** : chaque table métier scoped par `household_id`, policy `auth.uid() in (select user_id from household_members where household_id = ...)`.
-- **Données de santé** (`important_info`, `symptoms_log`) : policies encore plus restrictives, envisager une table séparée avec accès audité.
-- **Types générés** : `npm run db:types` (= `supabase gen types typescript --local --schema public > src/lib/supabase/database.types.ts`). Nécessite le stack Supabase local (`npm run db:start`, requiert Docker) ou un projet lié (`supabase link`).
-- **CLI** : `supabase/config.toml` posé en Phase 0 via `supabase init`. **La création du projet Supabase cloud (compte, URL, clé anon) reste une étape manuelle utilisateur** — copier `.env.example` en `.env` et renseigner `EXPO_PUBLIC_SUPABASE_URL` / `EXPO_PUBLIC_SUPABASE_ANON_KEY` (Project Settings > API sur supabase.com). Sans ça, `src/lib/supabase/client.ts` fonctionne avec des valeurs placeholder (l'app se lance, les appels Supabase échoueront).
+- **Schéma et RLS** : voir [`DOCS/migrations/README.md`](./migrations/README.md) pour le catalogue complet. `households` porte directement `pregnant_user_id`/`partner_user_id` (pas de table de jointure générique — un foyer ne dépasse jamais 2 personnes), et deux fonctions SQL `is_household_member(household_id)` / `household_role(household_id)` factorisent toutes les policies.
+- **Données de santé** (`symptoms_log`) : lecture ouverte aux deux membres, écriture réservée à la personne enceinte — la policy la plus restrictive du schéma.
+- **Types générés** : `bun run db:types` (= `supabase gen types typescript --local --schema public > src/lib/supabase/database.types.ts`). Nécessite le stack Supabase local (`bun run db:start`, requiert Docker) ou un projet lié (`supabase link`).
+- **CLI** : `supabase/config.toml` posé en Phase 0 via `supabase init`. Le projet Supabase cloud existe (`EXPO_PUBLIC_SUPABASE_URL` / `EXPO_PUBLIC_SUPABASE_KEY` dans `.env`, jamais commité — `.env.example` ne contient que des placeholders). Sans ces variables, `src/lib/supabase/client.ts` fonctionne quand même avec des valeurs placeholder (l'app se lance, les appels Supabase échouent proprement).
 
 ### Stratégie de synchronisation temps réel (décision Phase 0)
 

@@ -11,19 +11,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.11
+
       - uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
-          cache: npm
 
-      - run: npm ci
+      - run: bun install --frozen-lockfile
 
       # Generates expo-env.d.ts and src/uniwind-types.d.ts (gitignored,
       # required for typecheck) as a side effect, and doubles as a build
       # smoke test. No Supabase credentials needed — the client falls back
       # to placeholder values when EXPO_PUBLIC_SUPABASE_* is unset.
-      - run: npx expo export --platform web
+      - run: bunx expo export --platform web
 
-      - run: npm run lint
+      - run: bun run lint
 
-      - run: npm run typecheck
+      - run: bun run typecheck
