@@ -24,21 +24,21 @@ title: Plan d'action de développement — US
 Objectif : avoir un projet qui compile, se lint, se déploie sur device, et
 qui parle à Supabase — avant d'écrire le moindre écran métier.
 
-- [ ] Scaffold Expo + TypeScript strict + Expo Router
-- [ ] Intégration Hero UI Native (thème de base, couleur de marque `#2D5E5A`)
-- [ ] Configuration Biome (lint + format) + pre-commit hook
-- [ ] Projet Supabase créé, client configuré, script `db:types` (génération des types TS)
-- [ ] Auth Supabase par magic link fonctionnelle (écran 1a minimal, sans le reste de l'onboarding)
-- [ ] Setup TanStack Query (queryClient, provider, conventions de query keys)
-- [ ] Setup Jotai (atoms globaux : rôle courant, session)
-- [ ] **Modèle "espace partagé" posé dès le socle** : un household = un seul
+- [x] Scaffold Expo + TypeScript strict + Expo Router
+- [x] Intégration Hero UI Native (thème de base, couleur de marque `#2D5E5A`)
+- [x] Configuration Biome (lint + format) + pre-commit hook
+- [x] Projet Supabase créé, client configuré, script `db:types` (génération des types TS)
+- [x] Auth Supabase par magic link fonctionnelle (écran 1a minimal, sans le reste de l'onboarding)
+- [x] Setup TanStack Query (queryClient, provider, conventions de query keys)
+- [x] Setup Jotai (atoms globaux : rôle courant, session)
+- [x] **Modèle "espace partagé" posé dès le socle** : un household = un seul
       jeu de données (pas de copie par utilisateur). Décider ici la stratégie
       de synchronisation temps réel (Supabase Realtime vs invalidation
       agressive de query TanStack Query) pour que les écrans partagés
       (humeur, rendez-vous partagés, statuts de démarches) soient à jour sans
       action manuelle — voir [Architecture](./04-ARCHITECTURE.md). Ce n'est
       **pas** un chantier V2, c'est structurant dès le MVP.
-- [ ] CI minimale (lint + typecheck sur PR)
+- [x] CI minimale (lint + typecheck sur PR)
 
 ## Phase 1 — Coquille de navigation, onboarding, hub, 3 piliers gratuits (→ MVP)
 
