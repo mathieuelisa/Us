@@ -34,7 +34,30 @@ racine du repo — la racine reste réservée à la config (`app.json`,
 
 - **TanStack Query** : toute donnée qui vit côté serveur (Supabase) — `households`, `pregnancies`, `appointments`, `procedures`, `baby_*`, `mood_checkins`, etc. Pas de duplication manuelle dans Jotai.
 - **Jotai** : état UI éphémère et transverse — rôle actif de l'utilisateur (enceinte/partenaire), thème/couleur d'accent en cours d'édition, état d'un formulaire multi-étapes (onboarding) avant soumission, état d'ouverture des bottom sheets.
-- **TanStack Form** : tous les formulaires (onboarding multi-étapes, ajout RDV, ajout mesure/biberon/bain, profil, réglages).
+- **TanStack Form** : tous les formulaires (onboarding multi-étapes, ajout RDV, ajout mesure/biberon/bain, profil, réglages). **Non appliqué à ce jour** — voir ci-dessous.
+
+### TanStack Form — mandat suspendu (Phase 1.2)
+
+L'onboarding a d'abord été écrit avec TanStack Form v1.33, puis basculé sur
+de l'état React contrôlé (`useState`), comme l'écran de connexion. En l'état,
+**aucun formulaire du projet n'utilise TanStack Form** et le paquet n'est pas
+installé.
+
+Ce qui a été observé pendant l'implémentation : la saisie mettait bien à jour
+le store du formulaire, mais ni le rendu de `form.Field` ni un
+`useStore(form.store, …)` ne se re-rendaient — champ figé et bouton
+« Continuer » jamais activé. `"use no memo"` (échappatoire React Compiler)
+n'y changeait rien.
+
+⚠️ **Ce diagnostic n'est pas concluant** : il a été établi avant de découvrir
+que plusieurs instances d'un même écran pouvaient être empilées dans le DOM
+pendant les tests, ce qui a produit d'autres faux positifs. Il est possible
+que la saisie ait porté sur une instance masquée. Avant de conclure que
+TanStack Form est inutilisable ici (Expo SDK 57 / React 19 / Metro), il faut
+donc **refaire l'essai proprement** sur une seule instance d'écran.
+
+En attendant, `useState` est le motif de référence pour les formulaires du
+projet — il fonctionne et reste trivial à remplacer.
 
 Règle simple : si la donnée doit survivre à un redémarrage de l'app ou être partagée entre utilisateurs → Supabase + TanStack Query. Sinon → Jotai.
 

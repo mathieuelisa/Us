@@ -39,6 +39,7 @@ npm run db:types                         # régénère src/lib/supabase/database
 | [`20260806151000_baby_size_by_week.sql`](../../supabase/migrations/20260806151000_baby_size_by_week.sql) | `baby_size_by_week` | Référentiel statique "taille du bébé par semaine" (seedé) |
 | [`20260806151100_household_info_items.sql`](../../supabase/migrations/20260806151100_household_info_items.sql) | `household_info_items` | Onglet "Information" — liste libre et réorganisable (drag-and-drop), pas de colonnes figées |
 | [`20260806151200_app_feedback.sql`](../../supabase/migrations/20260806151200_app_feedback.sql) | `app_feedback` | Retours de la demande d'avis in-app, personnels (non partagés avec le partenaire) |
+| [`20260807120000_onboarding_and_invites.sql`](../../supabase/migrations/20260807120000_onboarding_and_invites.sql) | `households`, fonction `accept_household_invite()` | Manques révélés par la Phase 1.2 : `households.partner_first_name` (prénom saisi avant que le co-parent ait un compte), index uniques « un foyer par utilisateur et par rôle », et la fonction de rattachement du co-parent invité |
 
 ## Décisions de modélisation
 
@@ -63,3 +64,11 @@ npm run db:types                         # régénère src/lib/supabase/database
   la volée (`households.birth_date` + `procedure_templates.deadline_days_after_birth`)
   pour garder `birth_date` comme unique source de vérité (cf. la démarche
   "déclaration de naissance").
+- **`accept_household_invite()` en `security definer`** : le co-parent
+  invité n'est membre d'aucun foyer au moment où il clique le lien, donc
+  `is_household_member()` est faux et les policies RLS l'empêchent à la fois
+  de voir son invitation et de se rattacher. La fonction est la seule porte
+  d'entrée ; elle ne prend **aucun paramètre** et matche uniquement sur
+  l'email vérifié du JWT de l'appelant, donc il n'y a rien à falsifier côté
+  client. Elle refuse de rejoindre un foyer ayant déjà un co-parent, ou le
+  foyer dont l'appelant est lui-même le parent porteur.

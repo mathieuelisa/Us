@@ -340,6 +340,7 @@ export type Database = {
           due_date: string | null;
           id: string;
           is_first_child: boolean | null;
+          partner_first_name: string | null;
           partner_user_id: string | null;
           partner_uses_app: boolean;
           pregnant_user_id: string;
@@ -355,6 +356,7 @@ export type Database = {
           due_date?: string | null;
           id?: string;
           is_first_child?: boolean | null;
+          partner_first_name?: string | null;
           partner_user_id?: string | null;
           partner_uses_app?: boolean;
           pregnant_user_id: string;
@@ -370,6 +372,7 @@ export type Database = {
           due_date?: string | null;
           id?: string;
           is_first_child?: boolean | null;
+          partner_first_name?: string | null;
           partner_user_id?: string | null;
           partner_uses_app?: boolean;
           pregnant_user_id?: string;
@@ -541,6 +544,7 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      accept_household_invite: { Args: never; Returns: string };
       household_role: { Args: { hh_id: string }; Returns: string };
       is_household_member: { Args: { hh_id: string }; Returns: boolean };
     };

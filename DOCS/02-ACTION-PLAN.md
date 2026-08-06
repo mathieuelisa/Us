@@ -63,19 +63,40 @@ sections du design.
 
 ### 1.2 Onboarding et mise en place de l'espace partagé
 
-1. **Onboarding complet** (écrans 1a → 1f, 1y) — magic link (email seul,
+1. [x] **Onboarding complet** (écrans 1a → 1f, 1y) — magic link (email seul,
    aucune identité obligatoire), prénoms des deux parents (obligatoire),
    date d'accouchement prévue, statut pro, mode d'accompagnement (couple /
    coparentalité / seul·e / autre), priorités, rythme de notifications.
-   Formulaire multi-étapes avec TanStack Form, état d'avancement en Jotai,
-   persistance finale en Supabase (`households`, `pregnancies`,
-   `onboarding_answers`)
-2. **Écran 1g (paywall)** — affiché en toute fin d'onboarding mais
+   Formulaire multi-étapes, état d'avancement en Jotai, persistance finale
+   en Supabase.
+   - Tout est écrit dans `households` (+ `profiles.first_name`) : les
+     tables `pregnancies` et `onboarding_answers` mentionnées ici n'ont
+     jamais existé, le schéma les a volontairement pliées dans `households`
+     (cf. [migrations](./migrations/README.md#décisions-de-modélisation)).
+   - ⚠️ **Écrit sans TanStack Form**, contrairement à
+     [l'architecture](./04-ARCHITECTURE.md#stack) — voir la note « TanStack
+     Form » là-bas.
+2. [x] **Écran 1g (paywall)** — affiché en toute fin d'onboarding mais
    désactivé/non fonctionnel, cf. [MVP.md](./versions/MVP.md)
-3. **Invitation automatique du co-parent** en fin d'onboarding — le premier
+3. [x] **Invitation automatique du co-parent** en fin d'onboarding — le premier
    parent (la mère) configure l'espace puis un email d'invitation part
    automatiquement ; l'espace devient partagé dès que le second parent
    clique le lien et crée son compte (écrans 2a, 2b, 2d)
+   - Rattachement côté base par `accept_household_invite()` (`security
+     definer`, matching sur l'email vérifié du JWT) : sans elle, l'invité
+     n'est membre de rien au moment du clic et les policies RLS lui
+     interdisent de voir son invitation.
+   - ⚠️ **Limite MVP** : l'email envoyé est le template « lien de
+     connexion » standard de Supabase, pas une invitation personnalisée au
+     nom du premier parent — cela suppose une Edge Function et un SMTP
+     configuré (le projet utilise encore le service mutualisé Supabase,
+     limité à quelques emails par heure).
+
+**Reste à vérifier sur la 1.2** : le parcours a été validé écran par écran
+(navigation, validations, branches avec/sans co-parent), mais les écritures
+Supabase réelles — création du foyer, envoi de l'invitation, acceptation par
+le co-parent — n'ont pas pu être testées de bout en bout, faute de session
+authentifiée disponible en vérification automatisée.
 
 ### 1.3 Hub d'accueil
 

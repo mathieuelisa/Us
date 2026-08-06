@@ -1,0 +1,101 @@
+import { Button } from 'heroui-native';
+import type { ReactNode } from 'react';
+import { Pressable, ScrollView, Text, View } from 'react-native';
+import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
+import { withUniwind } from 'uniwind';
+
+import { ONBOARDING_STEP_COUNT } from '@/features/onboarding/constants';
+
+const SafeAreaView = withUniwind(RNSafeAreaView);
+
+const STEP_NUMBERS = Array.from(
+  { length: ONBOARDING_STEP_COUNT },
+  (_, index) => index + 1,
+);
+
+/**
+ * Ossature commune des écrans d'onboarding : barre de progression, titre,
+ * sous-titre, contenu scrollable et action principale en pied d'écran.
+ * Les écrans hors parcours numéroté (réassurance, paywall, invitation)
+ * passent simplement `step={null}`.
+ */
+export function OnboardingStepShell({
+  step,
+  title,
+  subtitle,
+  children,
+  primaryLabel,
+  onPrimaryPress,
+  isPrimaryDisabled = false,
+  secondaryLabel,
+  onSecondaryPress,
+}: {
+  step: number | null;
+  title: string;
+  subtitle?: string;
+  children: ReactNode;
+  primaryLabel: string;
+  onPrimaryPress: () => void;
+  isPrimaryDisabled?: boolean;
+  secondaryLabel?: string;
+  onSecondaryPress?: () => void;
+}) {
+  return (
+    <SafeAreaView className="flex-1 bg-white">
+      <View className="flex-1 px-7 pt-4">
+        {step === null ? null : (
+          <View className="gap-2 pb-6">
+            <View className="h-1 flex-row gap-1">
+              {STEP_NUMBERS.map((stepNumber) => (
+                <View
+                  key={stepNumber}
+                  className={`h-1 flex-1 rounded-full ${
+                    stepNumber <= step ? 'bg-accent' : 'bg-[#e8e8e8]'
+                  }`}
+                />
+              ))}
+            </View>
+            <Text className="text-[12.5px] text-[#9a9a9a]">
+              Étape {step} sur {ONBOARDING_STEP_COUNT}
+            </Text>
+          </View>
+        )}
+
+        <Text className="text-[24px] font-bold leading-7 text-[#1a1a1a]">
+          {title}
+        </Text>
+        {subtitle ? (
+          <Text className="pt-2 text-[14px] leading-5 text-[#6b6b6b]">
+            {subtitle}
+          </Text>
+        ) : null}
+
+        <ScrollView
+          className="flex-1"
+          contentContainerClassName="gap-3 py-6"
+          showsVerticalScrollIndicator={false}
+        >
+          {children}
+        </ScrollView>
+
+        <View className="gap-3 pb-2">
+          <Button isDisabled={isPrimaryDisabled} onPress={onPrimaryPress}>
+            <Button.Label>{primaryLabel}</Button.Label>
+          </Button>
+
+          {secondaryLabel && onSecondaryPress ? (
+            <Pressable
+              accessibilityRole="button"
+              className="items-center py-2"
+              onPress={onSecondaryPress}
+            >
+              <Text className="text-[14px] text-[#6b6b6b]">
+                {secondaryLabel}
+              </Text>
+            </Pressable>
+          ) : null}
+        </View>
+      </View>
+    </SafeAreaView>
+  );
+}

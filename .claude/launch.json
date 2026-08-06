@@ -1,14 +1,16 @@
 {
   "version": "0.0.1",
+  "autoPort": true,
   "configurations": [
     {
       "name": "web",
       "runtimeExecutable": "bash",
       "runtimeArgs": [
         "-lc",
-        "export NVM_DIR=\"$HOME/.nvm\" && source \"$NVM_DIR/nvm.sh\" && nvm use 22.14.0 && bun run web"
+        "export NVM_DIR=\"$HOME/.nvm\" && source \"$NVM_DIR/nvm.sh\" && nvm use 22.14.0 && bunx expo start --web --port ${PORT:-8081}"
       ],
-      "port": 8081
+      "port": 8081,
+      "autoPort": true
     }
   ]
 }
