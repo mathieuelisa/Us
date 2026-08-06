@@ -13,6 +13,7 @@ import { AnimatedSplashOverlay } from '@/components/animated-icon';
 import { sessionAtom } from '@/lib/atoms/session';
 import { queryClient } from '@/lib/query/query-client';
 import { supabase } from '@/lib/supabase/client';
+import { webSessionRecovery } from '@/lib/supabase/web-session-recovery';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -37,9 +38,11 @@ export default function RootLayout() {
   const [isSessionReady, setIsSessionReady] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
-      setIsSessionReady(true);
+    webSessionRecovery.finally(() => {
+      supabase.auth.getSession().then(({ data }) => {
+        setSession(data.session);
+        setIsSessionReady(true);
+      });
     });
 
     const {

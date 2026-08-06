@@ -24,6 +24,10 @@ export const supabase = createClient<Database>(
       storage: AsyncStorage,
       autoRefreshToken: true,
       persistSession: true,
+      // Handled manually in the root layout instead: Expo Router's web
+      // linking strips the URL hash before GoTrueClient's own async
+      // detection gets a chance to read it, so the built-in flag is
+      // unreliable here. See restoreSessionFromUrl() in _layout.tsx.
       detectSessionInUrl: false,
     },
   },
