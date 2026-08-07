@@ -1,5 +1,5 @@
 import { Button } from 'heroui-native';
-import { useAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai';
 import { useEffect, useRef } from 'react';
 import { ActivityIndicator, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
@@ -7,7 +7,7 @@ import { withUniwind } from 'uniwind';
 
 import { useSubmitOnboarding } from '@/features/onboarding/hooks';
 // ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
-import { devBypassAtom } from '@/lib/atoms/dev-bypass';
+import { devBypassAtom, devBypassFirstNameAtom } from '@/lib/atoms/dev-bypass';
 import {
   EMPTY_ONBOARDING_DRAFT,
   onboardingDraftAtom,
@@ -27,6 +27,7 @@ export default function FinalisationScreen() {
 
   // ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
   const [devBypass, setDevBypass] = useAtom(devBypassAtom);
+  const setDevBypassFirstName = useSetAtom(devBypassFirstNameAtom);
 
   const hasSubmitted = useRef(false);
   const { mutate } = submitOnboarding;
@@ -37,8 +38,11 @@ export default function FinalisationScreen() {
 
     // ⚠️ TEMPORAIRE : sans utilisateur réel, l'écriture échouerait. On passe
     // directement au hub pour que le parcours reste explorable de bout en
-    // bout tant que la connexion n'aboutit pas.
+    // bout tant que la connexion n'aboutit pas. Le prénom (le sien, jamais
+    // celui du co-parent) est conservé à part, sans quoi la salutation du
+    // hub resterait vide une fois le brouillon effacé juste après.
     if (devBypass === 'onboarding') {
+      setDevBypassFirstName(draft.firstName.trim());
       setDraft(EMPTY_ONBOARDING_DRAFT);
       setDevBypass('app');
       return;
@@ -51,7 +55,7 @@ export default function FinalisationScreen() {
       },
       { onSuccess: () => setDraft(EMPTY_ONBOARDING_DRAFT) },
     );
-  }, [mutate, draft, setDraft, devBypass, setDevBypass]);
+  }, [mutate, draft, setDraft, devBypass, setDevBypass, setDevBypassFirstName]);
 
   const retry = () => {
     submitOnboarding.mutate(

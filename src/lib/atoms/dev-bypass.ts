@@ -16,9 +16,18 @@ import { atom } from 'jotai';
  * mode contournement.
  *
  * Pour retirer ce contournement : supprimer ce fichier, puis les usages
- * dans `src/app/_layout.tsx`, `src/app/(auth)/login.tsx` et
- * `src/app/(onboarding)/finalisation.tsx` (le compilateur les signalera).
+ * dans `src/app/_layout.tsx`, `src/app/(auth)/login.tsx`,
+ * `src/app/(onboarding)/finalisation.tsx` et `src/app/(tabs)/index.tsx`
+ * (le compilateur les signalera).
  */
 export type DevBypassStage = 'off' | 'onboarding' | 'app';
 
 export const devBypassAtom = atom<DevBypassStage>('off');
+
+/**
+ * Prénom saisi à l'étape 2 de l'onboarding, conservé au moment où le
+ * brouillon est effacé (`finalisation.tsx`) pour que le hub puisse encore
+ * personnaliser la salutation en mode contournement — sans utilisateur
+ * réel, `useMyProfile()` ne renvoie rien.
+ */
+export const devBypassFirstNameAtom = atom<string>('');

@@ -13,6 +13,8 @@ import {
 } from '@/features/hub/constants';
 import { useHubSummary } from '@/features/hub/hooks';
 import { useMyProfile } from '@/features/profile/hooks';
+// ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
+import { devBypassFirstNameAtom } from '@/lib/atoms/dev-bypass';
 import { currentRoleAtom } from '@/lib/atoms/role';
 
 const SafeAreaView = withUniwind(RNSafeAreaView);
@@ -32,6 +34,11 @@ export default function HubScreen() {
   const { data: profile } = useMyProfile();
   const { data: household } = useMyHousehold();
   const { data: summary } = useHubSummary(household);
+
+  // ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts. Le sien, jamais le
+  // prénom du co-parent : c'est le seul champ que ce contournement propage.
+  const devBypassFirstName = useAtomValue(devBypassFirstNameAtom);
+  const greetingName = profile?.first_name || devBypassFirstName || null;
 
   // Le rôle n'est pas encore résolu au tout premier rendu ; la vue « femme
   // enceinte » est le défaut, c'est elle qui crée le foyer.
@@ -70,7 +77,7 @@ export default function HubScreen() {
       >
         <View className="flex-row items-center justify-between gap-3">
           <Text className="flex-1 text-[26px] font-bold text-[#1a1a1a]">
-            {profile?.first_name ? `Bonjour ${profile.first_name}` : 'Bonjour'}
+            {greetingName ? `Bonjour ${greetingName}` : 'Bonjour'}
           </Text>
 
           {isPregnant ? (
