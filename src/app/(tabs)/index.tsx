@@ -183,29 +183,34 @@ export default function HubScreen() {
           </View>
         </View>
 
-        {hasPartnerJoined ? (
-          <View className="gap-2">
-            <Text className="text-[11.5px] font-semibold tracking-wide text-[#8a8a8a]">
-              MON PARTENAIRE
-            </Text>
-            <Pressable
-              accessibilityRole="button"
-              onPress={() => router.push('/partenaire')}
-              className="flex-row items-center gap-3.5 rounded-[16px] border border-[#e0e0e0] bg-white px-4 py-4"
-            >
-              <Text className="text-[20px]">💕</Text>
-              <View className="flex-1 gap-0.5">
-                <Text className="text-[16px] font-semibold text-[#1a1a1a]">
-                  {partnerName ? `Avec ${partnerName}` : 'Avec votre co-parent'}
-                </Text>
-                <Text className="text-[13px] text-[#6b6b6b]">
-                  Voir son état cette semaine
-                </Text>
-              </View>
-              <Text className="text-[20px] text-[#c0c0c0]">›</Text>
-            </Pressable>
-          </View>
-        ) : null}
+        {/* Toujours affiché, même avant l'arrivée du co-parent : la
+            maquette 2b ne montrait ce bloc qu'une fois l'espace partagé,
+            mais depuis la Phase 1.5 cet écran porte aussi la taille du bébé
+            et les astuces du jour — le masquer les rendrait inatteignables.
+            Seul le sous-titre s'adapte. */}
+        <View className="gap-2">
+          <Text className="text-[11.5px] font-semibold tracking-wide text-[#8a8a8a]">
+            MON PARTENAIRE
+          </Text>
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => router.push('/partenaire')}
+            className="flex-row items-center gap-3.5 rounded-[16px] border border-[#e0e0e0] bg-white px-4 py-4"
+          >
+            <Text className="text-[20px]">💕</Text>
+            <View className="flex-1 gap-0.5">
+              <Text className="text-[16px] font-semibold text-[#1a1a1a]">
+                {partnerName ? `Avec ${partnerName}` : 'Avec votre co-parent'}
+              </Text>
+              <Text className="text-[13px] text-[#6b6b6b]">
+                {hasPartnerJoined
+                  ? 'Voir son état cette semaine'
+                  : 'Taille du bébé et astuces du jour'}
+              </Text>
+            </View>
+            <Text className="text-[20px] text-[#c0c0c0]">›</Text>
+          </Pressable>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );

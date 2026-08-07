@@ -136,7 +136,11 @@ authentifiée disponible en vérification automatisée.
       `appointments`) ; à défaut de données, le libellé neutre de la section
       est affiché plutôt qu'un chiffre inventé.
 - [x] **Bloc "Mon partenaire"** — section indépendante sous les piliers,
-      **pas un 4e pilier**, accessible en un tap (voir 1.5)
+      **pas un 4e pilier**, accessible en un tap (voir 1.5).
+      ⚠️ Affiché **en permanence**, alors que la maquette 2b ne le montrait
+      qu'une fois l'espace partagé : depuis la 1.5, cet écran porte aussi la
+      taille du bébé et les astuces du jour, utiles sans co-parent. Le
+      masquer les rendait inatteignables. Seul le sous-titre s'adapte.
 - [x] Bouton **"J'ai accouché"** — visible uniquement par la femme, en haut
       du hub à côté de la salutation (voir point ouvert en tête de document).
       ⚠️ Les maquettes 3c **et** 3d l'affichent pour les deux rôles :
