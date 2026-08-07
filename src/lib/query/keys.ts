@@ -26,4 +26,17 @@ export const queryKeys = {
       ['together', householdId, userId, 'week', weekStart] as const,
     gesture: (role: string) => ['together', 'gesture', role] as const,
   },
+  health: {
+    all: ['health'] as const,
+    symptoms: (householdId: string, date: string) =>
+      ['health', householdId, 'symptoms', date] as const,
+    symptomDates: (householdId: string, weekStart: string) =>
+      ['health', householdId, 'symptom-dates', weekStart] as const,
+    appointments: (householdId: string) =>
+      ['health', householdId, 'appointments'] as const,
+    contacts: (householdId: string) =>
+      ['health', householdId, 'contacts'] as const,
+    exercises: ['health', 'exercises'] as const,
+    babySize: (week: number) => ['health', 'baby-size', week] as const,
+  },
 } as const;

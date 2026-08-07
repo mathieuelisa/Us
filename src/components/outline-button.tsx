@@ -20,6 +20,8 @@ export function OutlineButton({
 }) {
   return (
     <Pressable
+      accessibilityRole="button"
+      accessibilityState={{ disabled: isDisabled }}
       disabled={isDisabled}
       onPress={onPress}
       className={`items-center justify-center rounded-full border border-[#d0d0d0] px-4 py-3 ${isDisabled ? 'opacity-40' : ''} ${className ?? ''}`}

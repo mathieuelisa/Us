@@ -28,9 +28,10 @@ title: Plan d'action de développement — US
 | 1.2 Onboarding et espace partagé | ✅ terminée, **vérification incomplète** (voir ci-dessous) |
 | 1.3 Hub d'accueil | ✅ terminée |
 | 1.4 Pilier Ensemble | ✅ implémentée, interface symétrique pour l'instant (demande explicite) |
-| 1.5 → 1.7, Phases 2 à 5 | ⬜ à faire |
+| 1.5 Suivi santé + Mon partenaire | ✅ implémentée pour la **vue femme enceinte** ; vue co-parent reportée (demande explicite) |
+| 1.6 → 1.7, Phases 2 à 5 | ⬜ à faire |
 
-**Prochaine étape : [1.5 Pilier Suivi santé + section "Mon partenaire"](#15-pilier-suivi-santé-section-mon-partenaire).**
+**Prochaine étape : [1.6 Pilier Démarches](#16-pilier-démarches).**
 
 ⚠️ **La 1.2 porte une dette de vérification** : aucune écriture Supabase
 authentifiée (création du foyer, invitation, rattachement du co-parent) n'a
@@ -182,34 +183,54 @@ même pour les deux. L'asymétrie complète est reportée à une passe dédiée.
 
 ### 1.5 Pilier Suivi santé + section "Mon partenaire"
 
+**✅ Implémentée pour la vue femme enceinte**, avec un écart de périmètre
+assumé : voir plus bas.
+
 4 onglets internes avec des **règles de visibilité strictes, différentes
 par onglet** :
 
-- **Journal** (symptômes) — saisi et visible **uniquement par la femme
+- [x] **Journal** (symptômes) — saisi et visible **uniquement par la femme
   enceinte**. N'apparaît **pas du tout** dans l'interface du co-parent,
-  qui y accède uniquement en lecture seule via "Mon partenaire"
-- **Rendez-vous** — calendrier du mois + liste "Vos prochains rendez-vous".
+  qui y accède uniquement en lecture seule via "Mon partenaire".
+  L'onglet est **retiré de la liste** pour le co-parent, pas grisé ; la RLS
+  lui refuse de toute façon l'écriture. Deux barrières indépendantes,
+  volontairement — c'est une donnée de santé.
+- [x] **Rendez-vous** — calendrier du mois + liste "Vos prochains rendez-vous".
   À la création, la femme choisit partagé/non partagé. Côté femme : tous
   ses rendez-vous. Côté co-parent (dans son propre onglet Rendez-vous) :
-  uniquement les rendez-vous marqués partagés
-- **Contacts** — visible et modifiable par les deux, réorganisable par
-  drag-and-drop
-- **Exercices** — visible par les deux, filtré automatiquement selon le
-  trimestre de grossesse en cours
+  uniquement les rendez-vous marqués partagés. Le filtrage par rôle est
+  **entièrement porté par la RLS** (`appointments_select_scoped`), jamais
+  redoublé côté client : deux implémentations d'une même règle de
+  visibilité finiraient par diverger. Défaut : **non partagé**.
+- [x] **Contacts** — visible et modifiable par les deux, réorganisable.
+  Boutons haut/bas plutôt qu'un vrai glisser-déposer, comme l'onglet
+  Information (même dette, cf. [05](./05-DETTE-ET-POINTS-OUVERTS.md) n° 12).
+- [x] **Exercices** — visible par les deux, filtré automatiquement selon le
+  trimestre de grossesse en cours, déduit de la date de terme.
+  ⚠️ La maquette 4f liste les **trois** trimestres ; `CONCEPT.md` demande un
+  filtrage. CLAUDE.md tranche pour `CONCEPT.md`. Repli assumé : si la date
+  de terme est inconnue, on affiche les trois groupes plutôt que de deviner
+  un trimestre.
 
 **Section "Mon partenaire"** (bloc hub indépendant, contenu partiellement
 symétrique) :
 
-- Tendance d'humeur du partenaire sur la semaine (qualitative, réciproque)
-- "Vos prochains rendez-vous" — reprise, pour le co-parent, des **mêmes
+- [x] Tendance d'humeur du partenaire sur la semaine (qualitative, réciproque)
+- [ ] "Vos prochains rendez-vous" — reprise, pour le co-parent, des **mêmes
   rendez-vous partagés** que dans son onglet Suivi santé > Rendez-vous
-  (jamais les non-partagés)
-- Taille du bébé de la semaine (fruit/légume) + astuce **spécifique au
+  (jamais les non-partagés) — *bloc propre au co-parent, reporté*
+- [x] Taille du bébé de la semaine (fruit/légume) + astuce **spécifique au
   rôle** (une carte pour la femme, une carte pour le co-parent) — partagé
-  entre les deux
-- **Pour le co-parent uniquement** : accès en lecture seule aux symptômes
+  entre les deux. Les deux cartes sont affichées aux deux parents, avec le
+  destinataire indiqué, puisque le contenu est explicitement partagé.
+- [ ] **Pour le co-parent uniquement** : accès en lecture seule aux symptômes
   renseignés par sa partenaire dans le Journal (seule porte d'entrée, il n'a
-  pas accès direct à l'onglet Journal)
+  pas accès direct à l'onglet Journal) — *reporté avec la vue co-parent*
+
+⚠️ **Écart de périmètre** (demande explicite) : seule la vue de la personne
+enceinte est implémentée. Restent à faire, côté co-parent : la reprise de ses
+rendez-vous partagés et l'accès en lecture seule aux symptômes — sa seule
+porte d'entrée vers cette donnée de santé.
 
 ### 1.6 Pilier Démarches
 

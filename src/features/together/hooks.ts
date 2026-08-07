@@ -32,6 +32,34 @@ export function useMyWeekCheckins(household: Household | null | undefined) {
   });
 }
 
+/**
+ * Humeur de la semaine d'un membre donné du foyer — utilisé par « Mon
+ * partenaire » pour afficher la tendance de l'autre. La RLS autorise les
+ * deux membres à lire les check-ins du foyer ; la restriction à du
+ * qualitatif est une règle de rendu, appliquée par `WeekMoodStrip`.
+ */
+export function useWeekCheckinsFor(
+  household: Household | null | undefined,
+  targetUserId: string | null | undefined,
+) {
+  const weekDates = getCurrentWeekIsoDates();
+
+  return useQuery({
+    queryKey: queryKeys.together.weekCheckins(
+      household?.id ?? '',
+      targetUserId ?? '',
+      weekDates[0],
+    ),
+    queryFn: () =>
+      fetchMyWeekCheckins(
+        household?.id as string,
+        targetUserId as string,
+        weekDates,
+      ),
+    enabled: Boolean(household?.id && targetUserId),
+  });
+}
+
 export function useGestureOfTheDay(role: HouseholdRole) {
   return useQuery({
     queryKey: queryKeys.together.gesture(role),

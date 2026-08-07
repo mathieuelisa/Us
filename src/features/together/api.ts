@@ -1,6 +1,6 @@
 import type { MoodValue } from '@/features/hub/api';
 import type { HouseholdRole } from '@/lib/atoms/role';
-import { todayIso, toLocalIsoDate } from '@/lib/date';
+import { pickForToday, todayIso, toLocalIsoDate } from '@/lib/date';
 import { supabase } from '@/lib/supabase/client';
 import type { Database } from '@/lib/supabase/database.types';
 
@@ -84,22 +84,11 @@ export async function fetchGestureSuggestions(
   return data;
 }
 
-/**
- * Sélection déterministe : le même geste toute la journée pour tout le
- * monde du même rôle, qui change le lendemain — pas un tirage aléatoire à
- * chaque ouverture d'écran.
- */
+/** Cf. `pickForToday` : même geste toute la journée pour un rôle donné. */
 export function pickGestureOfTheDay(
   gestures: GestureSuggestion[],
 ): GestureSuggestion | null {
-  if (gestures.length === 0) return null;
-  const dayOfYear = getDayOfYear(new Date());
-  return gestures[dayOfYear % gestures.length];
-}
-
-function getDayOfYear(date: Date): number {
-  const start = new Date(date.getFullYear(), 0, 1);
-  return Math.floor((date.getTime() - start.getTime()) / (24 * 60 * 60 * 1000));
+  return pickForToday(gestures);
 }
 
 /**
