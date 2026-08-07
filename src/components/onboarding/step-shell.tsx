@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router';
 import { Button } from 'heroui-native';
 import type { ReactNode } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
@@ -40,9 +41,26 @@ export function OnboardingStepShell({
   secondaryLabel?: string;
   onSecondaryPress?: () => void;
 }) {
+  const router = useRouter();
+
   return (
     <SafeAreaView className="flex-1 bg-white">
       <View className="flex-1 px-7 pt-4">
+        {/* Aligné à gauche : c'est la convention iOS/Android, et surtout le
+            côté d'où part le swipe de retour — bouton et geste désignent
+            ainsi la même direction. */}
+        {router.canGoBack() ? (
+          <Pressable
+            accessibilityLabel="Revenir à l’étape précédente"
+            accessibilityRole="button"
+            hitSlop={12}
+            onPress={() => router.back()}
+            className="mb-2 h-9 w-9 items-center justify-center rounded-full bg-[#f4f4f4]"
+          >
+            <Text className="text-[17px] leading-[20px] text-[#1a1a1a]">‹</Text>
+          </Pressable>
+        ) : null}
+
         {step === null ? null : (
           <View className="gap-2 pb-6">
             <View className="h-1 flex-row gap-1">

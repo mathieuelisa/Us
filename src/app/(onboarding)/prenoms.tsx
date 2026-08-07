@@ -27,12 +27,16 @@ import { onboardingDraftAtom } from '@/lib/atoms/onboarding';
  */
 export default function FirstNamesStep() {
   const [draft, setDraft] = useAtom(onboardingDraftAtom);
-
-  const [firstName, setFirstName] = useState(draft.firstName);
-  const [partnerFirstName, setPartnerFirstName] = useState(
-    draft.partnerFirstName,
-  );
   const [touchedField, setTouchedField] = useState<Record<string, boolean>>({});
+
+  // La saisie va directement dans le brouillon, comme sur les autres étapes :
+  // l'écran est démonté dès qu'on revient en arrière, donc un état local
+  // serait perdu à chaque aller-retour entre étapes.
+  const { firstName, partnerFirstName } = draft;
+  const setFirstName = (value: string) =>
+    setDraft((current) => ({ ...current, firstName: value }));
+  const setPartnerFirstName = (value: string) =>
+    setDraft((current) => ({ ...current, partnerFirstName: value }));
 
   const hasPartner = shouldInvitePartner(
     draft.accompanimentType,
@@ -47,8 +51,8 @@ export default function FirstNamesStep() {
   const goToNextStep = () => {
     setDraft((current) => ({
       ...current,
-      firstName: firstName.trim(),
-      partnerFirstName: hasPartner ? partnerFirstName.trim() : '',
+      firstName: current.firstName.trim(),
+      partnerFirstName: hasPartner ? current.partnerFirstName.trim() : '',
     }));
     router.push('/bebe');
   };

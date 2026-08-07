@@ -23,8 +23,13 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
  */
 export default function InvitePartnerStep() {
   const [draft, setDraft] = useAtom(onboardingDraftAtom);
-  const [partnerEmail, setPartnerEmail] = useState(draft.partnerEmail);
   const [isTouched, setIsTouched] = useState(false);
+
+  // Saisie stockée dans le brouillon, pour survivre aux allers-retours
+  // entre étapes (l'écran est démonté quand on revient en arrière).
+  const partnerEmail = draft.partnerEmail;
+  const setPartnerEmail = (value: string) =>
+    setDraft((current) => ({ ...current, partnerEmail: value }));
 
   const partnerName = draft.partnerFirstName.trim();
   const isValidEmail = EMAIL_PATTERN.test(partnerEmail.trim());
@@ -32,7 +37,7 @@ export default function InvitePartnerStep() {
   const sendInvitation = () => {
     setDraft((current) => ({
       ...current,
-      partnerEmail: partnerEmail.trim(),
+      partnerEmail: current.partnerEmail.trim(),
     }));
     router.push('/finalisation');
   };

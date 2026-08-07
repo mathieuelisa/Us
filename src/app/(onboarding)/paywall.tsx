@@ -43,6 +43,18 @@ export default function PaywallStep() {
   return (
     <SafeAreaView className="flex-1 bg-[#1a1a1a]">
       <View className="flex-1 px-7 pt-4">
+        {router.canGoBack() ? (
+          <Pressable
+            accessibilityLabel="Revenir à l’étape précédente"
+            accessibilityRole="button"
+            hitSlop={12}
+            onPress={() => router.back()}
+            className="mb-2 h-9 w-9 items-center justify-center rounded-full bg-[#2d2d2d]"
+          >
+            <Text className="text-[17px] leading-[20px] text-white">‹</Text>
+          </Pressable>
+        ) : null}
+
         <View className="gap-2">
           <Text className="text-[24px] font-bold leading-7 text-white">
             Débloquez le suivi complet de bébé
