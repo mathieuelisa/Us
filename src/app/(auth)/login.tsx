@@ -5,6 +5,7 @@ import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import { withUniwind } from 'uniwind';
 
 import { supabase } from '@/lib/supabase/client';
+import { getAuthRedirectTo } from '@/lib/supabase/magic-link';
 
 const SafeAreaView = withUniwind(RNSafeAreaView);
 
@@ -21,6 +22,7 @@ export default function LoginScreen() {
 
     const { error } = await supabase.auth.signInWithOtp({
       email: email.trim(),
+      options: { emailRedirectTo: getAuthRedirectTo() },
     });
 
     if (error) {

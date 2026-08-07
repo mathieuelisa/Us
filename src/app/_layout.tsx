@@ -14,7 +14,10 @@ import { useMyHousehold, useSyncCurrentRole } from '@/features/household/hooks';
 import { sessionAtom } from '@/lib/atoms/session';
 import { queryClient } from '@/lib/query/query-client';
 import { supabase } from '@/lib/supabase/client';
-import { webSessionRecovery } from '@/lib/supabase/web-session-recovery';
+import {
+  initialSessionRecovery,
+  useMagicLinkListener,
+} from '@/lib/supabase/magic-link';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -62,8 +65,11 @@ export default function RootLayout() {
   const setSession = useSetAtom(sessionAtom);
   const [isSessionReady, setIsSessionReady] = useState(false);
 
+  // Liens magiques reçus pendant que l'app tourne déjà (mobile).
+  useMagicLinkListener();
+
   useEffect(() => {
-    webSessionRecovery.finally(() => {
+    initialSessionRecovery.finally(() => {
       supabase.auth.getSession().then(({ data }) => {
         setSession(data.session);
         setIsSessionReady(true);

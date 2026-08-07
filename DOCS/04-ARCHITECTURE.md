@@ -113,6 +113,35 @@ Posé en Phase 0 : `src/lib/supabase/client.ts`, `src/lib/query/query-client.ts`
 - **Types générés** : `bun run db:types` (= `supabase gen types typescript --local --schema public > src/lib/supabase/database.types.ts`). Nécessite le stack Supabase local (`bun run db:start`, requiert Docker) ou un projet lié (`supabase link`).
 - **CLI** : `supabase/config.toml` posé en Phase 0 via `supabase init`. Le projet Supabase cloud existe (`EXPO_PUBLIC_SUPABASE_URL` / `EXPO_PUBLIC_SUPABASE_KEY` dans `.env`, jamais commité — `.env.example` ne contient que des placeholders). Sans ces variables, `src/lib/supabase/client.ts` fonctionne quand même avec des valeurs placeholder (l'app se lance, les appels Supabase échouent proprement).
 
+### Liens magiques — redirection et deep links
+
+Le lien magique doit ramener l'utilisateur **dans l'app**, ce qui suppose
+deux réglages qui n'ont rien d'automatique :
+
+1. **Côté app** : `signInWithOtp` passe systématiquement `emailRedirectTo`,
+   calculé par `getAuthRedirectTo()` (`src/lib/supabase/magic-link.ts`) —
+   l'origine courante en web, un deep link `Linking.createURL('/')` en
+   natif. Sans ce paramètre, Supabase retombe sur le `Site URL` du projet.
+2. **Côté Supabase** (`Authentication > URL Configuration`) :
+
+   | Réglage | Valeur |
+   |---|---|
+   | Site URL | `us://` |
+   | Redirect URLs | `us://**`, `exp://**`, `exp+us://**`, `http://localhost:8081/**` |
+
+   ⚠️ Les trois dernières entrées servent **au développement** (Expo Go,
+   build de dev, web local). Elles élargissent la surface d'open-redirect
+   et sont **à retirer avant la mise en production**.
+
+Toute URL non listée est refusée par Supabase, silencieusement du point de
+vue de l'utilisateur — le symptôme est un lien qui n'ouvre pas l'app.
+
+La récupération de session est traitée dans le même module, avec deux
+chemins distincts : `initialSessionRecovery` (app **ouverte par** le lien —
+fragment d'URL en web, `getInitialURL()` en natif) et
+`useMagicLinkListener()` (app **déjà lancée**, cas courant sur mobile).
+Les jetons arrivent dans le fragment `#`, jamais dans la query string.
+
 ### Stratégie de synchronisation temps réel (décision Phase 0)
 
 `CONCEPT.md` impose un seul jeu de données par couple, à jour "sans étape de
