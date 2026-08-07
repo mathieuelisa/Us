@@ -19,7 +19,33 @@ title: Plan d'action de développement — US
 > (le concept écrit fait foi par défaut), à corriger si l'utilisateur préfère
 > le comportement des maquettes.
 
+## État d'avancement
+
+| Étape | État |
+|---|---|
+| Phase 0 — Socle technique | ✅ terminée |
+| 1.1 Coquille de navigation | ✅ terminée |
+| 1.2 Onboarding et espace partagé | ✅ terminée, **vérification incomplète** (voir ci-dessous) |
+| 1.3 → 1.7, Phases 2 à 5 | ⬜ à faire |
+
+**Prochaine étape : [1.3 Hub d'accueil](#13-hub-daccueil).**
+
+⚠️ **Dette de vérification sur la 1.2** — à solder avant de considérer le
+MVP testable de bout en bout :
+
+- les écritures Supabase réelles (création du foyer, envoi de l'invitation,
+  acceptation par le co-parent via `accept_household_invite()`) n'ont jamais
+  été exécutées : elles demandent deux sessions authentifiées réelles ;
+- le projet Supabase n'a pas de SMTP personnalisé et la confirmation d'email
+  est active, donc les envois passent par le service mutualisé Supabase
+  (quelques emails par heure) — c'est le premier blocage à lever pour tester
+  l'invitation du co-parent ;
+- les liens magiques ne sont câblés que pour le web ; sur iOS/Android ils
+  arrivent par deep link (`us://`), pas encore traité.
+
 ## Phase 0 — Socle technique (aucune feature visible)
+
+**✅ Terminée.**
 
 Objectif : avoir un projet qui compile, se lint, se déploie sur device, et
 qui parle à Supabase — avant d'écrire le moindre écran métier.
@@ -47,6 +73,8 @@ sections du design.
 
 ### 1.1 Coquille de navigation
 
+**✅ Terminée.**
+
 - [x] Barre de navigation basse à **4 onglets fixes** (et non 3) : **Home**
       (hub) / **User** (profil personnel) / **Information** (infos
       importantes partagées) / **Setting** (réglages) — cf. `CONCEPT.md`
@@ -62,6 +90,9 @@ sections du design.
       Gesture Handler) dans une passe dédiée si le besoin se confirme.
 
 ### 1.2 Onboarding et mise en place de l'espace partagé
+
+**✅ Terminée**, mais avec une dette de vérification — voir
+[État d'avancement](#état-davancement).
 
 1. [x] **Onboarding complet** (écrans 1a → 1f, 1y) — magic link (email seul,
    aucune identité obligatoire), prénoms des deux parents (obligatoire),

@@ -1,6 +1,6 @@
 ---
 title: MVP — US
-status: à venir
+status: en cours
 depends_on: ../02-ACTION-PLAN.md#phase-1—mvp
 ---
 
@@ -41,6 +41,9 @@ Correspondance avec les sections du [Design Overview](../01-DESIGN-OVERVIEW.md#c
 ## Critères de sortie (Definition of Done MVP)
 
 - [ ] Un couple peut s'inscrire, se rattacher, et terminer l'onboarding de bout en bout
+      — *implémenté en [Phase 1.2](../02-ACTION-PLAN.md#12-onboarding-et-mise-en-place-de-lespace-partagé),
+      mais jamais exécuté pour de vrai : reste à valider avec deux comptes
+      réels une fois un SMTP configuré*
 - [ ] Les 3 piliers gratuits sont fonctionnels avec persistance Supabase (pas de mock)
 - [ ] La déclaration de naissance recalcule correctement les échéances de démarches
 - [ ] RLS Supabase vérifiée sur toutes les tables (un household ne voit jamais les données d'un autre)
