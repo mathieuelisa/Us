@@ -1,9 +1,12 @@
 import { Button, Input, TextField } from 'heroui-native';
+import { useSetAtom } from 'jotai';
 import { useState } from 'react';
-import { Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import { withUniwind } from 'uniwind';
 
+// ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
+import { devBypassOnboardingAtom } from '@/lib/atoms/dev-bypass';
 import { supabase } from '@/lib/supabase/client';
 import { getAuthRedirectTo } from '@/lib/supabase/magic-link';
 
@@ -15,6 +18,9 @@ export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<Status>('idle');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  // ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
+  const setDevBypass = useSetAtom(devBypassOnboardingAtom);
 
   const handleSubmit = async () => {
     setStatus('sending');
@@ -90,6 +96,21 @@ export default function LoginScreen() {
             )}
           </View>
         )}
+
+        {/* ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts.
+            Hors du bloc conditionnel ci-dessus pour rester atteignable même
+            après l'envoi du lien, et absent des builds de production. */}
+        {__DEV__ ? (
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => setDevBypass(true)}
+            className="mt-6 items-center rounded-[12px] border border-dashed border-[#d0d0d0] py-3"
+          >
+            <Text className="text-[13px] font-medium text-[#9a9a9a]">
+              DEV — passer à l’onboarding sans connexion
+            </Text>
+          </Pressable>
+        ) : null}
       </View>
     </SafeAreaView>
   );
