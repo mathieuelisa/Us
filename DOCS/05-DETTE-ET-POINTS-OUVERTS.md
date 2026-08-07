@@ -58,3 +58,5 @@ Décisions prises par défaut, à confirmer ou corriger.
 | 16 | **Prénom du co-parent** : obligatoire selon `CONCEPT.md`, « facultatif » avec une option « Passer cette étape » dans la maquette 1z. | Obligatoire, et uniquement quand il y a effectivement un co-parent. |
 | 17 | **Invitation par SMS** : la maquette 2d propose « Email ou numéro ». | Email seul — le rattachement repose sur un lien magique. Le SMS supposerait un fournisseur et un autre mécanisme. |
 | 18 | **Navigation avant au swipe** : demandée « de step en step », mais une pile de navigation ne permet le geste que vers l'arrière. | Retour au swipe ; l'avance reste sur « Continuer », qui porte la validation. Un vrai carrousel demanderait une autre architecture (pager). |
+| 19 | **Visibilité de « J'ai accouché »** : les maquettes 3c **et** 3d l'affichent, `CONCEPT.md` le réserve à la femme enceinte. | Femme enceinte uniquement. |
+| 20 | **Écrans d'attente ouverts depuis le hub** (Démarches, Ensemble, Suivi santé, Mon partenaire, J'ai accouché) : à remplacer par le contenu réel en phases 1.4 à 1.6 et 2. | [`src/components/coming-soon.tsx`](../src/components/coming-soon.tsx) |

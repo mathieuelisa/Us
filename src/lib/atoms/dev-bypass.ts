@@ -3,16 +3,22 @@ import { atom } from 'jotai';
 /**
  * ⚠️ TEMPORAIRE — À SUPPRIMER.
  *
- * Force l'affichage de l'onboarding sans session authentifiée, pour pouvoir
- * travailler dessus tant que le retour du lien magique n'aboutit pas dans
- * l'app (cf. DOCS/02-ACTION-PLAN.md, dette de vérification de la 1.2).
+ * Permet de parcourir l'app sans session authentifiée, tant que le retour
+ * du lien magique n'aboutit pas dans l'app (cf.
+ * [Dette et points ouverts](../../../DOCS/05-DETTE-ET-POINTS-OUVERTS.md)).
  *
- * Conséquence à connaître : sans utilisateur réel, l'écran de finalisation
- * **échouera** au moment d'écrire en base — c'est attendu, seul le parcours
- * jusque-là est explorable.
+ * - `off` : comportement normal, la session fait foi.
+ * - `onboarding` : force le parcours d'onboarding.
+ * - `app` : force le hub, comme après un onboarding réussi.
  *
- * Pour retirer ce contournement : supprimer ce fichier, puis les trois
- * usages qu'il a dans `src/app/_layout.tsx` et `src/app/(auth)/login.tsx`
- * (le compilateur les signalera).
+ * L'étape `app` existe parce que la finalisation de l'onboarding **échoue**
+ * sans utilisateur réel : sans elle, le hub resterait inatteignable en
+ * mode contournement.
+ *
+ * Pour retirer ce contournement : supprimer ce fichier, puis les usages
+ * dans `src/app/_layout.tsx`, `src/app/(auth)/login.tsx` et
+ * `src/app/(onboarding)/finalisation.tsx` (le compilateur les signalera).
  */
-export const devBypassOnboardingAtom = atom(false);
+export type DevBypassStage = 'off' | 'onboarding' | 'app';
+
+export const devBypassAtom = atom<DevBypassStage>('off');

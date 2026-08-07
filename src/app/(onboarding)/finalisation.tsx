@@ -6,6 +6,8 @@ import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import { withUniwind } from 'uniwind';
 
 import { useSubmitOnboarding } from '@/features/onboarding/hooks';
+// ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
+import { devBypassAtom } from '@/lib/atoms/dev-bypass';
 import {
   EMPTY_ONBOARDING_DRAFT,
   onboardingDraftAtom,
@@ -23,12 +25,24 @@ export default function FinalisationScreen() {
   const [draft, setDraft] = useAtom(onboardingDraftAtom);
   const submitOnboarding = useSubmitOnboarding();
 
+  // ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
+  const [devBypass, setDevBypass] = useAtom(devBypassAtom);
+
   const hasSubmitted = useRef(false);
   const { mutate } = submitOnboarding;
 
   useEffect(() => {
     if (hasSubmitted.current) return;
     hasSubmitted.current = true;
+
+    // ⚠️ TEMPORAIRE : sans utilisateur réel, l'écriture échouerait. On passe
+    // directement au hub pour que le parcours reste explorable de bout en
+    // bout tant que la connexion n'aboutit pas.
+    if (devBypass === 'onboarding') {
+      setDraft(EMPTY_ONBOARDING_DRAFT);
+      setDevBypass('app');
+      return;
+    }
 
     mutate(
       {
@@ -37,7 +51,7 @@ export default function FinalisationScreen() {
       },
       { onSuccess: () => setDraft(EMPTY_ONBOARDING_DRAFT) },
     );
-  }, [mutate, draft, setDraft]);
+  }, [mutate, draft, setDraft, devBypass, setDevBypass]);
 
   const retry = () => {
     submitOnboarding.mutate(

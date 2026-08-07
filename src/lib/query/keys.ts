@@ -16,4 +16,8 @@ export const queryKeys = {
     infoItems: (householdId: string) =>
       ['household', householdId, 'info-items'] as const,
   },
+  hub: {
+    all: ['hub'] as const,
+    summary: (householdId: string) => ['hub', householdId, 'summary'] as const,
+  },
 } as const;

@@ -6,7 +6,7 @@ import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import { withUniwind } from 'uniwind';
 
 // ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
-import { devBypassOnboardingAtom } from '@/lib/atoms/dev-bypass';
+import { devBypassAtom } from '@/lib/atoms/dev-bypass';
 import { supabase } from '@/lib/supabase/client';
 import { getAuthRedirectTo } from '@/lib/supabase/magic-link';
 
@@ -20,7 +20,7 @@ export default function LoginScreen() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
-  const setDevBypass = useSetAtom(devBypassOnboardingAtom);
+  const setDevBypass = useSetAtom(devBypassAtom);
 
   const handleSubmit = async () => {
     setStatus('sending');
@@ -103,7 +103,7 @@ export default function LoginScreen() {
         {__DEV__ ? (
           <Pressable
             accessibilityRole="button"
-            onPress={() => setDevBypass(true)}
+            onPress={() => setDevBypass('onboarding')}
             className="mt-6 items-center rounded-[12px] border border-dashed border-[#d0d0d0] py-3"
           >
             <Text className="text-[13px] font-medium text-[#9a9a9a]">

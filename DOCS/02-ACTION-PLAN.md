@@ -26,9 +26,10 @@ title: Plan d'action de développement — US
 | Phase 0 — Socle technique | ✅ terminée |
 | 1.1 Coquille de navigation | ✅ terminée |
 | 1.2 Onboarding et espace partagé | ✅ terminée, **vérification incomplète** (voir ci-dessous) |
-| 1.3 → 1.7, Phases 2 à 5 | ⬜ à faire |
+| 1.3 Hub d'accueil | ✅ terminée |
+| 1.4 → 1.7, Phases 2 à 5 | ⬜ à faire |
 
-**Prochaine étape : [1.3 Hub d'accueil](#13-hub-daccueil).**
+**Prochaine étape : [1.4 Pilier Ensemble](#14-pilier-ensemble).**
 
 ⚠️ **La 1.2 porte une dette de vérification** : aucune écriture Supabase
 authentifiée (création du foyer, invitation, rattachement du co-parent) n'a
@@ -125,12 +126,24 @@ authentifiée disponible en vérification automatisée.
 
 ### 1.3 Hub d'accueil
 
-- [ ] **3 piliers de poids visuel égal** — Démarches, Ensemble, Suivi santé
-      — chacun affichant un état contextuel (pas une description statique)
-- [ ] **Bloc "Mon partenaire"** — section indépendante sous les piliers,
+**✅ Terminée.**
+
+- [x] **3 piliers de poids visuel égal** — Démarches, Ensemble, Suivi santé
+      — chacun affichant un état contextuel (pas une description statique).
+      L'état vient de la base (`household_procedures`, `mood_checkins`,
+      `appointments`) ; à défaut de données, le libellé neutre de la section
+      est affiché plutôt qu'un chiffre inventé.
+- [x] **Bloc "Mon partenaire"** — section indépendante sous les piliers,
       **pas un 4e pilier**, accessible en un tap (voir 1.5)
-- [ ] Bouton **"J'ai accouché"** — visible uniquement par la femme, en haut
-      du hub à côté de la salutation (voir point ouvert en tête de document)
+- [x] Bouton **"J'ai accouché"** — visible uniquement par la femme, en haut
+      du hub à côté de la salutation (voir point ouvert en tête de document).
+      ⚠️ Les maquettes 3c **et** 3d l'affichent pour les deux rôles :
+      `CONCEPT.md` fait foi, il est réservé à la femme enceinte.
+
+Les sections ouvertes depuis le hub (Démarches, Ensemble, Suivi santé, Mon
+partenaire, J'ai accouché) mènent à des écrans d'attente jusqu'à leur phase
+respective : la navigation est donc réelle et testable dès maintenant, et la
+barre reste à 4 onglets fixes.
 
 ### 1.4 Pilier Ensemble
 

@@ -1,6 +1,14 @@
 import { Tabs } from 'expo-router';
 import { Text } from 'react-native';
 
+const HUB_DESTINATIONS = [
+  'demarches',
+  'ensemble',
+  'sante',
+  'partenaire',
+  'naissance',
+] as const;
+
 /**
  * Emoji placeholders — swap for the real icon set once the Hi-Fi tab bar
  * assets are implemented (see DOCS/01-DESIGN-OVERVIEW.md). CONCEPT.md names
@@ -52,6 +60,13 @@ export default function TabsLayout() {
           ),
         }}
       />
+
+      {/* Destinations ouvertes depuis le hub, pas des onglets : la barre
+          reste à 4 entrées fixes (CONCEPT.md). `href: null` les retire de
+          la barre sans les retirer de la navigation. */}
+      {HUB_DESTINATIONS.map((name) => (
+        <Tabs.Screen key={name} name={name} options={{ href: null }} />
+      ))}
     </Tabs>
   );
 }

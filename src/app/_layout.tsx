@@ -12,7 +12,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { AnimatedSplashOverlay } from '@/components/animated-icon';
 import { useMyHousehold, useSyncCurrentRole } from '@/features/household/hooks';
 // ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
-import { devBypassOnboardingAtom } from '@/lib/atoms/dev-bypass';
+import { devBypassAtom } from '@/lib/atoms/dev-bypass';
 import { sessionAtom } from '@/lib/atoms/session';
 import { queryClient } from '@/lib/query/query-client';
 import { supabase } from '@/lib/supabase/client';
@@ -37,7 +37,7 @@ function AuthGate() {
   useSyncCurrentRole(household);
 
   // ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
-  const isDevBypass = useAtomValue(devBypassOnboardingAtom);
+  const devBypass = useAtomValue(devBypassAtom);
 
   const hasSession = !!session;
   const isResolvingHousehold = hasSession && isPending;
@@ -52,13 +52,23 @@ function AuthGate() {
 
   return (
     <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Protected guard={!hasSession && !isDevBypass}>
+      <Stack.Protected guard={devBypass === 'off' && !hasSession}>
         <Stack.Screen name="(auth)" />
       </Stack.Protected>
-      <Stack.Protected guard={isDevBypass || (hasSession && !household)}>
+      <Stack.Protected
+        guard={
+          devBypass === 'onboarding' ||
+          (devBypass === 'off' && hasSession && !household)
+        }
+      >
         <Stack.Screen name="(onboarding)" />
       </Stack.Protected>
-      <Stack.Protected guard={!isDevBypass && hasSession && !!household}>
+      <Stack.Protected
+        guard={
+          devBypass === 'app' ||
+          (devBypass === 'off' && hasSession && !!household)
+        }
+      >
         <Stack.Screen name="(tabs)" />
       </Stack.Protected>
     </Stack>
