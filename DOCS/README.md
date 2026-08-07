@@ -11,6 +11,7 @@ grossesse et les premiers mois du bébé.
 2. [Plan d'action de développement](./02-ACTION-PLAN.md) — découpage en phases techniques
 3. [Plan de versionning](./03-VERSIONING.md) — MVP → V1 → V2, et convention pour les versions suivantes
 4. [Architecture technique](./04-ARCHITECTURE.md) — stack, conventions d'état, arborescence, Supabase
+5. [Dette et points ouverts](./05-DETTE-ET-POINTS-OUVERTS.md) — contournements temporaires, vérifications jamais faites, décisions prises par défaut. **À relire avant chaque jalon**
 
 Le contenu détaillé de chaque version livrable vit dans [`versions/`](./versions/) :
 [MVP](./versions/MVP.md), [V1](./versions/V1.md), [V2](./versions/V2.md).

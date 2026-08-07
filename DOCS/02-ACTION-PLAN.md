@@ -30,18 +30,12 @@ title: Plan d'action de développement — US
 
 **Prochaine étape : [1.3 Hub d'accueil](#13-hub-daccueil).**
 
-⚠️ **Dette de vérification sur la 1.2** — à solder avant de considérer le
-MVP testable de bout en bout :
-
-- les écritures Supabase réelles (création du foyer, envoi de l'invitation,
-  acceptation par le co-parent via `accept_household_invite()`) n'ont jamais
-  été exécutées : elles demandent deux sessions authentifiées réelles ;
-- le projet Supabase n'a pas de SMTP personnalisé et la confirmation d'email
-  est active, donc les envois passent par le service mutualisé Supabase
-  (quelques emails par heure) — c'est le premier blocage à lever pour tester
-  l'invitation du co-parent ;
-- les liens magiques ne sont câblés que pour le web ; sur iOS/Android ils
-  arrivent par deep link (`us://`), pas encore traité.
+⚠️ **La 1.2 porte une dette de vérification** : aucune écriture Supabase
+authentifiée (création du foyer, invitation, rattachement du co-parent) n'a
+jamais été exécutée, faute de SMTP configuré. Le détail et le reste des
+points en suspens sont centralisés dans
+[Dette et points ouverts](./05-DETTE-ET-POINTS-OUVERTS.md) — liste unique,
+pour éviter que deux inventaires divergent.
 
 ## Phase 0 — Socle technique (aucune feature visible)
 
