@@ -1,3 +1,4 @@
+import { todayIso } from '@/lib/date';
 import { supabase } from '@/lib/supabase/client';
 import type { Database } from '@/lib/supabase/database.types';
 
@@ -17,14 +18,6 @@ export type HubSummary = {
   partnerMood: { mood: MoodValue; needNote: string | null } | null;
   nextAppointment: { title: string; date: string } | null;
 };
-
-function todayIso(): string {
-  // Date locale, pas UTC : à 23 h à Paris, `toISOString()` bascule déjà au
-  // lendemain et le check-in du jour semblerait manquant.
-  const now = new Date();
-  const offsetMs = now.getTimezoneOffset() * 60 * 1000;
-  return new Date(now.getTime() - offsetMs).toISOString().slice(0, 10);
-}
 
 /** L'autre membre du foyer, ou null tant que le co-parent n'a pas rejoint. */
 export function getPartnerUserId(

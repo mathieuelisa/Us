@@ -20,4 +20,10 @@ export const queryKeys = {
     all: ['hub'] as const,
     summary: (householdId: string) => ['hub', householdId, 'summary'] as const,
   },
+  together: {
+    all: ['together'] as const,
+    weekCheckins: (householdId: string, userId: string, weekStart: string) =>
+      ['together', householdId, userId, 'week', weekStart] as const,
+    gesture: (role: string) => ['together', 'gesture', role] as const,
+  },
 } as const;

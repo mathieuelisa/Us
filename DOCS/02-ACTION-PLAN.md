@@ -27,9 +27,10 @@ title: Plan d'action de développement — US
 | 1.1 Coquille de navigation | ✅ terminée |
 | 1.2 Onboarding et espace partagé | ✅ terminée, **vérification incomplète** (voir ci-dessous) |
 | 1.3 Hub d'accueil | ✅ terminée |
-| 1.4 → 1.7, Phases 2 à 5 | ⬜ à faire |
+| 1.4 Pilier Ensemble | ✅ implémentée, interface symétrique pour l'instant (demande explicite) |
+| 1.5 → 1.7, Phases 2 à 5 | ⬜ à faire |
 
-**Prochaine étape : [1.4 Pilier Ensemble](#14-pilier-ensemble).**
+**Prochaine étape : [1.5 Pilier Suivi santé + section "Mon partenaire"](#15-pilier-suivi-santé-section-mon-partenaire).**
 
 ⚠️ **La 1.2 porte une dette de vérification** : aucune écriture Supabase
 authentifiée (création du foyer, invitation, rattachement du co-parent) n'a
@@ -147,22 +148,37 @@ barre reste à 4 onglets fixes.
 
 ### 1.4 Pilier Ensemble
 
+**✅ Implémentée**, avec un écart de périmètre assumé : voir plus bas.
+
 Interface **non symétrique** : chaque utilisateur a sa propre vue adaptée à
 son rôle, dans cet ordre précis :
 
-1. Check-in humeur du jour en un tap
-2. Popup post-tap pour préciser un besoin (sommeil / câlin / parler / texte
+1. [x] Check-in humeur du jour en un tap — persisté immédiatement à l'appui,
+   avant même la popup du besoin (sans quoi quitter la popup sans répondre
+   perdrait le check-in)
+2. [x] Popup post-tap pour préciser un besoin (sommeil / câlin / parler / texte
    libre) → ce besoin devient visible pour le co-parent sur le hub, dans sa
-   carte "Humeur du jour" (ex. "Camille aujourd'hui — a besoin d'un câlin")
-3. Calendrier hebdomadaire de tendance d'humeur — **qualitatif uniquement,
+   carte "Humeur du jour" (ex. "Camille aujourd'hui — a besoin d'un câlin").
+   ⚠️ Le hub affiche le besoin tel quel (déjà en place depuis la 1.3), pas
+   encore composé en phrase naturelle avec « a besoin de » — la grammaire
+   varie par tag (« d'un câlin » vs « de sommeil ») et n'a pas été traitée.
+3. [x] Calendrier hebdomadaire de tendance d'humeur — **qualitatif uniquement,
    jamais de chiffres ni d'historique jour par jour détaillé** (⚠️ corrige
    la maquette qui affichait un graphique à barres avec hauteurs variables —
-   à ne pas reproduire tel quel)
-4. "Geste du jour" — suggestion concrète pour aider le partenaire ;
-   **peut être déclenché comportementalement** (plusieurs jours consécutifs
-   d'humeur difficile détectés) — prévoir dès cette phase un point
-   d'extension pour la règle de déclenchement, même si le déclenchement réel
-   par notification est câblé en Phase 4
+   à ne pas reproduire tel quel). Un emoji par jour (L M M J V S D) reste
+   qualitatif ; c'est la hauteur de barre, pas l'info par jour, qui posait
+   problème.
+4. [x] "Geste du jour" — sélection déterministe (même geste pour tout le
+   monde du même rôle, toute la journée, change le lendemain), affiché en
+   box emoji + message. Le **point d'extension** pour le déclenchement
+   comportemental existe (`countTrailingDifficultMoodDays` dans
+   `features/together/api.ts`) mais n'est pas encore branché dans l'écran —
+   le déclenchement réel (notification) reste bien Phase 4.
+
+⚠️ **Écart de périmètre** (demande explicite) : une seule interface pour
+l'instant, pas encore la vue asymétrique par rôle que décrit CONCEPT.md — le
+contenu (pool de gestes) est déjà personnalisé par rôle, mais l'écran est le
+même pour les deux. L'asymétrie complète est reportée à une passe dédiée.
 
 ### 1.5 Pilier Suivi santé + section "Mon partenaire"
 

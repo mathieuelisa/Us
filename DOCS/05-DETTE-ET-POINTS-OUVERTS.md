@@ -37,6 +37,7 @@ pas les considérer comme acquis.
 | 7 | **iOS et Android n'ont jamais été lancés** dans une vérification complète : tout a été validé en web. Le geste de retour au swipe, notamment, n'est pas vérifiable en web. | — |
 | 8 | **SMTP personnalisé non configuré.** Le projet utilise le service mutualisé Supabase, limité à quelques emails par heure — impraticable pour tester l'invitation du co-parent. Brevo recommandé (société française, données en UE, 300 emails/jour gratuits) ; nécessite un nom de domaine pour SPF/DKIM. | Prérequis n° 1 pour débloquer le point 5. |
 | 9 | **Template d'email en anglais** (« Your sign-in link ») dans un parcours entièrement français. | À personnaliser en même temps que le SMTP. |
+| 21 | **Écriture du check-in humeur jamais exécutée** (pilier Ensemble, Phase 1.4) : même limite que le point 5 — vérifié en navigation/rendu, pas en persistance, faute de session réelle. | Même prérequis que le point 5. |
 
 ## 🟡 Contournements à remplacer
 
@@ -59,4 +60,8 @@ Décisions prises par défaut, à confirmer ou corriger.
 | 17 | **Invitation par SMS** : la maquette 2d propose « Email ou numéro ». | Email seul — le rattachement repose sur un lien magique. Le SMS supposerait un fournisseur et un autre mécanisme. |
 | 18 | **Navigation avant au swipe** : demandée « de step en step », mais une pile de navigation ne permet le geste que vers l'arrière. | Retour au swipe ; l'avance reste sur « Continuer », qui porte la validation. Un vrai carrousel demanderait une autre architecture (pager). |
 | 19 | **Visibilité de « J'ai accouché »** : les maquettes 3c **et** 3d l'affichent, `CONCEPT.md` le réserve à la femme enceinte. | Femme enceinte uniquement. |
-| 20 | **Écrans d'attente ouverts depuis le hub** (Démarches, Ensemble, Suivi santé, Mon partenaire, J'ai accouché) : à remplacer par le contenu réel en phases 1.4 à 1.6 et 2. | [`src/components/coming-soon.tsx`](../src/components/coming-soon.tsx) |
+| 20 | **Écrans d'attente ouverts depuis le hub** (Démarches, Suivi santé, Mon partenaire, J'ai accouché) : à remplacer par le contenu réel en phases 1.5, 1.6 et 2. Ensemble (1.4) a désormais son vrai contenu. | [`src/components/coming-soon.tsx`](../src/components/coming-soon.tsx) |
+| 22 | **Interface Ensemble symétrique** : une seule vue pour les deux rôles, alors que CONCEPT.md décrit une interface non symétrique. Demande explicite pour cette phase — le contenu (pool de gestes) est déjà personnalisé par rôle, l'écran ne l'est pas encore. | [`src/app/(tabs)/ensemble.tsx`](../src/app/%28tabs%29/ensemble.tsx) |
+| 23 | **Besoin affiché brut sur le hub**, pas composé en phrase naturelle (« a besoin d'un câlin ») : la grammaire varie par tag et n'a pas été traitée. | [`src/app/(tabs)/index.tsx`](../src/app/%28tabs%29/index.tsx) |
+| 24 | **Émoji du geste du jour associé par correspondance de texte exact**, faute de colonne dédiée en base (évite une migration pour un champ décoratif). Se dégrade silencieusement vers un emoji par défaut si le texte est reformulé en base. | [`src/features/together/constants.ts`](../src/features/together/constants.ts) |
+| 25 | **Point d'extension du déclenchement comportemental posé mais pas branché** : `countTrailingDifficultMoodDays()` existe, n'est pas encore appelé depuis l'écran. Le déclenchement réel (notification) reste Phase 4. | [`src/features/together/api.ts`](../src/features/together/api.ts) |

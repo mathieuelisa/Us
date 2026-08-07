@@ -13,9 +13,18 @@ export const MOOD_PRESENTATION: Record<
   great: { emoji: '😄', phrase: 'semble au top' },
   good: { emoji: '🙂', phrase: 'semble se sentir bien' },
   neutral: { emoji: '😐', phrase: 'passe une journée ordinaire' },
-  bad: { emoji: '😕', phrase: 'traverse une journée difficile' },
-  terrible: { emoji: '😩', phrase: 'traverse une journée très difficile' },
+  bad: { emoji: '😩', phrase: 'traverse une journée difficile' },
+  terrible: { emoji: '😢', phrase: 'traverse une journée très difficile' },
 };
+
+/** Ordre d'affichage des 5 humeurs (écrans 3a/3g) — great en tête. */
+export const MOOD_ORDER: MoodValue[] = [
+  'great',
+  'good',
+  'neutral',
+  'bad',
+  'terrible',
+];
 
 /** Fond dérivé du rôle, pas de l'écran (cf. DOCS/04-ARCHITECTURE.md). */
 export const ROLE_BACKGROUND = {
