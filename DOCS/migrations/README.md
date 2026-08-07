@@ -13,11 +13,32 @@ Périmètre : les tables du [MVP](../versions/MVP.md) uniquement (Phase 1 du
 [plan d'action](../02-ACTION-PLAN.md)) — le module premium "Votre bébé" (V1)
 n'a pas encore de migration, il en aura une propre en Phase 3.
 
+## Hébergement — `eu-west-3` (Paris)
+
+Le projet Supabase est hébergé **à Paris**, et doit le rester : `symptoms_log`
+(symptômes), `mood_checkins` (santé mentale) et `household_info_items`
+(groupe sanguin, allergies, n° de sécurité sociale) sont des **données de
+santé** au sens de l'article 4(15) du RGPD — la définition tient à ce que la
+donnée révèle de l'état de santé, indépendamment de toute intervention
+médicale. Rester intra-UE évite d'avoir à documenter un transfert vers un
+pays tiers.
+
+Le projet a d'abord été créé par erreur en `eu-west-2` (Londres, hors UE
+depuis le Brexit — les transferts n'y reposent que sur une décision
+d'adéquation révocable), puis recréé à Paris le 2026-08-07 alors que la base
+était encore vide. **La région d'un projet Supabase ne se change pas après
+création** : la corriger plus tard aurait imposé une migration de données de
+santé réelles.
+
+⚠️ L'hébergement n'est qu'une pièce du sujet. Restent à traiter : le
+consentement explicite (article 9), la politique de confidentialité, les
+durées de conservation et le DPA Supabase.
+
 ## Comment appliquer ces migrations
 
 ```bash
 npm run db:start                        # démarre Supabase en local (requiert Docker)
-supabase link --project-ref lmocuevvrznpnglcunea   # relie le projet cloud (1x, demande le mot de passe DB)
+supabase link --project-ref hsclyntlnoyevstdhgvu   # relie le projet cloud (1x, demande le mot de passe DB)
 supabase db push                         # applique les migrations en attente sur le projet lié
 npm run db:types                         # régénère src/lib/supabase/database.types.ts
 ```
