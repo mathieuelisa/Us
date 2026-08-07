@@ -18,11 +18,16 @@ import { supabase } from './client';
  *
  * ⚠️ Chaque forme d'URL produite ici doit être autorisée dans
  * `Authentication > URL Configuration` du projet Supabase, sinon la
- * redirection est refusée silencieusement.
+ * redirection est refusée silencieusement — Supabase retombe alors sur le
+ * `Site URL` sans prévenir.
+ *
+ * Le `/` final n'est pas cosmétique : les entrées de la liste blanche sont
+ * de la forme `http://localhost:8081/**`, et un glob `/**` ne matche pas
+ * une origine nue sans slash.
  */
 export function getAuthRedirectTo(): string {
   if (Platform.OS === 'web') {
-    return window.location.origin;
+    return `${window.location.origin}/`;
   }
   return Linking.createURL('/');
 }
