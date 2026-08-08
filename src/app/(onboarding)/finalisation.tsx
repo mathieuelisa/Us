@@ -6,6 +6,7 @@ import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import { withUniwind } from 'uniwind';
 
 import { useSubmitOnboarding } from '@/features/onboarding/hooks';
+import { useThemeBackground } from '@/features/settings/hooks';
 // ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
 import { devBypassAtom, devBypassFirstNameAtom } from '@/lib/atoms/dev-bypass';
 import {
@@ -24,6 +25,7 @@ const SafeAreaView = withUniwind(RNSafeAreaView);
 export default function FinalisationScreen() {
   const [draft, setDraft] = useAtom(onboardingDraftAtom);
   const submitOnboarding = useSubmitOnboarding();
+  const backgroundColor = useThemeBackground();
 
   // ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
   const [devBypass, setDevBypass] = useAtom(devBypassAtom);
@@ -65,7 +67,7 @@ export default function FinalisationScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1" style={{ backgroundColor }}>
       <View className="flex-1 items-center justify-center gap-4 px-7">
         {submitOnboarding.isError ? (
           <>

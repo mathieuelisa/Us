@@ -6,6 +6,7 @@ import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import { withUniwind } from 'uniwind';
 
 import { ONBOARDING_STEP_COUNT } from '@/features/onboarding/constants';
+import { useThemeBackground } from '@/features/settings/hooks';
 
 const SafeAreaView = withUniwind(RNSafeAreaView);
 
@@ -42,9 +43,10 @@ export function OnboardingStepShell({
   onSecondaryPress?: () => void;
 }) {
   const router = useRouter();
+  const backgroundColor = useThemeBackground();
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1" style={{ backgroundColor }}>
       <View className="flex-1 px-7 pt-4">
         {/* Aligné à gauche : c'est la convention iOS/Android, et surtout le
             côté d'où part le swipe de retour — bouton et geste désignent
