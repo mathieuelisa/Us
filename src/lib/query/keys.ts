@@ -39,4 +39,8 @@ export const queryKeys = {
     exercises: ['health', 'exercises'] as const,
     babySize: (week: number) => ['health', 'baby-size', week] as const,
   },
+  procedures: {
+    all: ['procedures'] as const,
+    list: (householdId: string) => ['procedures', householdId] as const,
+  },
 } as const;

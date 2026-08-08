@@ -29,9 +29,10 @@ title: Plan d'action de développement — US
 | 1.3 Hub d'accueil | ✅ terminée |
 | 1.4 Pilier Ensemble | ✅ implémentée, interface symétrique pour l'instant (demande explicite) |
 | 1.5 Suivi santé + Mon partenaire | ✅ implémentée pour la **vue femme enceinte** ; vue co-parent reportée (demande explicite) |
-| 1.6 → 1.7, Phases 2 à 5 | ⬜ à faire |
+| 1.6 Pilier Démarches | ✅ terminée |
+| 1.7, Phases 2 à 5 | ⬜ à faire |
 
-**Prochaine étape : [1.6 Pilier Démarches](#16-pilier-démarches).**
+**Prochaine étape : [1.7 Réglages MVP](#17-réglages-mvp).**
 
 ⚠️ **La 1.2 porte une dette de vérification** : aucune écriture Supabase
 authentifiée (création du foyer, invitation, rattachement du co-parent) n'a
@@ -238,18 +239,32 @@ porte d'entrée vers cette donnée de santé.
 
 ### 1.6 Pilier Démarches
 
-- [ ] Référentiel **figé à 6 démarches pour la V1** : déclaration de
+**✅ Terminée.**
+
+- [x] Référentiel **figé à 6 démarches pour la V1** : déclaration de
       naissance (mairie), CAF, sécurité sociale, mutuelle, congés employeur,
       mode de garde
-- [ ] Statuts À faire / En cours / Fait, modifiables par les deux parents
-- [ ] Lien direct vers le téléservice officiel — **pas d'explication de
-      procédure dans l'app**, juste la liste des documents à fournir
-- [ ] Écran de détail : échéance calculée, sélecteur de statut 3 états,
-      liste de documents, toggle de rappel/notification
-- [ ] "Déclaration de naissance à la mairie" — délai légal de 5 jours,
+- [x] Statuts À faire / En cours / Fait, modifiables par les deux parents —
+      pas de règle de visibilité par rôle sur ce pilier, contrairement à
+      Ensemble et Suivi santé.
+- [x] Lien direct vers le téléservice officiel — **pas d'explication de
+      procédure dans l'app**, juste la liste des documents à fournir.
+      Les 5 URL (`service-public.fr`, `caf.fr`, `ameli.fr`,
+      `demarches.interieur.gouv.fr`, `monenfant.fr`) ont été vérifiées par
+      recherche web au moment d'écrire la migration, pas devinées de
+      mémoire. « Mutuelle » reste sans lien : assureur privé propre à
+      chaque foyer, aucun téléservice officiel générique n'existe.
+- [x] Écran de détail : échéance calculée, sélecteur de statut 3 états,
+      liste de documents, toggle de rappel/notification. Liste et détail
+      vivent dans un seul écran (bascule par état local), même parti pris
+      que le pilier Suivi santé.
+- [x] "Déclaration de naissance à la mairie" — délai légal de 5 jours,
       échéance calculée **uniquement après validation via "J'ai accouché"**
       (ex. "jusqu'au 6 septembre") ; avant validation, affichage informatif
-      sans date précise (ex. "5 jours à partir de la naissance")
+      sans date précise (ex. "5 jours à partir de la naissance").
+      ⚠️ `households.birth_date` n'est encore jamais renseigné (la Phase 2
+      n'est pas construite) : le calcul de date précise n'a donc jamais
+      tourné en conditions réelles, seul l'affichage informatif l'a été.
 
 ### 1.7 Réglages MVP
 

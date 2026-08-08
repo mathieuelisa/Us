@@ -61,6 +61,7 @@ npm run db:types                         # régénère src/lib/supabase/database
 | [`20260806151100_household_info_items.sql`](../../supabase/migrations/20260806151100_household_info_items.sql) | `household_info_items` | Onglet "Information" — liste libre et réorganisable (drag-and-drop), pas de colonnes figées |
 | [`20260806151200_app_feedback.sql`](../../supabase/migrations/20260806151200_app_feedback.sql) | `app_feedback` | Retours de la demande d'avis in-app, personnels (non partagés avec le partenaire) |
 | [`20260807120000_onboarding_and_invites.sql`](../../supabase/migrations/20260807120000_onboarding_and_invites.sql) | `households`, fonction `accept_household_invite()` | Manques révélés par la Phase 1.2 : `households.partner_first_name` (prénom saisi avant que le co-parent ait un compte), index uniques « un foyer par utilisateur et par rôle », et la fonction de rattachement du co-parent invité |
+| [`20260808100000_procedure_official_links.sql`](../../supabase/migrations/20260808100000_procedure_official_links.sql) | `procedure_templates` | Renseigne `official_link` pour 5 des 6 démarches (absent de la migration initiale) — URL vérifiées par recherche web, pas de mémoire. « Mutuelle » reste sans lien : assureur privé propre à chaque foyer |
 
 ## Décisions de modélisation
 
