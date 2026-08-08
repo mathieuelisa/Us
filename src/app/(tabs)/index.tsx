@@ -2,7 +2,7 @@ import { router } from 'expo-router';
 import { useAtomValue } from 'jotai';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
-import { useUniwind, withUniwind } from 'uniwind';
+import { withUniwind } from 'uniwind';
 
 import { PillarCard } from '@/components/hub/pillar-card';
 import { useMyHousehold } from '@/features/household/hooks';
@@ -12,10 +12,7 @@ import {
 } from '@/features/hub/constants';
 import { useHubSummary } from '@/features/hub/hooks';
 import { useMyProfile } from '@/features/profile/hooks';
-import {
-  resolveThemeId,
-  THEME_PASTEL_BACKGROUND,
-} from '@/features/settings/constants';
+import { useThemeBackground } from '@/features/settings/hooks';
 // ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
 import { devBypassFirstNameAtom } from '@/lib/atoms/dev-bypass';
 import { currentRoleAtom } from '@/lib/atoms/role';
@@ -35,17 +32,15 @@ const SafeAreaView = withUniwind(RNSafeAreaView);
  *
  * Le **fond**, en revanche, n'est plus dérivé du rôle mais du thème
  * personnel choisi en Réglages (Phase 1.7) — pastel de la couleur d'accent
- * active (`THEME_PASTEL_BACKGROUND`), cohérent avec le fait que le thème
- * est propre à chaque compte, pas partagé. Avant cette phase, le hub
- * utilisait deux fonds fixes par rôle (`ROLE_BACKGROUND`, encore utilisé
- * sur les autres écrans) ; à harmoniser plus tard si besoin.
+ * active (`useThemeBackground`), cohérent avec le fait que le thème est
+ * propre à chaque compte, pas partagé. Même mécanisme sur les autres
+ * écrans (`sante.tsx`, `demarches.tsx`, `ensemble.tsx`, `partenaire.tsx`).
  */
 export default function HubScreen() {
   const { data: profile } = useMyProfile();
   const { data: household } = useMyHousehold();
   const { data: summary } = useHubSummary(household);
-  const { theme } = useUniwind();
-  const backgroundColor = THEME_PASTEL_BACKGROUND[resolveThemeId(theme)];
+  const backgroundColor = useThemeBackground();
 
   // ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts. Le sien, jamais le
   // prénom du co-parent : c'est le seul champ que ce contournement propage.

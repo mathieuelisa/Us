@@ -11,7 +11,7 @@ import { ExercisesTab } from '@/components/health/exercises-tab';
 import { JournalTab } from '@/components/health/journal-tab';
 import { SegmentedTabs } from '@/components/health/segmented-tabs';
 import { useMyHousehold } from '@/features/household/hooks';
-import { ROLE_BACKGROUND } from '@/features/hub/constants';
+import { useThemeBackground } from '@/features/settings/hooks';
 import { currentRoleAtom } from '@/lib/atoms/role';
 
 const SafeAreaView = withUniwind(RNSafeAreaView);
@@ -46,12 +46,10 @@ export default function HealthScreen() {
   const [activeTab, setActiveTab] = useState<HealthTab>(
     isPregnant ? 'journal' : 'appointments',
   );
+  const backgroundColor = useThemeBackground();
 
   return (
-    <SafeAreaView
-      className="flex-1"
-      style={{ backgroundColor: ROLE_BACKGROUND[role] }}
-    >
+    <SafeAreaView className="flex-1" style={{ backgroundColor }}>
       <ScrollView
         contentContainerClassName="gap-5 px-6 pb-10 pt-4"
         showsVerticalScrollIndicator={false}

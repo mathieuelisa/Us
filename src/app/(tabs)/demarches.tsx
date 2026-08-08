@@ -15,7 +15,6 @@ import { withUniwind } from 'uniwind';
 import { StatusBadge } from '@/components/procedures/status-badge';
 import { StatusSelector } from '@/components/procedures/status-selector';
 import { useMyHousehold } from '@/features/household/hooks';
-import { ROLE_BACKGROUND } from '@/features/hub/constants';
 import { formatDeadlineLabel } from '@/features/procedures/constants';
 // ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
 import { DEV_PROCEDURES_FIXTURE } from '@/features/procedures/dev-fixture';
@@ -24,9 +23,9 @@ import {
   useUpdateProcedureReminder,
   useUpdateProcedureStatus,
 } from '@/features/procedures/hooks';
+import { useThemeBackground } from '@/features/settings/hooks';
 // ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
 import { devBypassAtom } from '@/lib/atoms/dev-bypass';
-import { currentRoleAtom } from '@/lib/atoms/role';
 
 const SafeAreaView = withUniwind(RNSafeAreaView);
 
@@ -43,7 +42,6 @@ const SafeAreaView = withUniwind(RNSafeAreaView);
 export default function ProceduresScreen() {
   const router = useRouter();
   const { data: household } = useMyHousehold();
-  const role = useAtomValue(currentRoleAtom) ?? 'pregnant';
 
   const { data: remoteProcedures = [] } = useProcedures(household);
   const updateStatus = useUpdateProcedureStatus(household);
@@ -97,12 +95,10 @@ export default function ProceduresScreen() {
   );
 
   const completedCount = procedures.filter((p) => p.status === 'fait').length;
+  const backgroundColor = useThemeBackground();
 
   return (
-    <SafeAreaView
-      className="flex-1"
-      style={{ backgroundColor: ROLE_BACKGROUND[role] }}
-    >
+    <SafeAreaView className="flex-1" style={{ backgroundColor }}>
       <ScrollView
         contentContainerClassName="gap-5 px-6 pb-10 pt-4"
         showsVerticalScrollIndicator={false}

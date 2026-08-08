@@ -9,9 +9,9 @@ import { getWeeksOfAmenorrhea } from '@/features/health/constants';
 import { useBabySize } from '@/features/health/hooks';
 import { useMyHousehold } from '@/features/household/hooks';
 import { getPartnerUserId } from '@/features/hub/api';
-import { ROLE_BACKGROUND } from '@/features/hub/constants';
 import { useHubSummary } from '@/features/hub/hooks';
 import { getTipOfTheDay } from '@/features/partner/constants';
+import { useThemeBackground } from '@/features/settings/hooks';
 import { getCurrentWeekIsoDates } from '@/features/together/api';
 import { useWeekCheckinsFor } from '@/features/together/hooks';
 import { currentRoleAtom } from '@/lib/atoms/role';
@@ -53,12 +53,10 @@ export default function PartnerScreen() {
   const otherRole = role === 'pregnant' ? 'partner' : 'pregnant';
   const myTip = getTipOfTheDay(role);
   const partnerTip = getTipOfTheDay(otherRole);
+  const backgroundColor = useThemeBackground();
 
   return (
-    <SafeAreaView
-      className="flex-1"
-      style={{ backgroundColor: ROLE_BACKGROUND[role] }}
-    >
+    <SafeAreaView className="flex-1" style={{ backgroundColor }}>
       <ScrollView
         contentContainerClassName="gap-6 px-6 pb-10 pt-4"
         showsVerticalScrollIndicator={false}

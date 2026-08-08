@@ -26,12 +26,6 @@ export const MOOD_ORDER: MoodValue[] = [
   'terrible',
 ];
 
-/** Fond dérivé du rôle, pas de l'écran (cf. DOCS/04-ARCHITECTURE.md). */
-export const ROLE_BACKGROUND = {
-  pregnant: '#EAF5F0',
-  partner: '#FDF6E3',
-} as const;
-
 export function formatAppointmentDate(isoDate: string): string {
   const [year, month, day] = isoDate.split('-').map(Number);
   return new Date(year, month - 1, day).toLocaleDateString('fr-FR', {

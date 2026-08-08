@@ -307,15 +307,15 @@ dur — vérifié en changeant de thème depuis Réglages et en observant le hub
 (bouton "J'ai accouché", "Inviter") changer de couleur sans modification
 d'écran.
 
-⚠️ **Fond du hub aussi dérivé du thème** (ajout après coup, demande
-explicite) : le hub (`src/app/(tabs)/index.tsx`) affichait un fond fixe par
-rôle (`ROLE_BACKGROUND`, vert pâle femme enceinte / crème co-parent). Il
-affiche désormais un pastel de la couleur d'accent active
-(`THEME_PASTEL_BACKGROUND`, `src/features/settings/constants.ts`), cohérent
-avec le fait que le thème est personnel à chaque compte. Les autres écrans
-(`sante.tsx`, `demarches.tsx`, `ensemble.tsx`, `partenaire.tsx`) gardent
-encore le fond fixe par rôle — non demandé sur ce tour, à harmoniser plus
-tard si besoin.
+⚠️ **Fond de tous les écrans principaux dérivé du thème** (ajout après
+coup, demande explicite) : hub, Suivi santé, Démarches, Ensemble et Mon
+partenaire affichaient un fond fixe par rôle (`ROLE_BACKGROUND`, vert pâle
+femme enceinte / crème co-parent). Ils affichent désormais tous un pastel
+de la couleur d'accent active (`useThemeBackground`,
+`src/features/settings/hooks.ts`), cohérent avec le fait que le thème est
+personnel à chaque compte. `ROLE_BACKGROUND` a été retiré (plus aucun
+usage) ; le rôle continue de piloter d'autres éléments (visibilité
+d'onglets, contenu) sans lien avec la couleur de fond.
 
 ## Phase 2 — Déclaration de naissance & durcissement MVP
 

@@ -10,7 +10,8 @@ import { NeedNoteOverlay } from '@/components/together/need-note-overlay';
 import { WeekMoodStrip } from '@/components/together/week-mood-strip';
 import { useMyHousehold } from '@/features/household/hooks';
 import type { MoodValue } from '@/features/hub/api';
-import { MOOD_PRESENTATION, ROLE_BACKGROUND } from '@/features/hub/constants';
+import { MOOD_PRESENTATION } from '@/features/hub/constants';
+import { useThemeBackground } from '@/features/settings/hooks';
 import { getCurrentWeekIsoDates } from '@/features/together/api';
 import { getGestureEmoji } from '@/features/together/constants';
 import {
@@ -41,6 +42,7 @@ export default function TogetherScreen() {
   const { data: checkinsByDate = {} } = useMyWeekCheckins(household);
   const { data: gesture } = useGestureOfTheDay(role);
   const upsertCheckin = useUpsertMoodCheckin(household);
+  const backgroundColor = useThemeBackground();
 
   const today = todayIso();
   const todayMood = checkinsByDate[today] ?? null;
@@ -70,10 +72,7 @@ export default function TogetherScreen() {
   };
 
   return (
-    <SafeAreaView
-      className="flex-1"
-      style={{ backgroundColor: ROLE_BACKGROUND[role] }}
-    >
+    <SafeAreaView className="flex-1" style={{ backgroundColor }}>
       <ScrollView
         contentContainerClassName="gap-6 px-6 pb-10 pt-4"
         showsVerticalScrollIndicator={false}
