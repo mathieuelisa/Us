@@ -1,5 +1,6 @@
 import { Tabs } from 'expo-router';
-import { Text } from 'react-native';
+
+import { AppTabBar } from '@/components/navigation/tab-bar';
 
 const HUB_DESTINATIONS = [
   'demarches',
@@ -10,56 +11,24 @@ const HUB_DESTINATIONS = [
 ] as const;
 
 /**
- * Emoji placeholders — swap for the real icon set once the Hi-Fi tab bar
- * assets are implemented (see DOCS/01-DESIGN-OVERVIEW.md). CONCEPT.md names
- * the 4 tabs in English (Home / User / Information / Setting) even though
- * the rest of the app copy is French — kept as specified.
+ * Icônes réelles (Ionicons) et rendu de la barre entièrement délégués à
+ * `AppTabBar` (carte flottante + indicateur animé) — voir
+ * `src/components/navigation/tab-bar.tsx` pour le détail et le
+ * raisonnement. `title` reste ici, c'est le seul champ que `AppTabBar` lit
+ * depuis `options`. CONCEPT.md nomme les 4 onglets en anglais (Home / User
+ * / Information / Setting) même si le reste des textes est en français —
+ * gardé tel quel.
  */
 export default function TabsLayout() {
   return (
     <Tabs
-      screenOptions={{
-        headerShown: false,
-        tabBarActiveTintColor: '#2D5E5A',
-        tabBarInactiveTintColor: '#9a9a9a',
-      }}
+      tabBar={(props) => <AppTabBar {...props} />}
+      screenOptions={{ headerShown: false }}
     >
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => (
-            <Text style={{ fontSize: 20, color }}>🏠</Text>
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="profil"
-        options={{
-          title: 'User',
-          tabBarIcon: ({ color }) => (
-            <Text style={{ fontSize: 20, color }}>👤</Text>
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="informations"
-        options={{
-          title: 'Information',
-          tabBarIcon: ({ color }) => (
-            <Text style={{ fontSize: 20, color }}>ℹ️</Text>
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="reglages"
-        options={{
-          title: 'Setting',
-          tabBarIcon: ({ color }) => (
-            <Text style={{ fontSize: 20, color }}>⚙️</Text>
-          ),
-        }}
-      />
+      <Tabs.Screen name="index" options={{ title: 'Home' }} />
+      <Tabs.Screen name="profil" options={{ title: 'User' }} />
+      <Tabs.Screen name="informations" options={{ title: 'Information' }} />
+      <Tabs.Screen name="reglages" options={{ title: 'Setting' }} />
 
       {/* Destinations ouvertes depuis le hub, pas des onglets : la barre
           reste à 4 entrées fixes (CONCEPT.md). `href: null` les retire de

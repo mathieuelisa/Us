@@ -47,6 +47,7 @@ pas les considérer comme acquis.
 | 11 | **TanStack Form inutilisé** alors que [l'architecture](./04-ARCHITECTURE.md) le mandate pour tous les formulaires. Le diagnostic ayant conclu à une réactivité cassée **n'est pas fiable** (établi avant de découvrir une source de faux positifs dans la méthode de test) : l'essai est à refaire proprement avant de trancher. | [`04-ARCHITECTURE.md`](./04-ARCHITECTURE.md) |
 | 12 | **Réordonnancement par boutons haut/bas** dans l'onglet Information, là où le concept prévoit un vrai glisser-déposer. La persistance en base est correcte, seul le geste manque. | [`src/app/(tabs)/informations.tsx`](../src/app/%28tabs%29/informations.tsx) |
 | 13 | **Sélecteur de date en colonnes défilables** au lieu des molettes iOS des maquettes — à défaut d'un picker natif commun aux trois plateformes. | [`src/components/onboarding/date-picker.tsx`](../src/components/onboarding/date-picker.tsx) |
+| 39 | **`navigation` typé `unknown` + cast local dans `AppTabBar`** : `@react-navigation/bottom-tabs` n'est pas une dépendance directe (expo-router embarque sa copie sans l'exposer), donc son vrai type `NavigationHelpers` générique n'est pas importable proprement. Un type local (`AppTabBarNavigation`) redécrit juste les deux méthodes utilisées (`emit`, `navigate`). À refaire proprement si `@react-navigation/bottom-tabs` devient un jour une dépendance directe résolue. | [`src/components/navigation/tab-bar.tsx`](../src/components/navigation/tab-bar.tsx) |
 
 ## 🔵 À trancher
 

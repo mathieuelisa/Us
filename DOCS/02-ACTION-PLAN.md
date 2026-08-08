@@ -77,6 +77,14 @@ sections du design.
 - [x] Barre de navigation basse à **4 onglets fixes** (et non 3) : **Home**
       (hub) / **User** (profil personnel) / **Information** (infos
       importantes partagées) / **Setting** (réglages) — cf. `CONCEPT.md`
+      - [x] **Rendu personnalisé** (ajout ultérieur, demande explicite) :
+        carte flottante arrondie avec icônes réelles (Ionicons, paire
+        outline/pleine selon focus) et pastille active qui glisse
+        (Reanimated), teintée du pastel de thème. Remplace les icônes
+        emoji placeholder. Aucune maquette Hi-Fi ne montre de barre de ce
+        type (juste des icônes nues en bas d'écran) — inspiré d'un
+        moodboard de patterns fourni par l'utilisateur, pas de la
+        maquette. Voir [`tab-bar.tsx`](../src/components/navigation/tab-bar.tsx).
 - [x] Onglet **User** : écran de profil propre à chaque utilisateur (nom
       affiché modifiable ; avatar = fonctionnalité future, ne pas bloquer dessus)
 - [x] Onglet **Information** : fiche partagée et modifiable par les deux
