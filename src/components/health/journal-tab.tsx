@@ -97,7 +97,7 @@ export function JournalTab({
 
       <View className="gap-3">
         <Text className="text-[15px] font-medium text-[#1a1a1a]">
-          Un symptôme{' '}
+          Des symptômes{' '}
           {selectedDate === todayIso() ? 'aujourd’hui' : 'ce jour-là'} ?
         </Text>
 
