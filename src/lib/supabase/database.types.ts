@@ -177,6 +177,7 @@ export type Database = {
           description: string | null;
           duration_label: string | null;
           id: string;
+          image_url: string | null;
           sort_order: number;
           title: string;
           trimester: number;
@@ -185,6 +186,7 @@ export type Database = {
           description?: string | null;
           duration_label?: string | null;
           id?: string;
+          image_url?: string | null;
           sort_order?: number;
           title: string;
           trimester: number;
@@ -193,6 +195,7 @@ export type Database = {
           description?: string | null;
           duration_label?: string | null;
           id?: string;
+          image_url?: string | null;
           sort_order?: number;
           title?: string;
           trimester?: number;

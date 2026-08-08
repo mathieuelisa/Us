@@ -1,4 +1,7 @@
-import { Text, View } from 'react-native';
+import { Image } from 'expo-image';
+import { useState } from 'react';
+import { Pressable, Text, View } from 'react-native';
+import type { Exercise } from '@/features/health/api';
 import {
   getTrimester,
   getWeeksOfAmenorrhea,
@@ -25,12 +28,19 @@ export function ExercisesTab({
   household: Household | null | undefined;
 }) {
   const { data: exercises = [] } = useExercises();
+  const [selected, setSelected] = useState<Exercise | null>(null);
 
   const weeks = getWeeksOfAmenorrhea(household?.due_date ?? null);
   const currentTrimester = weeks === null ? null : getTrimester(weeks);
 
   const visibleTrimesters =
     currentTrimester === null ? ([1, 2, 3] as const) : [currentTrimester];
+
+  if (selected) {
+    return (
+      <ExerciseDetail exercise={selected} onBack={() => setSelected(null)} />
+    );
+  }
 
   return (
     <View className="gap-4">
@@ -61,8 +71,10 @@ export function ExercisesTab({
               </Text>
             ) : (
               forTrimester.map((exercise) => (
-                <View
+                <Pressable
                   key={exercise.id}
+                  accessibilityRole="button"
+                  onPress={() => setSelected(exercise)}
                   className="gap-0.5 rounded-[16px] bg-white px-4 py-3.5"
                 >
                   <Text className="text-[15px] font-medium text-[#1a1a1a]">
@@ -73,12 +85,71 @@ export function ExercisesTab({
                       {exercise.duration_label}
                     </Text>
                   ) : null}
-                </View>
+                </Pressable>
               ))
             )}
           </View>
         );
       })}
+    </View>
+  );
+}
+
+/**
+ * Détail d'un exercice : titre, durée, section image. `image_url` est
+ * nullable — le catalogue actuel n'a aucune photo réelle (aucun asset dans
+ * `design/`) ; tant qu'elle n'est pas renseignée en base, un repli visuel
+ * neutre remplace l'image plutôt que de casser l'écran ou d'inventer une URL.
+ */
+function ExerciseDetail({
+  exercise,
+  onBack,
+}: {
+  exercise: Exercise;
+  onBack: () => void;
+}) {
+  return (
+    <View className="gap-5">
+      <Pressable
+        accessibilityLabel="Retour à la liste des exercices"
+        accessibilityRole="button"
+        hitSlop={12}
+        onPress={onBack}
+        className="h-9 w-9 items-center justify-center rounded-full bg-white"
+      >
+        <Text className="text-[17px] leading-[20px] text-[#1a1a1a]">‹</Text>
+      </Pressable>
+
+      <View className="gap-1">
+        <Text className="text-[24px] font-bold text-[#1a1a1a]">
+          {exercise.title}
+        </Text>
+        {exercise.duration_label ? (
+          <Text className="text-[13px] font-medium text-accent">
+            {exercise.duration_label}
+          </Text>
+        ) : null}
+      </View>
+
+      <View className="aspect-video items-center justify-center overflow-hidden rounded-[16px] bg-white">
+        {exercise.image_url ? (
+          <Image
+            source={{ uri: exercise.image_url }}
+            style={{ width: '100%', height: '100%' }}
+            contentFit="cover"
+          />
+        ) : (
+          <Text className="text-[13px] text-[#9a9a9a]">
+            Illustration à venir
+          </Text>
+        )}
+      </View>
+
+      {exercise.description ? (
+        <Text className="text-[14px] leading-5 text-[#6b6b6b]">
+          {exercise.description}
+        </Text>
+      ) : null}
     </View>
   );
 }

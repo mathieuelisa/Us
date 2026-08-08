@@ -217,6 +217,13 @@ par onglet** :
   filtrage. CLAUDE.md tranche pour `CONCEPT.md`. Repli assumé : si la date
   de terme est inconnue, on affiche les trois groupes plutôt que de deviner
   un trimestre.
+  - [x] **Écran de détail** (hors maquette, ajout ultérieur) : chaque
+    exercice ouvre une fiche avec titre, durée, et une section image
+    (`exercises.image_url`). Même parti pris que Démarches — liste et
+    détail dans un seul écran, basculé par état local. Le catalogue n'a
+    aucune photo réelle pour l'instant (`image_url` toujours `null`) : un
+    repli visuel neutre s'affiche à la place, voir
+    [05](./05-DETTE-ET-POINTS-OUVERTS.md).
 
 **Section "Mon partenaire"** (bloc hub indépendant, contenu partiellement
 symétrique) :
