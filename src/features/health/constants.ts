@@ -15,6 +15,10 @@ export const SYMPTOM_OPTIONS: { value: string; label: string }[] = [
   { value: 'vertiges', label: 'Vertiges' },
   { value: 'mal_de_dos', label: 'Mal de dos' },
   { value: 'fatigue', label: 'Fatigue' },
+  { value: 'reflux_gastrique', label: 'Reflux gastrique' },
+  { value: 'bouffees_de_chaleur', label: 'Bouffées de chaleur' },
+  { value: 'insomnies', label: 'Insomnies' },
+  { value: 'nausees', label: 'Nausées' },
 ];
 
 export function getSymptomLabel(value: string): string {
