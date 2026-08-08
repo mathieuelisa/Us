@@ -114,88 +114,95 @@ export function AppTabBar({
   }));
 
   return (
-    <View
-      onLayout={(event) => setBarWidth(event.nativeEvent.layout.width)}
-      style={{
-        flexDirection: 'row',
-        marginHorizontal: BAR_MARGIN,
-        marginBottom: Math.max(insets.bottom, BAR_MARGIN / 2) + BAR_MARGIN / 2,
-        borderRadius: 28,
-        backgroundColor: '#ffffff',
-        paddingVertical: 8,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 8 },
-        shadowOpacity: 0.1,
-        shadowRadius: 16,
-        elevation: 6,
-      }}
-    >
-      {barWidth > 0 ? (
-        <Animated.View
-          pointerEvents="none"
-          style={[
-            {
-              position: 'absolute',
-              top: 6,
-              bottom: 6,
-              borderRadius: 20,
-              backgroundColor: pillColor,
-            },
-            pillStyle,
-          ]}
-        />
-      ) : null}
+    // Le conteneur que `BottomTabView` réserve pour la barre n'a pas de fond
+    // (transparent → noir par défaut derrière une `Tabs` non stylée) : on
+    // le colore ici du même pastel que le fond de page, pour qu'il se fonde
+    // avec l'écran plutôt que de trancher en noir autour de la carte.
+    <View style={{ backgroundColor: pillColor }}>
+      <View
+        onLayout={(event) => setBarWidth(event.nativeEvent.layout.width)}
+        style={{
+          flexDirection: 'row',
+          marginHorizontal: BAR_MARGIN,
+          marginBottom:
+            Math.max(insets.bottom, BAR_MARGIN / 2) + BAR_MARGIN / 2,
+          borderRadius: 28,
+          backgroundColor: '#ffffff',
+          paddingVertical: 8,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 8 },
+          shadowOpacity: 0.1,
+          shadowRadius: 16,
+          elevation: 6,
+        }}
+      >
+        {barWidth > 0 ? (
+          <Animated.View
+            pointerEvents="none"
+            style={[
+              {
+                position: 'absolute',
+                top: 6,
+                bottom: 6,
+                borderRadius: 20,
+                backgroundColor: pillColor,
+              },
+              pillStyle,
+            ]}
+          />
+        ) : null}
 
-      {routes.map((route, index) => {
-        const { options } = descriptors[route.key];
-        const label = options.title ?? route.name;
-        const isFocused = activeIndex === index;
-        const icons = TAB_ICONS[route.name];
+        {routes.map((route, index) => {
+          const { options } = descriptors[route.key];
+          const label = options.title ?? route.name;
+          const isFocused = activeIndex === index;
+          const icons = TAB_ICONS[route.name];
 
-        const onPress = () => {
-          const event = navigation.emit({
-            type: 'tabPress',
-            target: route.key,
-            canPreventDefault: true,
-          });
-          if (!isFocused && !event.defaultPrevented) {
-            navigation.navigate(route.name);
-          }
-        };
+          const onPress = () => {
+            const event = navigation.emit({
+              type: 'tabPress',
+              target: route.key,
+              canPreventDefault: true,
+            });
+            if (!isFocused && !event.defaultPrevented) {
+              navigation.navigate(route.name);
+            }
+          };
 
-        return (
-          <Pressable
-            key={route.key}
-            accessibilityRole="button"
-            accessibilityState={isFocused ? { selected: true } : {}}
-            accessibilityLabel={label}
-            onPress={onPress}
-            style={{
-              flex: 1,
-              alignItems: 'center',
-              gap: 3,
-              paddingVertical: 6,
-            }}
-          >
-            {icons ? (
-              <Ionicons
-                name={isFocused ? icons.filled : icons.outline}
-                size={22}
-                color={isFocused ? accent : INACTIVE_COLOR}
-              />
-            ) : null}
-            <Text
+          return (
+            <Pressable
+              key={route.key}
+              accessibilityRole="button"
+              accessibilityState={isFocused ? { selected: true } : {}}
+              accessibilityLabel={label}
+              onPress={onPress}
               style={{
-                fontSize: 11,
-                fontWeight: isFocused ? '600' : '400',
-                color: isFocused ? accent : INACTIVE_COLOR,
+                flex: 1,
+                alignItems: 'center',
+                gap: 3,
+                paddingVertical: 6,
               }}
             >
-              {label}
-            </Text>
-          </Pressable>
-        );
-      })}
+              {icons ? (
+                <Ionicons
+                  name={isFocused ? icons.filled : icons.outline}
+                  size={22}
+                  color={isFocused ? accent : INACTIVE_COLOR}
+                />
+              ) : null}
+              <Text
+                style={{
+                  fontSize: 11,
+                  fontWeight: isFocused ? '600' : '400',
+                  color: isFocused ? accent : INACTIVE_COLOR,
+                }}
+              >
+                {label}
+              </Text>
+            </Pressable>
+          );
+        })}
+      </View>
     </View>
   );
 }
