@@ -17,11 +17,15 @@ import { StatusSelector } from '@/components/procedures/status-selector';
 import { useMyHousehold } from '@/features/household/hooks';
 import { ROLE_BACKGROUND } from '@/features/hub/constants';
 import { formatDeadlineLabel } from '@/features/procedures/constants';
+// ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
+import { DEV_PROCEDURES_FIXTURE } from '@/features/procedures/dev-fixture';
 import {
   useProcedures,
   useUpdateProcedureReminder,
   useUpdateProcedureStatus,
 } from '@/features/procedures/hooks';
+// ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
+import { devBypassAtom } from '@/lib/atoms/dev-bypass';
 import { currentRoleAtom } from '@/lib/atoms/role';
 
 const SafeAreaView = withUniwind(RNSafeAreaView);
@@ -41,9 +45,51 @@ export default function ProceduresScreen() {
   const { data: household } = useMyHousehold();
   const role = useAtomValue(currentRoleAtom) ?? 'pregnant';
 
-  const { data: procedures = [] } = useProcedures(household);
+  const { data: remoteProcedures = [] } = useProcedures(household);
   const updateStatus = useUpdateProcedureStatus(household);
   const updateReminder = useUpdateProcedureReminder(household);
+
+  // ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts. Sans foyer réel,
+  // remoteProcedures reste toujours vide (la requête est désactivée) : cet
+  // écran ne montrerait jamais rien à explorer. Les modifications de statut
+  // et de rappel restent locales, elles n'écrivent jamais dans Supabase.
+  const isDevBypass = useAtomValue(devBypassAtom) !== 'off';
+  const [devProcedures, setDevProcedures] = useState(DEV_PROCEDURES_FIXTURE);
+  const procedures = isDevBypass ? devProcedures : remoteProcedures;
+
+  const changeStatus = (
+    householdProcedureId: string,
+    status: 'a_faire' | 'en_cours' | 'fait',
+  ) => {
+    if (isDevBypass) {
+      setDevProcedures((current) =>
+        current.map((procedure) =>
+          procedure.householdProcedureId === householdProcedureId
+            ? { ...procedure, status }
+            : procedure,
+        ),
+      );
+      return;
+    }
+    updateStatus.mutate({ householdProcedureId, status });
+  };
+
+  const toggleReminder = (
+    householdProcedureId: string,
+    reminderEnabled: boolean,
+  ) => {
+    if (isDevBypass) {
+      setDevProcedures((current) =>
+        current.map((procedure) =>
+          procedure.householdProcedureId === householdProcedureId
+            ? { ...procedure, reminderEnabled }
+            : procedure,
+        ),
+      );
+      return;
+    }
+    updateReminder.mutate({ householdProcedureId, reminderEnabled });
+  };
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const selected = procedures.find(
@@ -76,16 +122,10 @@ export default function ProceduresScreen() {
             procedure={selected}
             birthDate={household?.birth_date ?? null}
             onChangeStatus={(status) =>
-              updateStatus.mutate({
-                householdProcedureId: selected.householdProcedureId,
-                status,
-              })
+              changeStatus(selected.householdProcedureId, status)
             }
             onToggleReminder={(reminderEnabled) =>
-              updateReminder.mutate({
-                householdProcedureId: selected.householdProcedureId,
-                reminderEnabled,
-              })
+              toggleReminder(selected.householdProcedureId, reminderEnabled)
             }
           />
         ) : (

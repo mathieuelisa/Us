@@ -14,13 +14,13 @@ title: Dette et points ouverts — US
 > [architecture](./04-ARCHITECTURE.md)…). Ce fichier ne doit contenir que du
 > vivant, jamais d'historique.
 
-Dernière revue : 2026-08-07.
+Dernière revue : 2026-08-08.
 
 ## 🔴 Bloquant avant toute mise en production
 
 | # | Point | Où |
 |---|---|---|
-| 1 | **Retirer le bouton DEV** qui saute l'authentification pour atteindre l'onboarding. Protégé par `__DEV__` donc absent des builds de prod, mais le code doit disparaître. Procédure de suppression dans l'en-tête du fichier. | [`src/lib/atoms/dev-bypass.ts`](../src/lib/atoms/dev-bypass.ts) |
+| 1 | **Retirer le bouton DEV** qui saute l'authentification pour atteindre l'onboarding, et son fixture d'écran Démarches (données locales, jamais écrites en base). Protégés par `__DEV__` donc absents des builds de prod, mais le code doit disparaître. Procédure de suppression dans l'en-tête de chaque fichier. | [`src/lib/atoms/dev-bypass.ts`](../src/lib/atoms/dev-bypass.ts), [`src/features/procedures/dev-fixture.ts`](../src/features/procedures/dev-fixture.ts) |
 | 2 | **Restreindre les URL de redirection Supabase.** `exp://**`, `exp+us://**` et `http://localhost:8081/**` sont des commodités de développement : elles élargissent la surface d'open-redirect. Ne garder que `us://**` (et le domaine web réel le jour où il existe). | Dashboard Supabase → `Authentication > URL Configuration` |
 | 3 | **Consentement explicite RGPD (article 9).** L'app traite des données de santé (symptômes, humeur, groupe sanguin, n° de sécurité sociale) : leur traitement suppose un consentement explicite, donc une action dédiée — pas des CGU acceptées implicitement. À accompagner d'une politique de confidentialité, de durées de conservation et du DPA Supabase. | — |
 | 4 | **Supprimer l'ancien projet Supabase de Londres** (`lmocuevvrznpnglcunea`, en pause) et renommer « US app (Paris) » en « US app ». Tant qu'il existe, il occupe un des 2 emplacements gratuits. | Dashboard Supabase |
@@ -73,3 +73,4 @@ Décisions prises par défaut, à confirmer ou corriger.
 | 31 | **Le bouton « Inviter » du hub ne permet pas d'inviter** : il ouvre « Mon partenaire », où l'on ne peut rien envoyer non plus. L'invitation n'existe que pendant l'onboarding — si elle a été passée, il n'y a aujourd'hui **aucun moyen de l'envoyer plus tard**. Complétion de la Phase 1.2 (`invitePartner()` existe déjà côté API). | [`src/app/(tabs)/index.tsx`](../src/app/%28tabs%29/index.tsx) |
 | 32 | **Calcul d'échéance de la déclaration de naissance jamais exercé en conditions réelles** : `households.birth_date` reste `null` tant que la Phase 2 n'est pas construite ; seul l'affichage informatif par défaut (« 5 jours à partir de la naissance ») a pu être vérifié. | [`src/features/procedures/constants.ts`](../src/features/procedures/constants.ts) |
 | 33 | **Rappel de démarche sans effet réel** : le toggle « Me rappeler avant l'échéance » persiste bien `reminder_enabled`, mais rien ne le lit encore — les notifications sont câblées en Phase 4. | [`src/app/(tabs)/demarches.tsx`](../src/app/%28tabs%29/demarches.tsx) |
+| 34 | **Écran Démarches vérifié via fixture locale, pas via Supabase réel.** Sans foyer, `useProcedures()` reste vide : en mode contournement DEV, l'écran affiche 6 démarches statiques modifiables localement (jamais écrites en base) pour rester explorable. Le vrai chemin Supabase (lecture ET écriture) n'a toujours pas tourné une seule fois — même limite que les autres piliers, juste rendue visible autrement ici. | [`src/features/procedures/dev-fixture.ts`](../src/features/procedures/dev-fixture.ts) |
