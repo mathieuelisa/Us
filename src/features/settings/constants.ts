@@ -30,3 +30,18 @@ export function resolveThemeId(value: string | null | undefined): ThemeId {
     ? (value as ThemeId)
     : DEFAULT_THEME_ID;
 }
+
+/**
+ * Fond pastel du hub, dérivé du thème choisi en Réglages (pas du rôle —
+ * voir `src/app/(tabs)/index.tsx`). `sauge` reprend le vert pastel déjà
+ * utilisé (`#EAF5F0`) ; les trois autres sont des teintes inventées, dans
+ * la même logique que les couleurs d'accent (`THEME_OPTIONS`) : pas de
+ * référence maquette, choisies pour rester très claires et laisser les
+ * cartes blanches se détacher par-dessus.
+ */
+export const THEME_PASTEL_BACKGROUND: Record<ThemeId, string> = {
+  sauge: '#EAF5F0',
+  corail: '#FBEAE2',
+  lavande: '#EEEAF8',
+  ocre: '#FBF2DC',
+};

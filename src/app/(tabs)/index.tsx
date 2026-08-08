@@ -2,17 +2,20 @@ import { router } from 'expo-router';
 import { useAtomValue } from 'jotai';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
-import { withUniwind } from 'uniwind';
+import { useUniwind, withUniwind } from 'uniwind';
 
 import { PillarCard } from '@/components/hub/pillar-card';
 import { useMyHousehold } from '@/features/household/hooks';
 import {
   formatAppointmentDate,
   MOOD_PRESENTATION,
-  ROLE_BACKGROUND,
 } from '@/features/hub/constants';
 import { useHubSummary } from '@/features/hub/hooks';
 import { useMyProfile } from '@/features/profile/hooks';
+import {
+  resolveThemeId,
+  THEME_PASTEL_BACKGROUND,
+} from '@/features/settings/constants';
 // ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
 import { devBypassFirstNameAtom } from '@/lib/atoms/dev-bypass';
 import { currentRoleAtom } from '@/lib/atoms/role';
@@ -22,18 +25,27 @@ const SafeAreaView = withUniwind(RNSafeAreaView);
 /**
  * Écran 2b / 3c / 3d — le hub.
  *
- * Un seul composant pour les deux rôles : ce qui change (fond, visibilité
- * du bouton « J'ai accouché », contenu du bloc partenaire) est dérivé du
- * rôle courant, jamais dupliqué en deux écrans.
+ * Un seul composant pour les deux rôles : ce qui change (visibilité du
+ * bouton « J'ai accouché », contenu du bloc partenaire) est dérivé du rôle
+ * courant, jamais dupliqué en deux écrans.
  *
  * ⚠️ Écart avec les maquettes : 3c **et** 3d affichent « J'ai accouché »,
  * alors que CONCEPT.md le réserve à la femme enceinte. CLAUDE.md tranche en
  * faveur de CONCEPT.md — le bouton n'apparaît donc que pour elle.
+ *
+ * Le **fond**, en revanche, n'est plus dérivé du rôle mais du thème
+ * personnel choisi en Réglages (Phase 1.7) — pastel de la couleur d'accent
+ * active (`THEME_PASTEL_BACKGROUND`), cohérent avec le fait que le thème
+ * est propre à chaque compte, pas partagé. Avant cette phase, le hub
+ * utilisait deux fonds fixes par rôle (`ROLE_BACKGROUND`, encore utilisé
+ * sur les autres écrans) ; à harmoniser plus tard si besoin.
  */
 export default function HubScreen() {
   const { data: profile } = useMyProfile();
   const { data: household } = useMyHousehold();
   const { data: summary } = useHubSummary(household);
+  const { theme } = useUniwind();
+  const backgroundColor = THEME_PASTEL_BACKGROUND[resolveThemeId(theme)];
 
   // ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts. Le sien, jamais le
   // prénom du co-parent : c'est le seul champ que ce contournement propage.
@@ -67,10 +79,7 @@ export default function HubScreen() {
     : 'Journal du jour';
 
   return (
-    <SafeAreaView
-      className="flex-1"
-      style={{ backgroundColor: ROLE_BACKGROUND[role] }}
-    >
+    <SafeAreaView className="flex-1" style={{ backgroundColor }}>
       <ScrollView
         contentContainerClassName="gap-6 px-6 pb-10 pt-4"
         showsVerticalScrollIndicator={false}
