@@ -8,9 +8,12 @@ import { useAtomValue, useSetAtom } from 'jotai';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, useColorScheme, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { Uniwind } from 'uniwind';
 
 import { AnimatedSplashOverlay } from '@/components/animated-icon';
 import { useMyHousehold, useSyncCurrentRole } from '@/features/household/hooks';
+import { useMyProfile } from '@/features/profile/hooks';
+import { resolveThemeId } from '@/features/settings/constants';
 // ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
 import { devBypassAtom } from '@/lib/atoms/dev-bypass';
 import { sessionAtom } from '@/lib/atoms/session';
@@ -35,6 +38,16 @@ function AuthGate() {
   const session = useAtomValue(sessionAtom);
   const { data: household, isPending } = useMyHousehold();
   useSyncCurrentRole(household);
+
+  // Applique le thème choisi (Phase 1.7) dès que le profil est connu, pour
+  // que l'app entière s'ouvre déjà dans la bonne couleur — pas seulement
+  // l'écran Réglages où le choix a été fait.
+  const { data: profile } = useMyProfile();
+  useEffect(() => {
+    if (profile?.theme) {
+      Uniwind.setTheme(resolveThemeId(profile.theme));
+    }
+  }, [profile?.theme]);
 
   // ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
   const devBypass = useAtomValue(devBypassAtom);

@@ -28,3 +28,21 @@ export async function updateMyProfile(
   if (error) throw error;
   return data;
 }
+
+/**
+ * Fonction séparée plutôt qu'un `updateMyProfile` généralisé : le prénom et
+ * le thème ont des flux d'écriture différents (le prénom se valide avant
+ * envoi, le thème s'applique instantanément au tap) — pas de raison de les
+ * faire transiter par la même signature.
+ */
+export async function updateMyTheme(
+  userId: string,
+  theme: string,
+): Promise<void> {
+  const { error } = await supabase
+    .from('profiles')
+    .update({ theme })
+    .eq('id', userId);
+
+  if (error) throw error;
+}

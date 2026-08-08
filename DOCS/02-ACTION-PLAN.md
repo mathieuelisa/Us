@@ -30,9 +30,10 @@ title: Plan d'action de développement — US
 | 1.4 Pilier Ensemble | ✅ implémentée, interface symétrique pour l'instant (demande explicite) |
 | 1.5 Suivi santé + Mon partenaire | ✅ implémentée pour la **vue femme enceinte** ; vue co-parent reportée (demande explicite) |
 | 1.6 Pilier Démarches | ✅ terminée |
-| 1.7, Phases 2 à 5 | ⬜ à faire |
+| 1.7 Réglages MVP | ✅ terminée |
+| Phases 2 à 5 | ⬜ à faire |
 
-**Prochaine étape : [1.7 Réglages MVP](#17-réglages-mvp).**
+**Prochaine étape : [Phase 2 — Déclaration de naissance & durcissement MVP](#phase-2--déclaration-de-naissance--durcissement-mvp).**
 
 ⚠️ **La 1.2 porte une dette de vérification** : aucune écriture Supabase
 authentifiée (création du foyer, invitation, rattachement du co-parent) n'a
@@ -268,9 +269,36 @@ porte d'entrée vers cette donnée de santé.
 
 ### 1.7 Réglages MVP
 
-- [ ] Personnels, **non partagés avec le partenaire**
-- [ ] Choix entre 3 ou 4 thèmes visuels prédéfinis
-- [ ] Pas de sélecteur de langue en V1 (français uniquement)
+**✅ Terminée.**
+
+- [x] Personnels, **non partagés avec le partenaire** — écran propre à
+      chaque compte (`profiles.theme`), déjà garanti par la policy RLS
+      `profiles_update_own` existante.
+- [x] Choix entre **4 thèmes visuels prédéfinis** (sauge / corail / lavande /
+      ocre), appliqué instantanément (`Uniwind.setTheme`) et persisté en
+      base pour survivre à une reconnexion.
+- [x] Pas de sélecteur de langue (français uniquement)
+
+⚠️ **Ambiguïté résolue** entre [MVP.md](./versions/MVP.md) (« Thème sombre et
+couleur d'accent hors MVP ») et ce plan/`CONCEPT.md` (thèmes visuels
+prédéfinis en scope) : ce sont deux mécanismes différents. MVP.md exclut le
+couple « bascule clair/sombre + roue de couleur libre » de la maquette 10a ;
+ce qui est implémenté ici est un choix fermé de 4 palettes nommées, pas un
+sélecteur de couleur libre ni un mode sombre. Documenté dans le code
+(`src/features/settings/constants.ts`, `src/app/(tabs)/reglages.tsx`).
+
+⚠️ **Couleurs inventées** : seul le vert de marque (sauge, `#2D5E5A`) vient
+du design ; corail/lavande/ocre n'ont aucune référence maquette — hex choisis
+pour rester dans la même gamme de saturation/luminosité (texte blanc lisible
+dessus). À ajuster si une charte graphique les définit un jour.
+
+⚠️ **Mécanisme technique** : le re-thème s'appuie sur Uniwind
+(`extraThemes` dans `metro.config.js` + variants CSS dans `src/global.css`),
+et re-théme gratuitement tout écran qui lit déjà le token `accent`
+(`bg-accent`/`text-accent`/`border-accent`) plutôt qu'une couleur codée en
+dur — vérifié en changeant de thème depuis Réglages et en observant le hub
+(bouton "J'ai accouché", "Inviter") changer de couleur sans modification
+d'écran.
 
 ## Phase 2 — Déclaration de naissance & durcissement MVP
 

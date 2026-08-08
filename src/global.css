@@ -3,7 +3,25 @@
 @import "heroui-native/styles";
 @source "./node_modules/heroui-native/lib";
 
-/* Brand color — see DOCS/01-DESIGN-OVERVIEW.md#identité-visuelle */
+/*
+ * Brand color — see DOCS/01-DESIGN-OVERVIEW.md#identité-visuelle.
+ *
+ * `light`/`dark` restent au vert de marque : le mode sombre est hors
+ * périmètre MVP (DOCS/versions/MVP.md), ces deux variants ne servent donc
+ * qu'à satisfaire Uniwind, pas à proposer un vrai thème sombre.
+ *
+ * Les 4 thèmes visuels prédéfinis de la Phase 1.7 (CONCEPT.md) sont des
+ * variants Uniwind à part — `sauge`/`corail`/`lavande`/`ocre` — activés via
+ * `Uniwind.setTheme()` (voir src/features/settings/constants.ts). Comme la
+ * quasi-totalité de l'app lit déjà `--accent` via les classes Tailwind
+ * `bg-accent`/`text-accent`/`border-accent` plutôt que des hex codés en dur,
+ * changer de thème re-thème l'app entière sans retouche écran par écran.
+ *
+ * ⚠️ Corail/lavande/ocre sont des couleurs inventées : aucune maquette ne
+ * spécifie ces thèmes (seule leur existence — « 3 ou 4 thèmes visuels
+ * prédéfinis » — est demandée). Choisies pour rester dans la même gamme de
+ * saturation/luminosité que le sauge de référence.
+ */
 @layer theme {
   @variant light {
     --accent: #2d5e5a;
@@ -12,6 +30,26 @@
 
   @variant dark {
     --accent: #2d5e5a;
+    --accent-foreground: #ffffff;
+  }
+
+  @variant sauge {
+    --accent: #2d5e5a;
+    --accent-foreground: #ffffff;
+  }
+
+  @variant corail {
+    --accent: #b85c38;
+    --accent-foreground: #ffffff;
+  }
+
+  @variant lavande {
+    --accent: #6b5ca5;
+    --accent-foreground: #ffffff;
+  }
+
+  @variant ocre {
+    --accent: #96701c;
     --accent-foreground: #ffffff;
   }
 }
