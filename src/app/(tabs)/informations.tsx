@@ -14,12 +14,14 @@ import {
   useReorderInfoItems,
   useUpdateInfoItem,
 } from '@/features/household/hooks';
+import { useThemeBackground } from '@/features/settings/hooks';
 
 const SafeAreaView = withUniwind(RNSafeAreaView);
 
 export default function InformationsScreen() {
   const { data: household, isLoading: isHouseholdLoading } = useMyHousehold();
   const householdId = household?.id;
+  const backgroundColor = useThemeBackground();
 
   const { data: items = [], isLoading: areItemsLoading } =
     useInfoItems(householdId);
@@ -94,7 +96,7 @@ export default function InformationsScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1" style={{ backgroundColor }}>
       <View className="flex-1 gap-4 px-6 pt-4">
         <View className="gap-1">
           <Text className="text-[26px] font-bold text-[#1a1a1a]">

@@ -11,6 +11,7 @@ import {
   THEME_OPTIONS,
   type ThemeId,
 } from '@/features/settings/constants';
+import { useThemeBackground } from '@/features/settings/hooks';
 import { sessionAtom } from '@/lib/atoms/session';
 import { supabase } from '@/lib/supabase/client';
 
@@ -35,6 +36,7 @@ export default function SettingsScreen() {
   const session = useAtomValue(sessionAtom);
   const { theme: activeTheme } = useUniwind();
   const updateTheme = useUpdateMyTheme();
+  const backgroundColor = useThemeBackground();
   const [isSigningOut, setIsSigningOut] = useState(false);
 
   const selectedThemeId = resolveThemeId(activeTheme);
@@ -58,7 +60,7 @@ export default function SettingsScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1" style={{ backgroundColor }}>
       <View className="flex-1 gap-6 px-6 pt-4">
         <View className="gap-1">
           <Text className="text-[26px] font-bold text-[#1a1a1a]">Réglages</Text>

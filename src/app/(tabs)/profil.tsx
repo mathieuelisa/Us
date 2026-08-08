@@ -5,6 +5,7 @@ import { Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import { withUniwind } from 'uniwind';
 import { useMyProfile, useUpdateMyProfile } from '@/features/profile/hooks';
+import { useThemeBackground } from '@/features/settings/hooks';
 import { sessionAtom } from '@/lib/atoms/session';
 
 const SafeAreaView = withUniwind(RNSafeAreaView);
@@ -13,6 +14,7 @@ export default function ProfileScreen() {
   const session = useAtomValue(sessionAtom);
   const { data: profile, isLoading } = useMyProfile();
   const updateProfile = useUpdateMyProfile();
+  const backgroundColor = useThemeBackground();
 
   const [firstName, setFirstName] = useState('');
 
@@ -24,7 +26,7 @@ export default function ProfileScreen() {
   const hasChanges = firstName.trim() !== (profile?.first_name ?? '').trim();
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1" style={{ backgroundColor }}>
       <View className="flex-1 gap-6 px-6 pt-4">
         <Text className="text-[26px] font-bold text-[#1a1a1a]">Mon profil</Text>
 
