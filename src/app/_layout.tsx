@@ -17,6 +17,7 @@ import {
   DEFAULT_THEME_ID,
   resolveThemeId,
 } from '@/features/settings/constants';
+import { useThemeBackground } from '@/features/settings/hooks';
 // ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
 import { devBypassAtom } from '@/lib/atoms/dev-bypass';
 import { sessionAtom } from '@/lib/atoms/session';
@@ -106,6 +107,10 @@ export default function RootLayout() {
   const colorScheme = useColorScheme();
   const setSession = useSetAtom(sessionAtom);
   const [isSessionReady, setIsSessionReady] = useState(false);
+  // Fond de la racine de l'app, pour que la zone que `AppTabBar` laisse
+  // transparente (demande explicite) révèle la bonne couleur au lieu du
+  // noir par défaut du conteneur réservé par React Navigation.
+  const backgroundColor = useThemeBackground();
 
   // Liens magiques reçus pendant que l'app tourne déjà (mobile).
   useMagicLinkListener();
@@ -128,7 +133,7 @@ export default function RootLayout() {
   }, [setSession]);
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    <GestureHandlerRootView style={{ flex: 1, backgroundColor }}>
       <QueryClientProvider client={queryClient}>
         <HeroUINativeProvider>
           <ThemeProvider

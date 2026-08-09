@@ -8,6 +8,7 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import { useThemeAccent, useThemeBackground } from '@/features/settings/hooks';
+import { darkenHex } from '@/lib/color';
 
 type IoniconName = ComponentProps<typeof Ionicons>['name'];
 
@@ -66,10 +67,21 @@ const TAB_PADDING = 4;
  * patterns de nav mobile plutôt que de la maquette Hi-Fi (qui ne montre que
  * des icônes nues en bas d'écran, sans bar dédiée).
  *
- * L'indicateur actif est une pastille qui glisse derrière l'icône/le label
- * du courant (Reanimated), teintée du pastel de thème déjà utilisé comme
- * fond d'écran (`THEME_PASTEL_BACKGROUND`) — même famille de couleur que le
- * fond de page, mais posée sur la carte blanche de la barre pour ressortir.
+ * Carte de la barre teintée d'un pastel de thème légèrement assombri
+ * (`darkenHex`, demande explicite), l'onglet actif se détachant dessus par
+ * une pastille **blanche** qui glisse (Reanimated) plutôt que colorée —
+ * inversé par rapport à la version précédente (carte blanche, pastille
+ * colorée).
+ *
+ * ⚠️ Le conteneur réservé par `BottomTabView` autour de la carte est
+ * repeint du même pastel que le fond de page plutôt que laissé en vrai
+ * `transparent` (demande initiale) : en web, une vraie transparence ici
+ * laisse voir le fond noir d'un backdrop de `Modal` React Native resté mal
+ * masqué quand fermé (`PaywallModal`, `AppointmentFormModal`,
+ * `HowItWorksModal`, `NeedNoteOverlay` — tous `bg-black/40-50`), un bug du
+ * polyfill web de `Modal`, pas de ce composant. Visuellement identique à du
+ * transparent tant que ce pastel reste égal au fond d'écran courant
+ * (`src/app/_layout.tsx` applique le même pastel à la racine de l'app).
  *
  * Rendu en flux normal (pas de `position: absolute`) : c'est ce qui permet
  * à `BottomTabView` de réserver automatiquement la place occupée par la
@@ -84,7 +96,8 @@ export function AppTabBar({
 }: AppTabBarProps) {
   const navigation = rawNavigation as AppTabBarNavigation;
   const accent = useThemeAccent();
-  const pillColor = useThemeBackground();
+  const pastelBackground = useThemeBackground();
+  const cardBackground = darkenHex(pastelBackground, 0.06);
   const [barWidth, setBarWidth] = useState(0);
 
   // Seuls les 4 onglets fixes (CONCEPT.md) ont une icône : les autres
@@ -114,11 +127,7 @@ export function AppTabBar({
   }));
 
   return (
-    // Le conteneur que `BottomTabView` réserve pour la barre n'a pas de fond
-    // (transparent → noir par défaut derrière une `Tabs` non stylée) : on
-    // le colore ici du même pastel que le fond de page, pour qu'il se fonde
-    // avec l'écran plutôt que de trancher en noir autour de la carte.
-    <View style={{ backgroundColor: pillColor }}>
+    <View style={{ backgroundColor: pastelBackground }}>
       <View
         onLayout={(event) => setBarWidth(event.nativeEvent.layout.width)}
         style={{
@@ -127,7 +136,7 @@ export function AppTabBar({
           marginBottom:
             Math.max(insets.bottom, BAR_MARGIN / 2) + BAR_MARGIN / 2,
           borderRadius: 28,
-          backgroundColor: '#ffffff',
+          backgroundColor: cardBackground,
           paddingVertical: 8,
           shadowColor: '#000',
           shadowOffset: { width: 0, height: 8 },
@@ -145,7 +154,7 @@ export function AppTabBar({
                 top: 6,
                 bottom: 6,
                 borderRadius: 20,
-                backgroundColor: pillColor,
+                backgroundColor: '#ffffff',
               },
               pillStyle,
             ]}
