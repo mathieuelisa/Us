@@ -1,9 +1,11 @@
 import { router } from 'expo-router';
 import { useAtomValue } from 'jotai';
+import { useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import { withUniwind } from 'uniwind';
 
+import { HowItWorksModal } from '@/components/hub/how-it-works-modal';
 import { PillarCard } from '@/components/hub/pillar-card';
 import { useMyHousehold } from '@/features/household/hooks';
 import {
@@ -54,6 +56,7 @@ export default function HubScreen() {
 
   const partnerName = summary?.partnerFirstName?.trim();
   const hasPartnerJoined = Boolean(household?.partner_user_id);
+  const [isHowItWorksOpen, setIsHowItWorksOpen] = useState(false);
 
   // Tant que le résumé n'est pas chargé, on affiche le libellé neutre de la
   // section plutôt qu'un indicateur de chargement : il s'afficherait dans
@@ -125,18 +128,37 @@ export default function HubScreen() {
           </View>
         ) : (
           <View className="gap-3 rounded-[16px] bg-white px-4 py-4">
-            <Text className="text-[15px] leading-5 text-[#1a1a1a]">
-              {partnerName
-                ? `Inviter ${partnerName} à rejoindre votre espace ?`
-                : 'Inviter le co-parent à rejoindre votre espace ?'}
-            </Text>
+            <View className="flex-row items-start justify-between gap-3">
+              <View className="flex-1 gap-1">
+                <Text className="text-[15px] font-semibold text-[#1a1a1a]">
+                  Partager vos infos à deux
+                </Text>
+                <Text className="text-[13px] leading-5 text-[#6b6b6b]">
+                  Ajouter le co-parent ou un proche, tout se synchronisera en
+                  temps réel.
+                </Text>
+              </View>
+              {/* Repli emoji — remplacé par une image plus tard. */}
+              <Text className="text-[28px]">🤝</Text>
+            </View>
+
             <Pressable
               accessibilityRole="button"
               onPress={() => router.push('/partenaire')}
               className="items-center rounded-full bg-accent py-2.5"
             >
               <Text className="text-[14px] font-medium text-accent-foreground">
-                Inviter
+                Ajouter le co-parent
+              </Text>
+            </Pressable>
+
+            <Pressable
+              accessibilityRole="button"
+              onPress={() => setIsHowItWorksOpen(true)}
+              className="items-center py-1"
+            >
+              <Text className="text-[13px] font-medium text-accent">
+                Comment ça marche ?
               </Text>
             </Pressable>
           </View>
@@ -216,6 +238,11 @@ export default function HubScreen() {
           </Pressable>
         </View>
       </ScrollView>
+
+      <HowItWorksModal
+        visible={isHowItWorksOpen}
+        onClose={() => setIsHowItWorksOpen(false)}
+      />
     </SafeAreaView>
   );
 }
