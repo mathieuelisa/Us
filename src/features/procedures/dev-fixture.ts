@@ -21,7 +21,8 @@ export const DEV_PROCEDURES_FIXTURE: ProcedureWithStatus[] = [
     householdProcedureId: 'dev-declaration-naissance',
     slug: 'declaration-naissance',
     title: 'Déclaration de naissance',
-    description: 'À faire à la mairie du lieu de naissance de l’enfant.',
+    description:
+      'La déclaration de naissance se fait à la mairie du lieu de naissance de l’enfant. C’est cette démarche qui donne officiellement son état civil au bébé et permet ensuite toutes les autres inscriptions administratives. Elle doit être réalisée par l’un des parents, en présentant les documents ci-dessous.',
     deadline_days_after_birth: 5,
     documents: [
       'Carte d’identité (CNI)',

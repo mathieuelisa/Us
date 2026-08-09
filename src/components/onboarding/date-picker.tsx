@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 
 const MONTH_LABELS = [
@@ -53,8 +54,28 @@ function WheelColumn<T extends number>({
   onSelect: (value: T) => void;
   format: (value: T) => string;
 }) {
+  // Fait défiler la colonne jusqu'à la valeur sélectionnée — sans ça, ouvrir
+  // le formulaire de rendez-vous avec une date pré-remplie (depuis un clic
+  // sur le calendrier) mettait bien le bon jour/mois en surbrillance, mais
+  // hors du cadre visible tant qu'on ne défilait pas soi-même.
+  const scrollRef = useRef<ScrollView>(null);
+  const positionsRef = useRef<Map<T, number>>(new Map());
+
+  const scrollToSelected = () => {
+    const x = positionsRef.current.get(selected);
+    if (x !== undefined) {
+      scrollRef.current?.scrollTo({ x: Math.max(x - 16, 0), animated: true });
+    }
+  };
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: scrollToSelected lit `selected` via closure, le redéclarer en dépendance boucle sur lui-même sans changer le comportement.
+  useEffect(() => {
+    scrollToSelected();
+  }, [selected]);
+
   return (
     <ScrollView
+      ref={scrollRef}
       horizontal
       className="flex-1"
       contentContainerClassName="gap-1.5 px-1"
@@ -68,6 +89,10 @@ function WheelColumn<T extends number>({
             accessibilityRole="button"
             accessibilityState={{ selected: isSelected }}
             onPress={() => onSelect(value)}
+            onLayout={(event) => {
+              positionsRef.current.set(value, event.nativeEvent.layout.x);
+              if (isSelected) scrollToSelected();
+            }}
             className={`min-w-[52px] items-center rounded-[10px] px-3 py-2 ${
               isSelected ? 'bg-accent' : 'bg-[#f4f4f4]'
             }`}

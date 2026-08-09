@@ -281,6 +281,9 @@ porte d'entrée vers cette donnée de santé.
       ⚠️ `households.birth_date` n'est encore jamais renseigné (la Phase 2
       n'est pas construite) : le calcul de date précise n'a donc jamais
       tourné en conditions réelles, seul l'affichage informatif l'a été.
+      Description étoffée sur demande explicite (texte fourni par
+      l'utilisateur) pour expliquer à quoi sert la démarche — reste un
+      paragraphe de contexte, pas un mode d'emploi pas-à-pas.
 
 ### 1.7 Réglages MVP
 
