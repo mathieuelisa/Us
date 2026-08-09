@@ -257,9 +257,17 @@ porte d'entrée vers cette donnée de santé.
 
 **✅ Terminée.**
 
-- [x] Référentiel **figé à 6 démarches pour la V1** : déclaration de
-      naissance (mairie), CAF, sécurité sociale, mutuelle, congés employeur,
-      mode de garde
+- [x] Référentiel **étendu à 8 démarches** : déclaration de naissance
+      (mairie), CAF, sécurité sociale, mutuelle, congés employeur, mode de
+      garde, assurance habitation, administration fiscale.
+      ⚠️ CONCEPT.md n'en liste que 6 (« Pour une V1, 6 démarches
+      administratives ») — assurance habitation et administration fiscale
+      ajoutées sur demande explicite, avec description longue fournie par
+      l'utilisateur pour les 8. Toutes les descriptions courtes d'origine
+      (« Prime et allocations. », « Ajout de l'enfant. »…) ont été
+      remplacées par des paragraphes explicatifs ; la liste tronque
+      désormais la description à une ligne (`numberOfLines={1}`), le texte
+      complet ne s'affichant que sur l'écran de détail.
 - [x] Statuts À faire / En cours / Fait, modifiables par les deux parents —
       pas de règle de visibilité par rôle sur ce pilier, contrairement à
       Ensemble et Suivi santé.

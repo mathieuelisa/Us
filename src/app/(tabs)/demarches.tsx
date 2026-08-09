@@ -34,10 +34,12 @@ const SafeAreaView = withUniwind(RNSafeAreaView);
  * l'affichage basculé par état local plutôt que par une route imbriquée —
  * même parti pris que le pilier Suivi santé (`sante.tsx`).
  *
- * Le référentiel des 6 démarches (`procedure_templates`) est partagé par
+ * Le référentiel des 8 démarches (`procedure_templates`) est partagé par
  * tout le foyer, modifiable par les deux parents : pas de règle de
  * visibilité par rôle ici, contrairement aux piliers Ensemble et Suivi
- * santé.
+ * santé. Étendu de 6 à 8 sur demande explicite (Assurance habitation,
+ * Administration fiscale) — écart assumé avec CONCEPT.md, qui n'en liste
+ * que 6.
  */
 export default function ProceduresScreen() {
   const router = useRouter();
@@ -131,7 +133,7 @@ export default function ProceduresScreen() {
                 Démarches
               </Text>
               <Text className="text-[13px] text-[#6b6b6b]">
-                {completedCount} sur {procedures.length || 6} complétées
+                {completedCount} sur {procedures.length || 8} complétées
               </Text>
             </View>
 
@@ -154,7 +156,10 @@ export default function ProceduresScreen() {
                       <Text className="text-[15px] font-medium text-[#1a1a1a]">
                         {procedure.title}
                       </Text>
-                      <Text className="text-[13px] text-[#6b6b6b]">
+                      <Text
+                        numberOfLines={1}
+                        className="text-[13px] text-[#6b6b6b]"
+                      >
                         {deadline ?? procedure.description}
                       </Text>
                     </View>

@@ -9,7 +9,7 @@ type Household = Database['public']['Tables']['households']['Row'];
  * foyer est toujours le parent porteur (CONCEPT.md : « Le premier parent
  * (la mère) crée l'espace »), le co-parent arrive ensuite par invitation.
  *
- * Le trigger `on_household_created` seede les 6 démarches automatiquement,
+ * Le trigger `on_household_created` seede les 8 démarches automatiquement,
  * et `handle_new_user` a déjà créé la ligne `profiles` à l'inscription : on
  * ne fait que la compléter avec le prénom.
  */
