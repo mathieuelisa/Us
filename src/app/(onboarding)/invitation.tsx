@@ -1,10 +1,10 @@
 import { router } from 'expo-router';
-import { Input, TextField } from 'heroui-native';
 import { useAtom } from 'jotai';
 import { useState } from 'react';
 import { Text, View } from 'react-native';
 
 import { OnboardingStepShell } from '@/components/onboarding/step-shell';
+import { PlainInput } from '@/components/plain-input';
 import { onboardingDraftAtom } from '@/lib/atoms/onboarding';
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -64,19 +64,18 @@ export default function InvitePartnerStep() {
       onSecondaryPress={skipInvitation}
     >
       <View className="gap-1.5">
-        <TextField isInvalid={isTouched && !isValidEmail}>
-          <Input
-            placeholder={
-              partnerName ? `Email de ${partnerName}` : 'Email du co-parent'
-            }
-            value={partnerEmail}
-            onChangeText={setPartnerEmail}
-            onBlur={() => setIsTouched(true)}
-            keyboardType="email-address"
-            autoCapitalize="none"
-            autoComplete="email"
-          />
-        </TextField>
+        <PlainInput
+          isInvalid={isTouched && !isValidEmail}
+          placeholder={
+            partnerName ? `Email de ${partnerName}` : 'Email du co-parent'
+          }
+          value={partnerEmail}
+          onChangeText={setPartnerEmail}
+          onBlur={() => setIsTouched(true)}
+          keyboardType="email-address"
+          autoCapitalize="none"
+          autoComplete="email"
+        />
         {isTouched && partnerEmail.trim().length > 0 && !isValidEmail ? (
           <Text className="text-[12.5px] text-red-600">
             Cette adresse email ne semble pas valide.

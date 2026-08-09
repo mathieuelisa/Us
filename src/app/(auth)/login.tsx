@@ -1,10 +1,11 @@
-import { Button, Input, TextField } from 'heroui-native';
+import { Button } from 'heroui-native';
 import { useSetAtom } from 'jotai';
 import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import { withUniwind } from 'uniwind';
 
+import { PlainInput } from '@/components/plain-input';
 // ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
 import { devBypassAtom } from '@/lib/atoms/dev-bypass';
 import { supabase } from '@/lib/supabase/client';
@@ -62,17 +63,16 @@ export default function LoginScreen() {
           </Text>
         ) : (
           <View className="gap-3.5">
-            <TextField isInvalid={status === 'error'}>
-              <Input
-                placeholder="votre@email.com"
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                autoComplete="email"
-                editable={status !== 'sending'}
-              />
-            </TextField>
+            <PlainInput
+              isInvalid={status === 'error'}
+              placeholder="votre@email.com"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoComplete="email"
+              editable={status !== 'sending'}
+            />
 
             <Button
               isDisabled={status === 'sending' || email.trim().length === 0}

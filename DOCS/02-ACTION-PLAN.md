@@ -346,6 +346,25 @@ générique (`src/app/(tabs)/legal.tsx`) qui dit franchement que le contenu
 n'est pas encore rédigé — voir point bloquant n°3 de
 [05](./05-DETTE-ET-POINTS-OUVERTS.md) (consentement RGPD).
 
+⚠️ **Fonds pastel « sélectionné » corrigés dans toute l'app** (bug trouvé
+après coup) : de nombreux composants (sélecteur de statut des démarches,
+chips « Besoin de quelque chose », symptômes du Journal, options
+d'onboarding, badge « Partagé », pastille du jour courant…) codaient en dur
+un vert pâle (`#eaf5f0`) pour leur état sélectionné, au lieu de suivre le
+thème actif — sélectionner un élément restait vert même en thème lavande.
+Remplacé partout par `bg-accent/10` (Tailwind/Uniwind), qui recolore
+automatiquement sans dépendre d'un hook ni d'une couleur JS.
+
+⚠️ **Champs de saisie Hero UI Native sans fond visible** (bug trouvé après
+coup) : `Input`/`TextField` de la librairie n'ont jamais reçu leurs
+variables `--field-background`/`--field-border` pour nos 4 thèmes custom —
+le champ restait sans fond dès qu'un des 4 thèmes était actif (même famille
+de bug que le fond noir déjà corrigé, mais sur les *variables de champ*
+plutôt que le thème global). Remplacés partout par `PlainInput`
+(`src/components/plain-input.tsx`), un `TextInput` brut avec fond blanc et
+bordure `border-accent`. `Avatar` (profil) a la même origine, remplacé par
+un cercle `bg-accent` maison.
+
 ## Phase 2 — Déclaration de naissance & durcissement MVP
 
 - [ ] Bouton/flux "J'ai accouché" (7a) + recalcul des échéances de

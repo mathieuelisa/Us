@@ -132,7 +132,7 @@ export function MonthCalendar({
                   isSelected
                     ? 'bg-accent'
                     : isToday
-                      ? 'bg-[#eaf5f0]'
+                      ? 'bg-accent/10'
                       : 'bg-transparent'
                 }`}
               >

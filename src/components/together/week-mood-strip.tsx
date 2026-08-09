@@ -37,7 +37,7 @@ export function WeekMoodStrip({
             </Text>
             <View
               className={`h-9 w-9 items-center justify-center rounded-full ${
-                isToday ? 'bg-[#eaf5f0]' : 'bg-[#f4f4f4]'
+                isToday ? 'bg-accent/10' : 'bg-[#f4f4f4]'
               }`}
             >
               <Text className="text-[15px]">

@@ -22,7 +22,7 @@ export function ChoiceCard({
       accessibilityState={{ selected: isSelected }}
       onPress={onPress}
       className={`rounded-[14px] border px-4 py-3.5 ${
-        isSelected ? 'border-accent bg-[#eaf5f0]' : 'border-[#e8e8e8] bg-white'
+        isSelected ? 'border-accent bg-accent/10' : 'border-[#e8e8e8] bg-white'
       }`}
     >
       <View className="flex-row items-center justify-between gap-3">

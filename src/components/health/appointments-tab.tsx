@@ -91,7 +91,7 @@ export function AppointmentsTab({
                 {isPregnant ? (
                   <View
                     className={`rounded-full px-2 py-0.5 ${
-                      appointment.is_shared ? 'bg-[#eaf5f0]' : 'bg-[#f0f0f0]'
+                      appointment.is_shared ? 'bg-accent/10' : 'bg-[#f0f0f0]'
                     }`}
                   >
                     <Text

@@ -1,9 +1,10 @@
-import { Avatar, Button, Input, TextField } from 'heroui-native';
+import { Button } from 'heroui-native';
 import { useAtomValue } from 'jotai';
 import { useEffect, useState } from 'react';
 import { Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import { withUniwind } from 'uniwind';
+import { PlainInput } from '@/components/plain-input';
 import { useMyProfile, useUpdateMyProfile } from '@/features/profile/hooks';
 import { useThemeBackground } from '@/features/settings/hooks';
 import { sessionAtom } from '@/lib/atoms/session';
@@ -31,9 +32,15 @@ export default function ProfileScreen() {
         <Text className="text-[26px] font-bold text-[#1a1a1a]">Mon profil</Text>
 
         <View className="items-center gap-2">
-          <Avatar size="lg" color="accent">
-            <Avatar.Fallback>{initials}</Avatar.Fallback>
-          </Avatar>
+          {/* `Avatar` (Hero UI Native) n'a jamais reçu ses variables
+              --default/--surface pour nos 4 thèmes custom — même famille de
+              bug que les champs de saisie, cf. `PlainInput`. Cercle maison
+              en attendant une vraie photo. */}
+          <View className="h-16 w-16 items-center justify-center rounded-full bg-accent">
+            <Text className="text-[22px] font-bold text-accent-foreground">
+              {initials}
+            </Text>
+          </View>
           <Text className="text-[12.5px] text-[#9a9a9a]">
             Photo de profil — bientôt disponible
           </Text>
@@ -43,15 +50,13 @@ export default function ProfileScreen() {
           <Text className="text-[13px] font-medium text-[#6b6b6b]">
             Prénom affiché
           </Text>
-          <TextField>
-            <Input
-              placeholder="Votre prénom"
-              value={firstName}
-              onChangeText={setFirstName}
-              editable={!isLoading}
-              autoCapitalize="words"
-            />
-          </TextField>
+          <PlainInput
+            placeholder="Votre prénom"
+            value={firstName}
+            onChangeText={setFirstName}
+            editable={!isLoading}
+            autoCapitalize="words"
+          />
 
           <Button
             isDisabled={

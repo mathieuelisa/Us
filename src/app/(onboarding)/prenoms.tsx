@@ -1,10 +1,10 @@
 import { router } from 'expo-router';
-import { Input, TextField } from 'heroui-native';
 import { useAtom } from 'jotai';
 import { useState } from 'react';
 import { Text, View } from 'react-native';
 
 import { OnboardingStepShell } from '@/components/onboarding/step-shell';
+import { PlainInput } from '@/components/plain-input';
 import { shouldInvitePartner } from '@/features/onboarding/constants';
 import { onboardingDraftAtom } from '@/lib/atoms/onboarding';
 
@@ -67,17 +67,16 @@ export default function FirstNamesStep() {
       onPrimaryPress={goToNextStep}
     >
       <View className="gap-1.5">
-        <TextField isInvalid={touchedField.firstName && isFirstNameMissing}>
-          <Input
-            placeholder="Votre prénom"
-            value={firstName}
-            onChangeText={setFirstName}
-            onBlur={() =>
-              setTouchedField((current) => ({ ...current, firstName: true }))
-            }
-            autoCapitalize="words"
-          />
-        </TextField>
+        <PlainInput
+          isInvalid={touchedField.firstName && isFirstNameMissing}
+          placeholder="Votre prénom"
+          value={firstName}
+          onChangeText={setFirstName}
+          onBlur={() =>
+            setTouchedField((current) => ({ ...current, firstName: true }))
+          }
+          autoCapitalize="words"
+        />
         {touchedField.firstName && isFirstNameMissing ? (
           <Text className="text-[12.5px] text-red-600">
             Votre prénom est nécessaire.
@@ -87,24 +86,21 @@ export default function FirstNamesStep() {
 
       {hasPartner ? (
         <View className="gap-1.5">
-          <TextField
+          <PlainInput
             isInvalid={
               touchedField.partnerFirstName && isPartnerFirstNameMissing
             }
-          >
-            <Input
-              placeholder="Prénom du co-parent"
-              value={partnerFirstName}
-              onChangeText={setPartnerFirstName}
-              onBlur={() =>
-                setTouchedField((current) => ({
-                  ...current,
-                  partnerFirstName: true,
-                }))
-              }
-              autoCapitalize="words"
-            />
-          </TextField>
+            placeholder="Prénom du co-parent"
+            value={partnerFirstName}
+            onChangeText={setPartnerFirstName}
+            onBlur={() =>
+              setTouchedField((current) => ({
+                ...current,
+                partnerFirstName: true,
+              }))
+            }
+            autoCapitalize="words"
+          />
           {touchedField.partnerFirstName && isPartnerFirstNameMissing ? (
             <Text className="text-[12.5px] text-red-600">
               Le prénom du co-parent est nécessaire.

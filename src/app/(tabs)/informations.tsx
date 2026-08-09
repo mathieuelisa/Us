@@ -1,10 +1,11 @@
-import { Button, Card, CloseButton, Input, TextField } from 'heroui-native';
+import { Button, Card, CloseButton } from 'heroui-native';
 import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import { withUniwind } from 'uniwind';
 
 import { OutlineButton } from '@/components/outline-button';
+import { PlainInput } from '@/components/plain-input';
 import type { HouseholdInfoItem } from '@/features/household/api';
 import {
   useCreateInfoItem,
@@ -127,20 +128,16 @@ export default function InformationsScreen() {
                 editingId === item.id ? (
                   <Card key={item.id}>
                     <Card.Body className="gap-2.5">
-                      <TextField>
-                        <Input
-                          placeholder="Libellé"
-                          value={editLabel}
-                          onChangeText={setEditLabel}
-                        />
-                      </TextField>
-                      <TextField>
-                        <Input
-                          placeholder="Valeur"
-                          value={editValue}
-                          onChangeText={setEditValue}
-                        />
-                      </TextField>
+                      <PlainInput
+                        placeholder="Libellé"
+                        value={editLabel}
+                        onChangeText={setEditLabel}
+                      />
+                      <PlainInput
+                        placeholder="Valeur"
+                        value={editValue}
+                        onChangeText={setEditValue}
+                      />
                       <View className="flex-row gap-2">
                         <OutlineButton
                           className="flex-1"
@@ -220,20 +217,16 @@ export default function InformationsScreen() {
             {isAdding ? (
               <Card>
                 <Card.Body className="gap-2.5">
-                  <TextField>
-                    <Input
-                      placeholder="Libellé (ex. Groupe sanguin)"
-                      value={newLabel}
-                      onChangeText={setNewLabel}
-                    />
-                  </TextField>
-                  <TextField>
-                    <Input
-                      placeholder="Valeur"
-                      value={newValue}
-                      onChangeText={setNewValue}
-                    />
-                  </TextField>
+                  <PlainInput
+                    placeholder="Libellé (ex. Groupe sanguin)"
+                    value={newLabel}
+                    onChangeText={setNewLabel}
+                  />
+                  <PlainInput
+                    placeholder="Valeur"
+                    value={newValue}
+                    onChangeText={setNewValue}
+                  />
                   <View className="flex-row gap-2">
                     <OutlineButton
                       className="flex-1"

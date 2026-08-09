@@ -24,7 +24,7 @@ export function StatusSelector({
             }
             className={`flex-1 items-center rounded-[12px] border py-3 ${
               isSelected
-                ? 'border-accent bg-[#eaf5f0]'
+                ? 'border-accent bg-accent/10'
                 : 'border-[#e0e0e0] bg-white'
             }`}
           >

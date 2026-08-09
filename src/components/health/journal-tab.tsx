@@ -112,7 +112,7 @@ export function JournalTab({
                 onPress={() => toggle(option.value)}
                 className={`rounded-full border px-3.5 py-2 ${
                   isSelected
-                    ? 'border-accent bg-[#eaf5f0]'
+                    ? 'border-accent bg-accent/10'
                     : 'border-[#e0e0e0] bg-white'
                 }`}
               >
