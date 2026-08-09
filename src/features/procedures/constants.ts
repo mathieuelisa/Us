@@ -21,9 +21,10 @@ function formatLongDate(isoDate: string): string {
 }
 
 /**
- * Une seule démarche a une échéance légale : la déclaration de naissance
- * (5 jours). Les 5 autres n'ont pas de `deadline_days_after_birth` — pas
- * d'échéance à afficher pour elles, ce n'est pas un oubli.
+ * Une seule démarche a une échéance légale précise : la déclaration de
+ * naissance (5 jours). Les 7 autres n'ont pas de `deadline_days_after_birth`
+ * en base — demande explicite d'afficher quand même un repère sous le titre
+ * pour elles, avec un texte fixe plutôt qu'un délai inventé.
  *
  * `null` pour `birthDate` **restera le cas de tout le monde tant que la
  * Phase 2 n'est pas construite** : "J'ai accouché" ne renseigne pas encore
@@ -33,8 +34,8 @@ function formatLongDate(isoDate: string): string {
 export function formatDeadlineLabel(
   deadlineDaysAfterBirth: number | null,
   birthDate: string | null,
-): string | null {
-  if (deadlineDaysAfterBirth === null) return null;
+): string {
+  if (deadlineDaysAfterBirth === null) return 'Le plus rapidement possible';
 
   if (!birthDate) {
     return `${deadlineDaysAfterBirth} jours à partir de la naissance`;

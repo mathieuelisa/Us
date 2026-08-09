@@ -265,9 +265,14 @@ porte d'entrée vers cette donnée de santé.
       ajoutées sur demande explicite, avec description longue fournie par
       l'utilisateur pour les 8. Toutes les descriptions courtes d'origine
       (« Prime et allocations. », « Ajout de l'enfant. »…) ont été
-      remplacées par des paragraphes explicatifs ; la liste tronque
-      désormais la description à une ligne (`numberOfLines={1}`), le texte
-      complet ne s'affichant que sur l'écran de détail.
+      remplacées par des paragraphes explicatifs, mais **la liste
+      n'affiche plus la description** (trop longue même tronquée à une
+      ligne) — elle affiche désormais un repère sous le titre,
+      `formatDeadlineLabel()` : « X jours à partir de la naissance » pour
+      la déclaration de naissance (seule démarche avec une échéance légale
+      en base), « Le plus rapidement possible » pour les 7 autres. Le
+      texte complet de la description reste visible sur l'écran de détail,
+      sous ce même repère.
 - [x] Statuts À faire / En cours / Fait, modifiables par les deux parents —
       pas de règle de visibilité par rôle sur ce pilier, contrairement à
       Ensemble et Suivi santé.

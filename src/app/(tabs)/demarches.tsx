@@ -156,11 +156,8 @@ export default function ProceduresScreen() {
                       <Text className="text-[15px] font-medium text-[#1a1a1a]">
                         {procedure.title}
                       </Text>
-                      <Text
-                        numberOfLines={1}
-                        className="text-[13px] text-[#6b6b6b]"
-                      >
-                        {deadline ?? procedure.description}
+                      <Text className="text-[13px] text-[#6b6b6b]">
+                        {deadline}
                       </Text>
                     </View>
                     <StatusBadge status={procedure.status} />
