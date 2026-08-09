@@ -368,6 +368,20 @@ plutôt que le thème global). Remplacés partout par `PlainInput`
 bordure `border-accent`. `Avatar` (profil) a la même origine, remplacé par
 un cercle `bg-accent` maison.
 
+⚠️ **Crash natif corrigé à la racine** (`Cannot convert undefined value to
+object`, rencontré sur simulateur iOS — signalé par l'utilisateur, pas
+reproductible sur web où le même défaut de variables ne faisait
+qu'invisibiliser des fonds) : nos 4 thèmes custom ne redéfinissaient que
+`--accent`/`--accent-foreground`, jamais le reste des variables que Hero UI
+Native attend pour tout thème déclaré (`--surface`, `--default`,
+`--field-*`, `--segment`, `--border`, les shadows…). `src/global.css`
+redéfinit désormais l'intégralité du jeu de variables du thème `light` de
+la librairie pour sauge/corail/lavande/ocre — seuls `--accent` et
+`--accent-foreground` varient d'un thème à l'autre, tout le reste est
+recopié tel quel. Les contournements `PlainInput`/`bg-accent/10` restent en
+place (plus robustes, n'importe pas la logique interne de la librairie),
+mais ne sont plus la seule protection contre ce crash.
+
 ## Phase 2 — Déclaration de naissance & durcissement MVP
 
 - [ ] Bouton/flux "J'ai accouché" (7a) + recalcul des échéances de

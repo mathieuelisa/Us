@@ -21,6 +21,17 @@
  * spécifie ces thèmes (seule leur existence — « 3 ou 4 thèmes visuels
  * prédéfinis » — est demandée). Choisies pour rester dans la même gamme de
  * saturation/luminosité que le sauge de référence.
+ *
+ * ⚠️ Chaque variant redéfinit ici l'intégralité des variables du thème
+ * `light` de Hero UI Native (`node_modules/heroui-native/src/styles/variables.css`),
+ * pas seulement `--accent` : Uniwind exige que tous les thèmes déclarés
+ * partagent le même jeu de variables, et Hero UI Native ne fournit ces
+ * variables que pour `light`/`dark`. Sans ça, tout composant de la
+ * librairie qui lit une variable manquante (`--field-background`,
+ * `--default`, `--surface`…) plante au runtime sur mobile (« Cannot
+ * convert undefined value to object ») — pas seulement invisible comme sur
+ * web. Seuls `--accent`/`--accent-foreground`/`--focus` varient d'un thème
+ * à l'autre ; le reste est recopié tel quel du thème `light`.
  */
 @layer theme {
   @variant light {
@@ -34,23 +45,179 @@
   }
 
   @variant sauge {
+    --background: oklch(0.9702 0 0);
+    --foreground: var(--eclipse);
+    --surface: var(--white);
+    --surface-foreground: var(--foreground);
+    --surface-secondary: oklch(0.9524 0.0013 286.37);
+    --surface-secondary-foreground: var(--foreground);
+    --surface-tertiary: oklch(0.9373 0.0013 286.37);
+    --surface-tertiary-foreground: var(--foreground);
+    --overlay: var(--white);
+    --overlay-foreground: var(--foreground);
+    --backdrop: oklch(0% 0 0 / 20%);
+    --muted: oklch(0.5517 0.0138 285.94);
+    --default: oklch(94% 0.001 286.375);
+    --default-foreground: var(--eclipse);
     --accent: #2d5e5a;
     --accent-foreground: #ffffff;
+    --field-background: var(--white);
+    --field-foreground: oklch(0.2103 0.0059 285.89);
+    --field-placeholder: var(--muted);
+    --field-border: transparent;
+    --success: oklch(0.7329 0.1935 150.81);
+    --success-foreground: var(--eclipse);
+    --warning: oklch(0.7819 0.1585 72.33);
+    --warning-foreground: var(--eclipse);
+    --danger: oklch(0.6532 0.2328 25.74);
+    --danger-foreground: var(--snow);
+    --segment: var(--white);
+    --segment-foreground: var(--eclipse);
+    --border: oklch(90% 0.004 286.32);
+    --separator: oklch(74% 0.004 286.32);
+    --focus: var(--accent);
+    --link: var(--foreground);
+    --surface-shadow:
+      0 2px 4px 0 rgba(0, 0, 0, 0.04), 0 1px 2px 0 rgba(0, 0, 0, 0.06),
+      0 0 1px 0 rgba(0, 0, 0, 0.06);
+    --overlay-shadow:
+      0 2px 8px 0 rgba(0, 0, 0, 0.02), 0 -6px 12px 0 rgba(0, 0, 0, 0.01),
+      0 14px 28px 0 rgba(0, 0, 0, 0.03);
+    --field-shadow:
+      0 2px 4px 0 rgba(0, 0, 0, 0.04), 0 1px 2px 0 rgba(0, 0, 0, 0.06),
+      0 0 1px 0 rgba(0, 0, 0, 0.06);
   }
 
   @variant corail {
+    --background: oklch(0.9702 0 0);
+    --foreground: var(--eclipse);
+    --surface: var(--white);
+    --surface-foreground: var(--foreground);
+    --surface-secondary: oklch(0.9524 0.0013 286.37);
+    --surface-secondary-foreground: var(--foreground);
+    --surface-tertiary: oklch(0.9373 0.0013 286.37);
+    --surface-tertiary-foreground: var(--foreground);
+    --overlay: var(--white);
+    --overlay-foreground: var(--foreground);
+    --backdrop: oklch(0% 0 0 / 20%);
+    --muted: oklch(0.5517 0.0138 285.94);
+    --default: oklch(94% 0.001 286.375);
+    --default-foreground: var(--eclipse);
     --accent: #b85c38;
     --accent-foreground: #ffffff;
+    --field-background: var(--white);
+    --field-foreground: oklch(0.2103 0.0059 285.89);
+    --field-placeholder: var(--muted);
+    --field-border: transparent;
+    --success: oklch(0.7329 0.1935 150.81);
+    --success-foreground: var(--eclipse);
+    --warning: oklch(0.7819 0.1585 72.33);
+    --warning-foreground: var(--eclipse);
+    --danger: oklch(0.6532 0.2328 25.74);
+    --danger-foreground: var(--snow);
+    --segment: var(--white);
+    --segment-foreground: var(--eclipse);
+    --border: oklch(90% 0.004 286.32);
+    --separator: oklch(74% 0.004 286.32);
+    --focus: var(--accent);
+    --link: var(--foreground);
+    --surface-shadow:
+      0 2px 4px 0 rgba(0, 0, 0, 0.04), 0 1px 2px 0 rgba(0, 0, 0, 0.06),
+      0 0 1px 0 rgba(0, 0, 0, 0.06);
+    --overlay-shadow:
+      0 2px 8px 0 rgba(0, 0, 0, 0.02), 0 -6px 12px 0 rgba(0, 0, 0, 0.01),
+      0 14px 28px 0 rgba(0, 0, 0, 0.03);
+    --field-shadow:
+      0 2px 4px 0 rgba(0, 0, 0, 0.04), 0 1px 2px 0 rgba(0, 0, 0, 0.06),
+      0 0 1px 0 rgba(0, 0, 0, 0.06);
   }
 
   @variant lavande {
+    --background: oklch(0.9702 0 0);
+    --foreground: var(--eclipse);
+    --surface: var(--white);
+    --surface-foreground: var(--foreground);
+    --surface-secondary: oklch(0.9524 0.0013 286.37);
+    --surface-secondary-foreground: var(--foreground);
+    --surface-tertiary: oklch(0.9373 0.0013 286.37);
+    --surface-tertiary-foreground: var(--foreground);
+    --overlay: var(--white);
+    --overlay-foreground: var(--foreground);
+    --backdrop: oklch(0% 0 0 / 20%);
+    --muted: oklch(0.5517 0.0138 285.94);
+    --default: oklch(94% 0.001 286.375);
+    --default-foreground: var(--eclipse);
     --accent: #6b5ca5;
     --accent-foreground: #ffffff;
+    --field-background: var(--white);
+    --field-foreground: oklch(0.2103 0.0059 285.89);
+    --field-placeholder: var(--muted);
+    --field-border: transparent;
+    --success: oklch(0.7329 0.1935 150.81);
+    --success-foreground: var(--eclipse);
+    --warning: oklch(0.7819 0.1585 72.33);
+    --warning-foreground: var(--eclipse);
+    --danger: oklch(0.6532 0.2328 25.74);
+    --danger-foreground: var(--snow);
+    --segment: var(--white);
+    --segment-foreground: var(--eclipse);
+    --border: oklch(90% 0.004 286.32);
+    --separator: oklch(74% 0.004 286.32);
+    --focus: var(--accent);
+    --link: var(--foreground);
+    --surface-shadow:
+      0 2px 4px 0 rgba(0, 0, 0, 0.04), 0 1px 2px 0 rgba(0, 0, 0, 0.06),
+      0 0 1px 0 rgba(0, 0, 0, 0.06);
+    --overlay-shadow:
+      0 2px 8px 0 rgba(0, 0, 0, 0.02), 0 -6px 12px 0 rgba(0, 0, 0, 0.01),
+      0 14px 28px 0 rgba(0, 0, 0, 0.03);
+    --field-shadow:
+      0 2px 4px 0 rgba(0, 0, 0, 0.04), 0 1px 2px 0 rgba(0, 0, 0, 0.06),
+      0 0 1px 0 rgba(0, 0, 0, 0.06);
   }
 
   @variant ocre {
+    --background: oklch(0.9702 0 0);
+    --foreground: var(--eclipse);
+    --surface: var(--white);
+    --surface-foreground: var(--foreground);
+    --surface-secondary: oklch(0.9524 0.0013 286.37);
+    --surface-secondary-foreground: var(--foreground);
+    --surface-tertiary: oklch(0.9373 0.0013 286.37);
+    --surface-tertiary-foreground: var(--foreground);
+    --overlay: var(--white);
+    --overlay-foreground: var(--foreground);
+    --backdrop: oklch(0% 0 0 / 20%);
+    --muted: oklch(0.5517 0.0138 285.94);
+    --default: oklch(94% 0.001 286.375);
+    --default-foreground: var(--eclipse);
     --accent: #96701c;
     --accent-foreground: #ffffff;
+    --field-background: var(--white);
+    --field-foreground: oklch(0.2103 0.0059 285.89);
+    --field-placeholder: var(--muted);
+    --field-border: transparent;
+    --success: oklch(0.7329 0.1935 150.81);
+    --success-foreground: var(--eclipse);
+    --warning: oklch(0.7819 0.1585 72.33);
+    --warning-foreground: var(--eclipse);
+    --danger: oklch(0.6532 0.2328 25.74);
+    --danger-foreground: var(--snow);
+    --segment: var(--white);
+    --segment-foreground: var(--eclipse);
+    --border: oklch(90% 0.004 286.32);
+    --separator: oklch(74% 0.004 286.32);
+    --focus: var(--accent);
+    --link: var(--foreground);
+    --surface-shadow:
+      0 2px 4px 0 rgba(0, 0, 0, 0.04), 0 1px 2px 0 rgba(0, 0, 0, 0.06),
+      0 0 1px 0 rgba(0, 0, 0, 0.06);
+    --overlay-shadow:
+      0 2px 8px 0 rgba(0, 0, 0, 0.02), 0 -6px 12px 0 rgba(0, 0, 0, 0.01),
+      0 14px 28px 0 rgba(0, 0, 0, 0.03);
+    --field-shadow:
+      0 2px 4px 0 rgba(0, 0, 0, 0.04), 0 1px 2px 0 rgba(0, 0, 0, 0.06),
+      0 0 1px 0 rgba(0, 0, 0, 0.06);
   }
 }
 
