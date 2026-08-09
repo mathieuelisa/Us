@@ -20,13 +20,15 @@ export function YesNoChoice({
             onPress={() => onChange(option)}
             className={`flex-1 items-center rounded-[12px] border py-3 ${
               isSelected
-                ? 'border-accent bg-[#eaf5f0]'
+                ? 'border-accent bg-accent'
                 : 'border-[#e8e8e8] bg-white'
             }`}
           >
             <Text
               className={`text-[15px] ${
-                isSelected ? 'font-medium text-accent' : 'text-[#1a1a1a]'
+                isSelected
+                  ? 'font-medium text-accent-foreground'
+                  : 'text-[#1a1a1a]'
               }`}
             >
               {option ? 'Oui' : 'Non'}

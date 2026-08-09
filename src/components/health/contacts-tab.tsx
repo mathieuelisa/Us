@@ -199,7 +199,15 @@ export function ContactsTab({
           </View>
         </View>
       ) : (
-        <OutlineButton label="+ Ajouter" onPress={() => setIsAdding(true)} />
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => setIsAdding(true)}
+          className="items-center rounded-full bg-accent py-3"
+        >
+          <Text className="text-[15px] font-medium text-accent-foreground">
+            + Ajouter
+          </Text>
+        </Pressable>
       )}
     </View>
   );

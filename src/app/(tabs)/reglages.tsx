@@ -1,3 +1,4 @@
+import { router } from 'expo-router';
 import { useAtomValue } from 'jotai';
 import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
@@ -16,6 +17,18 @@ import { sessionAtom } from '@/lib/atoms/session';
 import { supabase } from '@/lib/supabase/client';
 
 const SafeAreaView = withUniwind(RNSafeAreaView);
+
+/**
+ * Sous-section CONFIDENTIALITÉ — les 3 documents légaux n'existent pas
+ * encore (cf. `legal.tsx`, point bloquant n°3 de
+ * DOCS/05-DETTE-ET-POINTS-OUVERTS.md) ; ces liens ouvrent un écran qui le
+ * dit franchement plutôt qu'un contenu inventé.
+ */
+const LEGAL_LINKS = [
+  { doc: 'privacy', label: 'Politique de confidentialité' },
+  { doc: 'terms', label: "Conditions d'utilisation" },
+  { doc: 'legal-notice', label: 'Mentions légales' },
+] as const;
 
 /**
  * Écran 10a — Réglages. Périmètre strict du plan d'action §1.7 : personnels
@@ -114,6 +127,25 @@ export default function SettingsScreen() {
           L’application reste en français pour l’instant — pas de sélecteur de
           langue.
         </Text>
+
+        <View className="gap-3">
+          <Text className="text-[11.5px] font-semibold tracking-wide text-[#8a8a8a]">
+            CONFIDENTIALITÉ
+          </Text>
+          <View className="gap-2.5">
+            {LEGAL_LINKS.map((link) => (
+              <Pressable
+                key={link.doc}
+                accessibilityRole="button"
+                onPress={() => router.push(`/legal?doc=${link.doc}`)}
+                className="flex-row items-center justify-between rounded-[14px] bg-white px-4 py-3.5"
+              >
+                <Text className="text-[14px] text-[#1a1a1a]">{link.label}</Text>
+                <Text className="text-[18px] text-[#c0c0c0]">›</Text>
+              </Pressable>
+            ))}
+          </View>
+        </View>
 
         <OutlineButton
           label={isSigningOut ? 'Déconnexion…' : 'Se déconnecter'}

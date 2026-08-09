@@ -50,6 +50,7 @@ export default function InvitePartnerStep() {
   return (
     <OnboardingStepShell
       step={null}
+      centered
       title={partnerName ? `Inviter ${partnerName}` : 'Inviter le co-parent'}
       subtitle={
         partnerName

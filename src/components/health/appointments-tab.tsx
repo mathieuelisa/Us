@@ -3,7 +3,6 @@ import { Pressable, Text, View } from 'react-native';
 
 import { AppointmentFormModal } from '@/components/health/appointment-form-modal';
 import { MonthCalendar } from '@/components/health/month-calendar';
-import { OutlineButton } from '@/components/outline-button';
 import { formatAppointmentSummary } from '@/features/health/constants';
 import {
   useAppointments,
@@ -29,6 +28,12 @@ export function AppointmentsTab({
   const [year, setYear] = useState(Number(today.slice(0, 4)));
   const [month, setMonth] = useState(Number(today.slice(5, 7)));
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [pickedDate, setPickedDate] = useState<string | null>(null);
+
+  const openFormFor = (isoDate: string | null) => {
+    setPickedDate(isoDate);
+    setIsFormOpen(true);
+  };
 
   const changeMonth = (delta: -1 | 1) => {
     const next = month + delta;
@@ -54,6 +59,11 @@ export function AppointmentsTab({
         month={month}
         markedDates={appointments.map((item) => item.appointment_date)}
         onChangeMonth={changeMonth}
+        // Cliquer une date ouvre directement le formulaire pré-rempli — le
+        // co-parent n'a de toute façon pas le bouton d'ajout, la sélection
+        // reste donc désactivée pour lui (cf. `disabled={!onSelectDate}`
+        // dans MonthCalendar).
+        onSelectDate={isPregnant ? openFormFor : undefined}
       />
 
       <View className="gap-2.5">
@@ -118,16 +128,22 @@ export function AppointmentsTab({
         )}
 
         {isPregnant ? (
-          <OutlineButton
-            label="+ Ajouter un rendez-vous"
-            onPress={() => setIsFormOpen(true)}
-          />
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => openFormFor(null)}
+            className="items-center rounded-full bg-accent py-3"
+          >
+            <Text className="text-[15px] font-medium text-accent-foreground">
+              + Ajouter un rendez-vous
+            </Text>
+          </Pressable>
         ) : null}
       </View>
 
       <AppointmentFormModal
         visible={isFormOpen}
         isSaving={createAppointment.isPending}
+        initialDate={pickedDate}
         onCancel={() => setIsFormOpen(false)}
         onSubmit={(input) =>
           createAppointment.mutate(input, {

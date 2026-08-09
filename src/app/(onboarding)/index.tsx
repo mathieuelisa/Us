@@ -22,7 +22,7 @@ export default function AccompanimentStep() {
     <OnboardingStepShell
       step={1}
       title="Qui vous accompagne dans cette aventure ?"
-      primaryLabel="Continuer"
+      primaryLabel="Suivant"
       isPrimaryDisabled={draft.accompanimentType === null}
       onPrimaryPress={() => router.push('/prenoms')}
     >

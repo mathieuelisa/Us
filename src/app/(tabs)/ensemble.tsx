@@ -109,18 +109,15 @@ export default function TogetherScreen() {
         </View>
 
         {gesture ? (
-          <View className="gap-2 rounded-[16px] border border-[#ececec] bg-white px-4 py-4">
-            <Text className="text-[11.5px] font-semibold tracking-wide text-[#8a8a8a]">
+          <View className="items-center gap-3 rounded-[20px] border border-[#ececec] bg-white px-5 py-7">
+            <Text className="self-start text-[11.5px] font-semibold tracking-wide text-[#8a8a8a]">
               GESTE DU JOUR
             </Text>
-            <View className="flex-row items-start gap-3">
-              <Text className="text-[26px]">
-                {getGestureEmoji(gesture.body)}
-              </Text>
-              <Text className="flex-1 text-[15px] leading-5 text-[#1a1a1a]">
-                {gesture.body}
-              </Text>
-            </View>
+            {/* Emoji en repli, en attendant une vraie illustration. */}
+            <Text className="text-[64px]">{getGestureEmoji(gesture.body)}</Text>
+            <Text className="text-center text-[15px] leading-5 text-[#1a1a1a]">
+              {gesture.body}
+            </Text>
           </View>
         ) : null}
       </ScrollView>

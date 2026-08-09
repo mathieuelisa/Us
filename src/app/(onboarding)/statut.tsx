@@ -15,7 +15,7 @@ export default function ProfessionalStatusStep() {
       step={4}
       title="Quel est votre statut professionnel ?"
       subtitle="Pour adapter vos démarches"
-      primaryLabel="Continuer"
+      primaryLabel="Suivant"
       isPrimaryDisabled={draft.professionalStatus === null}
       onPrimaryPress={() => router.push('/priorites')}
     >

@@ -325,6 +325,27 @@ personnel à chaque compte. `ROLE_BACKGROUND` a été retiré (plus aucun
 usage) ; le rôle continue de piloter d'autres éléments (visibilité
 d'onglets, contenu) sans lien avec la couleur de fond.
 
+⚠️ **Thème par défaut forcé au montage** (bug corrigé après coup) : tant que
+le profil n'est pas chargé (tout l'onboarding, avant la création du foyer),
+Uniwind suivait le thème système — `dark` sur un appareil en mode sombre —
+ce qui faisait apparaître les champs `Input` de Hero UI Native en noir (leurs
+couleurs viennent du variant `dark` de la librairie, pas de nos couleurs de
+marque). `src/app/_layout.tsx` appelle maintenant `Uniwind.setTheme(DEFAULT_THEME_ID)`
+sans condition dès le montage, indépendamment du profil.
+
+⚠️ **Libellés du footer traduits** (demande explicite, écart avec
+CONCEPT.md) : CONCEPT.md nomme les 4 onglets en anglais (Home / User /
+Information / Setting) ; ils s'affichent désormais en français (Accueil /
+Profil / Information / Réglages) dans `src/app/(tabs)/_layout.tsx`. Les noms
+de route ne changent pas.
+
+⚠️ **Sous-section Confidentialité ajoutée aux Réglages** (demande
+explicite, hors périmètre initial de la 1.7) : 3 liens (Politique de
+confidentialité, Conditions d'utilisation, Mentions légales) vers un écran
+générique (`src/app/(tabs)/legal.tsx`) qui dit franchement que le contenu
+n'est pas encore rédigé — voir point bloquant n°3 de
+[05](./05-DETTE-ET-POINTS-OUVERTS.md) (consentement RGPD).
+
 ## Phase 2 — Déclaration de naissance & durcissement MVP
 
 - [ ] Bouton/flux "J'ai accouché" (7a) + recalcul des échéances de

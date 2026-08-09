@@ -20,6 +20,11 @@ const STEP_NUMBERS = Array.from(
  * sous-titre, contenu scrollable et action principale en pied d'écran.
  * Les écrans hors parcours numéroté (réassurance, paywall, invitation)
  * passent simplement `step={null}`.
+ *
+ * `centered` : variante où titre, sous-titre et contenu sont regroupés au
+ * centre vertical de l'écran plutôt qu'alignés en haut — pour les écrans de
+ * transition (réassurance, invitation) qui n'ont pas de longue liste à
+ * faire défiler.
  */
 export function OnboardingStepShell({
   step,
@@ -31,6 +36,7 @@ export function OnboardingStepShell({
   isPrimaryDisabled = false,
   secondaryLabel,
   onSecondaryPress,
+  centered = false,
 }: {
   step: number | null;
   title: string;
@@ -41,6 +47,7 @@ export function OnboardingStepShell({
   isPrimaryDisabled?: boolean;
   secondaryLabel?: string;
   onSecondaryPress?: () => void;
+  centered?: boolean;
 }) {
   const router = useRouter();
   const backgroundColor = useThemeBackground();
@@ -81,22 +88,38 @@ export function OnboardingStepShell({
           </View>
         )}
 
-        <Text className="text-[24px] font-bold leading-7 text-[#1a1a1a]">
-          {title}
-        </Text>
-        {subtitle ? (
-          <Text className="pt-2 text-[14px] leading-5 text-[#6b6b6b]">
-            {subtitle}
-          </Text>
-        ) : null}
+        {centered ? (
+          <View className="flex-1 justify-center gap-2">
+            <Text className="text-center text-[24px] font-bold leading-7 text-[#1a1a1a]">
+              {title}
+            </Text>
+            {subtitle ? (
+              <Text className="px-2 text-center text-[14px] leading-5 text-[#6b6b6b]">
+                {subtitle}
+              </Text>
+            ) : null}
+            <View className="gap-6 pt-4">{children}</View>
+          </View>
+        ) : (
+          <>
+            <Text className="text-[24px] font-bold leading-7 text-[#1a1a1a]">
+              {title}
+            </Text>
+            {subtitle ? (
+              <Text className="pt-2 text-[14px] leading-5 text-[#6b6b6b]">
+                {subtitle}
+              </Text>
+            ) : null}
 
-        <ScrollView
-          className="flex-1"
-          contentContainerClassName="gap-3 py-6"
-          showsVerticalScrollIndicator={false}
-        >
-          {children}
-        </ScrollView>
+            <ScrollView
+              className="flex-1"
+              contentContainerClassName="gap-3 py-6"
+              showsVerticalScrollIndicator={false}
+            >
+              {children}
+            </ScrollView>
+          </>
+        )}
 
         <View className="gap-3 pb-2">
           <Button isDisabled={isPrimaryDisabled} onPress={onPrimaryPress}>

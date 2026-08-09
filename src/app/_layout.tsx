@@ -13,7 +13,10 @@ import { Uniwind } from 'uniwind';
 import { AnimatedSplashOverlay } from '@/components/animated-icon';
 import { useMyHousehold, useSyncCurrentRole } from '@/features/household/hooks';
 import { useMyProfile } from '@/features/profile/hooks';
-import { resolveThemeId } from '@/features/settings/constants';
+import {
+  DEFAULT_THEME_ID,
+  resolveThemeId,
+} from '@/features/settings/constants';
 // ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
 import { devBypassAtom } from '@/lib/atoms/dev-bypass';
 import { sessionAtom } from '@/lib/atoms/session';
@@ -48,6 +51,17 @@ function AuthGate() {
       Uniwind.setTheme(resolveThemeId(profile.theme));
     }
   }, [profile?.theme]);
+
+  // Tant que le profil n'est pas chargé (tout l'onboarding, avant la
+  // création du foyer), Uniwind retombe sur le thème système — `dark` sur un
+  // appareil/navigateur en mode sombre, ce qui fait apparaître les champs
+  // `Input` de Hero UI Native en noir (leurs couleurs de fond viennent du
+  // variant `dark`, pas de nos couleurs de marque). Un défaut explicite dès
+  // le montage évite de dépendre du réglage système avant qu'un vrai thème
+  // ne soit connu.
+  useEffect(() => {
+    Uniwind.setTheme(DEFAULT_THEME_ID);
+  }, []);
 
   // ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
   const devBypass = useAtomValue(devBypassAtom);

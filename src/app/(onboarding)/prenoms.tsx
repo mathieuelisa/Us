@@ -62,7 +62,7 @@ export default function FirstNamesStep() {
       step={2}
       title="Petit à petit, faisons connaissance 👋"
       subtitle="Ces prénoms nous servent uniquement à personnaliser votre espace — jamais utilisés pour vous identifier."
-      primaryLabel="Continuer"
+      primaryLabel="Suivant"
       isPrimaryDisabled={!isValid}
       onPrimaryPress={goToNextStep}
     >

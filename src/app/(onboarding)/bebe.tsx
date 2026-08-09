@@ -15,7 +15,7 @@ export default function BabyArrivalStep() {
     <OnboardingStepShell
       step={3}
       title="Quand votre bébé arrive-t-il ?"
-      primaryLabel="Continuer"
+      primaryLabel="Suivant"
       isPrimaryDisabled={draft.dueDate === null || draft.isFirstChild === null}
       onPrimaryPress={() => router.push('/statut')}
     >

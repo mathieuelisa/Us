@@ -23,7 +23,7 @@ export default function PrioritiesStep() {
       step={5}
       title="Quelles sont vos priorités ?"
       subtitle="Plusieurs choix possibles"
-      primaryLabel="Continuer"
+      primaryLabel="Suivant"
       isPrimaryDisabled={draft.priorities.length === 0}
       onPrimaryPress={() => router.push('/rappels')}
     >

@@ -23,11 +23,14 @@ import { todayIso } from '@/lib/date';
 export function AppointmentFormModal({
   visible,
   isSaving,
+  initialDate,
   onSubmit,
   onCancel,
 }: {
   visible: boolean;
   isSaving: boolean;
+  /** Date déjà choisie sur le calendrier avant l'ouverture, le cas échéant. */
+  initialDate?: string | null;
   onSubmit: (input: {
     title: string;
     appointmentDate: string;
@@ -46,12 +49,12 @@ export function AppointmentFormModal({
   useEffect(() => {
     if (visible) {
       setTitle('');
-      setDate(todayIso());
+      setDate(initialDate ?? todayIso());
       setTime('');
       setAddress('');
       setIsShared(false);
     }
-  }, [visible]);
+  }, [visible, initialDate]);
 
   const isTimeInvalid = time.trim().length > 0 && parseTimeInput(time) === null;
   const canSubmit = title.trim().length > 0 && !isTimeInvalid && !isSaving;
