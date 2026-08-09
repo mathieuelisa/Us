@@ -137,6 +137,8 @@ export function AppTabBar({
             Math.max(insets.bottom, BAR_MARGIN / 2) + BAR_MARGIN / 2,
           borderRadius: 28,
           backgroundColor: cardBackground,
+          borderWidth: 1,
+          borderColor: '#2D5E5A',
           paddingVertical: 8,
           shadowColor: '#000',
           shadowOffset: { width: 0, height: 8 },
