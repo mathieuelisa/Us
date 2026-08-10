@@ -1,6 +1,7 @@
 import '@/global.css';
 
 import { QueryClientProvider } from '@tanstack/react-query';
+import { useFonts } from 'expo-font';
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { HeroUINativeProvider } from 'heroui-native';
@@ -107,6 +108,11 @@ export default function RootLayout() {
   const colorScheme = useColorScheme();
   const setSession = useSetAtom(sessionAtom);
   const [isSessionReady, setIsSessionReady] = useState(false);
+  // Titres de l'onboarding (demande explicite) — voir `ONBOARDING_TITLE_FONT`
+  // dans `step-shell.tsx` pour l'usage.
+  const [fontsLoaded] = useFonts({
+    Provicali: require('@/assets/fonts/Provicali.otf'),
+  });
   // Fond de la racine de l'app, pour que la zone que `AppTabBar` laisse
   // transparente (demande explicite) révèle la bonne couleur au lieu du
   // noir par défaut du conteneur réservé par React Navigation.
@@ -140,7 +146,7 @@ export default function RootLayout() {
             value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
           >
             <AnimatedSplashOverlay />
-            {isSessionReady ? <AuthGate /> : null}
+            {isSessionReady && fontsLoaded ? <AuthGate /> : null}
           </ThemeProvider>
         </HeroUINativeProvider>
       </QueryClientProvider>

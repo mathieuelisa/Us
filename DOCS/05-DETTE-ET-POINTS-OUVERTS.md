@@ -24,6 +24,7 @@ Dernière revue : 2026-08-08.
 | 2 | **Restreindre les URL de redirection Supabase.** `exp://**`, `exp+us://**` et `http://localhost:8081/**` sont des commodités de développement : elles élargissent la surface d'open-redirect. Ne garder que `us://**` (et le domaine web réel le jour où il existe). | Dashboard Supabase → `Authentication > URL Configuration` |
 | 3 | **Consentement explicite RGPD (article 9).** L'app traite des données de santé (symptômes, humeur, groupe sanguin, n° de sécurité sociale) : leur traitement suppose un consentement explicite, donc une action dédiée — pas des CGU acceptées implicitement. À accompagner d'une politique de confidentialité, de durées de conservation et du DPA Supabase. | — |
 | 4 | **Supprimer l'ancien projet Supabase de Londres** (`lmocuevvrznpnglcunea`, en pause) et renommer « US app (Paris) » en « US app ». Tant qu'il existe, il occupe un des 2 emplacements gratuits. | Dashboard Supabase |
+| 42 | **Licence de la police Provicali (titres d'onboarding) à régulariser.** Distribuée par Chequered Ink Ltd. sous licence **Non-Commercial** — l'app a une intention commerciale (paywall, module premium, DOCS/versions/MVP.md), donc hors du périmètre autorisé par cette licence gratuite. Acheter la licence commerciale avant toute mise en production, ou remplacer la police. | [`assets/fonts/Provicali.otf`](../assets/fonts/Provicali.otf), [`src/components/onboarding/step-shell.tsx`](../src/components/onboarding/step-shell.tsx) |
 
 ## 🟠 Jamais vérifié
 

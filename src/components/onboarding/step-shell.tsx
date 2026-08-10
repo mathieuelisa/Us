@@ -16,6 +16,19 @@ const STEP_NUMBERS = Array.from(
 );
 
 /**
+ * Police custom (Provicali, demande explicite) réservée aux titres
+ * d'onboarding — chargée dans `src/app/_layout.tsx` via `useFonts`.
+ *
+ * ⚠️ Licence : `assets/fonts/Provicali.otf` est distribuée par Chequered
+ * Ink Ltd. sous licence **Non-Commercial** (voir
+ * `FSLA_NonCommercial_License.html` fourni avec le fichier). L'app a une
+ * intention commerciale (paywall, module premium — DOCS/versions/MVP.md) :
+ * une licence commerciale doit être achetée avant toute mise en
+ * production, sans quoi l'usage de cette police enfreint la licence.
+ */
+const ONBOARDING_TITLE_FONT = 'Provicali';
+
+/**
  * Ossature commune des écrans d'onboarding : barre de progression, titre,
  * sous-titre, contenu scrollable et action principale en pied d'écran.
  * Les écrans hors parcours numéroté (réassurance, paywall, invitation)
@@ -90,7 +103,10 @@ export function OnboardingStepShell({
 
         {centered ? (
           <View className="flex-1 justify-center gap-2">
-            <Text className="text-center text-[24px] font-bold leading-7 text-[#1a1a1a]">
+            <Text
+              style={{ fontFamily: ONBOARDING_TITLE_FONT }}
+              className="text-center text-[24px] leading-7 text-[#1a1a1a]"
+            >
               {title}
             </Text>
             {subtitle ? (
@@ -102,7 +118,10 @@ export function OnboardingStepShell({
           </View>
         ) : (
           <>
-            <Text className="text-[24px] font-bold leading-7 text-[#1a1a1a]">
+            <Text
+              style={{ fontFamily: ONBOARDING_TITLE_FONT }}
+              className="text-[24px] leading-7 text-[#1a1a1a]"
+            >
               {title}
             </Text>
             {subtitle ? (
