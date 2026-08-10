@@ -9,6 +9,7 @@ import { HowItWorksModal } from '@/components/hub/how-it-works-modal';
 import { PillarCard } from '@/components/hub/pillar-card';
 import { useMyHousehold } from '@/features/household/hooks';
 import {
+  CARD_SHADOW,
   formatAppointmentDate,
   MOOD_PRESENTATION,
 } from '@/features/hub/constants';
@@ -127,7 +128,10 @@ export default function HubScreen() {
             </View>
           </View>
         ) : (
-          <View className="gap-3 rounded-[16px] bg-white px-4 py-4">
+          <View
+            style={CARD_SHADOW}
+            className="gap-3 rounded-[16px] bg-white px-4 py-4"
+          >
             <View className="flex-row items-start justify-between gap-3">
               <View className="flex-1 gap-1">
                 <Text className="text-[15px] font-semibold text-[#1a1a1a]">
@@ -190,8 +194,13 @@ export default function HubScreen() {
           </View>
 
           {/* Traitement visuel distinct : « Votre bébé » n'est pas un 4e
-              pilier, c'est le module premium, verrouillé hors MVP. */}
-          <View className="mt-1 flex-row items-center gap-3.5 rounded-[16px] bg-[#1a1a1a] px-4 py-4">
+              pilier, c'est le module premium, verrouillé hors MVP. Bordure
+              jaune 1px en plus de l'ombre commune, pour le distinguer
+              davantage (demande explicite). */}
+          <View
+            style={{ ...CARD_SHADOW, borderWidth: 1, borderColor: '#e8c874' }}
+            className="mt-1 flex-row items-center gap-3.5 rounded-[16px] bg-[#1a1a1a] px-4 py-4"
+          >
             <Text className="text-[20px]">👶</Text>
             <View className="flex-1 gap-0.5">
               <Text className="text-[16px] font-semibold text-white">
@@ -221,6 +230,7 @@ export default function HubScreen() {
           <Pressable
             accessibilityRole="button"
             onPress={() => router.push('/partenaire')}
+            style={CARD_SHADOW}
             className="flex-row items-center gap-3.5 rounded-[16px] border border-[#e0e0e0] bg-white px-4 py-4"
           >
             <Text className="text-[20px]">💕</Text>

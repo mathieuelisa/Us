@@ -1,5 +1,7 @@
 import { Pressable, Text, View } from 'react-native';
 
+import { CARD_SHADOW } from '@/features/hub/constants';
+
 /**
  * Carte d'un des 3 piliers. Toutes ont volontairement le **même poids
  * visuel** (CONCEPT.md : « exactement 3 piliers de même poids visuel ») :
@@ -24,6 +26,7 @@ export function PillarCard({
       accessibilityRole="button"
       accessibilityLabel={`${title} — ${state}`}
       onPress={onPress}
+      style={CARD_SHADOW}
       className="flex-row items-center gap-3.5 rounded-[16px] bg-white px-4 py-4"
     >
       <View className="h-11 w-11 items-center justify-center rounded-[12px] bg-[#f4f4f4]">

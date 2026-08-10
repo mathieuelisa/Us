@@ -26,6 +26,20 @@ export const MOOD_ORDER: MoodValue[] = [
   'terrible',
 ];
 
+/**
+ * Ombre légère partagée par les cartes du hub (piliers, invitation, "Votre
+ * bébé", "Mon partenaire") — demande explicite de les mettre "légèrement"
+ * en valeur. Volontairement discrète : `shadowOpacity`/`elevation` bas,
+ * pour ne pas rompre l'égalité de poids visuel des 3 piliers (CONCEPT.md).
+ */
+export const CARD_SHADOW = {
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.06,
+  shadowRadius: 6,
+  elevation: 2,
+} as const;
+
 export function formatAppointmentDate(isoDate: string): string {
   const [year, month, day] = isoDate.split('-').map(Number);
   return new Date(year, month - 1, day).toLocaleDateString('fr-FR', {
