@@ -27,11 +27,9 @@ export function PillarCard({
       accessibilityLabel={`${title} — ${state}`}
       onPress={onPress}
       style={CARD_SHADOW}
-      className="flex-row items-center gap-3.5 rounded-[16px] bg-white px-4 py-4"
+      className="flex-row items-center gap-3.5 rounded-2xl bg-white px-4 py-4"
     >
-      <View className="h-11 w-11 items-center justify-center rounded-[12px] bg-[#f4f4f4]">
-        <Text className="text-[20px]">{emoji}</Text>
-      </View>
+      <Text className="text-[30px]">{emoji}</Text>
 
       <View className="flex-1 gap-0.5">
         <Text className="text-[16px] font-semibold text-[#1a1a1a]">

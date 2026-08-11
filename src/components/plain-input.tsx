@@ -21,7 +21,7 @@ export const PlainInput = forwardRef<
     <TextInput
       ref={ref}
       placeholderTextColor="#9a9a9a"
-      className={`rounded-[12px] border bg-white px-3.5 py-3 text-[14px] text-[#1a1a1a] ${
+      className={`rounded-xl border bg-white px-3.5 py-3 text-[14px] text-[#1a1a1a] ${
         isInvalid ? 'border-red-500' : 'border-accent'
       } ${className ?? ''}`}
       {...props}

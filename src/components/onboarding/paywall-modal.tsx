@@ -1,13 +1,13 @@
 import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
 
 const PREMIUM_FEATURES = [
-  'Suivi alimentation de bébé (rythme, quantité)',
+  'Match des Prénoms Duo',
+  'Assistant Contractions & Départ Maternité',
+  "Suivi Nutrition & Rythmes (Journal d'allaitement, biberons & statistiques)",
   'Suivi du rythme de sommeil de bébé',
-  'Mesures de bébé (poids, taille) avec courbe de croissance',
-  'Suivi du bain et des soins du jour',
-  'Calendrier des vaccins et rappels',
-  'Compteur de contractions',
-  'Informations partagées avec le co-parent',
+  'Carnet de Croissance (Courbes poids/taille)',
+  'Journal de Sommeil, Bain & Soins du quotidien',
+  'Espace Santé & Calendrier des Rappels Vaccinaux',
 ];
 
 /**
@@ -35,7 +35,7 @@ export function PaywallModal({
       onRequestClose={onClose}
     >
       <View className="flex-1 justify-end bg-black/50">
-        <View className="max-h-[92%] rounded-t-[24px] bg-[#1a1a1a] px-7 pb-8 pt-4">
+        <View className="max-h-[92%] rounded-t-3xl bg-[#1a1a1a] px-7 pb-8 pt-4">
           <View className="mb-3 h-1 w-10 self-center rounded-full bg-[#3a3a3a]" />
 
           <View className="gap-2">

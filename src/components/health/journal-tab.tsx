@@ -53,7 +53,7 @@ export function JournalTab({
 
   return (
     <View className="gap-5">
-      <View className="flex-row justify-between rounded-[16px] bg-white px-3 py-3">
+      <View className="flex-row justify-between rounded-2xl bg-white px-3 py-3">
         {weekDates.map((date, index) => {
           const isSelected = date === selectedDate;
           const hasSymptoms = markedDates.includes(date);

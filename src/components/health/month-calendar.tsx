@@ -63,7 +63,7 @@ export function MonthCalendar({
   const today = todayIso();
 
   return (
-    <View className="gap-3 rounded-[16px] bg-white px-4 py-4">
+    <View className="gap-3 rounded-2xl bg-white px-4 py-4">
       <View className="flex-row items-center justify-between">
         <Pressable
           accessibilityLabel="Mois précédent"

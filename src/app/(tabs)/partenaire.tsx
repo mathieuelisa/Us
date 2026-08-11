@@ -9,6 +9,7 @@ import { getWeeksOfAmenorrhea } from '@/features/health/constants';
 import { useBabySize } from '@/features/health/hooks';
 import { useMyHousehold } from '@/features/household/hooks';
 import { getPartnerUserId } from '@/features/hub/api';
+import { CARD_SHADOW } from '@/features/hub/constants';
 import { useHubSummary } from '@/features/hub/hooks';
 import { getTipOfTheDay } from '@/features/partner/constants';
 import { useThemeBackground } from '@/features/settings/hooks';
@@ -66,10 +67,11 @@ export default function PartnerScreen() {
             accessibilityLabel="Revenir en arrière"
             accessibilityRole="button"
             hitSlop={12}
+            style={CARD_SHADOW}
             onPress={() => router.back()}
             className="h-9 w-9 items-center justify-center rounded-full bg-white"
           >
-            <Text className="text-[17px] leading-[20px] text-[#1a1a1a]">‹</Text>
+            <Text className="text-[17px] leading-5 text-[#1a1a1a]">‹</Text>
           </Pressable>
         ) : null}
 
@@ -82,7 +84,7 @@ export default function PartnerScreen() {
             <Text className="text-[11.5px] font-semibold tracking-wide text-[#8a8a8a]">
               SON HUMEUR CETTE SEMAINE
             </Text>
-            <View className="rounded-[16px] bg-white px-4 py-4">
+            <View className="shadow-sm rounded-2xl bg-white px-4 py-4">
               <WeekMoodStrip
                 weekDates={weekDates}
                 checkinsByDate={partnerCheckins}
@@ -90,7 +92,7 @@ export default function PartnerScreen() {
             </View>
           </View>
         ) : (
-          <View className="rounded-[16px] bg-white px-4 py-4">
+          <View className="rounded-2xl bg-white px-4 py-4">
             <Text className="text-[14px] leading-5 text-[#6b6b6b]">
               {partnerName
                 ? `${partnerName} n’a pas encore rejoint votre espace. Sa tendance d’humeur apparaîtra ici dès qu’il ou elle aura créé son compte.`
@@ -103,7 +105,7 @@ export default function PartnerScreen() {
           <Text className="text-[11.5px] font-semibold tracking-wide text-[#8a8a8a]">
             VOTRE BÉBÉ CETTE SEMAINE
           </Text>
-          <View className="flex-row items-center gap-3.5 rounded-[16px] bg-white px-4 py-4">
+          <View className="flex-row shadow-sm items-center gap-3.5 rounded-2xl bg-white px-4 py-4">
             <Text className="text-[28px]">🍼</Text>
             <View className="flex-1 gap-0.5">
               <Text className="text-[15px] font-medium text-[#1a1a1a]">
@@ -129,7 +131,7 @@ export default function PartnerScreen() {
           </Text>
 
           {myTip ? (
-            <View className="gap-1 rounded-[16px] bg-white px-4 py-4">
+            <View className="gap-1 shadow-sm rounded-2xl bg-white px-4 py-4">
               <Text className="text-[11.5px] font-medium text-accent">
                 Pour vous
               </Text>
@@ -140,7 +142,7 @@ export default function PartnerScreen() {
           ) : null}
 
           {partnerTip ? (
-            <View className="gap-1 rounded-[16px] border border-[#e8e8e8] bg-white px-4 py-4">
+            <View className="gap-1 shadow-sm rounded-2xl border border-[#e8e8e8] bg-white px-4 py-4">
               <Text className="text-[11.5px] font-medium text-[#8a8a8a]">
                 {partnerName ? `Pour ${partnerName}` : 'Pour le co-parent'}
               </Text>

@@ -45,13 +45,15 @@ export default function ReassuranceStep() {
           </View>
 
           <View className="flex-row gap-4">
-            <View className="flex-1 items-center gap-1 rounded-[14px] bg-[#f4f4f4] px-4 py-5">
-              <Text className="text-[20px] font-bold text-accent">50 000+</Text>
+            <View className="flex-1 items-center border border-accent gap-1 rounded-[14px] bg-[#ffffff] px-4 py-5">
+              <Text className="text-[20px] font-bold text-accent">
+                50 000 +
+              </Text>
               <Text className="text-[13px] text-[#6b6b6b]">
                 Téléchargements
               </Text>
             </View>
-            <View className="flex-1 items-center gap-1 rounded-[14px] bg-[#f4f4f4] px-4 py-5">
+            <View className="flex-1 items-center border border-accent gap-1 rounded-[14px] bg-[#ffffff] px-4 py-5">
               <Text className="text-[20px] font-bold text-accent">4,8 ★</Text>
               <Text className="text-[13px] text-[#6b6b6b]">Note moyenne</Text>
             </View>

@@ -10,7 +10,7 @@ import { NeedNoteOverlay } from '@/components/together/need-note-overlay';
 import { WeekMoodStrip } from '@/components/together/week-mood-strip';
 import { useMyHousehold } from '@/features/household/hooks';
 import type { MoodValue } from '@/features/hub/api';
-import { MOOD_PRESENTATION } from '@/features/hub/constants';
+import { CARD_SHADOW, MOOD_PRESENTATION } from '@/features/hub/constants';
 import { useThemeBackground } from '@/features/settings/hooks';
 import { getCurrentWeekIsoDates } from '@/features/together/api';
 import { getGestureEmoji } from '@/features/together/constants';
@@ -35,6 +35,7 @@ const SafeAreaView = withUniwind(RNSafeAreaView);
  */
 export default function TogetherScreen() {
   const router = useRouter();
+
   const { data: household } = useMyHousehold();
   const role = useAtomValue(currentRoleAtom) ?? 'pregnant';
   const weekDates = getCurrentWeekIsoDates();
@@ -77,17 +78,16 @@ export default function TogetherScreen() {
         contentContainerClassName="gap-6 px-6 pb-10 pt-4"
         showsVerticalScrollIndicator={false}
       >
-        {router.canGoBack() ? (
-          <Pressable
-            accessibilityLabel="Revenir en arrière"
-            accessibilityRole="button"
-            hitSlop={12}
-            onPress={() => router.back()}
-            className="h-9 w-9 items-center justify-center rounded-full bg-white"
-          >
-            <Text className="text-[17px] leading-[20px] text-[#1a1a1a]">‹</Text>
-          </Pressable>
-        ) : null}
+        <Pressable
+          accessibilityLabel="Revenir en arrière"
+          accessibilityRole="button"
+          hitSlop={12}
+          style={CARD_SHADOW}
+          onPress={() => router.back()}
+          className="h-9 w-9 items-center justify-center rounded-full bg-white"
+        >
+          <Text className="text-[17px] leading-5 text-[#1a1a1a]">‹</Text>
+        </Pressable>
 
         <Text className="text-[26px] font-bold text-[#1a1a1a]">Ensemble</Text>
 
@@ -109,7 +109,7 @@ export default function TogetherScreen() {
         </View>
 
         {gesture ? (
-          <View className="items-center gap-3 rounded-[20px] border border-[#ececec] bg-white px-5 py-7">
+          <View className="items-center gap-3 rounded-[20px] border border-[#ececec] bg-white px-5 py-7 shadow-sm">
             <Text className="self-start text-[11.5px] font-semibold tracking-wide text-[#8a8a8a]">
               GESTE DU JOUR
             </Text>

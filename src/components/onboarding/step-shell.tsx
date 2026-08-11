@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import { withUniwind } from 'uniwind';
-
+import { CARD_SHADOW } from '@/features/hub/constants';
 import { ONBOARDING_STEP_COUNT } from '@/features/onboarding/constants';
 import { useThemeBackground } from '@/features/settings/hooks';
 
@@ -76,10 +76,11 @@ export function OnboardingStepShell({
             accessibilityLabel="Revenir à l’étape précédente"
             accessibilityRole="button"
             hitSlop={12}
+            style={CARD_SHADOW}
             onPress={() => router.back()}
-            className="mb-2 h-9 w-9 items-center justify-center rounded-full bg-[#f4f4f4]"
+            className="mb-2 h-9 w-9 items-center justify-center rounded-full bg-[#ffffff]"
           >
-            <Text className="text-[17px] leading-[20px] text-[#1a1a1a]">‹</Text>
+            <Text className="text-[17px] leading-5 text-[#1a1a1a]">‹</Text>
           </Pressable>
         ) : null}
 

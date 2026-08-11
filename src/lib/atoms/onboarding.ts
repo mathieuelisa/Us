@@ -31,7 +31,7 @@ export const EMPTY_ONBOARDING_DRAFT: OnboardingDraft = {
   firstName: '',
   partnerFirstName: '',
   dueDate: null,
-  isFirstChild: null,
+  isFirstChild: true,
   professionalStatus: null,
   priorities: [],
   reminderFrequency: null,

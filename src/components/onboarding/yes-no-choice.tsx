@@ -18,7 +18,7 @@ export function YesNoChoice({
             accessibilityRole="button"
             accessibilityState={{ selected: isSelected }}
             onPress={() => onChange(option)}
-            className={`flex-1 items-center rounded-[12px] border py-3 ${
+            className={`flex-1 items-center rounded-xl border py-3 ${
               isSelected
                 ? 'border-accent bg-accent'
                 : 'border-[#e8e8e8] bg-white'

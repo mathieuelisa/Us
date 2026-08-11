@@ -9,6 +9,7 @@ import {
 } from '@/features/health/constants';
 import { useExercises } from '@/features/health/hooks';
 import type { Household } from '@/features/household/api';
+import { CARD_SHADOW } from '@/features/hub/constants';
 
 /**
  * Écran 4f — exercices.
@@ -75,7 +76,8 @@ export function ExercisesTab({
                   key={exercise.id}
                   accessibilityRole="button"
                   onPress={() => setSelected(exercise)}
-                  className="gap-0.5 rounded-[16px] bg-white px-4 py-3.5"
+                  style={CARD_SHADOW}
+                  className="gap-0.5 rounded-2xl bg-white px-4 py-3.5"
                 >
                   <Text className="text-[15px] font-medium text-[#1a1a1a]">
                     {exercise.title}
@@ -114,10 +116,11 @@ function ExerciseDetail({
         accessibilityLabel="Retour à la liste des exercices"
         accessibilityRole="button"
         hitSlop={12}
+        style={CARD_SHADOW}
         onPress={onBack}
         className="h-9 w-9 items-center justify-center rounded-full bg-white"
       >
-        <Text className="text-[17px] leading-[20px] text-[#1a1a1a]">‹</Text>
+        <Text className="text-[17px] leading-5 text-[#1a1a1a]">‹</Text>
       </Pressable>
 
       <View className="gap-1">
@@ -131,7 +134,7 @@ function ExerciseDetail({
         ) : null}
       </View>
 
-      <View className="aspect-video items-center justify-center overflow-hidden rounded-[16px] bg-white">
+      <View className="aspect-video shadow-sm items-center justify-center overflow-hidden rounded-2xl bg-white">
         {exercise.image_url ? (
           <Image
             source={{ uri: exercise.image_url }}

@@ -2,7 +2,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Pressable, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import { withUniwind } from 'uniwind';
-
+import { CARD_SHADOW } from '@/features/hub/constants';
 import { useThemeBackground } from '@/features/settings/hooks';
 
 const SafeAreaView = withUniwind(RNSafeAreaView);
@@ -39,10 +39,11 @@ export default function LegalScreen() {
             accessibilityLabel="Revenir en arrière"
             accessibilityRole="button"
             hitSlop={12}
+            style={CARD_SHADOW}
             onPress={() => router.back()}
             className="mb-2 h-9 w-9 items-center justify-center rounded-full bg-white"
           >
-            <Text className="text-[17px] leading-[20px] text-[#1a1a1a]">‹</Text>
+            <Text className="text-[17px] leading-5 text-[#1a1a1a]">‹</Text>
           </Pressable>
         ) : null}
 

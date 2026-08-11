@@ -15,11 +15,16 @@ import { Stack } from 'expo-router';
  * `presentation: 'modal'` a été essayée d'abord, mais casse la navigation
  * suivante sur web (l'écran ouvert juste après reste caché derrière le
  * paywall) — pas fiable pour un projet qui tourne aussi en web.
+ *
+ * `bienvenue` (4 slides de présentation, demande explicite) est désormais
+ * le premier écran du groupe — avant `index` (« Qui vous accompagne… »,
+ * étape 1/6). Hors du décompte « Étape X sur 6 », ce n'est pas une étape du
+ * formulaire, juste une introduction skippable.
  */
 export default function OnboardingLayout() {
   return (
     <Stack
-      initialRouteName="index"
+      initialRouteName="bienvenue"
       screenOptions={{
         headerShown: false,
         gestureEnabled: true,

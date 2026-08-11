@@ -6,6 +6,7 @@ import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import { Uniwind, useUniwind, withUniwind } from 'uniwind';
 
 import { OutlineButton } from '@/components/outline-button';
+import { CARD_SHADOW } from '@/features/hub/constants';
 import { useUpdateMyTheme } from '@/features/profile/hooks';
 import {
   resolveThemeId,
@@ -137,6 +138,7 @@ export default function SettingsScreen() {
               <Pressable
                 key={link.doc}
                 accessibilityRole="button"
+                style={CARD_SHADOW}
                 onPress={() => router.push(`/legal?doc=${link.doc}`)}
                 className="flex-row items-center justify-between rounded-[14px] bg-white px-4 py-3.5"
               >

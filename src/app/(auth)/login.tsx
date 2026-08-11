@@ -45,13 +45,13 @@ export default function LoginScreen() {
     <SafeAreaView className="flex-1 bg-white">
       <View className="flex-1 justify-center gap-4 px-7">
         <View className="flex-1 items-center justify-center gap-4">
-          <View className="h-[72px] w-[72px] items-center justify-center rounded-[20px] bg-accent">
+          <View className="h-18 w-18 items-center justify-center rounded-[20px] bg-accent">
             <Text className="text-[28px] font-semibold text-accent-foreground">
               US
             </Text>
           </View>
           <Text className="text-[28px] font-bold text-[#1a1a1a]">US</Text>
-          <Text className="max-w-[240px] text-center text-[15px] leading-5 text-[#6b6b6b]">
+          <Text className="max-w-60 text-center text-[15px] leading-5 text-[#6b6b6b]">
             Votre bébé a son carnet de santé. Vous, vous avez US.
           </Text>
         </View>
@@ -104,7 +104,7 @@ export default function LoginScreen() {
           <Pressable
             accessibilityRole="button"
             onPress={() => setDevBypass('onboarding')}
-            className="mt-6 items-center rounded-[12px] border border-dashed border-[#d0d0d0] py-3"
+            className="mt-6 items-center rounded-xl border border-dashed border-[#d0d0d0] py-3"
           >
             <Text className="text-[13px] font-medium text-[#9a9a9a]">
               DEV — passer à l’onboarding sans connexion

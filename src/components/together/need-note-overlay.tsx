@@ -51,7 +51,7 @@ export function NeedNoteOverlay({
       onRequestClose={onSkip}
     >
       <View className="flex-1 items-center justify-end bg-black/40">
-        <View className="w-full gap-4 rounded-t-[24px] bg-white px-6 pb-8 pt-6">
+        <View className="w-full gap-4 rounded-t-3xl bg-white px-6 pb-8 pt-6">
           <Text className="text-center text-[36px]">{moodEmoji}</Text>
           <Text className="text-center text-[18px] font-bold text-[#1a1a1a]">
             Besoin de quelque chose ?
@@ -93,7 +93,7 @@ export function NeedNoteOverlay({
               setSelectedTag(null);
             }}
             multiline
-            className="rounded-[12px] border border-[#e0e0e0] px-3.5 py-3 text-[14px] text-[#1a1a1a]"
+            className="rounded-xl border border-[#e0e0e0] px-3.5 py-3 text-[14px] text-[#1a1a1a]"
           />
 
           <Button isDisabled={!canSubmit} onPress={submit}>

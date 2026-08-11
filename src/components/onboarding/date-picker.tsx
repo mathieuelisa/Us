@@ -93,7 +93,7 @@ function WheelColumn<T extends number>({
               positionsRef.current.set(value, event.nativeEvent.layout.x);
               if (isSelected) scrollToSelected();
             }}
-            className={`min-w-[52px] items-center rounded-[10px] px-3 py-2 ${
+            className={`min-w-13 items-center rounded-[10px] px-3 py-2 ${
               isSelected ? 'bg-accent' : 'bg-[#f4f4f4]'
             }`}
           >

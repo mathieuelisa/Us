@@ -15,6 +15,7 @@ import { withUniwind } from 'uniwind';
 import { StatusBadge } from '@/components/procedures/status-badge';
 import { StatusSelector } from '@/components/procedures/status-selector';
 import { useMyHousehold } from '@/features/household/hooks';
+import { CARD_SHADOW } from '@/features/hub/constants';
 import { formatDeadlineLabel } from '@/features/procedures/constants';
 // ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
 import { DEV_PROCEDURES_FIXTURE } from '@/features/procedures/dev-fixture';
@@ -109,10 +110,11 @@ export default function ProceduresScreen() {
           accessibilityLabel="Revenir en arrière"
           accessibilityRole="button"
           hitSlop={12}
+          style={CARD_SHADOW}
           onPress={() => (selected ? setSelectedId(null) : router.back())}
           className="h-9 w-9 items-center justify-center rounded-full bg-white"
         >
-          <Text className="text-[17px] leading-[20px] text-[#1a1a1a]">‹</Text>
+          <Text className="text-[17px] leading-5 text-[#1a1a1a]">‹</Text>
         </Pressable>
 
         {selected ? (
@@ -147,10 +149,11 @@ export default function ProceduresScreen() {
                   <Pressable
                     key={procedure.householdProcedureId}
                     accessibilityRole="button"
+                    style={CARD_SHADOW}
                     onPress={() =>
                       setSelectedId(procedure.householdProcedureId)
                     }
-                    className="flex-row items-center gap-3 rounded-[16px] bg-white px-4 py-3.5"
+                    className="flex-row items-center gap-3 rounded-2xl bg-white px-4 py-3.5"
                   >
                     <View className="flex-1 gap-0.5">
                       <Text className="text-[15px] font-medium text-[#1a1a1a]">
@@ -225,7 +228,7 @@ function ProcedureDetail({
           <Text className="text-[13px] font-medium text-[#1a1a1a]">
             Documents à fournir
           </Text>
-          <View className="gap-2 rounded-[16px] bg-white px-4 py-3.5">
+          <View className="gap-2 rounded-2xl bg-white px-4 py-3.5 shadow-sm">
             {procedure.documents.map((document) => (
               <View key={document} className="flex-row items-start gap-2">
                 <Text className="text-[13px] text-accent">•</Text>
@@ -238,7 +241,7 @@ function ProcedureDetail({
         </View>
       ) : null}
 
-      <View className="flex-row items-center justify-between gap-3 rounded-[12px] bg-white px-3.5 py-3">
+      <View className="flex-row items-center justify-between gap-3 shadow-sm rounded-xl bg-white px-3.5 py-3">
         <Text className="flex-1 text-[14px] text-[#1a1a1a]">
           Me rappeler avant l’échéance
         </Text>

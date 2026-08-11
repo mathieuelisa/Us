@@ -91,6 +91,7 @@ export default function HubScreen() {
           {isPregnant ? (
             <Pressable
               accessibilityRole="button"
+              style={CARD_SHADOW}
               onPress={() => router.push('/naissance')}
               className="rounded-full bg-accent px-3.5 py-2"
             >
@@ -106,7 +107,7 @@ export default function HubScreen() {
             <Text className="text-[11.5px] font-semibold tracking-wide text-[#8a8a8a]">
               HUMEUR DU JOUR
             </Text>
-            <View className="flex-row items-center gap-3.5 rounded-[16px] bg-white px-4 py-4">
+            <View className="flex-row items-center gap-3.5 rounded-2xl bg-white px-4 py-4">
               <Text className="text-[28px]">
                 {summary?.partnerMood
                   ? MOOD_PRESENTATION[summary.partnerMood.mood].emoji
@@ -130,7 +131,7 @@ export default function HubScreen() {
         ) : (
           <View
             style={CARD_SHADOW}
-            className="gap-3 rounded-[16px] bg-white px-4 py-4"
+            className="gap-3 rounded-2xl bg-white px-4 py-4"
           >
             <View className="flex-row items-start justify-between gap-3">
               <View className="flex-1 gap-1">
@@ -198,10 +199,10 @@ export default function HubScreen() {
               jaune 1px en plus de l'ombre commune, pour le distinguer
               davantage (demande explicite). */}
           <View
-            style={{ ...CARD_SHADOW, borderWidth: 1, borderColor: '#e8c874' }}
-            className="mt-1 flex-row items-center gap-3.5 rounded-[16px] bg-[#1a1a1a] px-4 py-4"
+            style={{ ...CARD_SHADOW, borderWidth: 2, borderColor: '#e8c874' }}
+            className="mt-1 flex-row items-center gap-3.5 rounded-2xl bg-[#1a1a1a] px-4 py-4"
           >
-            <Text className="text-[20px]">👶</Text>
+            <Text className="text-[30px]">👶</Text>
             <View className="flex-1 gap-0.5">
               <Text className="text-[16px] font-semibold text-white">
                 Votre bébé
@@ -231,7 +232,7 @@ export default function HubScreen() {
             accessibilityRole="button"
             onPress={() => router.push('/partenaire')}
             style={CARD_SHADOW}
-            className="flex-row items-center gap-3.5 rounded-[16px] border border-[#e0e0e0] bg-white px-4 py-4"
+            className="flex-row items-center gap-3.5 rounded-2xl border border-[#e0e0e0] bg-white px-4 py-4"
           >
             <Text className="text-[20px]">💕</Text>
             <View className="flex-1 gap-0.5">

@@ -67,7 +67,7 @@ export function AppointmentFormModal({
       onRequestClose={onCancel}
     >
       <View className="flex-1 justify-end bg-black/40">
-        <View className="max-h-[88%] rounded-t-[24px] bg-white px-6 pb-8 pt-6">
+        <View className="max-h-[88%] rounded-t-3xl bg-white px-6 pb-8 pt-6">
           <ScrollView
             showsVerticalScrollIndicator={false}
             contentContainerClassName="gap-4"
@@ -108,7 +108,7 @@ export function AppointmentFormModal({
               onChangeText={setAddress}
             />
 
-            <View className="flex-row items-center justify-between gap-3 rounded-[12px] bg-[#f4f4f4] px-3.5 py-3">
+            <View className="flex-row items-center justify-between gap-3 rounded-xl bg-[#f4f4f4] px-3.5 py-3">
               <Text className="flex-1 text-[14px] text-[#1a1a1a]">
                 Visible par les deux parents
               </Text>
@@ -167,7 +167,7 @@ function PlainInput(props: {
       placeholderTextColor="#9a9a9a"
       value={props.value}
       onChangeText={props.onChangeText}
-      className="rounded-[12px] border border-[#e0e0e0] px-3.5 py-3 text-[14px] text-[#1a1a1a]"
+      className="rounded-xl border border-[#e0e0e0] px-3.5 py-3 text-[14px] text-[#1a1a1a]"
     />
   );
 }

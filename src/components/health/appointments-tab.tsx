@@ -79,7 +79,7 @@ export function AppointmentsTab({
           upcoming.map((appointment) => (
             <View
               key={appointment.id}
-              className="gap-1.5 rounded-[16px] bg-white px-4 py-3.5"
+              className="gap-1.5 rounded-2xl bg-white px-4 py-3.5"
             >
               <View className="flex-row items-center gap-2">
                 <Text className="flex-1 text-[15px] font-medium text-[#1a1a1a]">

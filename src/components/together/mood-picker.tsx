@@ -1,7 +1,11 @@
 import { Pressable, Text, View } from 'react-native';
 
 import type { MoodValue } from '@/features/hub/api';
-import { MOOD_ORDER, MOOD_PRESENTATION } from '@/features/hub/constants';
+import {
+  CARD_SHADOW,
+  MOOD_ORDER,
+  MOOD_PRESENTATION,
+} from '@/features/hub/constants';
 
 /** Les 5 emoji du check-in (écrans 3a/3g) — un tap suffit à enregistrer. */
 export function MoodPicker({
@@ -19,6 +23,7 @@ export function MoodPicker({
           <Pressable
             key={mood}
             accessibilityRole="button"
+            style={CARD_SHADOW}
             accessibilityLabel={MOOD_PRESENTATION[mood].phrase}
             accessibilityState={{ selected: isSelected }}
             onPress={() => onSelect(mood)}
