@@ -1,7 +1,7 @@
 import { router } from 'expo-router';
 import { useAtomValue } from 'jotai';
 import { useState } from 'react';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import { withUniwind } from 'uniwind';
 
@@ -199,10 +199,15 @@ export default function HubScreen() {
               jaune 1px en plus de l'ombre commune, pour le distinguer
               davantage (demande explicite). */}
           <View
-            style={{ ...CARD_SHADOW, borderWidth: 2, borderColor: '#e8c874' }}
-            className="mt-1 flex-row items-center gap-3.5 rounded-2xl bg-[#1a1a1a] px-4 py-4"
+            style={{ ...CARD_SHADOW, borderWidth: 5, borderColor: '#e8c874' }}
+            className="mt-1 flex-row items-center gap-3.5 rounded-2xl bg-[#2e5e5a] px-4 py-4"
           >
-            <Text className="text-[30px]">👶</Text>
+            <Image
+              source={require('@/assets/images/Baby_head.png')}
+              className="w-10 h-12"
+              resizeMode="contain"
+            />
+
             <View className="flex-1 gap-0.5">
               <Text className="text-[16px] font-semibold text-white">
                 Votre bébé

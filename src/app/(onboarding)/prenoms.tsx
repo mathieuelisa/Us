@@ -60,7 +60,7 @@ export default function FirstNamesStep() {
   return (
     <OnboardingStepShell
       step={2}
-      title="Petit à petit, faisons connaissance 👋"
+      title="Petit à petit, faisons connaissance"
       subtitle="Ces prénoms nous servent uniquement à personnaliser votre espace — jamais utilisés pour vous identifier."
       primaryLabel="Suivant"
       isPrimaryDisabled={!isValid}

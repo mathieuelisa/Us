@@ -1,6 +1,14 @@
 import { Button } from 'heroui-native';
 import { useEffect, useState } from 'react';
-import { Modal, Pressable, Text, TextInput, View } from 'react-native';
+import {
+  Image,
+  type ImageSourcePropType,
+  Modal,
+  Pressable,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
 
 import { NEED_TAGS } from '@/features/together/constants';
 
@@ -18,7 +26,7 @@ export function NeedNoteOverlay({
   onSkip,
 }: {
   visible: boolean;
-  moodEmoji: string;
+  moodEmoji?: ImageSourcePropType;
   onSubmit: (note: string) => void;
   onSkip: () => void;
 }) {
@@ -52,7 +60,11 @@ export function NeedNoteOverlay({
     >
       <View className="flex-1 items-center justify-end bg-black/40">
         <View className="w-full gap-4 rounded-t-3xl bg-white px-6 pb-8 pt-6">
-          <Text className="text-center text-[36px]">{moodEmoji}</Text>
+          <Image
+            source={moodEmoji}
+            className="mx-auto h-40 w-40"
+            resizeMode="contain"
+          />
           <Text className="text-center text-[18px] font-bold text-[#1a1a1a]">
             Besoin de quelque chose ?
           </Text>

@@ -124,7 +124,9 @@ export default function TogetherScreen() {
 
       <NeedNoteOverlay
         visible={isOverlayOpen}
-        moodEmoji={pendingMood ? MOOD_PRESENTATION[pendingMood].emoji : ''}
+        moodEmoji={
+          pendingMood ? MOOD_PRESENTATION[pendingMood].imgUrl : undefined
+        }
         onSubmit={submitNeed}
         onSkip={closeOverlay}
       />

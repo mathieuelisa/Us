@@ -112,6 +112,7 @@ export default function RootLayout() {
   // dans `step-shell.tsx` pour l'usage.
   const [fontsLoaded] = useFonts({
     Provicali: require('@/assets/fonts/Provicali.otf'),
+    Tondu: require('@/assets/fonts/Tondu.ttf'),
   });
   // Fond de la racine de l'app, pour que la zone que `AppTabBar` laisse
   // transparente (demande explicite) révèle la bonne couleur au lieu du

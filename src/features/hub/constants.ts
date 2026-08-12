@@ -1,3 +1,4 @@
+import type { ImageSourcePropType } from 'react-native';
 import type { MoodValue } from './api';
 
 /**
@@ -8,13 +9,33 @@ import type { MoodValue } from './api';
  */
 export const MOOD_PRESENTATION: Record<
   MoodValue,
-  { emoji: string; phrase: string }
+  { emoji: string; phrase: string; imgUrl: ImageSourcePropType }
 > = {
-  great: { emoji: '😄', phrase: 'semble au top' },
-  good: { emoji: '🙂', phrase: 'semble se sentir bien' },
-  neutral: { emoji: '😐', phrase: 'passe une journée ordinaire' },
-  bad: { emoji: '😩', phrase: 'traverse une journée difficile' },
-  terrible: { emoji: '😢', phrase: 'traverse une journée très difficile' },
+  great: {
+    emoji: '😄',
+    imgUrl: require('@/assets/images/Mother_happy.png'),
+    phrase: 'semble au top',
+  },
+  good: {
+    emoji: '🙂',
+    imgUrl: require('@/assets/images/Mother_smile.png'),
+    phrase: 'semble se sentir bien',
+  },
+  neutral: {
+    emoji: '😐',
+    imgUrl: require('@/assets/images/Mother_neutral.png'),
+    phrase: 'passe une journée ordinaire',
+  },
+  bad: {
+    emoji: '😩',
+    imgUrl: require('@/assets/images/Mother_sad.png'),
+    phrase: 'traverse une journée difficile',
+  },
+  terrible: {
+    emoji: '😢',
+    imgUrl: require('@/assets/images/Mother_cry.png'),
+    phrase: 'traverse une journée très difficile',
+  },
 };
 
 /** Ordre d'affichage des 5 humeurs (écrans 3a/3g) — great en tête. */

@@ -1,7 +1,7 @@
 import { router } from 'expo-router';
 import { Button } from 'heroui-native';
 import { useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Image, Pressable, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import { withUniwind } from 'uniwind';
 import { CARD_SHADOW } from '@/features/hub/constants';
@@ -23,25 +23,25 @@ const SafeAreaView = withUniwind(RNSafeAreaView);
  */
 const SLIDES = [
   {
-    emoji: '💞',
+    imgUrl: require('@/assets/images/Family.png'),
     title: 'Bienvenue sur US',
     description:
       'L’application pensée pour les couples qui attendent un enfant. Simplifiez votre quotidien, à deux, du premier trimestre aux premiers mois.',
   },
   {
-    emoji: '💬',
+    imgUrl: require('@/assets/images/Father_feelings_mother.png'),
     title: 'Partagez vos émotions',
     description:
       'Grâce à US, vous saurez ce que ressent votre partenaire au quotidien — d’un simple geste, restez connectés malgré la fatigue et le stress.',
   },
   {
-    emoji: '🩺',
+    imgUrl: require('@/assets/images/Father_speak_with_mother.png'),
     title: 'Suivez la grossesse ensemble',
     description:
       'Rendez-vous, symptômes, taille du bébé semaine après semaine : toutes les infos essentielles centralisées et partagées à deux.',
   },
   {
-    emoji: '📋',
+    imgUrl: require('@/assets/images/Mother_with_calendar.png'),
     title: 'Ne ratez aucune démarche',
     description:
       'CAF, sécurité sociale, déclaration de naissance… US vous rappelle quoi faire et quand, pour ne rien oublier après l’arrivée de bébé.',
@@ -106,9 +106,15 @@ export default function WelcomeCarousel() {
         </View>
 
         <View className="flex-1 items-center justify-center gap-5">
-          <Text className="text-[116px]">{slide.emoji}</Text>
+          {/* <Text className='text-[116px]'>{slide.emoji}</Text> */}
+          <Image
+            source={slide.imgUrl}
+            className="w-50 h-50"
+            resizeMode="contain"
+          />
+
           <Text
-            style={{ fontFamily: 'Provicali' }}
+            style={{ fontFamily: 'Tondu' }}
             className="text-center text-[36px] leading-8 text-[#1a1a1a]"
           >
             {slide.title}

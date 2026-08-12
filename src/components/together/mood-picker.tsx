@@ -1,4 +1,4 @@
-import { Pressable, Text, View } from 'react-native';
+import { Image, Pressable, View } from 'react-native';
 
 import type { MoodValue } from '@/features/hub/api';
 import {
@@ -27,13 +27,18 @@ export function MoodPicker({
             accessibilityLabel={MOOD_PRESENTATION[mood].phrase}
             accessibilityState={{ selected: isSelected }}
             onPress={() => onSelect(mood)}
-            className={`h-14 w-14 items-center justify-center rounded-full border-2 ${
+            className={`h-20 w-20 items-center justify-center rounded-full border-2 ${
               isSelected
                 ? 'border-accent bg-accent/10'
                 : 'border-transparent bg-white'
             }`}
           >
-            <Text className="text-[26px]">{MOOD_PRESENTATION[mood].emoji}</Text>
+            {/* <Text className="text-[26px]">{MOOD_PRESENTATION[mood].emoji}</Text> */}
+            <Image
+              source={MOOD_PRESENTATION[mood].imgUrl}
+              className="w-16 h-40"
+              resizeMode="contain"
+            />
           </Pressable>
         );
       })}

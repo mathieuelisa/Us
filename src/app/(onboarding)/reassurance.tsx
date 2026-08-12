@@ -1,7 +1,7 @@
 import { router } from 'expo-router';
 import { useAtomValue } from 'jotai';
 import { useState } from 'react';
-import { Text, View } from 'react-native';
+import { Image, Text, View } from 'react-native';
 import { PaywallModal } from '@/components/onboarding/paywall-modal';
 import { OnboardingStepShell } from '@/components/onboarding/step-shell';
 import { shouldInvitePartner } from '@/features/onboarding/constants';
@@ -36,7 +36,11 @@ export default function ReassuranceStep() {
         onPrimaryPress={() => setIsPaywallOpen(true)}
       >
         <View className="items-center gap-6">
-          <Text className="text-[52px]">🎉</Text>
+          <Image
+            source={require('@/assets/images/Father_mother_baby_party.png')}
+            className="w-80 h-60"
+            resizeMode="contain"
+          />
 
           <View className="flex-row items-center gap-1.5 rounded-full bg-accent px-3.5 py-1.5">
             <Text className="text-[13px] font-medium text-accent-foreground">
@@ -54,7 +58,9 @@ export default function ReassuranceStep() {
               </Text>
             </View>
             <View className="flex-1 items-center border border-accent gap-1 rounded-[14px] bg-[#ffffff] px-4 py-5">
-              <Text className="text-[20px] font-bold text-accent">4,8 ★</Text>
+              <Text className="text-[20px] font-bold text-accent">
+                4,8 <Text className="text-yellow-400">★</Text>
+              </Text>
               <Text className="text-[13px] text-[#6b6b6b]">Note moyenne</Text>
             </View>
           </View>
