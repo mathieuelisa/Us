@@ -21,15 +21,18 @@ import type { Household } from '@/features/household/api';
  */
 export function ContactsTab({
   household,
+  isAdding,
+  onIsAddingChange,
 }: {
   household: Household | null | undefined;
+  isAdding: boolean;
+  onIsAddingChange: (isAdding: boolean) => void;
 }) {
   const { data: contacts = [] } = useContacts(household);
   const createContact = useCreateContact(household);
   const deleteContact = useDeleteContact(household);
   const reorderContacts = useReorderContacts(household);
 
-  const [isAdding, setIsAdding] = useState(false);
   const [name, setName] = useState('');
   const [roleLabel, setRoleLabel] = useState('');
   const [phone, setPhone] = useState('');
@@ -40,7 +43,7 @@ export function ContactsTab({
     setRoleLabel('');
     setPhone('');
     setIsEmergency(false);
-    setIsAdding(false);
+    onIsAddingChange(false);
   };
 
   const moveContact = (index: number, direction: -1 | 1) => {
@@ -198,17 +201,7 @@ export function ContactsTab({
             </Button>
           </View>
         </View>
-      ) : (
-        <Pressable
-          accessibilityRole="button"
-          onPress={() => setIsAdding(true)}
-          className="items-center rounded-full bg-accent py-3"
-        >
-          <Text className="text-[15px] font-medium text-accent-foreground">
-            + Ajouter
-          </Text>
-        </Pressable>
-      )}
+      ) : null}
     </View>
   );
 }

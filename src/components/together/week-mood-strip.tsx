@@ -7,11 +7,13 @@ import { todayIso } from '@/lib/date';
 const DAY_LETTERS = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
 
 /**
- * Tendance hebdomadaire **qualitative** : un emoji par jour, jamais un
- * chiffre ni une hauteur de barre — DOCS/02-ACTION-PLAN.md §1.4 corrige
- * explicitement la maquette sur ce point (graphique à barres à ne pas
- * reproduire). Un emoji par jour reste qualitatif ; une hauteur suggère une
- * échelle numérique sous-jacente.
+ * Tendance hebdomadaire **qualitative** : l'humeur reste un emoji par jour,
+ * jamais un chiffre ni une hauteur de barre — DOCS/02-ACTION-PLAN.md §1.4
+ * corrige explicitement la maquette sur ce point (graphique à barres à ne
+ * pas reproduire). Un emoji par jour reste qualitatif ; une hauteur suggère
+ * une échelle numérique sous-jacente. Le numéro affiché sous le rond est la
+ * date du jour (repère calendaire, comme dans Suivi santé), pas une valeur
+ * d'humeur.
  */
 export function WeekMoodStrip({
   weekDates,
@@ -27,6 +29,8 @@ export function WeekMoodStrip({
       {weekDates.map((date, index) => {
         const mood = checkinsByDate[date];
         const isToday = date === today;
+
+        const dayNumber = Number(date.slice(-2));
 
         return (
           <View key={date} className="items-center gap-1.5">
@@ -44,6 +48,11 @@ export function WeekMoodStrip({
                 {mood ? MOOD_PRESENTATION[mood].emoji : ''}
               </Text>
             </View>
+            <Text
+              className={`text-[10px] ${isToday ? 'font-medium text-accent' : 'text-[#9a9a9a]'}`}
+            >
+              {dayNumber}
+            </Text>
           </View>
         );
       })}

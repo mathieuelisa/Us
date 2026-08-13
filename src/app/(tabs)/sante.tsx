@@ -46,12 +46,15 @@ export default function HealthScreen() {
   const [activeTab, setActiveTab] = useState<HealthTab>(
     isPregnant ? 'journal' : 'appointments',
   );
+  const [isAddingContact, setIsAddingContact] = useState(false);
   const backgroundColor = useThemeBackground();
 
   return (
     <SafeAreaView className="flex-1" style={{ backgroundColor }}>
       <ScrollView
-        contentContainerClassName="gap-5 px-6 pb-10 pt-4"
+        contentContainerClassName={`gap-5 px-6 pt-4 ${
+          activeTab === 'contacts' ? 'pb-28' : 'pb-10'
+        }`}
         showsVerticalScrollIndicator={false}
       >
         {router.canGoBack() ? (
@@ -84,13 +87,30 @@ export default function HealthScreen() {
             <AppointmentsTab household={household} isPregnant={isPregnant} />
           ) : null}
           {activeTab === 'contacts' ? (
-            <ContactsTab household={household} />
+            <ContactsTab
+              household={household}
+              isAdding={isAddingContact}
+              onIsAddingChange={setIsAddingContact}
+            />
           ) : null}
           {activeTab === 'exercises' ? (
             <ExercisesTab household={household} />
           ) : null}
         </View>
       </ScrollView>
+
+      {activeTab === 'contacts' && !isAddingContact ? (
+        <Pressable
+          accessibilityLabel="Ajouter un contact"
+          accessibilityRole="button"
+          onPress={() => setIsAddingContact(true)}
+          className="absolute bottom-6 right-6 h-16 w-16 items-center justify-center rounded-full bg-accent shadow-lg"
+        >
+          <Text className="text-[26px] font-medium leading-7 text-accent-foreground">
+            +
+          </Text>
+        </Pressable>
+      ) : null}
     </SafeAreaView>
   );
 }

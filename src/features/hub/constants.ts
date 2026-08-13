@@ -9,32 +9,37 @@ import type { MoodValue } from './api';
  */
 export const MOOD_PRESENTATION: Record<
   MoodValue,
-  { emoji: string; phrase: string; imgUrl: ImageSourcePropType }
+  { emoji: string; phrase: string; label: string; imgUrl: ImageSourcePropType }
 > = {
   great: {
     emoji: '😄',
     imgUrl: require('@/assets/images/Mother_happy.png'),
     phrase: 'semble au top',
+    label: 'Épanouie',
   },
   good: {
     emoji: '🙂',
     imgUrl: require('@/assets/images/Mother_smile.png'),
     phrase: 'semble se sentir bien',
+    label: 'Contente',
   },
   neutral: {
     emoji: '😐',
     imgUrl: require('@/assets/images/Mother_neutral.png'),
     phrase: 'passe une journée ordinaire',
+    label: 'Neutre',
   },
   bad: {
     emoji: '😩',
     imgUrl: require('@/assets/images/Mother_sad.png'),
     phrase: 'traverse une journée difficile',
+    label: 'Triste',
   },
   terrible: {
     emoji: '😢',
     imgUrl: require('@/assets/images/Mother_cry.png'),
     phrase: 'traverse une journée très difficile',
+    label: 'Malheureuse',
   },
 };
 
