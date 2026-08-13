@@ -17,7 +17,10 @@ import { StatusBadge } from '@/components/procedures/status-badge';
 import { StatusSelector } from '@/components/procedures/status-selector';
 import { useMyHousehold } from '@/features/household/hooks';
 import { CARD_SHADOW } from '@/features/hub/constants';
-import { formatDeadlineLabel } from '@/features/procedures/constants';
+import {
+  formatDeadlineLabel,
+  getProcedureIconStyle,
+} from '@/features/procedures/constants';
 // ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
 import { DEV_PROCEDURES_FIXTURE } from '@/features/procedures/dev-fixture';
 import {
@@ -146,6 +149,7 @@ export default function ProceduresScreen() {
                   procedure.deadline_days_after_birth,
                   household?.birth_date ?? null,
                 );
+                const iconStyle = getProcedureIconStyle(procedure.slug);
                 return (
                   <Pressable
                     key={procedure.householdProcedureId}
@@ -156,6 +160,16 @@ export default function ProceduresScreen() {
                     }
                     className="flex-row items-center gap-3 rounded-2xl bg-white px-4 py-3.5"
                   >
+                    <View
+                      style={{ backgroundColor: iconStyle.bg }}
+                      className="h-11 w-11 items-center justify-center rounded-full"
+                    >
+                      <Ionicons
+                        name={iconStyle.icon}
+                        size={20}
+                        color={iconStyle.color}
+                      />
+                    </View>
                     <View className="flex-1 gap-0.5">
                       <View className="flex-row items-center gap-1.5">
                         <Text className="text-[15px] font-medium text-[#1a1a1a]">
@@ -178,7 +192,10 @@ export default function ProceduresScreen() {
                         {deadline}
                       </Text>
                     </View>
-                    <StatusBadge status={procedure.status} />
+                    <StatusBadge
+                      status={procedure.status}
+                      todoColor={{ bg: iconStyle.bg, text: iconStyle.color }}
+                    />
                   </Pressable>
                 );
               })}
