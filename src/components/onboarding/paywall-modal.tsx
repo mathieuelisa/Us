@@ -77,8 +77,8 @@ export function PaywallModal({
           </ScrollView>
 
           <View className="gap-3 pt-2">
-            <View className="items-center rounded-full bg-[#3a3a3a] py-3.5">
-              <Text className="text-[15px] font-medium text-[#8a8a8a]">
+            <View className="items-center rounded-full bg-[#191818] py-3.5">
+              <Text className="text-[15px] font-medium text-[#e8c874]">
                 Débloquer — bientôt disponible
               </Text>
             </View>

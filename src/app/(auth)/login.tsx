@@ -1,11 +1,12 @@
 import { Button } from 'heroui-native';
 import { useSetAtom } from 'jotai';
 import { useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Image, Pressable, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import { withUniwind } from 'uniwind';
 
 import { PlainInput } from '@/components/plain-input';
+import { useThemeBackground } from '@/features/settings/hooks';
 // ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
 import { devBypassAtom } from '@/lib/atoms/dev-bypass';
 import { supabase } from '@/lib/supabase/client';
@@ -22,6 +23,7 @@ export default function LoginScreen() {
 
   // ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
   const setDevBypass = useSetAtom(devBypassAtom);
+  const backgroundColor = useThemeBackground();
 
   const handleSubmit = async () => {
     setStatus('sending');
@@ -42,15 +44,14 @@ export default function LoginScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1" style={{ backgroundColor }}>
       <View className="flex-1 justify-center gap-4 px-7">
         <View className="flex-1 items-center justify-center gap-4">
-          <View className="h-18 w-18 items-center justify-center rounded-[20px] bg-accent">
-            <Text className="text-[28px] font-semibold text-accent-foreground">
-              US
-            </Text>
-          </View>
-          <Text className="text-[28px] font-bold text-[#1a1a1a]">US</Text>
+          <Image
+            source={require('@/assets/images/Father_feelings_mother.png')}
+            className="h-90 w-90"
+            resizeMode="contain"
+          />
           <Text className="max-w-60 text-center text-[15px] leading-5 text-[#6b6b6b]">
             Votre bébé a son carnet de santé. Vous, vous avez US.
           </Text>

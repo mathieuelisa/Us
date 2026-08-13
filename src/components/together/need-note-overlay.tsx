@@ -66,7 +66,7 @@ export function NeedNoteOverlay({
             resizeMode="contain"
           />
           <Text className="text-center text-[18px] font-bold text-[#1a1a1a]">
-            Besoin de quelque chose ?
+            Une envie particulière ?
           </Text>
 
           <View className="flex-row flex-wrap justify-center gap-2">

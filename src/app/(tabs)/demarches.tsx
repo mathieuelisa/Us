@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useAtomValue } from 'jotai';
 import { useState } from 'react';
@@ -156,9 +157,23 @@ export default function ProceduresScreen() {
                     className="flex-row items-center gap-3 rounded-2xl bg-white px-4 py-3.5"
                   >
                     <View className="flex-1 gap-0.5">
-                      <Text className="text-[15px] font-medium text-[#1a1a1a]">
-                        {procedure.title}
-                      </Text>
+                      <View className="flex-row items-center gap-1.5">
+                        <Text className="text-[15px] font-medium text-[#1a1a1a]">
+                          {procedure.title}
+                        </Text>
+                        {procedure.reminderEnabled ? (
+                          <View
+                            accessibilityLabel="Rappel activé avant l’échéance"
+                            className="h-4 w-4 items-center justify-center rounded-full bg-accent/15"
+                          >
+                            <Ionicons
+                              name="notifications"
+                              size={10}
+                              color="#2D5E5A"
+                            />
+                          </View>
+                        ) : null}
+                      </View>
                       <Text className="text-[13px] text-[#6b6b6b]">
                         {deadline}
                       </Text>
