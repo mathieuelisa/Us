@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Image, Pressable, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import { withUniwind } from 'uniwind';
+import { SlideInText } from '@/components/onboarding/slide-in-text';
 import { CARD_SHADOW } from '@/features/hub/constants';
 import { useThemeBackground } from '@/features/settings/hooks';
 
@@ -113,15 +114,19 @@ export default function WelcomeCarousel() {
             resizeMode="contain"
           />
 
-          <Text
-            style={{ fontFamily: 'Tondu' }}
-            className="text-center text-[36px] leading-8 text-[#1a1a1a]"
-          >
-            {slide.title}
-          </Text>
-          <Text className="px-2 text-center text-[14px] leading-5 text-[#6b6b6b]">
-            {slide.description}
-          </Text>
+          <SlideInText direction="left" resetKey={index}>
+            <Text
+              style={{ fontFamily: 'Tondu' }}
+              className="text-center text-[36px] leading-8 text-[#1a1a1a]"
+            >
+              {slide.title}
+            </Text>
+          </SlideInText>
+          <SlideInText direction="right" resetKey={index}>
+            <Text className="px-2 text-center text-[14px] leading-5 text-[#6b6b6b]">
+              {slide.description}
+            </Text>
+          </SlideInText>
         </View>
 
         <View className="gap-5 pb-2">

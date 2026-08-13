@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import { withUniwind } from 'uniwind';
+import { SlideInText } from '@/components/onboarding/slide-in-text';
 import { CARD_SHADOW } from '@/features/hub/constants';
 import { ONBOARDING_STEP_COUNT } from '@/features/onboarding/constants';
 import { useThemeBackground } from '@/features/settings/hooks';
@@ -104,31 +105,39 @@ export function OnboardingStepShell({
 
         {centered ? (
           <View className="flex-1 justify-center gap-2">
-            <Text
-              style={{ fontFamily: ONBOARDING_TITLE_FONT }}
-              className="text-center text-[24px] leading-7 text-[#1a1a1a]"
-            >
-              {title}
-            </Text>
-            {subtitle ? (
-              <Text className="px-2 text-center text-[14px] leading-5 text-[#6b6b6b]">
-                {subtitle}
+            <SlideInText direction="left">
+              <Text
+                style={{ fontFamily: ONBOARDING_TITLE_FONT }}
+                className="text-center text-[24px] leading-7 text-[#1a1a1a]"
+              >
+                {title}
               </Text>
+            </SlideInText>
+            {subtitle ? (
+              <SlideInText direction="right">
+                <Text className="px-2 text-center text-[14px] leading-5 text-[#6b6b6b]">
+                  {subtitle}
+                </Text>
+              </SlideInText>
             ) : null}
             <View className="gap-6 pt-4">{children}</View>
           </View>
         ) : (
           <>
-            <Text
-              style={{ fontFamily: ONBOARDING_TITLE_FONT }}
-              className="text-[24px] leading-7 text-[#1a1a1a]"
-            >
-              {title}
-            </Text>
-            {subtitle ? (
-              <Text className="pt-2 text-[14px] leading-5 text-[#6b6b6b]">
-                {subtitle}
+            <SlideInText direction="left">
+              <Text
+                style={{ fontFamily: ONBOARDING_TITLE_FONT }}
+                className="text-[24px] leading-7 text-[#1a1a1a]"
+              >
+                {title}
               </Text>
+            </SlideInText>
+            {subtitle ? (
+              <SlideInText direction="right" style={{ paddingTop: 8 }}>
+                <Text className="text-[14px] leading-5 text-[#6b6b6b]">
+                  {subtitle}
+                </Text>
+              </SlideInText>
             ) : null}
 
             <ScrollView
