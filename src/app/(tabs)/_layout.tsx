@@ -6,6 +6,7 @@ const HUB_DESTINATIONS = [
   'demarches',
   'ensemble',
   'sante',
+  'organisation',
   'partenaire',
   'naissance',
 ] as const;

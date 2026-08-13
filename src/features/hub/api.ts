@@ -17,6 +17,7 @@ export type HubSummary = {
   partnerFirstName: string | null;
   partnerMood: { mood: MoodValue; needNote: string | null } | null;
   nextAppointment: { title: string; date: string } | null;
+  checklistProgress: { checked: number; total: number } | null;
 };
 
 /** L'autre membre du foyer, ou null tant que le co-parent n'a pas rejoint. */
@@ -36,39 +37,45 @@ export async function fetchHubSummary(
   const today = todayIso();
   const partnerUserId = getPartnerUserId(household, userId);
 
-  const [procedures, moods, appointments, partnerProfile] = await Promise.all([
-    supabase
-      .from('household_procedures')
-      .select('status')
-      .eq('household_id', household.id),
-    supabase
-      .from('mood_checkins')
-      .select('user_id, mood, need_note')
-      .eq('household_id', household.id)
-      .eq('checkin_date', today),
-    // Les rendez-vous non partagés sont déjà filtrés par la RLS selon le
-    // rôle : rien à refaire côté client.
-    supabase
-      .from('appointments')
-      .select('title, appointment_date')
-      .eq('household_id', household.id)
-      .gte('appointment_date', today)
-      .order('appointment_date', { ascending: true })
-      .limit(1),
-    partnerUserId
-      ? supabase
-          .from('profiles')
-          .select('first_name')
-          .eq('id', partnerUserId)
-          .maybeSingle()
-      : Promise.resolve({ data: null, error: null }),
-  ]);
+  const [procedures, moods, appointments, partnerProfile, checklistItems] =
+    await Promise.all([
+      supabase
+        .from('household_procedures')
+        .select('status')
+        .eq('household_id', household.id),
+      supabase
+        .from('mood_checkins')
+        .select('user_id, mood, need_note')
+        .eq('household_id', household.id)
+        .eq('checkin_date', today),
+      // Les rendez-vous non partagés sont déjà filtrés par la RLS selon le
+      // rôle : rien à refaire côté client.
+      supabase
+        .from('appointments')
+        .select('title, appointment_date')
+        .eq('household_id', household.id)
+        .gte('appointment_date', today)
+        .order('appointment_date', { ascending: true })
+        .limit(1),
+      partnerUserId
+        ? supabase
+            .from('profiles')
+            .select('first_name')
+            .eq('id', partnerUserId)
+            .maybeSingle()
+        : Promise.resolve({ data: null, error: null }),
+      supabase
+        .from('household_checklist_items')
+        .select('checked')
+        .eq('household_id', household.id),
+    ]);
 
   const firstError =
     procedures.error ??
     moods.error ??
     appointments.error ??
-    partnerProfile.error;
+    partnerProfile.error ??
+    checklistItems.error;
   if (firstError) throw firstError;
 
   const partnerCheckin = moods.data?.find(
@@ -92,6 +99,12 @@ export async function fetchHubSummary(
       ? {
           title: nextAppointment.title,
           date: nextAppointment.appointment_date,
+        }
+      : null,
+    checklistProgress: checklistItems.data
+      ? {
+          checked: checklistItems.data.filter((row) => row.checked).length,
+          total: checklistItems.data.length,
         }
       : null,
   };

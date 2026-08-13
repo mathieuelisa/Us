@@ -77,6 +77,14 @@ export default function HubScreen() {
     ? `Prochain rendez-vous le ${formatAppointmentDate(summary.nextAppointment.date)}`
     : 'Journal du jour';
 
+  const organisationState = summary?.checklistProgress
+    ? summary.checklistProgress.total === 0
+      ? 'Vos listes avant le grand jour'
+      : summary.checklistProgress.checked === summary.checklistProgress.total
+        ? 'Tout est prêt'
+        : `${summary.checklistProgress.checked} sur ${summary.checklistProgress.total} complétés`
+    : 'Valise et sac de naissance';
+
   return (
     <SafeAreaView className="flex-1" style={{ backgroundColor }}>
       <ScrollView
@@ -191,6 +199,18 @@ export default function HubScreen() {
               title="Suivi santé"
               state={healthState}
               onPress={() => router.push('/sante')}
+            />
+          </View>
+
+          {/* Hors du bloc des 3 piliers (CONCEPT.md : poids visuel égal
+              réservé à Démarches/Ensemble/Suivi santé) — nouvelle section,
+              pas un 4e pilier, demande explicite placée juste en dessous. */}
+          <View className="mt-1">
+            <PillarCard
+              emoji="🧳"
+              title="Organisation & Préparation"
+              state={organisationState}
+              onPress={() => router.push('/organisation')}
             />
           </View>
 

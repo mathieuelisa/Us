@@ -128,6 +128,27 @@ export type Database = {
         };
         Relationships: [];
       };
+      checklist_item_templates: {
+        Row: {
+          checklist_slug: string;
+          id: string;
+          label: string;
+          sort_order: number;
+        };
+        Insert: {
+          checklist_slug: string;
+          id?: string;
+          label: string;
+          sort_order?: number;
+        };
+        Update: {
+          checklist_slug?: string;
+          id?: string;
+          label?: string;
+          sort_order?: number;
+        };
+        Relationships: [];
+      };
       contacts: {
         Row: {
           address: string | null;
@@ -222,6 +243,45 @@ export type Database = {
           target_role?: string;
         };
         Relationships: [];
+      };
+      household_checklist_items: {
+        Row: {
+          checked: boolean;
+          checklist_item_template_id: string;
+          household_id: string;
+          id: string;
+          updated_at: string;
+        };
+        Insert: {
+          checked?: boolean;
+          checklist_item_template_id: string;
+          household_id: string;
+          id?: string;
+          updated_at?: string;
+        };
+        Update: {
+          checked?: boolean;
+          checklist_item_template_id?: string;
+          household_id?: string;
+          id?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'household_checklist_items_checklist_item_template_id_fkey';
+            columns: ['checklist_item_template_id'];
+            isOneToOne: false;
+            referencedRelation: 'checklist_item_templates';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'household_checklist_items_household_id_fkey';
+            columns: ['household_id'];
+            isOneToOne: false;
+            referencedRelation: 'households';
+            referencedColumns: ['id'];
+          },
+        ];
       };
       household_info_items: {
         Row: {

@@ -43,4 +43,9 @@ export const queryKeys = {
     all: ['procedures'] as const,
     list: (householdId: string) => ['procedures', householdId] as const,
   },
+  organisation: {
+    all: ['organisation'] as const,
+    checklistItems: (householdId: string) =>
+      ['organisation', householdId, 'checklist-items'] as const,
+  },
 } as const;
