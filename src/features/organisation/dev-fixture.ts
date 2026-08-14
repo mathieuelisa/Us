@@ -3,11 +3,13 @@ import type { ChecklistItem } from '@/features/organisation/api';
 /**
  * ⚠️ TEMPORAIRE — À SUPPRIMER, voir src/lib/atoms/dev-bypass.ts.
  *
- * Reproduit le catalogue des migrations `20260813120000_organisation_checklists.sql`
- * et `20260814100000_checklist_categories.sql` pour que l'écran Organisation
- * & Préparation soit explorable sans session ni foyer réel, même parti pris
- * que `procedures/dev-fixture.ts`. Les cases cochées restent locales en
- * mode DEV, elles n'écrivent jamais dans Supabase (cf. `organisation.tsx`).
+ * Reproduit le catalogue des migrations `20260813120000_organisation_checklists.sql`,
+ * `20260814100000_checklist_categories.sql` et
+ * `20260814110000_sac_naissance_categories.sql` pour que l'écran
+ * Organisation & Préparation soit explorable sans session ni foyer réel,
+ * même parti pris que `procedures/dev-fixture.ts`. Les cases cochées
+ * restent locales en mode DEV, elles n'écrivent jamais dans Supabase (cf.
+ * `organisation.tsx`).
  */
 export const DEV_CHECKLIST_ITEMS_FIXTURE: ChecklistItem[] = [
   {
@@ -176,7 +178,7 @@ export const DEV_CHECKLIST_ITEMS_FIXTURE: ChecklistItem[] = [
     label: 'Tenue confortable pour le travail',
     sortOrder: 1,
     checked: false,
-    category: null,
+    category: 'maman',
   },
   {
     id: 'dev-sac-2',
@@ -184,7 +186,7 @@ export const DEV_CHECKLIST_ITEMS_FIXTURE: ChecklistItem[] = [
     label: 'Chaussettes chaudes',
     sortOrder: 2,
     checked: false,
-    category: null,
+    category: 'maman',
   },
   {
     id: 'dev-sac-3',
@@ -192,7 +194,7 @@ export const DEV_CHECKLIST_ITEMS_FIXTURE: ChecklistItem[] = [
     label: 'Brumisateur ou huile de massage',
     sortOrder: 3,
     checked: false,
-    category: null,
+    category: 'maman',
   },
   {
     id: 'dev-sac-4',
@@ -200,7 +202,7 @@ export const DEV_CHECKLIST_ITEMS_FIXTURE: ChecklistItem[] = [
     label: 'Musique ou playlist de relaxation',
     sortOrder: 4,
     checked: false,
-    category: null,
+    category: 'maman',
   },
   {
     id: 'dev-sac-5',
@@ -208,7 +210,7 @@ export const DEV_CHECKLIST_ITEMS_FIXTURE: ChecklistItem[] = [
     label: 'Bouteille d’eau et en-cas',
     sortOrder: 5,
     checked: false,
-    category: null,
+    category: 'maman',
   },
   {
     id: 'dev-sac-6',
@@ -216,7 +218,7 @@ export const DEV_CHECKLIST_ITEMS_FIXTURE: ChecklistItem[] = [
     label: 'Coussin d’allaitement',
     sortOrder: 6,
     checked: false,
-    category: null,
+    category: 'bebe',
   },
   {
     id: 'dev-sac-7',
@@ -224,7 +226,7 @@ export const DEV_CHECKLIST_ITEMS_FIXTURE: ChecklistItem[] = [
     label: 'Appareil photo ou téléphone chargé',
     sortOrder: 7,
     checked: false,
-    category: null,
+    category: 'co_parent',
   },
   {
     id: 'dev-sac-8',
@@ -232,7 +234,7 @@ export const DEV_CHECKLIST_ITEMS_FIXTURE: ChecklistItem[] = [
     label: 'Serviette de toilette',
     sortOrder: 8,
     checked: false,
-    category: null,
+    category: 'maman',
   },
   {
     id: 'dev-sac-9',
@@ -240,7 +242,7 @@ export const DEV_CHECKLIST_ITEMS_FIXTURE: ChecklistItem[] = [
     label: 'Body pour le peau à peau',
     sortOrder: 9,
     checked: false,
-    category: null,
+    category: 'bebe',
   },
   {
     id: 'dev-sac-10',
@@ -248,6 +250,6 @@ export const DEV_CHECKLIST_ITEMS_FIXTURE: ChecklistItem[] = [
     label: 'Liste des personnes à prévenir',
     sortOrder: 10,
     checked: false,
-    category: null,
+    category: 'co_parent',
   },
 ];

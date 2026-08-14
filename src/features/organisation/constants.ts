@@ -4,7 +4,7 @@ import type { ChecklistItem } from './api';
  * ⚠️ Contenu inventé : ni les maquettes ni CONCEPT.md ne décrivent cette
  * section — demande explicite de l'utilisateur, sans liste d'affaires
  * fournie. Les deux listes reprennent des essentiels usuels (valise de
- * maternité / sac pour la salle d'accouchement), à ajuster si besoin.
+ * maternité / valise pour la salle de naissance), à ajuster si besoin.
  */
 export const CHECKLIST_META: Record<
   string,
@@ -16,7 +16,7 @@ export const CHECKLIST_META: Record<
     bg: '#DCEAFB',
   },
   'sac-naissance': {
-    title: 'Le sac en salle d’accouchement',
+    title: 'La valise en salle de naissance',
     emoji: '🎒',
     bg: '#FBE4D8',
   },
@@ -26,9 +26,9 @@ export const CHECKLIST_META: Record<
 export const CHECKLIST_ORDER = ['valise-maternite', 'sac-naissance'];
 
 /**
- * Sous-sections de « La Valise de maternité » (demande explicite) — seuls
- * les articles de ce checklist portent une `category`, « Le sac en salle
- * d'accouchement » reste une liste plate (cf. `groupChecklistItemsByCategory`).
+ * Sous-sections Maman / Bébé / Co-parent, appliquées aux deux checklists
+ * (demande explicite) — chaque article porte une `category`
+ * (cf. `groupChecklistItemsByCategory`).
  */
 export const CHECKLIST_CATEGORY_META: Record<string, { title: string }> = {
   maman: { title: 'Maman' },
