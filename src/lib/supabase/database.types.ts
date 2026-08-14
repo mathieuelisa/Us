@@ -130,18 +130,21 @@ export type Database = {
       };
       checklist_item_templates: {
         Row: {
+          category: string | null;
           checklist_slug: string;
           id: string;
           label: string;
           sort_order: number;
         };
         Insert: {
+          category?: string | null;
           checklist_slug: string;
           id?: string;
           label: string;
           sort_order?: number;
         };
         Update: {
+          category?: string | null;
           checklist_slug?: string;
           id?: string;
           label?: string;

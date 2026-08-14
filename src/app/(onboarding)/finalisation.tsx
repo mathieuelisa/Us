@@ -8,7 +8,11 @@ import { withUniwind } from 'uniwind';
 import { useSubmitOnboarding } from '@/features/onboarding/hooks';
 import { useThemeBackground } from '@/features/settings/hooks';
 // ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
-import { devBypassAtom, devBypassFirstNameAtom } from '@/lib/atoms/dev-bypass';
+import {
+  devBypassAccompanimentTypeAtom,
+  devBypassAtom,
+  devBypassFirstNameAtom,
+} from '@/lib/atoms/dev-bypass';
 import {
   EMPTY_ONBOARDING_DRAFT,
   onboardingDraftAtom,
@@ -30,6 +34,9 @@ export default function FinalisationScreen() {
   // ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
   const [devBypass, setDevBypass] = useAtom(devBypassAtom);
   const setDevBypassFirstName = useSetAtom(devBypassFirstNameAtom);
+  const setDevBypassAccompanimentType = useSetAtom(
+    devBypassAccompanimentTypeAtom,
+  );
 
   const hasSubmitted = useRef(false);
   const { mutate } = submitOnboarding;
@@ -45,6 +52,7 @@ export default function FinalisationScreen() {
     // hub resterait vide une fois le brouillon effacé juste après.
     if (devBypass === 'onboarding') {
       setDevBypassFirstName(draft.firstName.trim());
+      setDevBypassAccompanimentType(draft.accompanimentType ?? '');
       setDraft(EMPTY_ONBOARDING_DRAFT);
       setDevBypass('app');
       return;
@@ -57,7 +65,15 @@ export default function FinalisationScreen() {
       },
       { onSuccess: () => setDraft(EMPTY_ONBOARDING_DRAFT) },
     );
-  }, [mutate, draft, setDraft, devBypass, setDevBypass, setDevBypassFirstName]);
+  }, [
+    mutate,
+    draft,
+    setDraft,
+    devBypass,
+    setDevBypass,
+    setDevBypassFirstName,
+    setDevBypassAccompanimentType,
+  ]);
 
   const retry = () => {
     submitOnboarding.mutate(

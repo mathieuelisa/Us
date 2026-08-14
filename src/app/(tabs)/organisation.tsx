@@ -11,8 +11,11 @@ import { useMyHousehold } from '@/features/household/hooks';
 import { CARD_SHADOW } from '@/features/hub/constants';
 import type { ChecklistItem } from '@/features/organisation/api';
 import {
+  CHECKLIST_CATEGORY_META,
   CHECKLIST_META,
   CHECKLIST_ORDER,
+  filterVisibleChecklistItems,
+  groupChecklistItemsByCategory,
   groupChecklistItemsBySlug,
 } from '@/features/organisation/constants';
 // ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
@@ -23,7 +26,10 @@ import {
 } from '@/features/organisation/hooks';
 import { useThemeBackground } from '@/features/settings/hooks';
 // ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
-import { devBypassAtom } from '@/lib/atoms/dev-bypass';
+import {
+  devBypassAccompanimentTypeAtom,
+  devBypassAtom,
+} from '@/lib/atoms/dev-bypass';
 
 const SafeAreaView = withUniwind(RNSafeAreaView);
 
@@ -33,7 +39,9 @@ const SafeAreaView = withUniwind(RNSafeAreaView);
  * bascule par état local, même parti pris que Démarches/Suivi santé.
  *
  * Pas de règle de visibilité par rôle : les deux parents voient et cochent
- * les mêmes listes, comme pour les démarches administratives.
+ * les mêmes listes, comme pour les démarches administratives. Seule la
+ * sous-section « Co-parent » de la valise de maternité est masquée quand le
+ * foyer est « Seul·e » (demande explicite).
  */
 export default function OrganisationScreen() {
   const router = useRouter();
@@ -47,8 +55,19 @@ export default function OrganisationScreen() {
   // ne montrerait jamais rien à explorer. Les cases cochées en mode DEV
   // restent locales, elles n'écrivent jamais dans Supabase.
   const isDevBypass = useAtomValue(devBypassAtom) !== 'off';
+  const devBypassAccompanimentType = useAtomValue(
+    devBypassAccompanimentTypeAtom,
+  );
   const [devItems, setDevItems] = useState(DEV_CHECKLIST_ITEMS_FIXTURE);
   const items = isDevBypass ? devItems : remoteItems;
+
+  // Sans foyer réel en mode contournement, on retombe sur la réponse donnée
+  // à l'étape 1 de l'onboarding (conservée à part, cf. dev-bypass.ts) —
+  // jamais un foyer inconnu n'est traité comme « Seul·e » par défaut.
+  const accompanimentType = isDevBypass
+    ? devBypassAccompanimentType
+    : (household?.accompaniment_type ?? null);
+  const hideCoParent = accompanimentType === 'seul';
 
   const toggleChecked = (item: ChecklistItem) => {
     if (isDevBypass) {
@@ -67,7 +86,8 @@ export default function OrganisationScreen() {
     });
   };
 
-  const itemsBySlug = groupChecklistItemsBySlug(items);
+  const visibleItems = filterVisibleChecklistItems(items, { hideCoParent });
+  const itemsBySlug = groupChecklistItemsBySlug(visibleItems);
   const [selectedSlug, setSelectedSlug] = useState<string | null>(null);
   const selectedItems = selectedSlug ? (itemsBySlug[selectedSlug] ?? []) : [];
   const backgroundColor = useThemeBackground();
@@ -165,6 +185,7 @@ function ChecklistDetail({
   const meta = CHECKLIST_META[slug];
   const checkedCount = items.filter((item) => item.checked).length;
   const progress = items.length === 0 ? 0 : checkedCount / items.length;
+  const categoryGroups = groupChecklistItemsByCategory(items);
 
   return (
     <View className="gap-5">
@@ -179,32 +200,68 @@ function ChecklistDetail({
 
       <ProgressBar progress={progress} />
 
-      <View className="gap-2.5">
-        {items.map((item) => (
-          <Pressable
-            key={item.id}
-            accessibilityRole="checkbox"
-            accessibilityLabel={item.label}
-            accessibilityState={{ checked: item.checked }}
-            style={CARD_SHADOW}
-            onPress={() => onToggleItem(item)}
-            className="flex-row items-center gap-3 rounded-2xl bg-white px-4 py-3.5"
-          >
-            <Ionicons
-              name={item.checked ? 'checkbox' : 'square-outline'}
-              size={22}
-              color={item.checked ? '#2D5E5A' : '#c0c0c0'}
+      {categoryGroups.length > 0 ? (
+        <View className="gap-4">
+          {categoryGroups.map((group) => (
+            <View key={group.category} className="gap-2.5">
+              <Text className="text-[11.5px] font-semibold tracking-wide text-[#8a8a8a]">
+                {CHECKLIST_CATEGORY_META[group.category].title.toUpperCase()}
+              </Text>
+              <View className="gap-2.5">
+                {group.items.map((item) => (
+                  <ChecklistItemRow
+                    key={item.id}
+                    item={item}
+                    onToggle={onToggleItem}
+                  />
+                ))}
+              </View>
+            </View>
+          ))}
+        </View>
+      ) : (
+        <View className="gap-2.5">
+          {items.map((item) => (
+            <ChecklistItemRow
+              key={item.id}
+              item={item}
+              onToggle={onToggleItem}
             />
-            <Text
-              className={`flex-1 text-[14px] ${
-                item.checked ? 'text-[#9a9a9a] line-through' : 'text-[#1a1a1a]'
-              }`}
-            >
-              {item.label}
-            </Text>
-          </Pressable>
-        ))}
-      </View>
+          ))}
+        </View>
+      )}
     </View>
+  );
+}
+
+function ChecklistItemRow({
+  item,
+  onToggle,
+}: {
+  item: ChecklistItem;
+  onToggle: (item: ChecklistItem) => void;
+}) {
+  return (
+    <Pressable
+      accessibilityRole="checkbox"
+      accessibilityLabel={item.label}
+      accessibilityState={{ checked: item.checked }}
+      style={CARD_SHADOW}
+      onPress={() => onToggle(item)}
+      className="flex-row items-center gap-3 rounded-2xl bg-white px-4 py-3.5"
+    >
+      <Ionicons
+        name={item.checked ? 'checkbox' : 'square-outline'}
+        size={22}
+        color={item.checked ? '#2D5E5A' : '#c0c0c0'}
+      />
+      <Text
+        className={`flex-1 text-[14px] ${
+          item.checked ? 'text-[#9a9a9a] line-through' : 'text-[#1a1a1a]'
+        }`}
+      >
+        {item.label}
+      </Text>
+    </Pressable>
   );
 }

@@ -10,6 +10,7 @@ export type ChecklistItem = {
   label: string;
   sortOrder: number;
   checked: boolean;
+  category: string | null;
 };
 
 /**
@@ -39,6 +40,7 @@ export async function fetchChecklistItems(
         label: template.label,
         sortOrder: template.sort_order,
         checked: row.checked,
+        category: template.category,
       };
     });
 }

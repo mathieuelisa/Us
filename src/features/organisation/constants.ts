@@ -25,6 +25,19 @@ export const CHECKLIST_META: Record<
 /** Ordre d'affichage des 2 blocs. */
 export const CHECKLIST_ORDER = ['valise-maternite', 'sac-naissance'];
 
+/**
+ * Sous-sections de « La Valise de maternité » (demande explicite) — seuls
+ * les articles de ce checklist portent une `category`, « Le sac en salle
+ * d'accouchement » reste une liste plate (cf. `groupChecklistItemsByCategory`).
+ */
+export const CHECKLIST_CATEGORY_META: Record<string, { title: string }> = {
+  maman: { title: 'Maman' },
+  bebe: { title: 'Bébé' },
+  co_parent: { title: 'Co-parent' },
+};
+
+export const CHECKLIST_CATEGORY_ORDER = ['maman', 'bebe', 'co_parent'];
+
 export function groupChecklistItemsBySlug(
   items: ChecklistItem[],
 ): Record<string, ChecklistItem[]> {
@@ -38,4 +51,30 @@ export function groupChecklistItemsBySlug(
     group.sort((a, b) => a.sortOrder - b.sortOrder);
   }
   return grouped;
+}
+
+/**
+ * Retire les articles « Co-parent » quand l'utilisateur a répondu « Seul·e »
+ * à l'étape 1 de l'onboarding (`households.accompaniment_type === 'seul'`)
+ * — demande explicite. Les autres catégories ne sont jamais filtrées.
+ */
+export function filterVisibleChecklistItems(
+  items: ChecklistItem[],
+  { hideCoParent }: { hideCoParent: boolean },
+): ChecklistItem[] {
+  return hideCoParent
+    ? items.filter((item) => item.category !== 'co_parent')
+    : items;
+}
+
+/** Groupe par catégorie (Maman / Bébé / Co-parent) ; vide pour une liste plate. */
+export function groupChecklistItemsByCategory(
+  items: ChecklistItem[],
+): { category: string; items: ChecklistItem[] }[] {
+  return CHECKLIST_CATEGORY_ORDER.map((category) => ({
+    category,
+    items: items
+      .filter((item) => item.category === category)
+      .sort((a, b) => a.sortOrder - b.sortOrder),
+  })).filter((group) => group.items.length > 0);
 }

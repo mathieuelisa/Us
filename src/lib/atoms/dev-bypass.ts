@@ -17,8 +17,8 @@ import { atom } from 'jotai';
  *
  * Pour retirer ce contournement : supprimer ce fichier, puis les usages
  * dans `src/app/_layout.tsx`, `src/app/(auth)/login.tsx`,
- * `src/app/(onboarding)/finalisation.tsx` et `src/app/(tabs)/index.tsx`
- * (le compilateur les signalera).
+ * `src/app/(onboarding)/finalisation.tsx`, `src/app/(tabs)/index.tsx` et
+ * `src/app/(tabs)/organisation.tsx` (le compilateur les signalera).
  */
 export type DevBypassStage = 'off' | 'onboarding' | 'app';
 
@@ -31,3 +31,12 @@ export const devBypassAtom = atom<DevBypassStage>('off');
  * réel, `useMyProfile()` ne renvoie rien.
  */
 export const devBypassFirstNameAtom = atom<string>('');
+
+/**
+ * `accompanimentType` saisi à l'étape 1 de l'onboarding ('couple' |
+ * 'coparentalite' | 'seul' | 'autre'), conservé au même titre que le
+ * prénom — sans lui, `organisation.tsx` ne pourrait pas tester le masquage
+ * de la sous-section « Co-parent » en mode contournement (pas de foyer réel
+ * pour lire `households.accompaniment_type`).
+ */
+export const devBypassAccompanimentTypeAtom = atom<string>('');
