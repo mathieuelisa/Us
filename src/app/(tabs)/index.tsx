@@ -7,6 +7,7 @@ import { withUniwind } from 'uniwind';
 
 import { HowItWorksModal } from '@/components/hub/how-it-works-modal';
 import { PillarCard } from '@/components/hub/pillar-card';
+import { PremiumTeaserCard } from '@/components/hub/premium-teaser-card';
 import { useMyHousehold } from '@/features/household/hooks';
 import {
   CARD_SHADOW,
@@ -83,7 +84,7 @@ export default function HubScreen() {
       : summary.checklistProgress.checked === summary.checklistProgress.total
         ? 'Tout est prêt'
         : `${summary.checklistProgress.checked} sur ${summary.checklistProgress.total} complétés`
-    : 'Valise et sac de naissance';
+    : 'Valises de naissance et jeux des prénoms';
 
   return (
     <SafeAreaView className="flex-1" style={{ backgroundColor }}>
@@ -215,32 +216,21 @@ export default function HubScreen() {
           </View>
 
           {/* Traitement visuel distinct : « Votre bébé » n'est pas un 4e
-              pilier, c'est le module premium, verrouillé hors MVP. Bordure
-              jaune 1px en plus de l'ombre commune, pour le distinguer
-              davantage (demande explicite). */}
-          <View
-            style={{ ...CARD_SHADOW, borderWidth: 5, borderColor: '#e8c874' }}
-            className="mt-1 flex-row items-center gap-3.5 rounded-2xl bg-[#2e5e5a] px-4 py-4"
-          >
-            <Image
-              source={require('@/assets/images/Baby_head.png')}
-              className="w-10 h-12"
-              resizeMode="contain"
+              pilier, c'est le module premium, verrouillé hors MVP — même
+              carte teaser sobre que « Le match des prénoms »
+              (PremiumTeaserCard), pour un langage visuel cohérent. */}
+          <View className="mt-1">
+            <PremiumTeaserCard
+              icon={
+                <Image
+                  source={require('@/assets/images/Baby_head.png')}
+                  className="h-7 w-6"
+                  resizeMode="contain"
+                />
+              }
+              title="Votre bébé"
+              subtitle="Courbe de croissance"
             />
-
-            <View className="flex-1 gap-0.5">
-              <Text className="text-[16px] font-semibold text-white">
-                Votre bébé
-              </Text>
-              <Text className="text-[13px] text-[#b0b0b0]">
-                Courbe de croissance
-              </Text>
-            </View>
-            <View className="rounded-full bg-[#e8c874] px-2.5 py-1">
-              <Text className="text-[10px] font-bold text-[#1a1a1a]">
-                PREMIUM
-              </Text>
-            </View>
           </View>
         </View>
 

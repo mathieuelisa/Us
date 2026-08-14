@@ -6,6 +6,7 @@ import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import { withUniwind } from 'uniwind';
 
+import { PremiumTeaserCard } from '@/components/hub/premium-teaser-card';
 import { ProgressBar } from '@/components/organisation/progress-bar';
 import { useMyHousehold } from '@/features/household/hooks';
 import { CARD_SHADOW } from '@/features/hub/constants';
@@ -122,49 +123,71 @@ export default function OrganisationScreen() {
                 Organisation & Préparation
               </Text>
               <Text className="text-[13px] text-[#6b6b6b]">
-                Vos listes avant le grand jour
+                L'organisation pratique... et les décisions plus légères, comme
+                le prénom.
               </Text>
             </View>
 
-            <View className="gap-2.5">
-              {CHECKLIST_ORDER.map((slug) => {
-                const meta = CHECKLIST_META[slug];
-                const slugItems = itemsBySlug[slug] ?? [];
-                const checkedCount = slugItems.filter(
-                  (item) => item.checked,
-                ).length;
-                const progress =
-                  slugItems.length === 0 ? 0 : checkedCount / slugItems.length;
+            <View className="gap-2">
+              <Text className="text-[11.5px] font-semibold tracking-wide text-[#8a8a8a]">
+                LES CHECKLISTS DES VALISES
+              </Text>
+              <View className="gap-2.5">
+                {CHECKLIST_ORDER.map((slug) => {
+                  const meta = CHECKLIST_META[slug];
+                  const slugItems = itemsBySlug[slug] ?? [];
+                  const checkedCount = slugItems.filter(
+                    (item) => item.checked,
+                  ).length;
+                  const progress =
+                    slugItems.length === 0
+                      ? 0
+                      : checkedCount / slugItems.length;
 
-                return (
-                  <Pressable
-                    key={slug}
-                    accessibilityRole="button"
-                    style={CARD_SHADOW}
-                    onPress={() => setSelectedSlug(slug)}
-                    className="gap-3 rounded-2xl bg-white px-4 py-4"
-                  >
-                    <View className="flex-row items-center gap-3">
-                      <View
-                        style={{ backgroundColor: meta.bg }}
-                        className="h-11 w-11 items-center justify-center rounded-full"
-                      >
-                        <Text className="text-[20px]">{meta.emoji}</Text>
+                  return (
+                    <Pressable
+                      key={slug}
+                      accessibilityRole="button"
+                      style={CARD_SHADOW}
+                      onPress={() => setSelectedSlug(slug)}
+                      className="gap-3 rounded-2xl bg-white px-4 py-4"
+                    >
+                      <View className="flex-row items-center gap-3">
+                        <View
+                          style={{ backgroundColor: meta.bg }}
+                          className="h-11 w-11 items-center justify-center rounded-full"
+                        >
+                          <Text className="text-[20px]">{meta.emoji}</Text>
+                        </View>
+                        <View className="flex-1 gap-0.5">
+                          <Text className="text-[15px] font-medium text-[#1a1a1a]">
+                            {meta.title}
+                          </Text>
+                          <Text className="text-[13px] text-[#6b6b6b]">
+                            {checkedCount} sur {slugItems.length} complétés
+                          </Text>
+                        </View>
+                        <Text className="text-[20px] text-[#c0c0c0]">›</Text>
                       </View>
-                      <View className="flex-1 gap-0.5">
-                        <Text className="text-[15px] font-medium text-[#1a1a1a]">
-                          {meta.title}
-                        </Text>
-                        <Text className="text-[13px] text-[#6b6b6b]">
-                          {checkedCount} sur {slugItems.length} complétés
-                        </Text>
-                      </View>
-                      <Text className="text-[20px] text-[#c0c0c0]">›</Text>
-                    </View>
-                    <ProgressBar progress={progress} />
-                  </Pressable>
-                );
-              })}
+                      <ProgressBar progress={progress} />
+                    </Pressable>
+                  );
+                })}
+              </View>
+            </View>
+
+            {/* Teaser non interactif — même carte sobre que « Votre bébé »
+                sur le hub (PremiumTeaserCard), verrouillé hors MVP jusqu'à
+                l'implémentation du jeu (demande explicite). */}
+            <View className="gap-2">
+              <Text className="text-[11.5px] font-semibold tracking-wide text-[#8a8a8a]">
+                JEUX
+              </Text>
+              <PremiumTeaserCard
+                icon={<Text className="text-[20px]">📛</Text>}
+                title="Le match des prénoms"
+                subtitle="Trouvez le prénom parfait à deux"
+              />
             </View>
           </>
         )}
