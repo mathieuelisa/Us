@@ -40,7 +40,7 @@ function isHealthTab(value: string | undefined): value is HealthTab {
  * C'est une donnée de santé, cette règle ne se rajoute pas « plus tard ».
  *
  * `?tab=` (facultatif) ouvre directement l'onglet demandé — utilisé par
- * « Nos rendez-vous » du hub pour arriver sur Rendez-vous plutôt que sur le
+ * « Nos prochains rendez-vous » du hub pour arriver sur Rendez-vous plutôt que sur le
  * premier onglet par défaut.
  */
 export default function HealthScreen() {

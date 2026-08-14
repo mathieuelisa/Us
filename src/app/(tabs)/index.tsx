@@ -32,7 +32,7 @@ const SafeAreaView = withUniwind(RNSafeAreaView);
 /**
  * ⚠️ TEMPORAIRE — aucun rendez-vous réel tant que l'onboarding ne permet
  * pas encore d'en créer facilement. Sert uniquement à visualiser le rendu
- * de la section « Nos rendez-vous » ; à retirer dès que des rendez-vous
+ * de la section « Nos prochains rendez-vous » ; à retirer dès que des rendez-vous
  * réels existent (l'état vide légitime redeviendra alors visible).
  */
 const MOCK_APPOINTMENTS = [
@@ -345,7 +345,7 @@ export default function HubScreen() {
 
         <View className="gap-2">
           <Text className="text-[11.5px] font-semibold tracking-wide text-[#8a8a8a]">
-            NOS RENDEZ-VOUS
+            NOS PROCHAINS RENDEZ-VOUS
           </Text>
 
           <View className="gap-2">
