@@ -9,12 +9,22 @@ const HUB_DESTINATIONS = [
   'organisation',
   'partenaire',
   'naissance',
+  'bebe',
+  'prenoms',
 ] as const;
 
 // Destination ouverte depuis Réglages (sous-section Confidentialité), pas
 // depuis le hub — gardée à part de HUB_DESTINATIONS pour ne pas brouiller
 // son nom, même traitement `href: null`.
 const SETTINGS_DESTINATIONS = ['legal'] as const;
+
+// Page premium ouverte depuis l'icône dédiée de la barre de navigation
+// (`AppTabBar`), pas depuis le hub — une page simple (pas de `Modal`,
+// demande explicite) plutôt qu'une route `presentation: 'modal'`, pour les
+// mêmes raisons que le paywall onboarding (cf. `(onboarding)/_layout.tsx`).
+// Gardée dans le groupe `(tabs)` justement pour que la barre reste visible
+// et utilisable pendant la consultation de cette page (demande explicite).
+const FOOTER_DESTINATIONS = ['premium'] as const;
 
 /**
  * Icônes réelles (Ionicons) et rendu de la barre entièrement délégués à
@@ -38,8 +48,8 @@ export default function TabsLayout() {
     >
       <Tabs.Screen name="index" options={{ title: 'Accueil' }} />
       <Tabs.Screen name="profil" options={{ title: 'Profil' }} />
-      <Tabs.Screen name="informations" options={{ title: 'Information' }} />
-      <Tabs.Screen name="reglages" options={{ title: 'Réglages' }} />
+      <Tabs.Screen name="informations" options={{ title: 'Infos' }} />
+      <Tabs.Screen name="reglages" options={{ title: 'Réglage' }} />
 
       {/* Destinations ouvertes depuis le hub, pas des onglets : la barre
           reste à 4 entrées fixes (CONCEPT.md). `href: null` les retire de
@@ -48,6 +58,9 @@ export default function TabsLayout() {
         <Tabs.Screen key={name} name={name} options={{ href: null }} />
       ))}
       {SETTINGS_DESTINATIONS.map((name) => (
+        <Tabs.Screen key={name} name={name} options={{ href: null }} />
+      ))}
+      {FOOTER_DESTINATIONS.map((name) => (
         <Tabs.Screen key={name} name={name} options={{ href: null }} />
       ))}
     </Tabs>

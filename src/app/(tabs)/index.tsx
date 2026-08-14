@@ -230,6 +230,7 @@ export default function HubScreen() {
               }
               title="Votre bébé"
               subtitle="Courbe de croissance"
+              onPress={() => router.push('/bebe')}
             />
           </View>
         </View>

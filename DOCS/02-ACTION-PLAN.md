@@ -215,7 +215,10 @@ par onglet** :
   uniquement les rendez-vous marqués partagés. Le filtrage par rôle est
   **entièrement porté par la RLS** (`appointments_select_scoped`), jamais
   redoublé côté client : deux implémentations d'une même règle de
-  visibilité finiraient par diverger. Défaut : **non partagé**.
+  visibilité finiraient par diverger. Défaut : **partagé** — la femme
+  enceinte peut décocher au cas par cas si un rendez-vous doit rester
+  personnel (écart avec le choix initial « non partagé », demande
+  explicite).
 - [x] **Contacts** — visible et modifiable par les deux, réorganisable.
   Boutons haut/bas plutôt qu'un vrai glisser-déposer, comme l'onglet
   Information (même dette, cf. [05](./05-DETTE-ET-POINTS-OUVERTS.md) n° 12).

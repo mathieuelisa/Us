@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useAtomValue } from 'jotai';
 import { useState } from 'react';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import { withUniwind } from 'uniwind';
 
@@ -176,17 +176,25 @@ export default function OrganisationScreen() {
               </View>
             </View>
 
-            {/* Teaser non interactif — même carte sobre que « Votre bébé »
-                sur le hub (PremiumTeaserCard), verrouillé hors MVP jusqu'à
-                l'implémentation du jeu (demande explicite). */}
+            {/* Même carte sobre que « Votre bébé » sur le hub
+                (PremiumTeaserCard) — ouvre son propre écran d'accès
+                verrouillé (`/prenoms`), même concept que `/bebe` (demande
+                explicite). */}
             <View className="gap-2">
               <Text className="text-[11.5px] font-semibold tracking-wide text-[#8a8a8a]">
                 JEUX
               </Text>
               <PremiumTeaserCard
-                icon={<Text className="text-[20px]">📛</Text>}
+                icon={
+                  <Image
+                    source={require('@/assets/images/Heart_girls_boys.png')}
+                    className="h-7 w-7"
+                    resizeMode="contain"
+                  />
+                }
                 title="Le match des prénoms"
                 subtitle="Trouvez le prénom parfait à deux"
+                onPress={() => router.push('/prenoms')}
               />
             </View>
           </>

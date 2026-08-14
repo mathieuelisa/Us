@@ -30,25 +30,34 @@ export function NeedNoteOverlay({
   onSubmit: (note: string) => void;
   onSkip: () => void;
 }) {
-  const [selectedTag, setSelectedTag] = useState<string | null>(null);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [freeText, setFreeText] = useState('');
 
   // Repart de zéro à chaque nouvelle ouverture, pas seulement au montage :
   // la Modal reste montée entre deux check-ins.
   useEffect(() => {
     if (visible) {
-      setSelectedTag(null);
+      setSelectedTags([]);
       setFreeText('');
     }
   }, [visible]);
 
-  const selectedLabel = NEED_TAGS.find(
-    (tag) => tag.value === selectedTag,
-  )?.label;
-  const canSubmit = Boolean(selectedLabel || freeText.trim());
+  const selectedLabels = NEED_TAGS.filter((tag) =>
+    selectedTags.includes(tag.value),
+  ).map((tag) => tag.label);
+  const canSubmit = Boolean(selectedLabels.length || freeText.trim());
+
+  const toggleTag = (value: string) => {
+    setSelectedTags((current) =>
+      current.includes(value)
+        ? current.filter((tag) => tag !== value)
+        : [...current, value],
+    );
+    setFreeText('');
+  };
 
   const submit = () => {
-    onSubmit(freeText.trim() || selectedLabel || '');
+    onSubmit(freeText.trim() || selectedLabels.join(', '));
   };
 
   return (
@@ -71,16 +80,13 @@ export function NeedNoteOverlay({
 
           <View className="flex-row flex-wrap justify-center gap-2">
             {NEED_TAGS.map((tag) => {
-              const isSelected = selectedTag === tag.value;
+              const isSelected = selectedTags.includes(tag.value);
               return (
                 <Pressable
                   key={tag.value}
                   accessibilityRole="button"
                   accessibilityState={{ selected: isSelected }}
-                  onPress={() => {
-                    setSelectedTag(tag.value);
-                    setFreeText('');
-                  }}
+                  onPress={() => toggleTag(tag.value)}
                   className={`rounded-full border px-3.5 py-2 ${
                     isSelected
                       ? 'border-accent bg-accent/10'
@@ -102,7 +108,7 @@ export function NeedNoteOverlay({
             value={freeText}
             onChangeText={(text) => {
               setFreeText(text);
-              setSelectedTag(null);
+              setSelectedTags([]);
             }}
             multiline
             className="rounded-xl border border-[#e0e0e0] px-3.5 py-3 text-[14px] text-[#1a1a1a]"

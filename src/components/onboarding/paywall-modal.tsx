@@ -1,7 +1,7 @@
 import { Image, Modal, Pressable, ScrollView, Text, View } from 'react-native';
 
-const PREMIUM_FEATURES = [
-  'Match des Prénoms Duo',
+export const PREMIUM_FEATURES = [
+  'Match des Prénoms',
   'Assistant Contractions & Départ Maternité',
   "Suivi Nutrition & Rythmes (Journal d'allaitement, biberons & statistiques)",
   'Suivi du rythme de sommeil de bébé',
@@ -35,12 +35,12 @@ export function PaywallModal({
       onRequestClose={onClose}
     >
       <View className="flex-1 justify-end bg-black/50">
-        <View className="max-h-[92%] rounded-t-3xl bg-[#194522] px-7 pb-8 pt-4">
+        <View className="max-h-[92%] rounded-t-3xl bg-[#1f3d3a] px-7 pb-8 pt-4">
           <View className="mb-3 h-1 w-10 self-center rounded-full bg-[#3a3a3a]" />
 
           <View className="gap-2 items-center">
             <Image
-              source={require('@/assets/images/Baby_said_hi.png')}
+              source={require('@/assets/images/Baby_walking.png')}
               className="w-20 h-30"
               resizeMode="contain"
             />

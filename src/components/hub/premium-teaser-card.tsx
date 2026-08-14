@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import type { ReactNode } from 'react';
-import { Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
 import { CARD_SHADOW } from '@/features/hub/constants';
 
@@ -12,18 +12,29 @@ import { CARD_SHADOW } from '@/features/hub/constants';
  * pavé de couleur épais, juste un cercle décoratif vert clair discret —
  * tout en restant reconnaissable au milieu des cartes blanches (demande
  * explicite).
+ *
+ * `onPress` optionnel : « Le match des prénoms » reste une simple vitrine
+ * (jeu pas encore implémenté), alors que « Votre bébé » ouvre l'écran
+ * d'accès verrouillé (`/bebe`, demande explicite) — MVP.md prévoit cet
+ * écran d'accès même si le contenu réel est hors périmètre.
  */
 export function PremiumTeaserCard({
   icon,
   title,
   subtitle,
+  onPress,
 }: {
   icon: ReactNode;
   title: string;
   subtitle: string;
+  onPress?: () => void;
 }) {
+  const Container = onPress ? Pressable : View;
+
   return (
-    <View
+    <Container
+      accessibilityRole={onPress ? 'button' : undefined}
+      onPress={onPress}
       style={CARD_SHADOW}
       className="flex-row items-center gap-3.5 overflow-hidden rounded-2xl bg-[#1f3d3a] px-4 py-4"
     >
@@ -47,6 +58,6 @@ export function PremiumTeaserCard({
           Premium
         </Text>
       </View>
-    </View>
+    </Container>
   );
 }

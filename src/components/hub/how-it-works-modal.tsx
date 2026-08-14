@@ -1,4 +1,5 @@
 import { Modal, Pressable, Text, View } from 'react-native';
+import Animated, { SlideInDown, SlideOutDown } from 'react-native-reanimated';
 
 const STEPS = [
   'Cliquer sur « Ajouter le co-parent »',
@@ -17,6 +18,13 @@ const STEPS = [
  * ouvert n°31 de DOCS/05-DETTE-ET-POINTS-OUVERTS.md. Cette pop-up décrit
  * donc la cible produit, pas le comportement actuel ; à corriger dès que
  * le vrai mécanisme d'invitation post-onboarding est tranché.
+ *
+ * `animationType="none"` sur `Modal` (demande explicite) : le fond opaque
+ * doit apparaître instantanément, sans glisser avec le reste — seule la
+ * carte anime (`SlideInDown`/`SlideOutDown`, Reanimated). `Modal` démonte
+ * réellement ses enfants quand `visible` passe à `false` (son `render()`
+ * renvoie `null`), donc l'animation d'entrée se rejoue bien à chaque
+ * ouverture.
  */
 export function HowItWorksModal({
   visible,
@@ -29,11 +37,15 @@ export function HowItWorksModal({
     <Modal
       visible={visible}
       transparent
-      animationType="slide"
+      animationType="none"
       onRequestClose={onClose}
     >
       <View className="flex-1 justify-end bg-black/40">
-        <View className="gap-5 rounded-t-[24px] bg-white px-6 pb-8 pt-4">
+        <Animated.View
+          entering={SlideInDown.duration(300)}
+          exiting={SlideOutDown.duration(300)}
+          className="gap-5 rounded-t-[24px] bg-white px-6 pb-8 pt-4"
+        >
           <View className="h-1 w-10 self-center rounded-full bg-[#e0e0e0]" />
 
           <Text className="text-[18px] font-bold text-[#1a1a1a]">
@@ -64,7 +76,7 @@ export function HowItWorksModal({
               Compris
             </Text>
           </Pressable>
-        </View>
+        </Animated.View>
       </View>
     </Modal>
   );
