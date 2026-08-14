@@ -44,7 +44,7 @@ export function AppointmentFormModal({
   const [date, setDate] = useState<string>(todayIso());
   const [time, setTime] = useState('');
   const [address, setAddress] = useState('');
-  const [isShared, setIsShared] = useState(false);
+  const [isShared, setIsShared] = useState(true);
 
   useEffect(() => {
     if (visible) {
@@ -52,7 +52,7 @@ export function AppointmentFormModal({
       setDate(initialDate ?? todayIso());
       setTime('');
       setAddress('');
-      setIsShared(false);
+      setIsShared(true);
     }
   }, [visible, initialDate]);
 
