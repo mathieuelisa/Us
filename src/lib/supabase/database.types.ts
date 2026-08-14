@@ -288,6 +288,7 @@ export type Database = {
       };
       household_info_items: {
         Row: {
+          category: string | null;
           created_at: string;
           household_id: string;
           id: string;
@@ -296,6 +297,7 @@ export type Database = {
           value: string | null;
         };
         Insert: {
+          category?: string | null;
           created_at?: string;
           household_id: string;
           id?: string;
@@ -304,6 +306,7 @@ export type Database = {
           value?: string | null;
         };
         Update: {
+          category?: string | null;
           created_at?: string;
           household_id?: string;
           id?: string;

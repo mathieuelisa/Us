@@ -80,14 +80,16 @@ export function useCreateInfoItem(householdId: string | undefined) {
     mutationFn: ({
       label,
       value,
+      category,
       sortOrder,
     }: {
       label: string;
       value: string | null;
+      category: string | null;
       sortOrder: number;
     }) => {
       if (!householdId) throw new Error('No household');
-      return createInfoItem(householdId, { label, value }, sortOrder);
+      return createInfoItem(householdId, { label, value, category }, sortOrder);
     },
     onSuccess: () => {
       if (householdId) {
@@ -108,7 +110,9 @@ export function useUpdateInfoItem(householdId: string | undefined) {
       patch,
     }: {
       id: string;
-      patch: Partial<Pick<HouseholdInfoItem, 'label' | 'value' | 'sort_order'>>;
+      patch: Partial<
+        Pick<HouseholdInfoItem, 'label' | 'value' | 'category' | 'sort_order'>
+      >;
     }) => updateInfoItem(id, patch),
     onSuccess: () => {
       if (householdId) {

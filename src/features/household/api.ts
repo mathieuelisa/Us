@@ -31,7 +31,7 @@ export async function fetchInfoItems(
 
 export async function createInfoItem(
   householdId: string,
-  input: { label: string; value: string | null },
+  input: { label: string; value: string | null; category: string | null },
   sortOrder: number,
 ): Promise<HouseholdInfoItem> {
   const { data, error } = await supabase
@@ -40,6 +40,7 @@ export async function createInfoItem(
       household_id: householdId,
       label: input.label,
       value: input.value,
+      category: input.category,
       sort_order: sortOrder,
     })
     .select()
@@ -51,7 +52,9 @@ export async function createInfoItem(
 
 export async function updateInfoItem(
   id: string,
-  patch: Partial<Pick<HouseholdInfoItem, 'label' | 'value' | 'sort_order'>>,
+  patch: Partial<
+    Pick<HouseholdInfoItem, 'label' | 'value' | 'category' | 'sort_order'>
+  >,
 ): Promise<HouseholdInfoItem> {
   const { data, error } = await supabase
     .from('household_info_items')
