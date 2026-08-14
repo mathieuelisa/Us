@@ -1,6 +1,6 @@
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useAtomValue } from 'jotai';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import { withUniwind } from 'uniwind';
@@ -10,6 +10,7 @@ import { ContactsTab } from '@/components/health/contacts-tab';
 import { ExercisesTab } from '@/components/health/exercises-tab';
 import { JournalTab } from '@/components/health/journal-tab';
 import { SegmentedTabs } from '@/components/health/segmented-tabs';
+import { ScreenCornerShapes } from '@/components/ui/screen-corner-shapes';
 import { useMyHousehold } from '@/features/household/hooks';
 import { useThemeBackground } from '@/features/settings/hooks';
 import { currentRoleAtom } from '@/lib/atoms/role';
@@ -17,6 +18,17 @@ import { currentRoleAtom } from '@/lib/atoms/role';
 const SafeAreaView = withUniwind(RNSafeAreaView);
 
 type HealthTab = 'journal' | 'appointments' | 'contacts' | 'exercises';
+
+const HEALTH_TABS: HealthTab[] = [
+  'journal',
+  'appointments',
+  'contacts',
+  'exercises',
+];
+
+function isHealthTab(value: string | undefined): value is HealthTab {
+  return HEALTH_TABS.includes(value as HealthTab);
+}
 
 /**
  * Écrans 4a/4b/4c/4f — pilier Suivi santé.
@@ -26,9 +38,14 @@ type HealthTab = 'journal' | 'appointments' | 'contacts' | 'exercises';
  * plus sensible est toutefois **déjà appliquée** : l'onglet Journal
  * n'existe pas pour le co-parent — il est retiré de la liste, pas grisé.
  * C'est une donnée de santé, cette règle ne se rajoute pas « plus tard ».
+ *
+ * `?tab=` (facultatif) ouvre directement l'onglet demandé — utilisé par
+ * « Nos rendez-vous » du hub pour arriver sur Rendez-vous plutôt que sur le
+ * premier onglet par défaut.
  */
 export default function HealthScreen() {
   const router = useRouter();
+  const { tab: tabParam } = useLocalSearchParams<{ tab?: string }>();
   const { data: household } = useMyHousehold();
   const role = useAtomValue(currentRoleAtom) ?? 'pregnant';
   const isPregnant = role === 'pregnant';
@@ -44,13 +61,28 @@ export default function HealthScreen() {
   }, [isPregnant]);
 
   const [activeTab, setActiveTab] = useState<HealthTab>(
-    isPregnant ? 'journal' : 'appointments',
+    isHealthTab(tabParam) ? tabParam : isPregnant ? 'journal' : 'appointments',
   );
+
+  // `tabParam` peut n'être résolu qu'après le tout premier rendu (Expo
+  // Router web) : l'initialiseur de `useState` le rate parfois, cet effet
+  // rattrape le changement dès qu'il arrive.
+  useEffect(() => {
+    if (isHealthTab(tabParam)) {
+      setActiveTab(tabParam);
+    }
+  }, [tabParam]);
+
   const [isAddingContact, setIsAddingContact] = useState(false);
   const backgroundColor = useThemeBackground();
 
   return (
-    <SafeAreaView className="flex-1" style={{ backgroundColor }}>
+    <SafeAreaView
+      className="flex-1 overflow-hidden"
+      style={{ backgroundColor }}
+    >
+      <ScreenCornerShapes />
+
       <ScrollView
         contentContainerClassName={`gap-5 px-6 pt-4 ${
           activeTab === 'contacts' ? 'pb-28' : 'pb-10'

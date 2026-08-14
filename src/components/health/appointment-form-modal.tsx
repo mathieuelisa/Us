@@ -9,6 +9,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import Animated, { SlideInDown, SlideOutDown } from 'react-native-reanimated';
 
 import { OnboardingDatePicker } from '@/components/onboarding/date-picker';
 import { parseTimeInput } from '@/features/health/constants';
@@ -19,6 +20,10 @@ import { todayIso } from '@/lib/date';
  * lui qui décide si le co-parent verra ce rendez-vous (RLS
  * `appointments_select_scoped`). Non partagé par défaut — sur un pilier
  * santé, le défaut doit être le moins divulgant.
+ *
+ * `animationType="none"` sur `Modal` (même parti pris que `HowItWorksModal`) :
+ * le fond opaque apparaît instantanément, seule la carte glisse
+ * (`SlideInDown`/`SlideOutDown`, Reanimated).
  */
 export function AppointmentFormModal({
   visible,
@@ -63,11 +68,15 @@ export function AppointmentFormModal({
     <Modal
       visible={visible}
       transparent
-      animationType="slide"
+      animationType="none"
       onRequestClose={onCancel}
     >
       <View className="flex-1 justify-end bg-black/40">
-        <View className="max-h-[88%] rounded-t-3xl bg-white px-6 pb-8 pt-6">
+        <Animated.View
+          entering={SlideInDown.duration(300)}
+          exiting={SlideOutDown.duration(300)}
+          className="max-h-[88%] rounded-t-3xl bg-white px-6 pb-8 pt-6"
+        >
           <ScrollView
             showsVerticalScrollIndicator={false}
             contentContainerClassName="gap-4"
@@ -144,7 +153,7 @@ export function AppointmentFormModal({
               <Text className="text-[14px] text-[#6b6b6b]">Annuler</Text>
             </Pressable>
           </ScrollView>
-        </View>
+        </Animated.View>
       </View>
     </Modal>
   );

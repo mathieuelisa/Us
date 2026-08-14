@@ -1,7 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useAtomValue } from 'jotai';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
 import {
   Linking,
   Pressable,
@@ -15,11 +16,15 @@ import { withUniwind } from 'uniwind';
 
 import { StatusBadge } from '@/components/procedures/status-badge';
 import { StatusSelector } from '@/components/procedures/status-selector';
+import { ScreenCornerShapes } from '@/components/ui/screen-corner-shapes';
 import { useMyHousehold } from '@/features/household/hooks';
 import { CARD_SHADOW } from '@/features/hub/constants';
 import {
   formatDeadlineLabel,
+  getPregnancyMonthLabel,
   getProcedureIconStyle,
+  PREGNANCY_MONTHS,
+  PROCEDURE_PREGNANCY_MONTH,
 } from '@/features/procedures/constants';
 // ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
 import { DEV_PROCEDURES_FIXTURE } from '@/features/procedures/dev-fixture';
@@ -101,11 +106,83 @@ export default function ProceduresScreen() {
     (procedure) => procedure.householdProcedureId === selectedId,
   );
 
+  // Le mois centré à l'écran est toujours le mois sélectionné (demande
+  // explicite) — plus de « tous les mois » désélectionné, il y a toujours
+  // exactement un mois actif. Démarre sur le premier.
+  const [selectedMonth, setSelectedMonth] = useState<number>(1);
+
+  // `monthViewportWidth` en state (pas juste une ref) : sert de padding
+  // horizontal du contenu scrollable, pour que le premier et le dernier
+  // mois puissent eux aussi atteindre le centre de l'écran — sans cette
+  // marge, le scroll s'arrête à leurs bords naturels.
+  const [monthViewportWidth, setMonthViewportWidth] = useState(0);
+  const monthScrollRef = useRef<ScrollView>(null);
+  const monthLayoutsRef = useRef<Map<number, { x: number; width: number }>>(
+    new Map(),
+  );
+
+  const scrollToMonth = (month: number) => {
+    const layout = monthLayoutsRef.current.get(month);
+    if (!layout || !monthViewportWidth) return;
+    const targetX = layout.x + layout.width / 2 - monthViewportWidth / 2;
+    monthScrollRef.current?.scrollTo({
+      x: Math.max(targetX, 0),
+      animated: true,
+    });
+  };
+
+  // Recentre le mois sélectionné dès que layouts/viewport sont mesurés —
+  // même parti pris que `OnboardingDatePicker` (`WheelColumn`), qui
+  // rappelle `scrollToSelected()` à la fois depuis un effet et depuis
+  // `onLayout`, pour couvrir l'ordre de mesure imprévisible entre le
+  // scroller et ses enfants.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: scrollToMonth lit selectedMonth/monthViewportWidth via closure ; les redéclarer en dépendance boucle sur elle-même sans changer le comportement.
+  useEffect(() => {
+    scrollToMonth(selectedMonth);
+  }, [selectedMonth, monthViewportWidth]);
+
+  // Une fois le scroll relâché, le mois dont le centre est le plus proche
+  // du centre de l'écran devient le mois sélectionné — recentré
+  // précisément par l'effet ci-dessus (ou directement ici si le mois ne
+  // change pas, pour corriger tout écart de repos).
+  const handleMonthScrollSettle = (
+    event: NativeSyntheticEvent<NativeScrollEvent>,
+  ) => {
+    if (!monthViewportWidth) return;
+    const viewportCenter =
+      event.nativeEvent.contentOffset.x + monthViewportWidth / 2;
+
+    let closestMonth = selectedMonth;
+    let closestDistance = Number.POSITIVE_INFINITY;
+    monthLayoutsRef.current.forEach((layout, month) => {
+      const distance = Math.abs(layout.x + layout.width / 2 - viewportCenter);
+      if (distance < closestDistance) {
+        closestDistance = distance;
+        closestMonth = month;
+      }
+    });
+
+    if (closestMonth === selectedMonth) {
+      scrollToMonth(closestMonth);
+    } else {
+      setSelectedMonth(closestMonth);
+    }
+  };
+
+  const visibleProcedures = procedures.filter(
+    (procedure) => PROCEDURE_PREGNANCY_MONTH[procedure.slug] === selectedMonth,
+  );
+
   const completedCount = procedures.filter((p) => p.status === 'fait').length;
   const backgroundColor = useThemeBackground();
 
   return (
-    <SafeAreaView className="flex-1" style={{ backgroundColor }}>
+    <SafeAreaView
+      className="flex-1 overflow-hidden"
+      style={{ backgroundColor }}
+    >
+      <ScreenCornerShapes />
+
       <ScrollView
         contentContainerClassName="gap-5 px-6 pb-10 pt-4"
         showsVerticalScrollIndicator={false}
@@ -143,8 +220,73 @@ export default function ProceduresScreen() {
               </Text>
             </View>
 
+            <View className="gap-2">
+              <Text className="text-[11.5px] font-semibold tracking-wide text-[#8a8a8a]">
+                PAR MOIS DE GROSSESSE
+              </Text>
+              <ScrollView
+                ref={monthScrollRef}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                decelerationRate="fast"
+                onMomentumScrollEnd={handleMonthScrollSettle}
+                onScrollEndDrag={handleMonthScrollSettle}
+                contentContainerClassName="gap-2 py-1"
+                contentContainerStyle={{
+                  paddingHorizontal: monthViewportWidth / 2,
+                }}
+                onLayout={(event) => {
+                  const width = event.nativeEvent.layout.width;
+                  setMonthViewportWidth((current) =>
+                    current === width ? current : width,
+                  );
+                }}
+              >
+                {PREGNANCY_MONTHS.map((month) => {
+                  const isActive = month === selectedMonth;
+                  return (
+                    <Pressable
+                      key={month}
+                      accessibilityRole="button"
+                      accessibilityState={{ selected: isActive }}
+                      onPress={() => {
+                        setSelectedMonth(month);
+                        scrollToMonth(month);
+                      }}
+                      onLayout={(event) => {
+                        monthLayoutsRef.current.set(month, {
+                          x: event.nativeEvent.layout.x,
+                          width: event.nativeEvent.layout.width,
+                        });
+                        if (isActive) scrollToMonth(month);
+                      }}
+                      style={CARD_SHADOW}
+                      className={`rounded-full px-4 py-2.5 ${
+                        isActive ? 'bg-accent' : 'bg-white'
+                      }`}
+                    >
+                      <Text
+                        className={`text-[15px] ${
+                          isActive
+                            ? 'font-semibold text-accent-foreground'
+                            : 'text-[#6b6b6b]'
+                        }`}
+                      >
+                        {getPregnancyMonthLabel(month)}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+              </ScrollView>
+            </View>
+
             <View className="gap-2.5">
-              {procedures.map((procedure) => {
+              {visibleProcedures.length === 0 ? (
+                <Text className="px-1 text-[13px] text-[#8a8a8a]">
+                  Aucune démarche à faire ce mois-ci.
+                </Text>
+              ) : null}
+              {visibleProcedures.map((procedure) => {
                 const deadline = formatDeadlineLabel(
                   procedure.deadline_days_after_birth,
                   household?.birth_date ?? null,

@@ -8,6 +8,7 @@ import { withUniwind } from 'uniwind';
 import { MoodPicker } from '@/components/together/mood-picker';
 import { NeedNoteOverlay } from '@/components/together/need-note-overlay';
 import { WeekMoodStrip } from '@/components/together/week-mood-strip';
+import { ScreenCornerShapes } from '@/components/ui/screen-corner-shapes';
 import { useMyHousehold } from '@/features/household/hooks';
 import type { MoodValue } from '@/features/hub/api';
 import { CARD_SHADOW, MOOD_PRESENTATION } from '@/features/hub/constants';
@@ -73,7 +74,12 @@ export default function TogetherScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1" style={{ backgroundColor }}>
+    <SafeAreaView
+      className="flex-1 overflow-hidden"
+      style={{ backgroundColor }}
+    >
+      <ScreenCornerShapes />
+
       <ScrollView
         contentContainerClassName="gap-6 px-6 pb-10 pt-4"
         showsVerticalScrollIndicator={false}

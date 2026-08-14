@@ -4,6 +4,7 @@ import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import { withUniwind } from 'uniwind';
 
 import { PREMIUM_FEATURES } from '@/components/onboarding/paywall-modal';
+import { ScreenCornerShapes } from '@/components/ui/screen-corner-shapes';
 import { CARD_SHADOW } from '@/features/hub/constants';
 import { useThemeBackground } from '@/features/settings/hooks';
 
@@ -34,7 +35,12 @@ export default function PremiumScreen() {
   const backgroundColor = useThemeBackground();
 
   return (
-    <SafeAreaView className="flex-1" style={{ backgroundColor }}>
+    <SafeAreaView
+      className="flex-1 overflow-hidden"
+      style={{ backgroundColor }}
+    >
+      <ScreenCornerShapes />
+
       <ScrollView
         contentContainerClassName="gap-3 px-6 pb-10 pt-4"
         showsVerticalScrollIndicator={false}

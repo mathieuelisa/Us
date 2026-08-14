@@ -8,6 +8,7 @@ import { withUniwind } from 'uniwind';
 
 import { PremiumTeaserCard } from '@/components/hub/premium-teaser-card';
 import { ProgressBar } from '@/components/organisation/progress-bar';
+import { ScreenCornerShapes } from '@/components/ui/screen-corner-shapes';
 import { useMyHousehold } from '@/features/household/hooks';
 import { CARD_SHADOW } from '@/features/hub/constants';
 import type { ChecklistItem } from '@/features/organisation/api';
@@ -94,7 +95,12 @@ export default function OrganisationScreen() {
   const backgroundColor = useThemeBackground();
 
   return (
-    <SafeAreaView className="flex-1" style={{ backgroundColor }}>
+    <SafeAreaView
+      className="flex-1 overflow-hidden"
+      style={{ backgroundColor }}
+    >
+      <ScreenCornerShapes />
+
       <ScrollView
         contentContainerClassName="gap-5 px-6 pb-10 pt-4"
         showsVerticalScrollIndicator={false}

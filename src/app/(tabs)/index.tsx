@@ -8,11 +8,16 @@ import { withUniwind } from 'uniwind';
 import { HowItWorksModal } from '@/components/hub/how-it-works-modal';
 import { PillarCard } from '@/components/hub/pillar-card';
 import { PremiumTeaserCard } from '@/components/hub/premium-teaser-card';
+import { ScreenCornerShapes } from '@/components/ui/screen-corner-shapes';
+import { useAppointments } from '@/features/health/hooks';
 import { useMyHousehold } from '@/features/household/hooks';
 import {
   CARD_SHADOW,
   formatAppointmentDate,
+  formatAppointmentDayMonth,
+  formatAppointmentTime,
   MOOD_PRESENTATION,
+  PREMIUM_GOLD_ON_LIGHT,
 } from '@/features/hub/constants';
 import { useHubSummary } from '@/features/hub/hooks';
 import { useMyProfile } from '@/features/profile/hooks';
@@ -20,8 +25,39 @@ import { useThemeBackground } from '@/features/settings/hooks';
 // ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
 import { devBypassFirstNameAtom } from '@/lib/atoms/dev-bypass';
 import { currentRoleAtom } from '@/lib/atoms/role';
+import { shiftIsoDate, todayIso } from '@/lib/date';
 
 const SafeAreaView = withUniwind(RNSafeAreaView);
+
+/**
+ * ⚠️ TEMPORAIRE — aucun rendez-vous réel tant que l'onboarding ne permet
+ * pas encore d'en créer facilement. Sert uniquement à visualiser le rendu
+ * de la section « Nos rendez-vous » ; à retirer dès que des rendez-vous
+ * réels existent (l'état vide légitime redeviendra alors visible).
+ */
+const MOCK_APPOINTMENTS = [
+  {
+    id: 'mock-1',
+    title: 'Échographie T3',
+    date: shiftIsoDate(todayIso(), 6),
+    time: '10:30',
+    address: 'Maternité des Lilas',
+  },
+  {
+    id: 'mock-2',
+    title: 'Rendez-vous sage-femme',
+    date: shiftIsoDate(todayIso(), 13),
+    time: '14:00',
+    address: null,
+  },
+  {
+    id: 'mock-3',
+    title: 'Cours de préparation à la naissance',
+    date: shiftIsoDate(todayIso(), 20),
+    time: '18:30',
+    address: 'Cabinet Dr Martin',
+  },
+];
 
 /**
  * Écran 2b / 3c / 3d — le hub.
@@ -44,7 +80,29 @@ export default function HubScreen() {
   const { data: profile } = useMyProfile();
   const { data: household } = useMyHousehold();
   const { data: summary } = useHubSummary(household);
+  const { data: appointments = [] } = useAppointments(household);
   const backgroundColor = useThemeBackground();
+
+  // RLS filtre déjà les rendez-vous non partagés pour le co-parent — rien à
+  // refaire ici (cf. src/features/health/api.ts). Déjà triés par date/heure
+  // croissantes côté requête, il suffit de ne garder que l'avenir.
+  const today = todayIso();
+  const upcomingAppointments = appointments
+    .filter((appointment) => appointment.appointment_date >= today)
+    .slice(0, 3);
+
+  // Tant qu'aucun rendez-vous réel n'existe, on affiche des exemples
+  // fictifs plutôt qu'un état vide — voir `MOCK_APPOINTMENTS`.
+  const displayedAppointments =
+    upcomingAppointments.length > 0
+      ? upcomingAppointments.map((appointment) => ({
+          id: appointment.id,
+          title: appointment.title,
+          date: appointment.appointment_date,
+          time: appointment.appointment_time,
+          address: appointment.address,
+        }))
+      : MOCK_APPOINTMENTS;
 
   // ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts. Le sien, jamais le
   // prénom du co-parent : c'est le seul champ que ce contournement propage.
@@ -87,7 +145,12 @@ export default function HubScreen() {
     : 'Valises de naissance et jeux des prénoms';
 
   return (
-    <SafeAreaView className="flex-1" style={{ backgroundColor }}>
+    <SafeAreaView
+      className="flex-1 overflow-hidden"
+      style={{ backgroundColor }}
+    >
+      <ScreenCornerShapes />
+
       <ScrollView
         contentContainerClassName="gap-6 px-6 pb-10 pt-4"
         showsVerticalScrollIndicator={false}
@@ -248,21 +311,84 @@ export default function HubScreen() {
             accessibilityRole="button"
             onPress={() => router.push('/partenaire')}
             style={CARD_SHADOW}
-            className="flex-row items-center gap-3.5 rounded-2xl border border-[#e0e0e0] bg-white px-4 py-4"
+            className="flex-row items-center gap-3.5 overflow-hidden rounded-2xl bg-[#cf6d8c] px-4 py-4"
           >
-            <Text className="text-[20px]">💕</Text>
+            {/* Deux formes plutôt qu'une seule (contrairement à
+                PremiumTeaserCard) : le duo évoque « à deux », cohérent avec
+                le sujet de la carte. */}
+            <View
+              pointerEvents="none"
+              className="absolute -right-8 -top-12 h-36 w-36 rounded-full bg-white/15"
+            />
+            <View
+              pointerEvents="none"
+              className="absolute -bottom-10 -left-6 h-20 w-20 rounded-full bg-white/10"
+            />
+
+            <View className="h-11 w-11 items-center justify-center rounded-full bg-white/20">
+              <Text className="text-[20px]">💕</Text>
+            </View>
+
             <View className="flex-1 gap-0.5">
-              <Text className="text-[16px] font-semibold text-[#1a1a1a]">
+              <Text className="text-[16px] font-semibold text-white">
                 {partnerName ? `Avec ${partnerName}` : 'Avec votre co-parent'}
               </Text>
-              <Text className="text-[13px] text-[#6b6b6b]">
+              <Text className="text-[13px] text-white/75">
                 {hasPartnerJoined
                   ? 'Voir son état cette semaine'
                   : 'Taille du bébé et astuces du jour'}
               </Text>
             </View>
-            <Text className="text-[20px] text-[#c0c0c0]">›</Text>
+            <Text className="text-[20px] text-white/60">›</Text>
           </Pressable>
+        </View>
+
+        <View className="gap-2">
+          <Text className="text-[11.5px] font-semibold tracking-wide text-[#8a8a8a]">
+            NOS RENDEZ-VOUS
+          </Text>
+
+          <View className="gap-2">
+            {displayedAppointments.map((appointment) => {
+              const { day, month } = formatAppointmentDayMonth(
+                appointment.date,
+              );
+              const time = formatAppointmentTime(appointment.time);
+              const subtitle = [appointment.address, time]
+                .filter(Boolean)
+                .join(' · ');
+
+              return (
+                <Pressable
+                  key={appointment.id}
+                  accessibilityRole="button"
+                  onPress={() => router.push('/sante?tab=appointments')}
+                  style={CARD_SHADOW}
+                  className="flex-row items-center justify-between gap-3 rounded-2xl border border-[#e0e0e0] bg-white px-4 py-5"
+                >
+                  <View className="flex-1 gap-0.5">
+                    <Text className="text-[16px] font-semibold text-[#1a1a1a]">
+                      {appointment.title}
+                    </Text>
+                    {subtitle ? (
+                      <Text className="text-[13px] text-[#6b6b6b]">
+                        {subtitle}
+                      </Text>
+                    ) : null}
+                  </View>
+                  <View className="items-end">
+                    <Text
+                      className="text-[26px] font-bold leading-7"
+                      style={{ color: PREMIUM_GOLD_ON_LIGHT }}
+                    >
+                      {day}
+                    </Text>
+                    <Text className="text-[12px] text-[#6b6b6b]">{month}</Text>
+                  </View>
+                </Pressable>
+              );
+            })}
+          </View>
         </View>
       </ScrollView>
 

@@ -5,6 +5,7 @@ import { Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import { withUniwind } from 'uniwind';
 import { PlainInput } from '@/components/plain-input';
+import { ScreenCornerShapes } from '@/components/ui/screen-corner-shapes';
 import { useMyProfile, useUpdateMyProfile } from '@/features/profile/hooks';
 import { useThemeBackground } from '@/features/settings/hooks';
 import { sessionAtom } from '@/lib/atoms/session';
@@ -27,7 +28,12 @@ export default function ProfileScreen() {
   const hasChanges = firstName.trim() !== (profile?.first_name ?? '').trim();
 
   return (
-    <SafeAreaView className="flex-1" style={{ backgroundColor }}>
+    <SafeAreaView
+      className="flex-1 overflow-hidden"
+      style={{ backgroundColor }}
+    >
+      <ScreenCornerShapes />
+
       <View className="flex-1 gap-6 px-6 pt-4">
         <Text className="text-[26px] font-bold text-[#1a1a1a]">Mon profil</Text>
 

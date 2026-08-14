@@ -72,6 +72,31 @@ export function getStatusLabel(status: string): string {
   );
 }
 
+/**
+ * Mois de grossesse (1 à 9) auquel rattacher chaque démarche pour le
+ * listing par mois sous "X sur 8 complétées" (demande explicite). Seuls
+ * quatre mois sont ancrés par la demande — déclaration de naissance / congé
+ * employeur / CAF / mutuelle au 9e mois, assurance habitation au 5e — le
+ * reste (sécurité sociale, mode de garde, administration fiscale) est
+ * réparti à ma discrétion, l'utilisateur a dit ajuster l'ordre plus tard.
+ */
+export const PROCEDURE_PREGNANCY_MONTH: Record<string, number> = {
+  'mode-de-garde': 3,
+  'assurance-habitation': 5,
+  'securite-sociale': 6,
+  'administration-fiscale': 7,
+  'declaration-naissance': 9,
+  'conge-employeur': 9,
+  caf: 9,
+  mutuelle: 9,
+};
+
+export const PREGNANCY_MONTHS = [1, 2, 3, 4, 5, 6, 7, 8, 9] as const;
+
+export function getPregnancyMonthLabel(month: number): string {
+  return month === 1 ? '1er mois de grossesse' : `${month}e mois de grossesse`;
+}
+
 function formatLongDate(isoDate: string): string {
   const [year, month, day] = isoDate.split('-').map(Number);
   return new Date(year, month - 1, day).toLocaleDateString('fr-FR', {

@@ -66,10 +66,40 @@ export const CARD_SHADOW = {
   elevation: 2,
 } as const;
 
+/**
+ * Accent premium (or) sur fond clair — plus soutenu que le `#e8c874` posé
+ * sur fond sombre (badge de `PremiumTeaserCard`, CTA de `premium.tsx`), qui
+ * manque de contraste ici. Même teinte que `PREMIUM_GOLD` de `tab-bar.tsx`
+ * et `PREMIUM_GOLD_ON_LIGHT` de `premium.tsx`, dupliquée volontairement
+ * plutôt que partagée entre des fichiers qui n'ont pas vocation à
+ * s'importer entre eux.
+ */
+export const PREMIUM_GOLD_ON_LIGHT = '#b8860b';
+
 export function formatAppointmentDate(isoDate: string): string {
   const [year, month, day] = isoDate.split('-').map(Number);
   return new Date(year, month - 1, day).toLocaleDateString('fr-FR', {
     day: 'numeric',
     month: 'long',
   });
+}
+
+/** Jour et mois séparés, pour le pavé date des cartes de rendez-vous. */
+export function formatAppointmentDayMonth(isoDate: string): {
+  day: string;
+  month: string;
+} {
+  const [year, month, day] = isoDate.split('-').map(Number);
+  const date = new Date(year, month - 1, day);
+  return {
+    day: String(date.getDate()),
+    month: date.toLocaleDateString('fr-FR', { month: 'short' }),
+  };
+}
+
+/** "10:30" → "10h30" ; `null` si l'heure n'est pas renseignée. */
+export function formatAppointmentTime(time: string | null): string | null {
+  if (!time) return null;
+  const [hours, minutes] = time.split(':');
+  return `${hours}h${minutes}`;
 }

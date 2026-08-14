@@ -6,6 +6,7 @@ import { withUniwind } from 'uniwind';
 
 import { OutlineButton } from '@/components/outline-button';
 import { PlainInput } from '@/components/plain-input';
+import { ScreenCornerShapes } from '@/components/ui/screen-corner-shapes';
 import type { HouseholdInfoItem } from '@/features/household/api';
 import {
   useCreateInfoItem,
@@ -97,7 +98,12 @@ export default function InformationsScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1" style={{ backgroundColor }}>
+    <SafeAreaView
+      className="flex-1 overflow-hidden"
+      style={{ backgroundColor }}
+    >
+      <ScreenCornerShapes />
+
       <View className="flex-1 gap-4 px-6 pt-4">
         <View className="gap-1">
           <Text className="text-[26px] font-bold text-[#1a1a1a]">
