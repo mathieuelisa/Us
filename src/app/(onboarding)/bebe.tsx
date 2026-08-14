@@ -2,9 +2,9 @@ import { router } from 'expo-router';
 import { useAtom } from 'jotai';
 import { Text, View } from 'react-native';
 
-import { OnboardingDatePicker } from '@/components/onboarding/date-picker';
 import { OnboardingStepShell } from '@/components/onboarding/step-shell';
 import { YesNoChoice } from '@/components/onboarding/yes-no-choice';
+import { WheelDatePicker } from '@/components/wheel-date-picker';
 import { onboardingDraftAtom } from '@/lib/atoms/onboarding';
 
 /** Écran 1b — Étape 3/6, arrivée du bébé. */
@@ -23,7 +23,7 @@ export default function BabyArrivalStep() {
         <Text className="text-[14px] font-medium text-[#1a1a1a]">
           Date de naissance prévue ou réelle
         </Text>
-        <OnboardingDatePicker
+        <WheelDatePicker
           value={draft.dueDate}
           onChange={(dueDate) =>
             setDraft((current) => ({ ...current, dueDate }))

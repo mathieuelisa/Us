@@ -131,11 +131,7 @@ export default function ProceduresScreen() {
     });
   };
 
-  // Recentre le mois sélectionné dès que layouts/viewport sont mesurés —
-  // même parti pris que `OnboardingDatePicker` (`WheelColumn`), qui
-  // rappelle `scrollToSelected()` à la fois depuis un effet et depuis
-  // `onLayout`, pour couvrir l'ordre de mesure imprévisible entre le
-  // scroller et ses enfants.
+  // Recentre le mois sélectionné dès que layouts/viewport sont mesurés.
   // biome-ignore lint/correctness/useExhaustiveDependencies: scrollToMonth lit selectedMonth/monthViewportWidth via closure ; les redéclarer en dépendance boucle sur elle-même sans changer le comportement.
   useEffect(() => {
     scrollToMonth(selectedMonth);

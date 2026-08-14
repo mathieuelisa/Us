@@ -4,8 +4,8 @@ import { useEffect, useState } from 'react';
 import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import Animated, { SlideInDown, SlideOutDown } from 'react-native-reanimated';
 
-import { OnboardingDatePicker } from '@/components/onboarding/date-picker';
 import { PlainInput } from '@/components/plain-input';
+import { WheelDatePicker } from '@/components/wheel-date-picker';
 import type { HouseholdInfoItem } from '@/features/household/api';
 import {
   formatSocialSecurityNumber,
@@ -208,7 +208,7 @@ export function InfoItemFormModal({
                 ) : null}
 
                 {meta?.isDate ? (
-                  <OnboardingDatePicker value={value} onChange={setValue} />
+                  <WheelDatePicker value={value} onChange={setValue} />
                 ) : meta?.valueOptions ? (
                   <View className="flex-row flex-wrap gap-2">
                     {meta.valueOptions.map((option) => (

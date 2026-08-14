@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import Animated, { SlideInDown, SlideOutDown } from 'react-native-reanimated';
 
-import { OnboardingDatePicker } from '@/components/onboarding/date-picker';
+import { WheelDatePicker } from '@/components/wheel-date-picker';
 import { parseTimeInput } from '@/features/health/constants';
 import { todayIso } from '@/lib/date';
 
@@ -95,7 +95,7 @@ export function AppointmentFormModal({
               <Text className="text-[13px] font-medium text-[#6b6b6b]">
                 Date
               </Text>
-              <OnboardingDatePicker value={date} onChange={setDate} />
+              <WheelDatePicker value={date} onChange={setDate} />
             </View>
 
             <View className="gap-1.5">
