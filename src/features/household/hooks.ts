@@ -13,7 +13,6 @@ import {
   fetchMyHousehold,
   type Household,
   type HouseholdInfoItem,
-  reorderInfoItems,
   updateInfoItem,
 } from './api';
 
@@ -129,22 +128,6 @@ export function useDeleteInfoItem(householdId: string | undefined) {
 
   return useMutation({
     mutationFn: (id: string) => deleteInfoItem(id),
-    onSuccess: () => {
-      if (householdId) {
-        queryClient.invalidateQueries({
-          queryKey: queryKeys.household.infoItems(householdId),
-        });
-      }
-    },
-  });
-}
-
-export function useReorderInfoItems(householdId: string | undefined) {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (items: { id: string; sort_order: number }[]) =>
-      reorderInfoItems(items),
     onSuccess: () => {
       if (householdId) {
         queryClient.invalidateQueries({

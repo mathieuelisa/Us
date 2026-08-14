@@ -75,19 +75,3 @@ export async function deleteInfoItem(id: string): Promise<void> {
 
   if (error) throw error;
 }
-
-export async function reorderInfoItems(
-  items: { id: string; sort_order: number }[],
-): Promise<void> {
-  const results = await Promise.all(
-    items.map((item) =>
-      supabase
-        .from('household_info_items')
-        .update({ sort_order: item.sort_order })
-        .eq('id', item.id),
-    ),
-  );
-
-  const failed = results.find((result) => result.error);
-  if (failed?.error) throw failed.error;
-}

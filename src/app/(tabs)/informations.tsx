@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import { withUniwind } from 'uniwind';
 
@@ -19,7 +19,6 @@ import {
   useDeleteInfoItem,
   useInfoItems,
   useMyHousehold,
-  useReorderInfoItems,
   useUpdateInfoItem,
 } from '@/features/household/hooks';
 import { useThemeBackground } from '@/features/settings/hooks';
@@ -173,7 +172,6 @@ export default function InformationsScreen() {
   const createItem = useCreateInfoItem(householdId);
   const updateItem = useUpdateInfoItem(householdId);
   const deleteItem = useDeleteInfoItem(householdId);
-  const reorderItems = useReorderInfoItems(householdId);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<HouseholdInfoItem | null>(
@@ -225,22 +223,6 @@ export default function InformationsScreen() {
     }
   };
 
-  const moveWithinCategory = (
-    categoryItems: HouseholdInfoItem[],
-    index: number,
-    direction: -1 | 1,
-  ) => {
-    const targetIndex = index + direction;
-    if (targetIndex < 0 || targetIndex >= categoryItems.length) return;
-
-    const a = categoryItems[index];
-    const b = categoryItems[targetIndex];
-    reorderItems.mutate([
-      { id: a.id, sort_order: b.sort_order },
-      { id: b.id, sort_order: a.sort_order },
-    ]);
-  };
-
   // Tant que le foyer/les items réels ne sont pas branchés, on affiche des
   // exemples fictifs plutôt qu'un état vide — voir `MOCK_INFO_ITEMS`.
   const displayedItems = items.length > 0 ? items : MOCK_INFO_ITEMS;
@@ -255,7 +237,10 @@ export default function InformationsScreen() {
     >
       <ScreenCornerShapes />
 
-      <View className="flex-1 gap-4 px-6 pt-4">
+      <ScrollView
+        contentContainerClassName="gap-4 px-6 pb-24 pt-4"
+        showsVerticalScrollIndicator={false}
+      >
         <View className="gap-1">
           <Text className="text-[26px] font-bold text-[#1a1a1a]">
             Informations importantes
@@ -323,7 +308,7 @@ export default function InformationsScreen() {
                     </View>
                   ) : (
                     <View className="gap-2">
-                      {categoryItems.map((item, index) => (
+                      {categoryItems.map((item) => (
                         <View
                           key={item.id}
                           className="flex-row items-center gap-3 rounded-2xl border border-[#ececec] bg-white px-4 py-3.5"
@@ -350,56 +335,16 @@ export default function InformationsScreen() {
                             </Text>
                           </Pressable>
 
-                          <View className="flex-row items-center gap-1">
-                            <Pressable
-                              accessibilityLabel="Monter"
-                              accessibilityRole="button"
-                              disabled={index === 0}
-                              hitSlop={8}
-                              onPress={() =>
-                                moveWithinCategory(categoryItems, index, -1)
-                              }
-                            >
-                              <Text
-                                className={
-                                  index === 0
-                                    ? 'text-[15px] text-[#d0d0d0]'
-                                    : 'text-[15px] text-[#6b6b6b]'
-                                }
-                              >
-                                ▲
-                              </Text>
-                            </Pressable>
-                            <Pressable
-                              accessibilityLabel="Descendre"
-                              accessibilityRole="button"
-                              disabled={index === categoryItems.length - 1}
-                              hitSlop={8}
-                              onPress={() =>
-                                moveWithinCategory(categoryItems, index, 1)
-                              }
-                            >
-                              <Text
-                                className={
-                                  index === categoryItems.length - 1
-                                    ? 'text-[15px] text-[#d0d0d0]'
-                                    : 'text-[15px] text-[#6b6b6b]'
-                                }
-                              >
-                                ▼
-                              </Text>
-                            </Pressable>
-                            <Pressable
-                              accessibilityLabel={`Supprimer ${item.label}`}
-                              accessibilityRole="button"
-                              hitSlop={8}
-                              onPress={() => deleteItem.mutate(item.id)}
-                            >
-                              <Text className="text-[15px] text-[#9a9a9a]">
-                                ✕
-                              </Text>
-                            </Pressable>
-                          </View>
+                          <Pressable
+                            accessibilityLabel={`Supprimer ${item.label}`}
+                            accessibilityRole="button"
+                            hitSlop={8}
+                            onPress={() => deleteItem.mutate(item.id)}
+                          >
+                            <Text className="text-[15px] text-[#9a9a9a]">
+                              ✕
+                            </Text>
+                          </Pressable>
                         </View>
                       ))}
                     </View>
@@ -444,7 +389,7 @@ export default function InformationsScreen() {
             ) : null}
           </View>
         )}
-      </View>
+      </ScrollView>
 
       <Pressable
         accessibilityLabel="Ajouter une information"
