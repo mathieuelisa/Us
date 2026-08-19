@@ -1,3 +1,5 @@
+import type { ImageSourcePropType } from 'react-native';
+
 /**
  * Les 4 thèmes visuels prédéfinis (CONCEPT.md §Réglages, plan d'action
  * §1.7). Chaque id correspond à un variant Uniwind défini dans
@@ -44,4 +46,20 @@ export const THEME_PASTEL_BACKGROUND: Record<ThemeId, string> = {
   corail: '#FBEAE2',
   lavande: '#EEEAF8',
   ocre: '#FBF2DC',
+};
+
+/**
+ * Papier peint (motif biberons/hochets) de l'écran « Votre bébé », décliné
+ * dans les quatre teintes de `THEME_PASTEL_BACKGROUND` — le fond y est une
+ * image et non une couleur, donc changer de thème demande de changer d'asset
+ * plutôt que de couleur.
+ *
+ * `require` statique par entrée : le bundler Metro résout ces chemins à la
+ * compilation, un chemin construit à l'exécution ne fonctionnerait pas.
+ */
+export const THEME_BABY_WALLPAPER: Record<ThemeId, ImageSourcePropType> = {
+  sauge: require('@/assets/images/Wallpaper_baby_sauge.png'),
+  corail: require('@/assets/images/Wallpaper_baby_corail.png'),
+  lavande: require('@/assets/images/Wallpaper_baby_lavande.png'),
+  ocre: require('@/assets/images/Wallpaper_baby_ocre.png'),
 };

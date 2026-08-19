@@ -46,7 +46,9 @@ const SafeAreaView = withUniwind(RNSafeAreaView);
  *
  * `backgroundImage` optionnel : remplace le fond pastel du thème par un
  * wallpaper (demande explicite pour `/bebe` uniquement — `/prenoms` garde
- * `useThemeBackground`).
+ * `useThemeBackground`). L'appelant reste responsable de l'accorder au thème
+ * actif : `/bebe` passe pour cela `useThemeBabyWallpaper()`, qui décline le
+ * motif dans les quatre teintes.
  */
 export function PremiumLockedScreen({
   title,

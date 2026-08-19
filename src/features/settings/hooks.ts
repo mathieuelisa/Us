@@ -1,7 +1,9 @@
+import type { ImageSourcePropType } from 'react-native';
 import { useUniwind } from 'uniwind';
 
 import {
   resolveThemeId,
+  THEME_BABY_WALLPAPER,
   THEME_OPTIONS,
   THEME_PASTEL_BACKGROUND,
 } from './constants';
@@ -14,6 +16,15 @@ import {
 export function useThemeBackground(): string {
   const { theme } = useUniwind();
   return THEME_PASTEL_BACKGROUND[resolveThemeId(theme)];
+}
+
+/**
+ * Papier peint de l'écran « Votre bébé » accordé au thème actif — pendant de
+ * `useThemeBackground` pour le seul écran dont le fond est une image.
+ */
+export function useThemeBabyWallpaper(): ImageSourcePropType {
+  const { theme } = useUniwind();
+  return THEME_BABY_WALLPAPER[resolveThemeId(theme)];
 }
 
 /**

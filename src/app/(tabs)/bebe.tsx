@@ -4,6 +4,7 @@ import Svg, { Polyline } from 'react-native-svg';
 
 import { PremiumLockedScreen } from '@/components/hub/premium-locked-screen';
 import { CARD_SHADOW } from '@/features/hub/constants';
+import { useThemeBabyWallpaper } from '@/features/settings/hooks';
 
 /**
  * Petit graphe décoratif — évoque la courbe de croissance sans donner de
@@ -111,6 +112,8 @@ function BabyModulesGrid() {
  * en bento ici (`BabyModulesGrid`).
  */
 export default function BabyScreen() {
+  const wallpaper = useThemeBabyWallpaper();
+
   return (
     <PremiumLockedScreen
       title="Votre bébé"
@@ -118,7 +121,7 @@ export default function BabyScreen() {
       description="Centralisez la croissance, les repas et le sommeil de bébé, et gardez votre co-parent connecté à chaque étape."
       paywallTitle="Débloquez le suivi complet de bébé"
       gridContent={<BabyModulesGrid />}
-      backgroundImage={require('@/assets/images/Wallpaper_baby.png')}
+      backgroundImage={wallpaper}
     />
   );
 }
