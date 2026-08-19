@@ -16,7 +16,6 @@ import { withUniwind } from 'uniwind';
 
 import { StatusBadge } from '@/components/procedures/status-badge';
 import { StatusSelector } from '@/components/procedures/status-selector';
-import { EdgeBlurFade } from '@/components/ui/edge-blur-fade';
 import { ScreenCornerShapes } from '@/components/ui/screen-corner-shapes';
 import { useMyHousehold } from '@/features/household/hooks';
 import { CARD_SHADOW } from '@/features/hub/constants';
@@ -221,63 +220,60 @@ export default function ProceduresScreen() {
               <Text className="text-[11.5px] font-semibold tracking-wide text-[#8a8a8a]">
                 PAR MOIS DE GROSSESSE
               </Text>
-              <View className="relative">
-                <ScrollView
-                  ref={monthScrollRef}
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  decelerationRate="fast"
-                  onMomentumScrollEnd={handleMonthScrollSettle}
-                  onScrollEndDrag={handleMonthScrollSettle}
-                  contentContainerClassName="gap-2 py-1"
-                  contentContainerStyle={{
-                    paddingHorizontal: monthViewportWidth / 2,
-                  }}
-                  onLayout={(event) => {
-                    const width = event.nativeEvent.layout.width;
-                    setMonthViewportWidth((current) =>
-                      current === width ? current : width,
-                    );
-                  }}
-                >
-                  {PREGNANCY_MONTHS.map((month) => {
-                    const isActive = month === selectedMonth;
-                    return (
-                      <Pressable
-                        key={month}
-                        accessibilityRole="button"
-                        accessibilityState={{ selected: isActive }}
-                        onPress={() => {
-                          setSelectedMonth(month);
-                          scrollToMonth(month);
-                        }}
-                        onLayout={(event) => {
-                          monthLayoutsRef.current.set(month, {
-                            x: event.nativeEvent.layout.x,
-                            width: event.nativeEvent.layout.width,
-                          });
-                          if (isActive) scrollToMonth(month);
-                        }}
-                        style={CARD_SHADOW}
-                        className={`rounded-full px-4 py-2.5 ${
-                          isActive ? 'bg-accent' : 'bg-white'
+              <ScrollView
+                ref={monthScrollRef}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                decelerationRate="fast"
+                onMomentumScrollEnd={handleMonthScrollSettle}
+                onScrollEndDrag={handleMonthScrollSettle}
+                contentContainerClassName="gap-2 py-1"
+                contentContainerStyle={{
+                  paddingHorizontal: monthViewportWidth / 2,
+                }}
+                onLayout={(event) => {
+                  const width = event.nativeEvent.layout.width;
+                  setMonthViewportWidth((current) =>
+                    current === width ? current : width,
+                  );
+                }}
+              >
+                {PREGNANCY_MONTHS.map((month) => {
+                  const isActive = month === selectedMonth;
+                  return (
+                    <Pressable
+                      key={month}
+                      accessibilityRole="button"
+                      accessibilityState={{ selected: isActive }}
+                      onPress={() => {
+                        setSelectedMonth(month);
+                        scrollToMonth(month);
+                      }}
+                      onLayout={(event) => {
+                        monthLayoutsRef.current.set(month, {
+                          x: event.nativeEvent.layout.x,
+                          width: event.nativeEvent.layout.width,
+                        });
+                        if (isActive) scrollToMonth(month);
+                      }}
+                      style={CARD_SHADOW}
+                      className={`rounded-full px-4 py-2.5 ${
+                        isActive ? 'bg-accent' : 'bg-white'
+                      }`}
+                    >
+                      <Text
+                        className={`text-[15px] ${
+                          isActive
+                            ? 'font-semibold text-accent-foreground'
+                            : 'text-[#6b6b6b]'
                         }`}
                       >
-                        <Text
-                          className={`text-[15px] ${
-                            isActive
-                              ? 'font-semibold text-accent-foreground'
-                              : 'text-[#6b6b6b]'
-                          }`}
-                        >
-                          {getPregnancyMonthLabel(month)}
-                        </Text>
-                      </Pressable>
-                    );
-                  })}
-                </ScrollView>
-                <EdgeBlurFade color={backgroundColor} />
-              </View>
+                        {getPregnancyMonthLabel(month)}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+              </ScrollView>
             </View>
 
             <View className="gap-2.5">
