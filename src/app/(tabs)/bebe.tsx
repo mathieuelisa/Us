@@ -1,10 +1,22 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Text, View } from 'react-native';
+import { router } from 'expo-router';
+import { Pressable, Text, View } from 'react-native';
 import Svg, { Polyline } from 'react-native-svg';
 
 import { PremiumLockedScreen } from '@/components/hub/premium-locked-screen';
+import type { BabyModuleSlug } from '@/features/baby/constants';
 import { CARD_SHADOW } from '@/features/hub/constants';
 import { useThemeBabyWallpaper } from '@/features/settings/hooks';
+
+/**
+ * Ouvre le détail d'un suivi. Les 4 routes vivent dans le groupe `(tabs)`
+ * (`bebe-<slug>`, déclarées `href: null` dans `_layout.tsx`) pour que la
+ * barre de navigation reste visible pendant la consultation, comme pour
+ * `/premium`.
+ */
+function openBabyModule(slug: BabyModuleSlug) {
+  router.push(`/bebe-${slug}`);
+}
 
 /**
  * Petit graphe décoratif — évoque la courbe de croissance sans donner de
@@ -24,17 +36,28 @@ function GrowthSparkline() {
   );
 }
 
-function SmallModuleCard({ emoji, label }: { emoji: string; label: string }) {
+function SmallModuleCard({
+  emoji,
+  label,
+  slug,
+}: {
+  emoji: string;
+  label: string;
+  slug: BabyModuleSlug;
+}) {
   return (
-    <View
+    <Pressable
+      accessibilityLabel={`Ouvrir le suivi ${label}`}
+      accessibilityRole="button"
+      onPress={() => openBabyModule(slug)}
       style={CARD_SHADOW}
-      className="flex-1 justify-between rounded-3xl bg-white p-3.5"
+      className="flex-1 justify-between rounded-3xl bg-white p-3.5 active:opacity-70"
     >
       <View className="h-10 w-10 items-center justify-center rounded-2xl bg-[#1f3d3a]/10">
         <Text className="text-[20px]">{emoji}</Text>
       </View>
       <Text className="text-[13px] font-semibold text-[#1a1a1a]">{label}</Text>
-    </View>
+    </Pressable>
   );
 }
 
@@ -50,9 +73,12 @@ function BabyModulesGrid() {
   return (
     <View className="gap-3">
       <View className="flex-row gap-3">
-        <View
+        <Pressable
+          accessibilityLabel="Ouvrir le suivi Croissance"
+          accessibilityRole="button"
+          onPress={() => openBabyModule('croissance')}
           style={CARD_SHADOW}
-          className="flex-1 justify-between gap-3 rounded-3xl bg-white p-4"
+          className="flex-1 justify-between gap-3 rounded-3xl bg-white p-4 active:opacity-70"
         >
           <View className="flex-row items-start justify-between">
             <View className="h-11 w-11 items-center justify-center rounded-2xl bg-[#1f3d3a]/10">
@@ -76,17 +102,20 @@ function BabyModulesGrid() {
           </View>
 
           <GrowthSparkline />
-        </View>
+        </Pressable>
 
         <View className="flex-1 gap-3">
-          <SmallModuleCard emoji="🍼" label="Biberon" />
-          <SmallModuleCard emoji="🤱" label="Allaitement" />
+          <SmallModuleCard emoji="🍼" label="Biberon" slug="biberon" />
+          <SmallModuleCard emoji="🤱" label="Allaitement" slug="allaitement" />
         </View>
       </View>
 
-      <View
+      <Pressable
+        accessibilityLabel="Ouvrir le suivi Bain & Soins"
+        accessibilityRole="button"
+        onPress={() => openBabyModule('bain')}
         style={CARD_SHADOW}
-        className="flex-row items-center gap-3.5 rounded-3xl bg-white p-4"
+        className="flex-row items-center gap-3.5 rounded-3xl bg-white p-4 active:opacity-70"
       >
         <View className="h-12 w-12 items-center justify-center rounded-2xl bg-[#1f3d3a]/10">
           <Text className="text-[24px]">🛁</Text>
@@ -99,7 +128,8 @@ function BabyModulesGrid() {
             Rituel du soir, température, produits
           </Text>
         </View>
-      </View>
+        <Ionicons name="chevron-forward" size={16} color="#9a9a9a" />
+      </Pressable>
     </View>
   );
 }

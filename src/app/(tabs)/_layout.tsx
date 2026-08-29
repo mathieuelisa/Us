@@ -13,6 +13,17 @@ const HUB_DESTINATIONS = [
   'prenoms',
 ] as const;
 
+// Sous-destinations de « Votre bébé » : les 4 suivis de la grille bento de
+// `/bebe` (voir BABY_MODULES). Gardées à part de HUB_DESTINATIONS parce
+// qu'elles ne s'ouvrent pas depuis le hub mais depuis `/bebe` lui-même —
+// même traitement `href: null`.
+const BABY_DESTINATIONS = [
+  'bebe-croissance',
+  'bebe-biberon',
+  'bebe-allaitement',
+  'bebe-bain',
+] as const;
+
 // Destination ouverte depuis Réglages (sous-section Confidentialité), pas
 // depuis le hub — gardée à part de HUB_DESTINATIONS pour ne pas brouiller
 // son nom, même traitement `href: null`.
@@ -55,6 +66,9 @@ export default function TabsLayout() {
           reste à 4 entrées fixes (CONCEPT.md). `href: null` les retire de
           la barre sans les retirer de la navigation. */}
       {HUB_DESTINATIONS.map((name) => (
+        <Tabs.Screen key={name} name={name} options={{ href: null }} />
+      ))}
+      {BABY_DESTINATIONS.map((name) => (
         <Tabs.Screen key={name} name={name} options={{ href: null }} />
       ))}
       {SETTINGS_DESTINATIONS.map((name) => (
