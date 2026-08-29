@@ -38,6 +38,32 @@ export const CHECKLIST_CATEGORY_META: Record<string, { title: string }> = {
 
 export const CHECKLIST_CATEGORY_ORDER = ['maman', 'bebe', 'co_parent'];
 
+/**
+ * Sous-sections où l'on peut ajouter ses propres articles, par checklist.
+ *
+ * Les 3 sous-sections de la valise de maternité (demande explicite) ; la
+ * valise de salle de naissance n'en a pas. Une table plutôt qu'un booléen
+ * en dur dans l'écran : étendre le périmètre se fait ici, en une ligne.
+ */
+export const CUSTOM_ITEM_CATEGORIES: Record<string, string[]> = {
+  'valise-maternite': ['maman', 'bebe', 'co_parent'],
+};
+
+export function canAddCustomItem(slug: string, category: string): boolean {
+  return CUSTOM_ITEM_CATEGORIES[slug]?.includes(category) ?? false;
+}
+
+/**
+ * Tri d'affichage : les articles ajoutés par le foyer passent après ceux
+ * du catalogue, quel que soit leur `sortOrder` — « à la fin » de la
+ * sous-section est une position, pas un rang à négocier avec le
+ * catalogue.
+ */
+function sortChecklistItems(a: ChecklistItem, b: ChecklistItem): number {
+  if (a.isCustom !== b.isCustom) return a.isCustom ? 1 : -1;
+  return a.sortOrder - b.sortOrder;
+}
+
 export function groupChecklistItemsBySlug(
   items: ChecklistItem[],
 ): Record<string, ChecklistItem[]> {
@@ -48,7 +74,7 @@ export function groupChecklistItemsBySlug(
     grouped[item.checklistSlug] = group;
   }
   for (const group of Object.values(grouped)) {
-    group.sort((a, b) => a.sortOrder - b.sortOrder);
+    group.sort(sortChecklistItems);
   }
   return grouped;
 }
@@ -67,14 +93,21 @@ export function filterVisibleChecklistItems(
     : items;
 }
 
-/** Groupe par catégorie (Maman / Bébé / Co-parent) ; vide pour une liste plate. */
+/**
+ * Groupe par catégorie (Maman / Bébé / Co-parent) ; vide pour une liste
+ * plate. Une sous-section vide reste affichée si elle accepte des ajouts —
+ * sinon la ligne « Ajouter un élément » disparaîtrait avec elle.
+ */
 export function groupChecklistItemsByCategory(
   items: ChecklistItem[],
+  slug: string,
 ): { category: string; items: ChecklistItem[] }[] {
   return CHECKLIST_CATEGORY_ORDER.map((category) => ({
     category,
     items: items
       .filter((item) => item.category === category)
-      .sort((a, b) => a.sortOrder - b.sortOrder),
-  })).filter((group) => group.items.length > 0);
+      .sort(sortChecklistItems),
+  })).filter(
+    (group) => group.items.length > 0 || canAddCustomItem(slug, group.category),
+  );
 }

@@ -286,6 +286,50 @@ export type Database = {
           },
         ];
       };
+      household_custom_checklist_items: {
+        Row: {
+          category: string | null;
+          checked: boolean;
+          checklist_slug: string;
+          created_at: string;
+          household_id: string;
+          id: string;
+          label: string;
+          sort_order: number;
+          updated_at: string;
+        };
+        Insert: {
+          category?: string | null;
+          checked?: boolean;
+          checklist_slug: string;
+          created_at?: string;
+          household_id: string;
+          id?: string;
+          label: string;
+          sort_order?: number;
+          updated_at?: string;
+        };
+        Update: {
+          category?: string | null;
+          checked?: boolean;
+          checklist_slug?: string;
+          created_at?: string;
+          household_id?: string;
+          id?: string;
+          label?: string;
+          sort_order?: number;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'household_custom_checklist_items_household_id_fkey';
+            columns: ['household_id'];
+            isOneToOne: false;
+            referencedRelation: 'households';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       household_info_items: {
         Row: {
           category: string | null;

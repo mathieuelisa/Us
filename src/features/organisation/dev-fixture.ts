@@ -18,6 +18,7 @@ export const DEV_CHECKLIST_ITEMS_FIXTURE: ChecklistItem[] = [
     label: 'Pyjamas et vêtements confortables',
     sortOrder: 1,
     checked: false,
+    isCustom: false,
     category: 'maman',
   },
   {
@@ -26,6 +27,7 @@ export const DEV_CHECKLIST_ITEMS_FIXTURE: ChecklistItem[] = [
     label: 'Sous-vêtements et culottes filet/jetables',
     sortOrder: 2,
     checked: false,
+    isCustom: false,
     category: 'maman',
   },
   {
@@ -34,6 +36,7 @@ export const DEV_CHECKLIST_ITEMS_FIXTURE: ChecklistItem[] = [
     label: 'Trousse de toilette',
     sortOrder: 3,
     checked: false,
+    isCustom: false,
     category: 'maman',
   },
   {
@@ -42,6 +45,7 @@ export const DEV_CHECKLIST_ITEMS_FIXTURE: ChecklistItem[] = [
     label: 'Soutiens-gorge d’allaitement',
     sortOrder: 4,
     checked: false,
+    isCustom: false,
     category: 'maman',
   },
   {
@@ -50,6 +54,7 @@ export const DEV_CHECKLIST_ITEMS_FIXTURE: ChecklistItem[] = [
     label: 'Coussinets d’allaitement',
     sortOrder: 5,
     checked: false,
+    isCustom: false,
     category: 'maman',
   },
   {
@@ -58,6 +63,7 @@ export const DEV_CHECKLIST_ITEMS_FIXTURE: ChecklistItem[] = [
     label: 'Chaussons ou chaussettes chaudes',
     sortOrder: 6,
     checked: false,
+    isCustom: false,
     category: 'maman',
   },
   {
@@ -66,6 +72,7 @@ export const DEV_CHECKLIST_ITEMS_FIXTURE: ChecklistItem[] = [
     label: 'Chargeur de téléphone',
     sortOrder: 7,
     checked: false,
+    isCustom: false,
     category: 'maman',
   },
   {
@@ -74,6 +81,7 @@ export const DEV_CHECKLIST_ITEMS_FIXTURE: ChecklistItem[] = [
     label: 'Carte d’identité et carte vitale',
     sortOrder: 8,
     checked: false,
+    isCustom: false,
     category: 'maman',
   },
   {
@@ -82,6 +90,7 @@ export const DEV_CHECKLIST_ITEMS_FIXTURE: ChecklistItem[] = [
     label: 'Dossier de maternité',
     sortOrder: 9,
     checked: false,
+    isCustom: false,
     category: 'maman',
   },
   {
@@ -90,6 +99,7 @@ export const DEV_CHECKLIST_ITEMS_FIXTURE: ChecklistItem[] = [
     label: 'Bodys et pyjamas pour bébé (plusieurs tailles)',
     sortOrder: 10,
     checked: false,
+    isCustom: false,
     category: 'bebe',
   },
   {
@@ -98,6 +108,7 @@ export const DEV_CHECKLIST_ITEMS_FIXTURE: ChecklistItem[] = [
     label: 'Turbulette ou couverture',
     sortOrder: 11,
     checked: false,
+    isCustom: false,
     category: 'bebe',
   },
   {
@@ -106,6 +117,7 @@ export const DEV_CHECKLIST_ITEMS_FIXTURE: ChecklistItem[] = [
     label: 'Bonnet et moufles pour bébé',
     sortOrder: 12,
     checked: false,
+    isCustom: false,
     category: 'bebe',
   },
   {
@@ -114,6 +126,7 @@ export const DEV_CHECKLIST_ITEMS_FIXTURE: ChecklistItem[] = [
     label: 'Couches nouveau-né',
     sortOrder: 13,
     checked: false,
+    isCustom: false,
     category: 'bebe',
   },
   {
@@ -122,6 +135,7 @@ export const DEV_CHECKLIST_ITEMS_FIXTURE: ChecklistItem[] = [
     label: 'Tenue de sortie pour bébé',
     sortOrder: 14,
     checked: false,
+    isCustom: false,
     category: 'bebe',
   },
   {
@@ -130,6 +144,7 @@ export const DEV_CHECKLIST_ITEMS_FIXTURE: ChecklistItem[] = [
     label: 'Siège auto installé dans la voiture',
     sortOrder: 15,
     checked: false,
+    isCustom: false,
     category: 'bebe',
   },
   {
@@ -138,6 +153,7 @@ export const DEV_CHECKLIST_ITEMS_FIXTURE: ChecklistItem[] = [
     label: 'Vêtements de rechange',
     sortOrder: 16,
     checked: false,
+    isCustom: false,
     category: 'co_parent',
   },
   {
@@ -146,6 +162,7 @@ export const DEV_CHECKLIST_ITEMS_FIXTURE: ChecklistItem[] = [
     label: 'Trousse de toilette',
     sortOrder: 17,
     checked: false,
+    isCustom: false,
     category: 'co_parent',
   },
   {
@@ -154,6 +171,7 @@ export const DEV_CHECKLIST_ITEMS_FIXTURE: ChecklistItem[] = [
     label: 'Chargeur de téléphone et batterie externe',
     sortOrder: 18,
     checked: false,
+    isCustom: false,
     category: 'co_parent',
   },
   {
@@ -162,6 +180,7 @@ export const DEV_CHECKLIST_ITEMS_FIXTURE: ChecklistItem[] = [
     label: 'De quoi manger et boire pour la journée',
     sortOrder: 19,
     checked: false,
+    isCustom: false,
     category: 'co_parent',
   },
   {
@@ -170,6 +189,7 @@ export const DEV_CHECKLIST_ITEMS_FIXTURE: ChecklistItem[] = [
     label: 'Oreiller et couverture pour la nuit',
     sortOrder: 20,
     checked: false,
+    isCustom: false,
     category: 'co_parent',
   },
   {
@@ -178,6 +198,7 @@ export const DEV_CHECKLIST_ITEMS_FIXTURE: ChecklistItem[] = [
     label: 'Tenue confortable pour le travail',
     sortOrder: 1,
     checked: false,
+    isCustom: false,
     category: 'maman',
   },
   {
@@ -186,6 +207,7 @@ export const DEV_CHECKLIST_ITEMS_FIXTURE: ChecklistItem[] = [
     label: 'Chaussettes chaudes',
     sortOrder: 2,
     checked: false,
+    isCustom: false,
     category: 'maman',
   },
   {
@@ -194,6 +216,7 @@ export const DEV_CHECKLIST_ITEMS_FIXTURE: ChecklistItem[] = [
     label: 'Brumisateur ou huile de massage',
     sortOrder: 3,
     checked: false,
+    isCustom: false,
     category: 'maman',
   },
   {
@@ -202,6 +225,7 @@ export const DEV_CHECKLIST_ITEMS_FIXTURE: ChecklistItem[] = [
     label: 'Musique ou playlist de relaxation',
     sortOrder: 4,
     checked: false,
+    isCustom: false,
     category: 'maman',
   },
   {
@@ -210,6 +234,7 @@ export const DEV_CHECKLIST_ITEMS_FIXTURE: ChecklistItem[] = [
     label: 'Bouteille d’eau et en-cas',
     sortOrder: 5,
     checked: false,
+    isCustom: false,
     category: 'maman',
   },
   {
@@ -218,6 +243,7 @@ export const DEV_CHECKLIST_ITEMS_FIXTURE: ChecklistItem[] = [
     label: 'Coussin d’allaitement',
     sortOrder: 6,
     checked: false,
+    isCustom: false,
     category: 'bebe',
   },
   {
@@ -226,6 +252,7 @@ export const DEV_CHECKLIST_ITEMS_FIXTURE: ChecklistItem[] = [
     label: 'Appareil photo ou téléphone chargé',
     sortOrder: 7,
     checked: false,
+    isCustom: false,
     category: 'co_parent',
   },
   {
@@ -234,6 +261,7 @@ export const DEV_CHECKLIST_ITEMS_FIXTURE: ChecklistItem[] = [
     label: 'Serviette de toilette',
     sortOrder: 8,
     checked: false,
+    isCustom: false,
     category: 'maman',
   },
   {
@@ -242,6 +270,7 @@ export const DEV_CHECKLIST_ITEMS_FIXTURE: ChecklistItem[] = [
     label: 'Body pour le peau à peau',
     sortOrder: 9,
     checked: false,
+    isCustom: false,
     category: 'bebe',
   },
   {
@@ -250,6 +279,7 @@ export const DEV_CHECKLIST_ITEMS_FIXTURE: ChecklistItem[] = [
     label: 'Liste des personnes à prévenir',
     sortOrder: 10,
     checked: false,
+    isCustom: false,
     category: 'co_parent',
   },
 ];

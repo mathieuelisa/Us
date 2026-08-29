@@ -8,6 +8,7 @@ import { withUniwind } from 'uniwind';
 
 import { PremiumTeaserCard } from '@/components/hub/premium-teaser-card';
 import { ProgressBar } from '@/components/organisation/progress-bar';
+import { PlainInput } from '@/components/plain-input';
 import { ScreenCornerShapes } from '@/components/ui/screen-corner-shapes';
 import { useMyHousehold } from '@/features/household/hooks';
 import { CARD_SHADOW } from '@/features/hub/constants';
@@ -16,6 +17,7 @@ import {
   CHECKLIST_CATEGORY_META,
   CHECKLIST_META,
   CHECKLIST_ORDER,
+  canAddCustomItem,
   filterVisibleChecklistItems,
   groupChecklistItemsByCategory,
   groupChecklistItemsBySlug,
@@ -23,7 +25,9 @@ import {
 // ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
 import { DEV_CHECKLIST_ITEMS_FIXTURE } from '@/features/organisation/dev-fixture';
 import {
+  useAddCustomChecklistItem,
   useChecklistItems,
+  useDeleteCustomChecklistItem,
   useToggleChecklistItem,
 } from '@/features/organisation/hooks';
 import { useThemeBackground } from '@/features/settings/hooks';
@@ -51,6 +55,8 @@ export default function OrganisationScreen() {
 
   const { data: remoteItems = [] } = useChecklistItems(household);
   const toggleItem = useToggleChecklistItem(household);
+  const addCustomItem = useAddCustomChecklistItem(household);
+  const deleteCustomItem = useDeleteCustomChecklistItem(household);
 
   // ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts. Sans foyer réel,
   // remoteItems reste toujours vide (la requête est désactivée) : cet écran
@@ -83,9 +89,48 @@ export default function OrganisationScreen() {
       return;
     }
     toggleItem.mutate({
-      householdChecklistItemId: item.id,
+      itemId: item.id,
       checked: !item.checked,
+      isCustom: item.isCustom,
     });
+  };
+
+  const addItem = (input: {
+    checklistSlug: string;
+    category: string;
+    label: string;
+  }) => {
+    // Rangé après les articles existants de la sous-section ; le tri
+    // d'affichage place de toute façon les ajouts en fin de liste.
+    const sortOrder =
+      items.reduce((max, item) => Math.max(max, item.sortOrder), 0) + 1;
+
+    if (isDevBypass) {
+      setDevItems((current) => [
+        ...current,
+        {
+          id: `dev-custom-${Date.now()}`,
+          checklistSlug: input.checklistSlug,
+          label: input.label,
+          sortOrder,
+          checked: false,
+          category: input.category,
+          isCustom: true,
+        },
+      ]);
+      return;
+    }
+    addCustomItem.mutate({ ...input, sortOrder });
+  };
+
+  const removeItem = (item: ChecklistItem) => {
+    if (isDevBypass) {
+      setDevItems((current) =>
+        current.filter((current_item) => current_item.id !== item.id),
+      );
+      return;
+    }
+    deleteCustomItem.mutate(item.id);
   };
 
   const visibleItems = filterVisibleChecklistItems(items, { hideCoParent });
@@ -121,6 +166,8 @@ export default function OrganisationScreen() {
             slug={selectedSlug}
             items={selectedItems}
             onToggleItem={toggleChecked}
+            onAddItem={addItem}
+            onRemoveItem={removeItem}
           />
         ) : (
           <>
@@ -214,15 +261,23 @@ function ChecklistDetail({
   slug,
   items,
   onToggleItem,
+  onAddItem,
+  onRemoveItem,
 }: {
   slug: string;
   items: ChecklistItem[];
   onToggleItem: (item: ChecklistItem) => void;
+  onAddItem: (input: {
+    checklistSlug: string;
+    category: string;
+    label: string;
+  }) => void;
+  onRemoveItem: (item: ChecklistItem) => void;
 }) {
   const meta = CHECKLIST_META[slug];
   const checkedCount = items.filter((item) => item.checked).length;
   const progress = items.length === 0 ? 0 : checkedCount / items.length;
-  const categoryGroups = groupChecklistItemsByCategory(items);
+  const categoryGroups = groupChecklistItemsByCategory(items, slug);
 
   return (
     <View className="gap-5">
@@ -230,6 +285,8 @@ function ChecklistDetail({
         <Text className="text-[24px] font-bold text-[#1a1a1a]">
           {meta.title}
         </Text>
+        {/* Le total suit les ajouts : un article personnalisé compte comme
+            les autres, au numérateur comme au dénominateur. */}
         <Text className="text-[13px] font-medium text-accent">
           {checkedCount} sur {items.length} complétés
         </Text>
@@ -250,8 +307,24 @@ function ChecklistDetail({
                     key={item.id}
                     item={item}
                     onToggle={onToggleItem}
+                    onRemove={onRemoveItem}
                   />
                 ))}
+
+                {canAddCustomItem(slug, group.category) ? (
+                  <AddChecklistItemRow
+                    categoryTitle={
+                      CHECKLIST_CATEGORY_META[group.category].title
+                    }
+                    onAdd={(label) =>
+                      onAddItem({
+                        checklistSlug: slug,
+                        category: group.category,
+                        label,
+                      })
+                    }
+                  />
+                ) : null}
               </View>
             </View>
           ))}
@@ -263,6 +336,7 @@ function ChecklistDetail({
               key={item.id}
               item={item}
               onToggle={onToggleItem}
+              onRemove={onRemoveItem}
             />
           ))}
         </View>
@@ -271,12 +345,100 @@ function ChecklistDetail({
   );
 }
 
+/**
+ * Dernière ligne d'une sous-section personnalisable : un bouton discret
+ * qui se déplie en champ de saisie.
+ *
+ * Saisie en ligne plutôt qu'en modale : ajouter « Une brumisateur » à sa
+ * valise est un geste bref et répétitif — on en ajoute souvent plusieurs
+ * d'affilée, et le champ reste ouvert d'un ajout à l'autre.
+ */
+function AddChecklistItemRow({
+  categoryTitle,
+  onAdd,
+}: {
+  categoryTitle: string;
+  onAdd: (label: string) => void;
+}) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [label, setLabel] = useState('');
+  const trimmed = label.trim();
+
+  if (!isEditing) {
+    return (
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={`Ajouter un élément à la sous-section ${categoryTitle}`}
+        onPress={() => setIsEditing(true)}
+        className="flex-row items-center gap-3 rounded-2xl border border-dashed border-[#c9c9c9] px-4 py-3.5 active:opacity-60"
+      >
+        <Ionicons name="add-circle-outline" size={22} color="#2D5E5A" />
+        <Text className="flex-1 text-[14px] text-[#6b6b6b]">
+          Ajouter un élément
+        </Text>
+      </Pressable>
+    );
+  }
+
+  function submit() {
+    if (trimmed.length === 0) return;
+    onAdd(trimmed);
+    setLabel('');
+  }
+
+  return (
+    <View
+      style={CARD_SHADOW}
+      className="gap-2.5 rounded-2xl bg-white px-4 py-3.5"
+    >
+      <PlainInput
+        autoFocus
+        placeholder={`À ajouter dans « ${categoryTitle} »`}
+        value={label}
+        onChangeText={setLabel}
+        maxLength={120}
+        returnKeyType="done"
+        onSubmitEditing={submit}
+      />
+
+      <View className="flex-row items-center justify-end gap-4">
+        <Pressable
+          accessibilityRole="button"
+          hitSlop={8}
+          onPress={() => {
+            setLabel('');
+            setIsEditing(false);
+          }}
+        >
+          <Text className="text-[13.5px] text-[#6b6b6b]">Annuler</Text>
+        </Pressable>
+
+        <Pressable
+          accessibilityRole="button"
+          accessibilityState={{ disabled: trimmed.length === 0 }}
+          disabled={trimmed.length === 0}
+          onPress={submit}
+          className={`rounded-full px-4 py-2 ${
+            trimmed.length === 0 ? 'bg-[#1f3d3a]/30' : 'bg-[#1f3d3a]'
+          }`}
+        >
+          <Text className="text-[13.5px] font-semibold text-white">
+            Ajouter
+          </Text>
+        </Pressable>
+      </View>
+    </View>
+  );
+}
+
 function ChecklistItemRow({
   item,
   onToggle,
+  onRemove,
 }: {
   item: ChecklistItem;
   onToggle: (item: ChecklistItem) => void;
+  onRemove: (item: ChecklistItem) => void;
 }) {
   return (
     <Pressable
@@ -299,6 +461,19 @@ function ChecklistItemRow({
       >
         {item.label}
       </Text>
+
+      {/* Seuls les articles ajoutés par le foyer se suppriment : le
+          catalogue partagé reste intact, on ne fait que le cocher. */}
+      {item.isCustom ? (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={`Supprimer « ${item.label} »`}
+          hitSlop={10}
+          onPress={() => onRemove(item)}
+        >
+          <Ionicons name="close" size={18} color="#b0b0b0" />
+        </Pressable>
+      ) : null}
     </Pressable>
   );
 }
