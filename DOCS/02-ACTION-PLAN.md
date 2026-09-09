@@ -157,9 +157,9 @@ authentifiée disponible en vérification automatisée.
       `CONCEPT.md` fait foi, il est réservé à la femme enceinte.
 
 Les sections ouvertes depuis le hub (Démarches, Ensemble, Suivi santé, Mon
-partenaire, J'ai accouché) mènent à des écrans d'attente jusqu'à leur phase
-respective : la navigation est donc réelle et testable dès maintenant, et la
-barre reste à 4 onglets fixes.
+partenaire, J'ai accouché) menaient à des écrans d'attente jusqu'à leur
+phase respective ; elles ont toutes leur contenu réel depuis la Phase 2, et
+la barre reste à 4 onglets fixes.
 
 ### 1.4 Pilier Ensemble
 
@@ -400,9 +400,21 @@ mais ne sont plus la seule protection contre ce crash.
 
 ## Phase 2 — Déclaration de naissance & durcissement MVP
 
-- [ ] Bouton/flux "J'ai accouché" (7a) + recalcul des échéances de
+- [x] Bouton/flux "J'ai accouché" (7a) + recalcul des échéances de
       démarches à la confirmation (c'est l'événement pivot le plus délicat
       du MVP — à tester avec dates limites, fuseaux horaires, etc.)
+      — écran 7a construit : molette de date (`WheelDatePicker`), **aperçu
+      en direct** de l'échéance légale recalculée avant validation, garde
+      sur les dates futures / vieilles de plus d'un an, confirmation en
+      pop-up, puis état « naissance déclarée » avec accès direct à la
+      démarche. L'écriture se limite à `households.birth_date` (les
+      échéances se dérivent à l'affichage, rien n'est stocké) et la policy
+      `households_update_members` couvrait déjà ce cas — aucune migration.
+      ⚠️ **Reste à faire sur ce point** : la bascule de navigation
+      grossesse → bébé que 01-DESIGN-OVERVIEW rattache au même événement
+      (déblocage du module premium, changement de contenu du hub) est
+      restée en Phase 3, et le chemin Supabase réel n'a pas encore tourné
+      (vérifié en mode contournement DEV — cf. points ouverts 43 à 45).
 - [ ] Demande d'avis MVP (stockage du feedback, sans store review natif)
 - [ ] Vérification de bout en bout des règles de visibilité par rôle
       (Journal, Rendez-vous non partagés, Réglages) — ce sont les policies

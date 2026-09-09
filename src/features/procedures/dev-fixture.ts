@@ -12,8 +12,10 @@ import type { ProcedureWithStatus } from '@/features/procedures/api';
  * Les modifications de statut / rappel en mode DEV restent **locales** —
  * elles n'écrivent jamais dans Supabase, cf. `demarches.tsx`.
  *
- * Pour retirer : supprimer ce fichier et son usage dans
- * `src/app/(tabs)/demarches.tsx` (le compilateur le signalera).
+ * Pour retirer : supprimer ce fichier et ses usages dans
+ * `src/app/(tabs)/demarches.tsx` et `src/app/(tabs)/naissance.tsx` (ce
+ * dernier n'y lit que le délai légal de la déclaration de naissance — le
+ * compilateur signalera les deux).
  */
 export const DEV_PROCEDURES_FIXTURE: ProcedureWithStatus[] = [
   {
