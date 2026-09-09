@@ -160,14 +160,25 @@ export default function HubScreen() {
             {greetingName ? `Bonjour ${greetingName}` : 'Bonjour'}
           </Text>
 
+          {/* Or (`PREMIUM_GOLD_ON_LIGHT`) plutôt que l'accent du thème
+              (demande explicite) : posé à côté d'un titre en gras, le vert
+              sauge se confondait avec le reste de l'écran, alors que cette
+              action est la plus importante du hub.
+              ⚠️ Écart assumé avec le code couleur du reste de l'app, où
+              l'or signale le premium — y compris sur cet écran (badge de
+              « Votre bébé », pavés de date des rendez-vous) et dans la
+              barre de navigation. Une action gratuite prend donc ici la
+              couleur du payant. Blanc sur cet or donne par ailleurs ~3,3:1,
+              sous le seuil WCAG AA de 4,5:1 pour 13 px — le `semibold`
+              compense à l'œil, pas à la mesure. */}
           {isPregnant ? (
             <Pressable
               accessibilityRole="button"
-              style={CARD_SHADOW}
+              style={[CARD_SHADOW, { backgroundColor: PREMIUM_GOLD_ON_LIGHT }]}
               onPress={() => router.push('/naissance')}
-              className="rounded-full bg-accent px-3.5 py-2"
+              className="rounded-full px-3.5 py-2"
             >
-              <Text className="text-[13px] font-medium text-accent-foreground">
+              <Text className="text-[13px] font-semibold text-white">
                 J’ai accouché
               </Text>
             </Pressable>
@@ -344,7 +355,9 @@ export default function HubScreen() {
         </View>
 
         <View className="gap-2">
-          <Text className="text-[11.5px] font-semibold tracking-wide text-[#8a8a8a]">
+          {/* Seul intitulé de section aligné à droite (demande explicite),
+              pour détacher les rendez-vous des sections qui le précèdent. */}
+          <Text className="text-right text-[11.5px] font-semibold tracking-wide text-[#8a8a8a]">
             NOS PROCHAINS RENDEZ-VOUS
           </Text>
 
