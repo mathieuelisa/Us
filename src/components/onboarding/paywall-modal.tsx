@@ -1,4 +1,5 @@
 import { Image, Modal, Pressable, ScrollView, Text, View } from 'react-native';
+import Animated, { SlideInDown, SlideOutDown } from 'react-native-reanimated';
 
 export const PREMIUM_FEATURES = [
   'Match des Prénoms',
@@ -19,6 +20,16 @@ export const PREMIUM_FEATURES = [
  * paiement ni module « Votre bébé » (cf. DOCS/versions/MVP.md). Le bouton
  * « Débloquer » est donc désactivé et annoncé comme bientôt disponible ;
  * l'intégration réelle (RevenueCat) arrive en Phase 3.
+ *
+ * `animationType="none"` sur `Modal` (demande explicite) : le fond opaque
+ * doit apparaître d'un coup, sans glisser avec le reste — seule la carte
+ * anime (`SlideInDown`/`SlideOutDown`, Reanimated). `animationType="slide"`
+ * faisait remonter le voile noir en même temps que la feuille, ce qui
+ * donnait un balayage de bas en haut au lieu d'un assombrissement net.
+ * Même mécanique que `HowItWorksModal` et `ConfirmBirthModal` — les trois
+ * feuilles basses de l'app s'ouvrent désormais pareil. `Modal` démonte
+ * réellement ses enfants quand `visible` repasse à `false`, donc
+ * l'animation d'entrée se rejoue bien à chaque ouverture.
  */
 export function PaywallModal({
   visible,
@@ -31,11 +42,15 @@ export function PaywallModal({
     <Modal
       visible={visible}
       transparent
-      animationType="slide"
+      animationType="none"
       onRequestClose={onClose}
     >
       <View className="flex-1 justify-end bg-black/50">
-        <View className="max-h-[92%] rounded-t-3xl bg-[#1f3d3a] px-7 pb-8 pt-4">
+        <Animated.View
+          entering={SlideInDown.duration(300)}
+          exiting={SlideOutDown.duration(300)}
+          className="max-h-[92%] rounded-t-3xl bg-[#1f3d3a] px-7 pb-8 pt-4"
+        >
           <View className="mb-3 h-1 w-10 self-center rounded-full bg-[#3a3a3a]" />
 
           <View className="gap-2 items-center">
@@ -93,7 +108,7 @@ export function PaywallModal({
               </Text>
             </Pressable>
           </View>
-        </View>
+        </Animated.View>
       </View>
     </Modal>
   );
