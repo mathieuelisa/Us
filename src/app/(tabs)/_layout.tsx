@@ -29,6 +29,11 @@ const BABY_DESTINATIONS = [
 // son nom, même traitement `href: null`.
 const SETTINGS_DESTINATIONS = ['legal'] as const;
 
+// Détail d'un exercice, ouvert depuis l'onglet Exercices de `/sante` —
+// une route et non un état local de l'onglet, pour que son visuel de tête
+// puisse filer bord à bord (cf. l'en-tête de `exercice.tsx`).
+const HEALTH_DESTINATIONS = ['exercice'] as const;
+
 // Page premium ouverte depuis l'icône dédiée de la barre de navigation
 // (`AppTabBar`), pas depuis le hub — une page simple (pas de `Modal`,
 // demande explicite) plutôt qu'une route `presentation: 'modal'`, pour les
@@ -72,6 +77,9 @@ export default function TabsLayout() {
         <Tabs.Screen key={name} name={name} options={{ href: null }} />
       ))}
       {SETTINGS_DESTINATIONS.map((name) => (
+        <Tabs.Screen key={name} name={name} options={{ href: null }} />
+      ))}
+      {HEALTH_DESTINATIONS.map((name) => (
         <Tabs.Screen key={name} name={name} options={{ href: null }} />
       ))}
       {FOOTER_DESTINATIONS.map((name) => (
