@@ -2,7 +2,16 @@ import { Ionicons } from '@expo/vector-icons';
 import { Button } from 'heroui-native';
 import { useEffect, useState } from 'react';
 import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
-import Animated, { SlideInDown, SlideOutDown } from 'react-native-reanimated';
+import Animated, {
+  Easing,
+  interpolateColor,
+  type SharedValue,
+  SlideInDown,
+  SlideOutDown,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
 
 import { PlainInput } from '@/components/plain-input';
 import { WheelDatePicker } from '@/components/wheel-date-picker';
@@ -150,38 +159,12 @@ export function BabyEntryFormModal({
             </Text>
 
             {module.segments ? (
-              <View className="gap-2">
-                <Text className="text-[13px] font-medium text-[#6b6b6b]">
-                  {module.segments.label}
-                </Text>
-                <View className="flex-row gap-1 rounded-xl bg-[#f2f2f7] p-1">
-                  {module.segments.options.map((option) => {
-                    const isSelected = option === segment;
-                    return (
-                      <Pressable
-                        key={option}
-                        accessibilityRole="button"
-                        accessibilityState={{ selected: isSelected }}
-                        onPress={() => selectSegment(option)}
-                        className={`flex-1 items-center rounded-lg py-2.5 ${
-                          isSelected ? 'bg-white' : ''
-                        }`}
-                        style={isSelected ? SEGMENT_SHADOW : undefined}
-                      >
-                        <Text
-                          className={`text-[13.5px] ${
-                            isSelected
-                              ? 'font-semibold text-[#1a1a1a]'
-                              : 'text-[#8a8a8a]'
-                          }`}
-                        >
-                          {option}
-                        </Text>
-                      </Pressable>
-                    );
-                  })}
-                </View>
-              </View>
+              <SegmentedField
+                label={module.segments.label}
+                options={module.segments.options}
+                value={segment}
+                onChange={selectSegment}
+              />
             ) : null}
 
             <View className="gap-2">
@@ -367,6 +350,171 @@ const SEGMENT_SHADOW = {
   shadowRadius: 3,
   elevation: 1,
 } as const;
+
+/** Marge interne du rail (`p-1`) et écart entre segments (`gap-1`), en points. */
+const SEGMENT_TRACK_PADDING = 4;
+const SEGMENT_GAP = 4;
+const SEGMENT_SLIDE_DURATION = 220;
+
+const SEGMENT_COLOR_IDLE = '#8a8a8a';
+const SEGMENT_COLOR_ACTIVE = '#1a1a1a';
+
+/**
+ * Sélecteur de segment de tête du formulaire (Bain / Soins, sein gauche /
+ * sein droit).
+ *
+ * Une **seule** pastille blanche qui glisse d'un segment à l'autre, plutôt
+ * qu'un fond blanc allumé et éteint sur chaque option (demande explicite —
+ * le changement était sec) : c'est ce qui donne la continuité, l'œil suit
+ * la pastille au lieu de constater un saut. Même principe que la pastille
+ * de `AppTabBar`.
+ *
+ * La largeur du rail est mesurée plutôt que devinée : elle dépend de la
+ * largeur de la modale, et il faut la connaître pour placer la pastille au
+ * point. Tant qu'elle vaut 0 (avant la première mesure), la pastille n'est
+ * pas rendue — elle apparaîtrait sinon à gauche puis sauterait en place.
+ *
+ * La graisse du libellé, elle, bascule d'un coup : `fontWeight` ne
+ * s'interpole pas. Le texte étant centré dans sa colonne, le changement de
+ * largeur ne décale rien.
+ */
+function SegmentedField({
+  label,
+  options,
+  value,
+  onChange,
+}: {
+  label: string;
+  options: string[];
+  value: string | null;
+  onChange: (option: string) => void;
+}) {
+  const [trackWidth, setTrackWidth] = useState(0);
+  const selectedIndex = Math.max(options.indexOf(value ?? ''), 0);
+
+  // Position de la pastille en *index* (pas en points) : la largeur d'un
+  // segment peut changer (rotation, autre modale) sans fausser l'animation
+  // en cours.
+  const position = useSharedValue(selectedIndex);
+
+  useEffect(() => {
+    position.value = withTiming(selectedIndex, {
+      duration: SEGMENT_SLIDE_DURATION,
+      easing: Easing.out(Easing.cubic),
+    });
+  }, [selectedIndex, position]);
+
+  const innerWidth = Math.max(trackWidth - SEGMENT_TRACK_PADDING * 2, 0);
+  const segmentWidth =
+    options.length > 0
+      ? (innerWidth - SEGMENT_GAP * (options.length - 1)) / options.length
+      : 0;
+
+  const pillStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: position.value * (segmentWidth + SEGMENT_GAP) }],
+  }));
+
+  return (
+    <View className="gap-2">
+      <Text className="text-[13px] font-medium text-[#6b6b6b]">{label}</Text>
+
+      <View
+        className="rounded-xl bg-[#f2f2f7] p-1"
+        onLayout={(event) => {
+          const { width } = event.nativeEvent.layout;
+          setTrackWidth((current) => (current === width ? current : width));
+        }}
+      >
+        {/* Sous les libellés et transparente aux gestes : c'est le
+            `Pressable` de chaque option qui reçoit l'appui, pas la
+            pastille qui passe dessous. */}
+        {segmentWidth > 0 ? (
+          <Animated.View
+            pointerEvents="none"
+            style={[
+              {
+                ...SEGMENT_SHADOW,
+                position: 'absolute',
+                top: SEGMENT_TRACK_PADDING,
+                bottom: SEGMENT_TRACK_PADDING,
+                left: SEGMENT_TRACK_PADDING,
+                width: segmentWidth,
+                borderRadius: 8,
+                backgroundColor: '#ffffff',
+              },
+              pillStyle,
+            ]}
+          />
+        ) : null}
+
+        <View className="flex-row gap-1">
+          {options.map((option, index) => (
+            <SegmentLabel
+              key={option}
+              option={option}
+              index={index}
+              position={position}
+              isSelected={index === selectedIndex}
+              onPress={() => onChange(option)}
+            />
+          ))}
+        </View>
+      </View>
+    </View>
+  );
+}
+
+/**
+ * Libellé d'un segment. Sa couleur suit la pastille au lieu de basculer
+ * avec elle : `position` est une valeur continue pendant le glissement, et
+ * la proximité du libellé à cette position pilote l'interpolation.
+ *
+ * `Animated.Text` porte ses styles en `style` et non en `className` :
+ * Uniwind et les composants animés ne se combinent pas de façon fiable
+ * (même raison que le `Pressable` de `DeclareBirthButton`).
+ */
+function SegmentLabel({
+  option,
+  index,
+  position,
+  isSelected,
+  onPress,
+}: {
+  option: string;
+  index: number;
+  position: SharedValue<number>;
+  isSelected: boolean;
+  onPress: () => void;
+}) {
+  const textStyle = useAnimatedStyle(() => {
+    const closeness = 1 - Math.min(Math.abs(position.value - index), 1);
+    return {
+      color: interpolateColor(
+        closeness,
+        [0, 1],
+        [SEGMENT_COLOR_IDLE, SEGMENT_COLOR_ACTIVE],
+      ),
+    };
+  });
+
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityState={{ selected: isSelected }}
+      onPress={onPress}
+      className="flex-1 items-center py-2.5"
+    >
+      <Animated.Text
+        style={[
+          { fontSize: 13.5, fontWeight: isSelected ? '600' : '400' },
+          textStyle,
+        ]}
+      >
+        {option}
+      </Animated.Text>
+    </Pressable>
+  );
+}
 
 /**
  * Un champ compte comme rempli s'il contient un nombre strictement
