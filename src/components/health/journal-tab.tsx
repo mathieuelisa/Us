@@ -26,7 +26,8 @@ export function JournalTab({
   household: Household | null | undefined;
 }) {
   const weekDates = getCurrentWeekIsoDates();
-  const [selectedDate, setSelectedDate] = useState(todayIso());
+  const today = todayIso();
+  const [selectedDate, setSelectedDate] = useState(today);
 
   const { data: savedSymptoms } = useSymptomsForDate(household, selectedDate);
   const { data: markedDates = [] } = useSymptomDates(household, weekDates);
@@ -58,28 +59,43 @@ export function JournalTab({
           const isSelected = date === selectedDate;
           const hasSymptoms = markedDates.includes(date);
           const dayNumber = Number(date.slice(-2));
+          // On ne déclare pas un état à venir : les jours après aujourd'hui
+          // sont grisés et non sélectionnables (dates ISO → comparaison
+          // lexicographique fiable).
+          const isFuture = date > today;
 
           return (
             <Pressable
               key={date}
               accessibilityRole="button"
-              accessibilityState={{ selected: isSelected }}
+              accessibilityState={{ selected: isSelected, disabled: isFuture }}
+              disabled={isFuture}
               onPress={() => setSelectedDate(date)}
               className="items-center gap-1"
             >
-              <Text className="text-[11px] text-[#9a9a9a]">
+              <Text
+                className={`text-[11px] ${
+                  isFuture ? 'text-[#d0d0d0]' : 'text-[#9a9a9a]'
+                }`}
+              >
                 {DAY_LETTERS[index]}
               </Text>
               <View
                 className={`h-8 w-8 items-center justify-center rounded-full ${
-                  isSelected ? 'bg-accent' : 'bg-[#f4f4f4]'
+                  isSelected
+                    ? 'bg-accent'
+                    : isFuture
+                      ? 'bg-[#f8f8f8]'
+                      : 'bg-[#f4f4f4]'
                 }`}
               >
                 <Text
                   className={`text-[13px] ${
                     isSelected
                       ? 'font-medium text-accent-foreground'
-                      : 'text-[#1a1a1a]'
+                      : isFuture
+                        ? 'text-[#c8c8c8]'
+                        : 'text-[#1a1a1a]'
                   }`}
                 >
                   {dayNumber}
@@ -97,8 +113,8 @@ export function JournalTab({
 
       <View className="gap-3">
         <Text className="text-[15px] font-medium text-[#1a1a1a]">
-          Des symptômes{' '}
-          {selectedDate === todayIso() ? 'aujourd’hui' : 'ce jour-là'} ?
+          Des symptômes {selectedDate === today ? 'aujourd’hui' : 'ce jour-là'}{' '}
+          ?
         </Text>
 
         <View className="flex-row flex-wrap gap-2">
