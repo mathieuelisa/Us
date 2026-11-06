@@ -363,7 +363,7 @@ export default function HubScreen() {
 
           <View className="gap-2">
             {displayedAppointments.map((appointment) => {
-              const { day, month } = formatAppointmentDayMonth(
+              const { weekday, day, month } = formatAppointmentDayMonth(
                 appointment.date,
               );
               const time = formatAppointmentTime(appointment.time);
@@ -390,6 +390,9 @@ export default function HubScreen() {
                     ) : null}
                   </View>
                   <View className="items-end">
+                    <Text className="text-[12px] text-[#6b6b6b]">
+                      {weekday}
+                    </Text>
                     <Text
                       className="text-[26px] font-bold leading-7"
                       style={{ color: PREMIUM_GOLD_ON_LIGHT }}

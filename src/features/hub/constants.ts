@@ -84,14 +84,19 @@ export function formatAppointmentDate(isoDate: string): string {
   });
 }
 
-/** Jour et mois séparés, pour le pavé date des cartes de rendez-vous. */
+/**
+ * Jour de la semaine abrégé (« mer. »), jour et mois séparés, pour le pavé
+ * date des cartes de rendez-vous.
+ */
 export function formatAppointmentDayMonth(isoDate: string): {
+  weekday: string;
   day: string;
   month: string;
 } {
   const [year, month, day] = isoDate.split('-').map(Number);
   const date = new Date(year, month - 1, day);
   return {
+    weekday: date.toLocaleDateString('fr-FR', { weekday: 'short' }),
     day: String(date.getDate()),
     month: date.toLocaleDateString('fr-FR', { month: 'short' }),
   };
