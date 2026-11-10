@@ -28,10 +28,11 @@ import {
 } from '@/features/hub/constants';
 import { useHubSummary } from '@/features/hub/hooks';
 import { useMyProfile } from '@/features/profile/hooks';
-import { useThemeBackground } from '@/features/settings/hooks';
+import { useThemeAccent, useThemeBackground } from '@/features/settings/hooks';
 // ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
 import { devBypassFirstNameAtom } from '@/lib/atoms/dev-bypass';
 import { currentRoleAtom } from '@/lib/atoms/role';
+import { darkenHex } from '@/lib/color';
 import { shiftIsoDate, todayIso } from '@/lib/date';
 
 const SafeAreaView = withUniwind(RNSafeAreaView);
@@ -89,6 +90,7 @@ export default function HubScreen() {
   const { data: summary } = useHubSummary(household);
   const { data: appointments = [] } = useAppointments(household);
   const backgroundColor = useThemeBackground();
+  const accent = useThemeAccent();
 
   // RLS filtre déjà les rendez-vous non partagés pour le co-parent — rien à
   // refaire ici (cf. src/features/health/api.ts). Déjà triés par date/heure
@@ -370,17 +372,33 @@ export default function HubScreen() {
                       </Text>
                     ) : null}
                   </View>
-                  <View className="items-end">
-                    <Text className="text-[12px] text-[#6b6b6b]">
-                      {weekday}
+                  {/* Pavé date teinté du fond d'écran (demande explicite) :
+                      même famille de couleur que la page, chiffres en
+                      accent — il suit le thème choisi. */}
+                  <View
+                    className="h-[72px] w-[68px] items-center justify-center rounded-[20px]"
+                    style={{
+                      backgroundColor: darkenHex(backgroundColor, 0.04),
+                    }}
+                  >
+                    <Text
+                      className="text-[12.5px] font-medium leading-4"
+                      style={{ color: accent }}
+                    >
+                      {capitalize(weekday)}
                     </Text>
                     <Text
-                      className="text-[26px] font-bold leading-7"
-                      style={{ color: PREMIUM_GOLD_ON_LIGHT }}
+                      className="text-[24px] font-extrabold leading-7"
+                      style={{ color: accent }}
                     >
                       {day}
                     </Text>
-                    <Text className="text-[12px] text-[#6b6b6b]">{month}</Text>
+                    <Text
+                      className="text-[12.5px] font-medium leading-4"
+                      style={{ color: accent }}
+                    >
+                      {month}
+                    </Text>
                   </View>
                 </Pressable>
               );
@@ -395,4 +413,9 @@ export default function HubScreen() {
       />
     </SafeAreaView>
   );
+}
+
+/** « lun. » → « Lun. » */
+function capitalize(text: string): string {
+  return text.charAt(0).toUpperCase() + text.slice(1);
 }
