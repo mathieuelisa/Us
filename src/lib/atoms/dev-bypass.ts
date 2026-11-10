@@ -18,7 +18,7 @@ import { atom } from 'jotai';
  * Pour retirer ce contournement : supprimer ce fichier, puis les usages
  * dans `src/app/_layout.tsx`, `src/app/(auth)/login.tsx`,
  * `src/app/(onboarding)/finalisation.tsx`, `src/app/(tabs)/index.tsx`,
- * `src/app/(tabs)/organisation.tsx`, `src/app/(tabs)/demarches.tsx` et
+ * `src/app/(tabs)/profil.tsx`, `src/app/(tabs)/organisation.tsx`, `src/app/(tabs)/demarches.tsx` et
  * `src/app/(tabs)/naissance.tsx` (le compilateur les signalera).
  */
 export type DevBypassStage = 'off' | 'onboarding' | 'app';

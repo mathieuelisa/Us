@@ -8,6 +8,8 @@ import { PlainInput } from '@/components/plain-input';
 import { ScreenCornerShapes } from '@/components/ui/screen-corner-shapes';
 import { useMyProfile, useUpdateMyProfile } from '@/features/profile/hooks';
 import { useThemeBackground } from '@/features/settings/hooks';
+// ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
+import { devBypassFirstNameAtom } from '@/lib/atoms/dev-bypass';
 import { sessionAtom } from '@/lib/atoms/session';
 
 const SafeAreaView = withUniwind(RNSafeAreaView);
@@ -18,14 +20,20 @@ export default function ProfileScreen() {
   const updateProfile = useUpdateMyProfile();
   const backgroundColor = useThemeBackground();
 
-  const [firstName, setFirstName] = useState('');
+  // ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts. Sans utilisateur
+  // réel, `useMyProfile()` ne renvoie rien : on reprend le prénom saisi à
+  // l'onboarding, comme la salutation du hub.
+  const devBypassFirstName = useAtomValue(devBypassFirstNameAtom);
+  const savedFirstName = profile?.first_name || devBypassFirstName;
+
+  const [firstName, setFirstName] = useState(savedFirstName);
 
   useEffect(() => {
-    setFirstName(profile?.first_name ?? '');
-  }, [profile?.first_name]);
+    setFirstName(savedFirstName);
+  }, [savedFirstName]);
 
-  const initials = (profile?.first_name ?? '?').trim().charAt(0).toUpperCase();
-  const hasChanges = firstName.trim() !== (profile?.first_name ?? '').trim();
+  const initials = (savedFirstName || '?').trim().charAt(0).toUpperCase();
+  const hasChanges = firstName.trim() !== savedFirstName.trim();
 
   return (
     <SafeAreaView
