@@ -20,7 +20,7 @@ import { ScreenCornerShapes } from '@/components/ui/screen-corner-shapes';
 import { useMyHousehold } from '@/features/household/hooks';
 import { useThemeAccent, useThemeBackground } from '@/features/settings/hooks';
 import { currentRoleAtom } from '@/lib/atoms/role';
-import { hexToRgba } from '@/lib/color';
+import { hexToRgba, lightenHex } from '@/lib/color';
 
 const SafeAreaView = withUniwind(RNSafeAreaView);
 
@@ -44,7 +44,7 @@ const TAB_SUBTITLES: Record<HealthTab, string> = {
   journal: 'Sélectionnez la journée et les symptômes que vous ressentez.',
   appointments: 'Vos rendez-vous du mois et ceux à venir.',
   contacts: 'Les numéros utiles, à portée de main.',
-  exercises: 'Des exercices doux, adaptés à votre trimestre.',
+  exercises: 'Bouger en douceur, à votre rythme.',
 };
 
 function isHealthTab(value: string | undefined): value is HealthTab {
@@ -72,11 +72,27 @@ export default function HealthScreen() {
   const isPregnant = role === 'pregnant';
 
   const tabs = useMemo(() => {
-    const journalTab = { value: 'journal' as const, label: 'Journal' };
+    const journalTab = {
+      value: 'journal' as const,
+      label: 'Journal',
+      icon: 'book-outline' as const,
+    };
     const sharedTabs = [
-      { value: 'appointments' as const, label: 'Rendez-vous' },
-      { value: 'contacts' as const, label: 'Contacts' },
-      { value: 'exercises' as const, label: 'Exercices' },
+      {
+        value: 'appointments' as const,
+        label: 'Rendez-vous',
+        icon: 'calendar-outline' as const,
+      },
+      {
+        value: 'contacts' as const,
+        label: 'Contacts',
+        icon: 'call-outline' as const,
+      },
+      {
+        value: 'exercises' as const,
+        label: 'Exercices',
+        icon: 'barbell-outline' as const,
+      },
     ];
     return isPregnant ? [journalTab, ...sharedTabs] : sharedTabs;
   }, [isPregnant]);
@@ -238,11 +254,31 @@ export default function HealthScreen() {
           accessibilityLabel="Ajouter un contact"
           accessibilityRole="button"
           onPress={() => setIsAddingContact(true)}
-          className="absolute bottom-6 right-6 h-16 w-16 items-center justify-center rounded-full bg-accent shadow-lg"
+          className="absolute bottom-6 right-6 h-16 w-16 items-center justify-center overflow-hidden rounded-full"
+          style={{
+            backgroundColor: accent,
+            shadowColor: accent,
+            shadowOffset: { width: 0, height: 10 },
+            shadowOpacity: 0.3,
+            shadowRadius: 16,
+            elevation: 8,
+          }}
         >
-          <Text className="text-[26px] font-medium leading-7 text-accent-foreground">
-            +
-          </Text>
+          {/* Reflet clair, même finition que les boutons en gélule. */}
+          <View
+            pointerEvents="none"
+            style={{
+              position: 'absolute',
+              right: -18,
+              top: -18,
+              width: 52,
+              height: 52,
+              borderRadius: 26,
+              backgroundColor: lightenHex(accent, 0.12),
+              opacity: 0.6,
+            }}
+          />
+          <Ionicons name="person-add" size={24} color="#ffffff" />
         </Pressable>
       ) : null}
     </SafeAreaView>
