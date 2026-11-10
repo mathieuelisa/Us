@@ -17,3 +17,14 @@ export function darkenHex(hex: string, amount: number): string {
 
   return `#${channel((num >> 16) & 0xff)}${channel((num >> 8) & 0xff)}${channel(num & 0xff)}`;
 }
+
+/** Inverse de `darkenHex` : éclaircit chaque canal de `amount` (0–1). */
+export function lightenHex(hex: string, amount: number): string {
+  return darkenHex(hex, -amount);
+}
+
+/** `#rrggbb` + opacité (0–1) → `rgba(…)`, pour teinter bordures et ombres. */
+export function hexToRgba(hex: string, alpha: number): string {
+  const num = Number.parseInt(hex.replace('#', ''), 16);
+  return `rgba(${(num >> 16) & 0xff}, ${(num >> 8) & 0xff}, ${num & 0xff}, ${alpha})`;
+}
