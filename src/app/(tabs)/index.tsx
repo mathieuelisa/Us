@@ -8,6 +8,12 @@ import { withUniwind } from 'uniwind';
 import { HowItWorksModal } from '@/components/hub/how-it-works-modal';
 import { PillarCard } from '@/components/hub/pillar-card';
 import { PremiumTeaserCard } from '@/components/hub/premium-teaser-card';
+import {
+  WAVE_LILAC,
+  WAVE_MINT,
+  WAVE_PEACH,
+  WAVE_PINK,
+} from '@/components/ui/glass-card';
 import { ScreenCornerShapes } from '@/components/ui/screen-corner-shapes';
 import { useAppointments } from '@/features/health/hooks';
 import { useMyHousehold } from '@/features/household/hooks';
@@ -256,23 +262,29 @@ export default function HubScreen() {
           <Text className="text-[11.5px] font-semibold tracking-wide text-[#8a8a8a]">
             VOS SECTIONS
           </Text>
-          <View className="gap-2.5">
+          <View className="gap-3">
             <PillarCard
+              id="demarches"
               emoji="📋"
               title="Démarches"
               state={proceduresState}
+              waveColor={WAVE_PEACH}
               onPress={() => router.push('/demarches')}
             />
             <PillarCard
+              id="ensemble"
               emoji="💬"
               title="Ensemble"
               state={togetherState}
+              waveColor={WAVE_PINK}
               onPress={() => router.push('/ensemble')}
             />
             <PillarCard
+              id="sante"
               emoji="🩺"
               title="Suivi santé"
               state={healthState}
+              waveColor={WAVE_MINT}
               onPress={() => router.push('/sante')}
             />
           </View>
@@ -282,9 +294,11 @@ export default function HubScreen() {
               pas un 4e pilier, demande explicite placée juste en dessous. */}
           <View className="mt-1">
             <PillarCard
+              id="organisation"
               emoji="🧳"
               title="Organisation & Préparation"
               state={organisationState}
+              waveColor={WAVE_LILAC}
               onPress={() => router.push('/organisation')}
             />
           </View>
