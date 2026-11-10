@@ -8,6 +8,7 @@ import { withUniwind } from 'uniwind';
 import { HowItWorksModal } from '@/components/hub/how-it-works-modal';
 import { PillarCard } from '@/components/hub/pillar-card';
 import { PremiumTeaserCard } from '@/components/hub/premium-teaser-card';
+import { ShareInviteCard } from '@/components/hub/share-invite-card';
 import {
   WAVE_LILAC,
   WAVE_MINT,
@@ -218,44 +219,10 @@ export default function HubScreen() {
             </View>
           </View>
         ) : (
-          <View
-            style={CARD_SHADOW}
-            className="gap-3 rounded-2xl bg-white px-4 py-4"
-          >
-            <View className="flex-row items-start justify-between gap-3">
-              <View className="flex-1 gap-1">
-                <Text className="text-[15px] font-semibold text-[#1a1a1a]">
-                  Partager vos infos à deux
-                </Text>
-                <Text className="text-[13px] leading-5 text-[#6b6b6b]">
-                  Ajouter le co-parent ou un proche, tout se synchronisera en
-                  temps réel.
-                </Text>
-              </View>
-              {/* Repli emoji — remplacé par une image plus tard. */}
-              <Text className="text-[28px]">🤝</Text>
-            </View>
-
-            <Pressable
-              accessibilityRole="button"
-              onPress={() => router.push('/partenaire')}
-              className="items-center rounded-full bg-accent py-2.5"
-            >
-              <Text className="text-[14px] font-medium text-accent-foreground">
-                Ajouter le co-parent
-              </Text>
-            </Pressable>
-
-            <Pressable
-              accessibilityRole="button"
-              onPress={() => setIsHowItWorksOpen(true)}
-              className="items-center py-1"
-            >
-              <Text className="text-[13px] font-medium text-accent">
-                Comment ça marche ?
-              </Text>
-            </Pressable>
-          </View>
+          <ShareInviteCard
+            onAddPartner={() => router.push('/partenaire')}
+            onHowItWorks={() => setIsHowItWorksOpen(true)}
+          />
         )}
 
         <View className="gap-2">
