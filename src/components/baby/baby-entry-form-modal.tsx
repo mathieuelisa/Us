@@ -1,6 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Button } from 'heroui-native';
-import { useEffect, useState } from 'react';
+import { type ReactNode, useEffect, useState } from 'react';
 import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import Animated, {
   Easing,
@@ -13,11 +12,23 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-import { PlainInput } from '@/components/plain-input';
+import {
+  GLASS_BODY_COLOR,
+  GLASS_TITLE_COLOR,
+  SparkLines,
+} from '@/components/ui/glass-card';
+import {
+  IconBubble,
+  IconInput,
+  type IoniconName,
+} from '@/components/ui/icon-input';
+import { PillButton } from '@/components/ui/pill-button';
 import { WheelDatePicker } from '@/components/wheel-date-picker';
 import type { BabyEntry, BabyModule } from '@/features/baby/constants';
 import { formatDurationSeconds } from '@/features/baby/constants';
 import { parseTimeInput } from '@/features/health/constants';
+import { useThemeAccent } from '@/features/settings/hooks';
+import { hexToRgba, lightenHex } from '@/lib/color';
 import { todayIso } from '@/lib/date';
 
 /**
@@ -29,6 +40,13 @@ import { todayIso } from '@/lib/date';
  * `animationType="none"` sur `Modal` (même parti pris que
  * `HowItWorksModal` et `AppointmentFormModal`) : le fond opaque apparaît
  * instantanément, seule la feuille glisse.
+ *
+ * Habillage d'après une capture de référence de « Ajouter un biberon »
+ * (demande explicite), appliqué aux 4 modules puisque la modale est
+ * commune : illustration et sous-titre en tête, bouton de fermeture,
+ * segment en gélule d'accent, date compacte, champs `IconInput` deux par
+ * ligne, « Enregistrer » en `PillButton`. Resserrée pour tenir sans
+ * défiler (demande explicite).
  *
  * Les champs `kind: 'timer'` (durée d'allaitement, écran 8g) sont rendus
  * par `TimerField` : la durée se mesure au chronomètre, elle ne se tape
@@ -51,6 +69,7 @@ export function BabyEntryFormModal({
   onSubmit: (entry: Omit<BabyEntry, 'id'>) => void;
   onCancel: () => void;
 }) {
+  const accent = useThemeAccent();
   const [date, setDate] = useState(todayIso());
   const [time, setTime] = useState('');
   const [segment, setSegment] = useState<string | null>(null);
@@ -135,6 +154,46 @@ export function BabyEntryFormModal({
     !hasInvalidNumber &&
     !isTimeInvalid;
 
+  // Heure et champs chiffrés : petits champs posés deux par ligne.
+  const smallInputs: { key: string; node: ReactNode }[] = [
+    ...(module.hasTime
+      ? [
+          {
+            key: 'time',
+            node: (
+              <IconInput
+                icon="time-outline"
+                placeholder="Heure, ex. 14h20"
+                value={time}
+                onChangeText={setTime}
+                accent={accent}
+                isInvalid={isTimeInvalid}
+              />
+            ),
+          },
+        ]
+      : []),
+    ...module.fields
+      .filter((field) => field.kind === 'number')
+      .map((field) => ({
+        key: field.key,
+        node: (
+          <IconInput
+            icon={FIELD_ICONS[field.key] ?? 'calculator-outline'}
+            placeholder={`${field.label} (${field.unit})`}
+            keyboardType="decimal-pad"
+            value={values[field.key] ?? ''}
+            onChangeText={(next) => setValue(field.key, next)}
+            accent={accent}
+            isInvalid={
+              (values[field.key] ?? '').trim().length > 0 &&
+              !isNumberFilled(values[field.key])
+            }
+          />
+        ),
+      })),
+  ];
+
   return (
     <Modal
       visible={visible}
@@ -146,17 +205,70 @@ export function BabyEntryFormModal({
         <Animated.View
           entering={SlideInDown.duration(300)}
           exiting={SlideOutDown.duration(300)}
-          className="max-h-[88%] rounded-t-3xl bg-white px-6 pb-8 pt-4"
+          className="max-h-[94%] overflow-hidden rounded-t-[32px] bg-white"
         >
-          <View className="mb-4 h-1 w-10 self-center rounded-full bg-[#e0e0e0]" />
+          <View
+            pointerEvents="none"
+            className="absolute inset-0 overflow-hidden"
+          >
+            <View
+              style={{
+                position: 'absolute',
+                top: -70,
+                right: -60,
+                width: 220,
+                height: 200,
+                borderRadius: 110,
+                backgroundColor: lightenHex(accent, 0.55),
+                opacity: 0.35,
+              }}
+            />
+          </View>
 
+          {/* La feuille doit tenir sans défiler (demande explicite) : date
+              compacte, petits champs deux par ligne, commentaire sur une
+              ligne. Le `ScrollView` ne reste qu'en filet de sécurité (très
+              petit écran, clavier ouvert). */}
           <ScrollView
             showsVerticalScrollIndicator={false}
-            contentContainerClassName="gap-4"
+            keyboardShouldPersistTaps="handled"
+            contentContainerClassName="gap-3.5 px-5 pb-7 pt-2.5"
           >
-            <Text className="text-center text-[18px] font-bold text-[#1a1a1a]">
-              {module.actionLabel}
-            </Text>
+            <View className="h-1.5 w-11 self-center rounded-full bg-[#e6e6ea]" />
+
+            <View className="flex-row items-center gap-3.5">
+              <ModuleIllustration emoji={module.emoji} accent={accent} />
+              <View className="flex-1 gap-1">
+                <Text
+                  className="text-[21px] font-extrabold leading-[26px]"
+                  style={{ color: GLASS_TITLE_COLOR, letterSpacing: -0.4 }}
+                >
+                  {module.actionLabel}
+                </Text>
+                <Text
+                  className="text-[13px] leading-[18px]"
+                  style={{ color: GLASS_BODY_COLOR }}
+                >
+                  {module.formSubtitle}
+                </Text>
+              </View>
+              <Pressable
+                accessibilityLabel="Fermer"
+                accessibilityRole="button"
+                hitSlop={8}
+                onPress={onCancel}
+                className="h-9 w-9 items-center justify-center self-start rounded-full bg-white"
+                style={{
+                  shadowColor: accent,
+                  shadowOffset: { width: 0, height: 5 },
+                  shadowOpacity: 0.14,
+                  shadowRadius: 10,
+                  elevation: 4,
+                }}
+              >
+                <Ionicons name="close" size={19} color={GLASS_TITLE_COLOR} />
+              </Pressable>
+            </View>
 
             {module.segments ? (
               <SegmentedField
@@ -164,71 +276,75 @@ export function BabyEntryFormModal({
                 options={module.segments.options}
                 value={segment}
                 onChange={selectSegment}
+                accent={accent}
               />
             ) : null}
 
             <View className="gap-2">
-              <Text className="text-[13px] font-medium text-[#6b6b6b]">
-                Date
-              </Text>
-              <WheelDatePicker value={date} onChange={setDate} />
+              <FieldLabel
+                icon="calendar-outline"
+                label="Date"
+                accent={accent}
+              />
+              <WheelDatePicker value={date} onChange={setDate} compact />
             </View>
 
-            {module.hasTime ? (
-              <View className="gap-1.5">
-                <PlainInput
-                  placeholder="Heure — ex. 14h20 (facultatif)"
-                  value={time}
-                  onChangeText={setTime}
-                  isInvalid={isTimeInvalid}
-                />
-                {isTimeInvalid ? (
-                  <Text className="text-[12.5px] text-red-600">
-                    Heure non reconnue. Formats acceptés : 14h20, 14:20.
-                  </Text>
-                ) : null}
-              </View>
-            ) : null}
-
-            {module.fields.map((field) =>
-              field.kind === 'timer' ? (
+            {module.fields
+              .filter((field) => field.kind === 'timer')
+              .map((field) => (
                 <TimerField
                   // Remonter le composant est la remise à zéro : plus
                   // simple qu'un effet de reset, et l'intervalle en cours
                   // est nettoyé au passage.
                   key={`${field.key}-${timerResetToken}`}
                   label={field.label}
+                  accent={accent}
                   onRunningChange={setIsTimerRunning}
                   onStop={(seconds) => setValue(field.key, String(seconds))}
                   onStart={() => setValue(field.key, '')}
                 />
-              ) : (
-                <PlainInput
-                  key={field.key}
-                  placeholder={`${field.label} (${field.unit})`}
-                  keyboardType="decimal-pad"
-                  value={values[field.key] ?? ''}
-                  onChangeText={(next) => setValue(field.key, next)}
-                  isInvalid={
-                    (values[field.key] ?? '').trim().length > 0 &&
-                    !isNumberFilled(values[field.key])
-                  }
-                />
-              ),
-            )}
+              ))}
+
+            {smallInputs.length > 0 ? (
+              <View className="gap-1.5">
+                {chunkPairs(smallInputs).map((pair) => (
+                  <View key={pair[0].key} className="flex-row gap-2.5">
+                    {pair.map((input) => (
+                      <View key={input.key} className="flex-1">
+                        {input.node}
+                      </View>
+                    ))}
+                  </View>
+                ))}
+                {isTimeInvalid ? (
+                  <Text className="px-2 text-[12px] text-red-600">
+                    Heure non reconnue. Formats acceptés : 14h20, 14:20.
+                  </Text>
+                ) : module.hasTime ? (
+                  <Text
+                    className="px-2 text-[12px]"
+                    style={{ color: '#a3a1b0' }}
+                  >
+                    L’heure est facultative.
+                  </Text>
+                ) : null}
+              </View>
+            ) : null}
 
             {module.hasComment ? (
-              <PlainInput
+              <IconInput
+                icon="chatbubble-ellipses-outline"
                 placeholder="Commentaire (facultatif)"
                 value={comment}
                 onChangeText={setComment}
-                multiline
-                className="h-20 py-3"
-                style={{ textAlignVertical: 'top' }}
+                accent={accent}
               />
             ) : null}
 
-            <Button
+            <PillButton
+              label="Enregistrer"
+              icon="save-outline"
+              size="compact"
               isDisabled={!canSubmit}
               onPress={() =>
                 onSubmit({
@@ -239,16 +355,19 @@ export function BabyEntryFormModal({
                   comment: module.hasComment ? comment.trim() || null : null,
                 })
               }
-            >
-              <Button.Label>Enregistrer</Button.Label>
-            </Button>
+            />
 
             <Pressable
               accessibilityRole="button"
-              className="items-center py-1"
+              className="items-center"
               onPress={onCancel}
             >
-              <Text className="text-[14px] text-[#6b6b6b]">Annuler</Text>
+              <Text
+                className="text-[14.5px] font-semibold"
+                style={{ color: GLASS_TITLE_COLOR }}
+              >
+                Annuler
+              </Text>
             </Pressable>
           </ScrollView>
         </Animated.View>
@@ -342,22 +461,13 @@ function DiscardTimerAlert({
   );
 }
 
-/** Ombre du segment actif — reprise du design (8g/8h). */
-const SEGMENT_SHADOW = {
-  shadowColor: '#000',
-  shadowOffset: { width: 0, height: 1 },
-  shadowOpacity: 0.12,
-  shadowRadius: 3,
-  elevation: 1,
-} as const;
-
 /** Marge interne du rail (`p-1`) et écart entre segments (`gap-1`), en points. */
 const SEGMENT_TRACK_PADDING = 4;
 const SEGMENT_GAP = 4;
 const SEGMENT_SLIDE_DURATION = 220;
 
-const SEGMENT_COLOR_IDLE = '#8a8a8a';
-const SEGMENT_COLOR_ACTIVE = '#1a1a1a';
+const SEGMENT_COLOR_IDLE = GLASS_BODY_COLOR;
+const SEGMENT_COLOR_ACTIVE = '#ffffff';
 
 /**
  * Sélecteur de segment de tête du formulaire (Bain / Soins, sein gauche /
@@ -383,11 +493,13 @@ function SegmentedField({
   options,
   value,
   onChange,
+  accent,
 }: {
   label: string;
   options: string[];
   value: string | null;
   onChange: (option: string) => void;
+  accent: string;
 }) {
   const [trackWidth, setTrackWidth] = useState(0);
   const selectedIndex = Math.max(options.indexOf(value ?? ''), 0);
@@ -416,10 +528,11 @@ function SegmentedField({
 
   return (
     <View className="gap-2">
-      <Text className="text-[13px] font-medium text-[#6b6b6b]">{label}</Text>
+      <FieldLabel icon="water-outline" label={label} accent={accent} />
 
       <View
-        className="rounded-xl bg-[#f2f2f7] p-1"
+        className="rounded-full p-1"
+        style={{ backgroundColor: hexToRgba(accent, 0.08) }}
         onLayout={(event) => {
           const { width } = event.nativeEvent.layout;
           setTrackWidth((current) => (current === width ? current : width));
@@ -433,14 +546,18 @@ function SegmentedField({
             pointerEvents="none"
             style={[
               {
-                ...SEGMENT_SHADOW,
                 position: 'absolute',
                 top: SEGMENT_TRACK_PADDING,
                 bottom: SEGMENT_TRACK_PADDING,
                 left: SEGMENT_TRACK_PADDING,
                 width: segmentWidth,
-                borderRadius: 8,
-                backgroundColor: '#ffffff',
+                borderRadius: 999,
+                backgroundColor: accent,
+                shadowColor: accent,
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.25,
+                shadowRadius: 8,
+                elevation: 4,
               },
               pillStyle,
             ]}
@@ -502,11 +619,14 @@ function SegmentLabel({
       accessibilityRole="button"
       accessibilityState={{ selected: isSelected }}
       onPress={onPress}
-      className="flex-1 items-center py-2.5"
+      className="flex-1 flex-row items-center justify-center gap-1.5 py-2.5"
     >
+      {isSelected ? (
+        <Ionicons name="checkmark-circle" size={16} color="#ffffff" />
+      ) : null}
       <Animated.Text
         style={[
-          { fontSize: 13.5, fontWeight: isSelected ? '600' : '400' },
+          { fontSize: 14, fontWeight: isSelected ? '700' : '500' },
           textStyle,
         ]}
       >
@@ -559,11 +679,13 @@ function normalizeValues(
  */
 function TimerField({
   label,
+  accent,
   onRunningChange,
   onStart,
   onStop,
 }: {
   label: string;
+  accent: string;
   /** Remonte l'état de marche — le parent en a besoin pour ses garde-fous. */
   onRunningChange: (isRunning: boolean) => void;
   /** Appelé au démarrage et à la remise à zéro — la durée n'est plus valide. */
@@ -611,12 +733,30 @@ function TimerField({
 
   return (
     <View className="gap-2">
-      <Text className="text-[13px] font-medium text-[#6b6b6b]">{label}</Text>
+      <FieldLabel icon="timer-outline" label={label} accent={accent} />
 
-      <View className="items-center gap-3 rounded-2xl bg-[#f2f2f7] px-4 py-5">
-        <Text className="text-[34px] font-bold tabular-nums text-[#1a1a1a]">
-          {formatStopwatch(elapsedSeconds)}
-        </Text>
+      <View
+        className="flex-row items-center justify-between rounded-[24px] px-5 py-3.5"
+        style={{ backgroundColor: hexToRgba(accent, 0.07) }}
+      >
+        <View className="gap-0.5">
+          <Text
+            className="text-[30px] font-bold tabular-nums"
+            style={{ color: GLASS_TITLE_COLOR }}
+          >
+            {formatStopwatch(elapsedSeconds)}
+          </Text>
+          {!isRunning && elapsedSeconds > 0 ? (
+            <Pressable accessibilityRole="button" onPress={reset} hitSlop={8}>
+              <Text
+                className="text-[13px] font-medium"
+                style={{ color: accent }}
+              >
+                Recommencer
+              </Text>
+            </Pressable>
+          ) : null}
+        </View>
 
         <Pressable
           accessibilityLabel={
@@ -624,20 +764,23 @@ function TimerField({
           }
           accessibilityRole="button"
           onPress={toggle}
-          className="h-12 w-12 items-center justify-center rounded-full bg-[#1f3d3a] active:opacity-80"
+          className="h-14 w-14 items-center justify-center rounded-full active:opacity-80"
+          style={{
+            backgroundColor: accent,
+            shadowColor: accent,
+            shadowOffset: { width: 0, height: 6 },
+            shadowOpacity: 0.3,
+            shadowRadius: 10,
+            elevation: 6,
+          }}
         >
           <Ionicons
             name={isRunning ? 'stop' : 'play'}
-            size={20}
+            size={22}
             color="#ffffff"
+            style={isRunning ? undefined : { marginLeft: 3 }}
           />
         </Pressable>
-
-        {!isRunning && elapsedSeconds > 0 ? (
-          <Pressable accessibilityRole="button" onPress={reset} hitSlop={8}>
-            <Text className="text-[13px] text-[#6b6b6b]">Recommencer</Text>
-          </Pressable>
-        ) : null}
       </View>
     </View>
   );
@@ -651,4 +794,96 @@ function formatStopwatch(totalSeconds: number): string {
   const tail = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 
   return hours > 0 ? `${hours}:${tail}` : tail;
+}
+
+/** Icône des champs chiffrés, par clé ; repli générique sinon. */
+const FIELD_ICONS: Record<string, IoniconName> = {
+  quantity: 'water-outline',
+  height: 'resize-outline',
+  weight: 'scale-outline',
+  headCircumference: 'ellipse-outline',
+};
+
+/** Libellé de champ précédé d'une icône dans un rond teinté. */
+function FieldLabel({
+  icon,
+  label,
+  accent,
+}: {
+  icon: IoniconName;
+  label: string;
+  accent: string;
+}) {
+  return (
+    <View className="flex-row items-center gap-2.5">
+      <IconBubble icon={icon} color={accent} />
+      <Text
+        className="text-[14px] font-semibold"
+        style={{ color: GLASS_TITLE_COLOR }}
+      >
+        {label}
+      </Text>
+    </View>
+  );
+}
+
+/**
+ * Illustration de tête : l'emoji du module sur une tache d'accent, avec
+ * feuille, cœur et petits traits — composée, faute d'illustration dédiée.
+ */
+function ModuleIllustration({
+  emoji,
+  accent,
+}: {
+  emoji: string;
+  accent: string;
+}) {
+  return (
+    <View pointerEvents="none" style={{ width: 76, height: 76 }}>
+      <View
+        style={{
+          position: 'absolute',
+          inset: 0,
+          borderTopLeftRadius: 40,
+          borderTopRightRadius: 34,
+          borderBottomRightRadius: 40,
+          borderBottomLeftRadius: 30,
+          backgroundColor: hexToRgba(accent, 0.12),
+        }}
+      />
+      <Ionicons
+        name="leaf"
+        size={24}
+        color={hexToRgba(accent, 0.35)}
+        style={{
+          position: 'absolute',
+          left: 2,
+          bottom: 4,
+          transform: [{ rotate: '-30deg' }],
+        }}
+      />
+      <View className="flex-1 items-center justify-center">
+        <Text style={{ fontSize: 40 }}>{emoji}</Text>
+      </View>
+      <Ionicons
+        name="heart"
+        size={14}
+        color="#f08aa8"
+        style={{ position: 'absolute', right: 2, top: 6 }}
+      />
+      <SparkLines
+        color={hexToRgba(accent, 0.55)}
+        style={{ left: -10, top: -10, transform: [{ rotate: '-70deg' }] }}
+      />
+    </View>
+  );
+}
+
+/** Regroupe une liste deux par deux (le dernier groupe peut être seul). */
+function chunkPairs<T>(items: T[]): T[][] {
+  const pairs: T[][] = [];
+  for (let index = 0; index < items.length; index += 2) {
+    pairs.push(items.slice(index, index + 2));
+  }
+  return pairs;
 }

@@ -50,6 +50,8 @@ export type BabyModule = {
   emptyState: string;
   /** Libellé du bouton d'ajout et titre de la modale (écrans 8d/8f/8g/8h). */
   actionLabel: string;
+  /** Sous-titre de la modale d'ajout, sous `actionLabel`. */
+  formSubtitle: string;
   segments: BabySegmentGroup | null;
   /**
    * Le formulaire demande-t-il une heure ? Oui pour les gestes ponctuels
@@ -82,6 +84,7 @@ export const BABY_MODULES: Record<BabyModuleSlug, BabyModule> = {
     emptyState:
       'Aucune mesure enregistrée. La courbe se dessinera dès la première.',
     actionLabel: 'Ajouter une mesure',
+    formSubtitle: 'Notez les mesures de votre bébé.',
     segments: null,
     hasTime: false,
     hasComment: true,
@@ -105,6 +108,7 @@ export const BABY_MODULES: Record<BabyModuleSlug, BabyModule> = {
     sectionTitle: 'Derniers biberons',
     emptyState: 'Aucun biberon enregistré pour le moment.',
     actionLabel: 'Ajouter un biberon',
+    formSubtitle: 'Renseignez les informations de votre biberon.',
     segments: {
       label: 'Type de lait',
       options: ['Lait maternel', 'Lait infantile'],
@@ -124,6 +128,7 @@ export const BABY_MODULES: Record<BabyModuleSlug, BabyModule> = {
     sectionTitle: 'Dernières tétées',
     emptyState: 'Aucune tétée enregistrée pour le moment.',
     actionLabel: 'Ajouter un allaitement',
+    formSubtitle: 'Lancez le chronomètre pendant la tétée.',
     // Le design 8g proposait aussi « Les deux » ; retiré sur demande
     // explicite — une tétée se note sein par sein.
     segments: { label: 'Sein', options: ['Sein gauche', 'Sein droit'] },
@@ -140,6 +145,7 @@ export const BABY_MODULES: Record<BabyModuleSlug, BabyModule> = {
     sectionTitle: 'Derniers soins',
     emptyState: 'Aucun bain ni soin enregistré pour le moment.',
     actionLabel: 'Ajouter un bain',
+    formSubtitle: 'Notez le bain ou les soins du jour.',
     segments: { label: 'Type', options: ['Bain', 'Soins'] },
     hasTime: true,
     hasComment: true,
