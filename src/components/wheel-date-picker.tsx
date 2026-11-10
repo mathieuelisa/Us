@@ -39,12 +39,17 @@ const WEEKDAY_LABELS = [
   'samedi',
 ];
 
-/** Hauteur d'une ligne : c'est l'unité de snap de toutes les molettes. */
-const ITEM_HEIGHT = 40;
-/** Impair, pour qu'une ligne tombe pile au centre du bandeau de sélection. */
-const VISIBLE_ITEMS = 5;
-const WHEEL_HEIGHT = ITEM_HEIGHT * VISIBLE_ITEMS;
-const WHEEL_PADDING = (WHEEL_HEIGHT - ITEM_HEIGHT) / 2;
+/**
+ * Gabarits de molette. `itemHeight` est l'unité de snap de toutes les
+ * colonnes ; `visibleItems` est impair, pour qu'une ligne tombe pile au
+ * centre du bandeau de sélection. `compact` sert là où la hauteur manque
+ * (modale « Nouveau rendez-vous », qui doit tenir sans défiler).
+ */
+const WHEEL_SIZES = {
+  regular: { itemHeight: 40, visibleItems: 5, fontSize: 19 },
+  compact: { itemHeight: 34, visibleItems: 3, fontSize: 16 },
+} as const;
+type WheelSize = (typeof WHEEL_SIZES)[keyof typeof WHEEL_SIZES];
 
 function daysInMonth(year: number, month: number): number {
   // `month` est 1-indexé ; le jour 0 du mois suivant = dernier jour du mois.
@@ -79,16 +84,19 @@ function WheelRow({
   item,
   index,
   offset,
+  size,
 }: {
   item: WheelItem;
   index: number;
   offset: SharedValue<number>;
+  size: WheelSize;
 }) {
+  const { itemHeight, fontSize } = size;
   // Distance signée (en lignes) entre cette ligne et le centre de la molette :
   // c'est elle qui pilote la rotation, l'échelle et l'opacité, donc le rendu
   // « cylindre » qui distingue une vraie molette d'une simple liste.
   const animatedStyle = useAnimatedStyle(() => {
-    const distance = offset.value / ITEM_HEIGHT - index;
+    const distance = offset.value / itemHeight - index;
     const absolute = Math.abs(distance);
 
     return {
@@ -126,12 +134,13 @@ function WheelRow({
   // défilement seul, comme le picker natif iOS.
   return (
     <Animated.View
-      style={[{ height: ITEM_HEIGHT }, animatedStyle]}
+      style={[{ height: itemHeight }, animatedStyle]}
       className="items-center justify-center"
     >
       <Text
         numberOfLines={1}
-        className="text-[19px] leading-[24px] text-[#1a1a1a]"
+        className="text-[#1a1a1a]"
+        style={{ fontSize, lineHeight: fontSize + 5 }}
       >
         {item.label}
       </Text>
@@ -145,13 +154,18 @@ function WheelColumn({
   onSelect,
   accessibilityLabel,
   flex,
+  size,
 }: {
   items: WheelItem[];
   selected: number;
   onSelect: (value: number) => void;
   accessibilityLabel: string;
   flex: number;
+  size: WheelSize;
 }) {
+  const { itemHeight } = size;
+  const wheelHeight = itemHeight * size.visibleItems;
+  const wheelPadding = (wheelHeight - itemHeight) / 2;
   const scrollRef = useAnimatedRef<Animated.ScrollView>();
   const offset = useSharedValue(0);
   // Index réellement affiché sous le bandeau. Sert à ne remonter au parent que
@@ -182,7 +196,7 @@ function WheelColumn({
     clearCommitTimeout();
     settledIndexRef.current = index;
     isScrollingProgrammaticallyRef.current = true;
-    scrollRef.current?.scrollTo({ y: index * ITEM_HEIGHT, animated });
+    scrollRef.current?.scrollTo({ y: index * itemHeight, animated });
     // Laisse passer les événements de défilement provoqués par ce `scrollTo`.
     setTimeout(() => {
       isScrollingProgrammaticallyRef.current = false;
@@ -213,7 +227,7 @@ function WheelColumn({
       if (isScrollingProgrammaticallyRef.current) return;
 
       const index = Math.min(
-        Math.max(Math.round(offset.value / ITEM_HEIGHT), 0),
+        Math.max(Math.round(offset.value / itemHeight), 0),
         items.length - 1,
       );
       if (index === settledIndexRef.current) return;
@@ -224,7 +238,7 @@ function WheelColumn({
 
   const activeIndex = useDerivedValue(() =>
     Math.min(
-      Math.max(Math.round(offset.value / ITEM_HEIGHT), 0),
+      Math.max(Math.round(offset.value / itemHeight), 0),
       items.length - 1,
     ),
   );
@@ -252,16 +266,22 @@ function WheelColumn({
       accessibilityLabel={accessibilityLabel}
       accessibilityRole="adjustable"
       accessibilityValue={{ text: items[selectedIndex]?.label }}
-      style={{ flex, height: WHEEL_HEIGHT }}
-      contentContainerStyle={{ paddingVertical: WHEEL_PADDING }}
+      style={{ flex, height: wheelHeight }}
+      contentContainerStyle={{ paddingVertical: wheelPadding }}
       showsVerticalScrollIndicator={false}
-      snapToInterval={ITEM_HEIGHT}
+      snapToInterval={itemHeight}
       decelerationRate="fast"
       onScroll={scrollHandler}
       scrollEventThrottle={16}
     >
       {items.map((item, index) => (
-        <WheelRow key={item.value} item={item} index={index} offset={offset} />
+        <WheelRow
+          key={item.value}
+          item={item}
+          index={index}
+          offset={offset}
+          size={size}
+        />
       ))}
     </Animated.ScrollView>
   );
@@ -281,10 +301,15 @@ function WheelColumn({
 export function WheelDatePicker({
   value,
   onChange,
+  compact = false,
 }: {
   value: string | null;
   onChange: (isoDate: string) => void;
+  compact?: boolean;
 }) {
+  const size = compact ? WHEEL_SIZES.compact : WHEEL_SIZES.regular;
+  const wheelHeight = size.itemHeight * size.visibleItems;
+  const wheelPadding = (wheelHeight - size.itemHeight) / 2;
   const { year, month, day } = parseIsoDate(value);
   const currentYear = new Date().getFullYear();
 
@@ -310,17 +335,17 @@ export function WheelDatePicker({
   const weekday = WEEKDAY_LABELS[new Date(year, month - 1, day).getDay()];
 
   return (
-    <View className="gap-2">
+    <View className={compact ? 'gap-1.5' : 'gap-2'}>
       <View
         style={CARD_SHADOW}
         className="overflow-hidden rounded-[20px] bg-[#ffffff] px-2 py-1"
       >
-        <View style={{ height: WHEEL_HEIGHT }}>
+        <View style={{ height: wheelHeight }}>
           {/* Bandeau de sélection, derrière les molettes et transparent aux
               gestes pour ne pas bloquer le défilement. */}
           <View
             pointerEvents="none"
-            style={{ top: WHEEL_PADDING, height: ITEM_HEIGHT }}
+            style={{ top: wheelPadding, height: size.itemHeight }}
             className="absolute inset-x-1 rounded-[12px] bg-accent/10"
           />
 
@@ -334,6 +359,7 @@ export function WheelDatePicker({
               }}
               accessibilityLabel="Jour"
               flex={0.8}
+              size={size}
             />
             <WheelColumn
               items={monthItems}
@@ -343,6 +369,7 @@ export function WheelDatePicker({
               }
               accessibilityLabel="Mois"
               flex={1.4}
+              size={size}
             />
             <WheelColumn
               items={yearItems}
@@ -352,6 +379,7 @@ export function WheelDatePicker({
               }
               accessibilityLabel="Année"
               flex={1}
+              size={size}
             />
           </View>
         </View>
