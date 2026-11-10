@@ -1,17 +1,23 @@
 import { Ionicons } from '@expo/vector-icons';
 import type { ImageSourcePropType } from 'react-native';
-import { Image, Modal, Pressable, ScrollView, Text, View } from 'react-native';
+import { Modal, Pressable, ScrollView, View } from 'react-native';
 
-import { PREMIUM_FEATURES } from '@/components/onboarding/paywall-modal';
+import { PremiumOffer } from '@/components/hub/premium-offer';
+import { GLASS_TITLE_COLOR } from '@/components/ui/glass-card';
+import { useThemeAccent } from '@/features/settings/hooks';
+import { lightenHex } from '@/lib/color';
 
 /**
  * Paywall des écrans d'accès premium (`/bebe`, `/prenoms`) — variante
  * centrée du `PaywallModal` de l'onboarding (qui, lui, glisse depuis le
  * bas) : demande explicite d'une « modale centrale » avec un bouton dédié
- * pour la fermer, plutôt qu'un lien texte « Plus tard ». Fond `#1f3d3a`
- * (demande explicite) : même vert que `PremiumTeaserCard`, pour un langage
- * visuel premium cohérent entre les cartes teaser et leurs paywalls.
- * S'ouvre automatiquement à l'arrivée sur l'écran.
+ * pour la fermer, plutôt qu'un lien texte « Plus tard ». S'ouvre
+ * automatiquement à l'arrivée sur l'écran.
+ *
+ * Habillage clair d'après une capture de référence (demande explicite),
+ * à la place de l'ancien fond vert sombre et or. Le contenu (`PremiumOffer`)
+ * est partagé avec la page `/premium`. Il suit la couleur du thème, comme
+ * le reste de l'app.
  *
  * `title`/`image` varient par écran (demande explicite « exactement le même
  * concept » pour « Le match des prénoms » que pour « Votre bébé ») ; la
@@ -29,6 +35,8 @@ export function PremiumPaywallModal({
   title: string;
   image: ImageSourcePropType;
 }) {
+  const accent = useThemeAccent();
+
   return (
     <Modal
       visible={visible}
@@ -36,57 +44,71 @@ export function PremiumPaywallModal({
       animationType="fade"
       onRequestClose={onClose}
     >
-      <View className="flex-1 items-center justify-center bg-black/60 px-6">
-        <View className="w-full max-h-[85%] rounded-3xl bg-[#1f3d3a] px-6 pb-6 pt-5">
+      <View className="flex-1 items-center justify-center bg-black/50 px-5">
+        <View
+          className="max-h-[88%] w-full overflow-hidden rounded-[32px] bg-white"
+          style={{
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 20 },
+            shadowOpacity: 0.2,
+            shadowRadius: 30,
+            elevation: 12,
+          }}
+        >
+          {/* Taches pâles aux coins, rognées par leur propre cadre. */}
+          <View
+            pointerEvents="none"
+            className="absolute inset-0 overflow-hidden"
+          >
+            <View
+              style={{
+                position: 'absolute',
+                top: -80,
+                right: -70,
+                width: 230,
+                height: 210,
+                borderRadius: 115,
+                backgroundColor: lightenHex(accent, 0.55),
+                opacity: 0.35,
+              }}
+            />
+            <View
+              style={{
+                position: 'absolute',
+                bottom: -90,
+                left: -80,
+                width: 220,
+                height: 200,
+                borderRadius: 110,
+                backgroundColor: lightenHex(accent, 0.55),
+                opacity: 0.3,
+              }}
+            />
+          </View>
+
           <Pressable
             accessibilityLabel="Fermer"
             accessibilityRole="button"
             hitSlop={12}
             onPress={onClose}
-            className="absolute right-4 top-4 z-10 h-8 w-8 items-center justify-center rounded-full bg-white/10"
+            className="absolute right-4 top-4 z-10 h-10 w-10 items-center justify-center rounded-full bg-white"
+            style={{
+              shadowColor: accent,
+              shadowOffset: { width: 0, height: 5 },
+              shadowOpacity: 0.16,
+              shadowRadius: 10,
+              elevation: 4,
+            }}
           >
-            <Ionicons name="close" size={18} color="#fff" />
+            <Ionicons name="close" size={20} color={GLASS_TITLE_COLOR} />
           </Pressable>
 
-          <View className="items-center gap-2 pt-2">
-            <Image source={image} className="h-30 w-20" resizeMode="contain" />
-            <Text className="text-center text-[22px] font-bold leading-7 text-white">
-              {title}
-            </Text>
-            <Text className="text-[14px] text-[#b0b0b0]">
-              Un seul paiement, accès à vie
-            </Text>
-          </View>
-
           <ScrollView
-            className="mt-4"
-            contentContainerClassName="gap-3 pb-2"
             showsVerticalScrollIndicator={false}
+            contentContainerClassName="gap-4 px-5 pb-6 pt-5"
           >
-            <View className="gap-1 rounded-[14px] border border-[#e8c874] px-4 py-4">
-              <Text className="text-[18px] font-bold text-[#e8c874]">
-                14,99 € — paiement unique
-              </Text>
-              <Text className="text-[13px] text-[#b0b0b0]">
-                Pas d’abonnement, pas de renouvellement
-              </Text>
-            </View>
-
-            {PREMIUM_FEATURES.map((feature) => (
-              <View key={feature} className="flex-row gap-2.5">
-                <Text className="text-[14px] text-[#e8c874]">✓</Text>
-                <Text className="flex-1 text-[14px] leading-5 text-[#e0e0e0]">
-                  {feature}
-                </Text>
-              </View>
-            ))}
+            <PremiumOffer title={title} image={image} />
           </ScrollView>
-
-          <View className="mt-2 items-center rounded-full bg-[#191818] py-3.5">
-            <Text className="text-[15px] font-medium text-[#e8c874]">
-              Débloquer — bientôt disponible
-            </Text>
-          </View>
         </View>
       </View>
     </Modal>

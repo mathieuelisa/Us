@@ -1,19 +1,15 @@
+import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { Image, Pressable, ScrollView, Text, View } from 'react-native';
+import { Pressable, ScrollView, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import { withUniwind } from 'uniwind';
 
-import { PREMIUM_FEATURES } from '@/components/onboarding/paywall-modal';
+import { PremiumOffer } from '@/components/hub/premium-offer';
+import { GLASS_TITLE_COLOR } from '@/components/ui/glass-card';
 import { ScreenCornerShapes } from '@/components/ui/screen-corner-shapes';
-import { CARD_SHADOW } from '@/features/hub/constants';
-import { useThemeBackground } from '@/features/settings/hooks';
+import { useThemeAccent, useThemeBackground } from '@/features/settings/hooks';
 
 const SafeAreaView = withUniwind(RNSafeAreaView);
-
-// Or plus soutenu que l'accent premium habituel (`#e8c874`) : celui-ci reste
-// lisible sur fond blanc/pastel, alors que la teinte plus claire est pensée
-// pour un fond sombre (cf. `PremiumTeaserCard`, `AppTabBar`).
-const PREMIUM_GOLD_ON_LIGHT = '#b8860b';
 
 /**
  * Page premium ouverte depuis l'icône dédiée de la barre de navigation
@@ -22,17 +18,16 @@ const PREMIUM_GOLD_ON_LIGHT = '#b8860b';
  * consultation, comme les autres destinations du hub (`organisation`,
  * `sante`…).
  *
- * Fond pastel du thème actif (`useThemeBackground`, demande explicite)
- * plutôt que le vert sombre du paywall onboarding (`PaywallModal`) : ce
- * dernier reste un pop-up isolé, alors qu'ici la démarcation entre une page
- * plein écran sombre et le fond clair du reste de l'app (barre de nav
- * comprise) créait une coupure visuelle disgracieuse. Seuls le CTA et
- * quelques accents gardent la touche « premium » (or), le reste suit la
- * palette claire commune aux autres écrans du hub.
+ * Fond pastel du thème actif (`useThemeBackground`). Le contenu est le même
+ * que le paywall des écrans d'accès (`PremiumOffer`, demande explicite que
+ * les deux correspondent), posé dans une carte blanche arrondie sous le
+ * bouton retour, au gabarit `compact` pour tenir sans défiler au-dessus de
+ * la barre de navigation (demande explicite).
  */
 export default function PremiumScreen() {
   const router = useRouter();
   const backgroundColor = useThemeBackground();
+  const accent = useThemeAccent();
 
   return (
     <SafeAreaView
@@ -42,71 +37,44 @@ export default function PremiumScreen() {
       <ScreenCornerShapes />
 
       <ScrollView
-        contentContainerClassName="gap-3 px-6 pb-10 pt-4"
+        contentContainerClassName="gap-3 px-5 pb-4 pt-2"
         showsVerticalScrollIndicator={false}
       >
         <Pressable
           accessibilityLabel="Revenir en arrière"
           accessibilityRole="button"
           hitSlop={12}
-          style={CARD_SHADOW}
           onPress={() => router.back()}
-          className="h-9 w-9 items-center justify-center rounded-full bg-white"
+          className="h-11 w-11 items-center justify-center rounded-full bg-white"
+          style={{
+            shadowColor: accent,
+            shadowOffset: { width: 0, height: 8 },
+            shadowOpacity: 0.12,
+            shadowRadius: 16,
+            elevation: 4,
+          }}
         >
-          <Text className="text-[17px] leading-5 text-[#1a1a1a]">‹</Text>
+          <Ionicons name="chevron-back" size={22} color={GLASS_TITLE_COLOR} />
         </Pressable>
 
-        <View className="items-center gap-2">
-          <Image
-            source={require('@/assets/images/Baby_said_hi.png')}
-            className="w-20 h-30"
-            resizeMode="contain"
+        <View
+          className="gap-3 rounded-[32px] px-4 pb-4 pt-3"
+          style={{
+            backgroundColor: 'rgba(255, 255, 255, 0.92)',
+            borderWidth: 1,
+            borderColor: 'rgba(255, 255, 255, 0.95)',
+            shadowColor: accent,
+            shadowOffset: { width: 0, height: 12 },
+            shadowOpacity: 0.1,
+            shadowRadius: 24,
+            elevation: 4,
+          }}
+        >
+          <PremiumOffer
+            title="Débloquez le suivi complet de bébé"
+            image={require('@/assets/images/Baby_said_hi.png')}
+            compact
           />
-          <Text className="text-center text-[24px] font-bold leading-7 text-[#1a1a1a]">
-            Débloquez le suivi complet de bébé
-          </Text>
-          <Text className="text-[14px] text-[#6b6b6b]">
-            Un seul paiement, accès à vie
-          </Text>
-        </View>
-
-        <View className="mt-2 gap-3">
-          <View
-            style={CARD_SHADOW}
-            className="gap-1 rounded-2xl bg-white px-4 py-4"
-          >
-            <Text
-              className="text-[18px] font-bold"
-              style={{ color: PREMIUM_GOLD_ON_LIGHT }}
-            >
-              14,99 € — paiement unique
-            </Text>
-            <Text className="text-[13px] text-[#6b6b6b]">
-              Pas d’abonnement, pas de renouvellement
-            </Text>
-          </View>
-
-          <View style={CARD_SHADOW} className="gap-3 rounded-2xl bg-white p-4">
-            {PREMIUM_FEATURES.map((feature) => (
-              <View key={feature} className="flex-row gap-2.5">
-                <Text
-                  className="text-[14px]"
-                  style={{ color: PREMIUM_GOLD_ON_LIGHT }}
-                >
-                  ✓
-                </Text>
-                <Text className="flex-1 text-[14px] leading-5 text-[#3d3d3d]">
-                  {feature}
-                </Text>
-              </View>
-            ))}
-          </View>
-        </View>
-
-        <View className="mt-2 items-center rounded-full bg-[#191818] py-3.5">
-          <Text className="text-[15px] font-medium text-[#e8c874]">
-            Débloquer — bientôt disponible
-          </Text>
         </View>
       </ScrollView>
     </SafeAreaView>
