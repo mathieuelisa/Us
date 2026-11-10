@@ -1,11 +1,16 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
+import Svg, { Path } from 'react-native-svg';
 import { withUniwind } from 'uniwind';
 
 import { InfoItemFormModal } from '@/components/household/info-item-form-modal';
 import { BlobFab } from '@/components/ui/blob-fab';
+import {
+  GLASS_BODY_COLOR,
+  GLASS_TITLE_COLOR,
+} from '@/components/ui/glass-card';
 import { ScreenCornerShapes } from '@/components/ui/screen-corner-shapes';
 import type { HouseholdInfoItem } from '@/features/household/api';
 import {
@@ -22,7 +27,8 @@ import {
   useMyHousehold,
   useUpdateInfoItem,
 } from '@/features/household/hooks';
-import { useThemeBackground } from '@/features/settings/hooks';
+import { useThemeAccent, useThemeBackground } from '@/features/settings/hooks';
+import { hexToRgba } from '@/lib/color';
 import { shiftIsoDate, todayIso } from '@/lib/date';
 
 const SafeAreaView = withUniwind(RNSafeAreaView);
@@ -144,6 +150,8 @@ const MOCK_INFO_ITEMS: HouseholdInfoItem[] = [
   },
 ];
 
+const HEADER_IMAGE = require('@/assets/images/Baby_said_hi.png');
+
 function displayValue(item: HouseholdInfoItem, category: InfoCategory) {
   if (!item.value) return '';
   return INFO_CATEGORY_META[category].isDate
@@ -167,6 +175,7 @@ export default function InformationsScreen() {
   const { data: household, isLoading: isHouseholdLoading } = useMyHousehold();
   const householdId = household?.id;
   const backgroundColor = useThemeBackground();
+  const accent = useThemeAccent();
 
   const { data: items = [], isLoading: areItemsLoading } =
     useInfoItems(householdId);
@@ -242,13 +251,83 @@ export default function InformationsScreen() {
         contentContainerClassName="gap-4 px-6 pb-24 pt-4"
         showsVerticalScrollIndicator={false}
       >
-        <View className="gap-1">
-          <Text className="text-[26px] font-bold text-[#1a1a1a]">
-            Informations importantes
-          </Text>
-          <Text className="text-[13px] text-[#6b6b6b]">
-            Partagées et modifiables par vous deux.
-          </Text>
+        {/* En-tête d'après une capture de référence (demande explicite) :
+            grand titre, sous-titre souligné, ourson en haut à droite sur une
+            tache d'accent, avec goutte (groupe sanguin), feuille et cœur. */}
+        <View className="min-h-[136px] justify-center">
+          <View
+            pointerEvents="none"
+            style={{ position: 'absolute', top: -6, right: -14 }}
+          >
+            <View
+              style={{
+                position: 'absolute',
+                width: 130,
+                height: 130,
+                borderRadius: 65,
+                backgroundColor: hexToRgba(accent, 0.1),
+                top: 10,
+                left: 14,
+              }}
+            />
+            <Ionicons
+              name="leaf"
+              size={34}
+              color={hexToRgba(accent, 0.3)}
+              style={{
+                position: 'absolute',
+                right: 6,
+                bottom: 6,
+                transform: [{ rotate: '25deg' }],
+              }}
+            />
+            <Image
+              source={HEADER_IMAGE}
+              style={{ width: 128, height: 148 }}
+              resizeMode="contain"
+            />
+            <Ionicons
+              name="water"
+              size={30}
+              color="#f08aa8"
+              style={{
+                position: 'absolute',
+                left: -16,
+                top: 26,
+                transform: [{ rotate: '-10deg' }],
+              }}
+            />
+            <Ionicons
+              name="heart"
+              size={16}
+              color="#f08aa8"
+              style={{ position: 'absolute', right: 4, top: 4 }}
+            />
+          </View>
+
+          <View className="gap-1.5" style={{ maxWidth: '64%' }}>
+            <Text
+              className="text-[28px] font-extrabold leading-[34px]"
+              style={{ color: GLASS_TITLE_COLOR, letterSpacing: -0.6 }}
+            >
+              Informations importantes
+            </Text>
+            <Text
+              className="text-[14px] leading-5"
+              style={{ color: GLASS_BODY_COLOR }}
+            >
+              Partagées et modifiables par vous deux.
+            </Text>
+            <Svg width={120} height={10} viewBox="0 0 120 10">
+              <Path
+                d="M3 7 C 34 2, 80 1.5, 117 4"
+                stroke={hexToRgba(accent, 0.5)}
+                strokeWidth={3}
+                strokeLinecap="round"
+                fill="none"
+              />
+            </Svg>
+          </View>
         </View>
 
         {isHouseholdLoading || areItemsLoading ? (
