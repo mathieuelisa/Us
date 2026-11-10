@@ -22,6 +22,8 @@
  * page de détail et ne doit pas en être retiré.
  */
 
+import type { ImageSourcePropType } from 'react-native';
+
 export type ExerciseTrimester = 1 | 2 | 3;
 
 export type CatalogExercise = {
@@ -38,6 +40,16 @@ export type CatalogExercise = {
   description: string;
   steps: string[];
   emoji: string;
+  /**
+   * Illustration du bandeau (carte et page de détail), quand elle existe —
+   * à défaut, le bandeau reste une composition aplat pastel + `emoji`.
+   */
+  image?: ImageSourcePropType;
+  /**
+   * Couleur du bord haut de `image`, prolongée au-dessus d'elle sur la page
+   * de détail (zone de la barre d'état) pour qu'aucune coupure ne se voie.
+   */
+  imageTopColor?: string;
   /** Fond pastel de la carte et du bandeau, et encre assortie. */
   tint: { bg: string; ink: string };
 };
@@ -74,6 +86,8 @@ export const EXERCISE_CATALOG: CatalogExercise[] = [
       'Répétez une dizaine de fois, puis restez immobile un instant.',
     ],
     emoji: '🫁',
+    image: require('@/assets/images/Exercise_respiration_prenatale.png'),
+    imageTopColor: '#ebf2fe',
     tint: TINT.souffle,
   },
   {
@@ -93,6 +107,8 @@ export const EXERCISE_CATALOG: CatalogExercise[] = [
       'Terminez en roulant lentement les épaules vers l’arrière.',
     ],
     emoji: '🧘‍♀️',
+    image: require('@/assets/images/Exercise_etirement_du_dos.png'),
+    imageTopColor: '#ebf8f2',
     tint: TINT.dos,
   },
   {
@@ -112,6 +128,8 @@ export const EXERCISE_CATALOG: CatalogExercise[] = [
       'Ralentissez progressivement plutôt que de vous arrêter net.',
     ],
     emoji: '🚶‍♀️',
+    image: require('@/assets/images/Exercise_marche_douce.png'),
+    imageTopColor: '#fef6e5',
     tint: TINT.endurance,
   },
   {
@@ -131,6 +149,8 @@ export const EXERCISE_CATALOG: CatalogExercise[] = [
       'Finissez en position de repos, front posé sur les mains.',
     ],
     emoji: '🐈',
+    image: require('@/assets/images/Exercise_bascule_du_bassin.png'),
+    imageTopColor: '#feedf2',
     tint: TINT.bassin,
   },
 

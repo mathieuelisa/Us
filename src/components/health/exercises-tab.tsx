@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Image, Pressable, Text, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
 import {
@@ -263,16 +263,26 @@ function ExerciseCard({
           style={{ backgroundColor: exercise.tint.bg }}
           className="h-[104px] items-center justify-center overflow-hidden"
         >
-          {/* Taches claires : le bandeau n'est pas un simple aplat. */}
-          <View
-            pointerEvents="none"
-            className="absolute -left-6 bottom-[-30px] h-24 w-24 rounded-full bg-white/35"
-          />
-          <View
-            pointerEvents="none"
-            className="absolute -right-5 -top-8 h-20 w-20 rounded-full bg-white/40"
-          />
-          <Text style={{ fontSize: 44 }}>{exercise.emoji}</Text>
+          {exercise.image ? (
+            <Image
+              source={exercise.image}
+              resizeMode="cover"
+              className="absolute inset-0 h-full w-full"
+            />
+          ) : (
+            <>
+              {/* Taches claires : le bandeau n'est pas un simple aplat. */}
+              <View
+                pointerEvents="none"
+                className="absolute -left-6 bottom-[-30px] h-24 w-24 rounded-full bg-white/35"
+              />
+              <View
+                pointerEvents="none"
+                className="absolute -right-5 -top-8 h-20 w-20 rounded-full bg-white/40"
+              />
+              <Text style={{ fontSize: 44 }}>{exercise.emoji}</Text>
+            </>
+          )}
           <View
             className="absolute right-2.5 top-2.5 h-8 w-8 items-center justify-center rounded-full bg-white"
             style={{

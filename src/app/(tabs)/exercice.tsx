@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import { withUniwind } from 'uniwind';
 
@@ -16,6 +16,10 @@ const SafeAreaView = withUniwind(RNSafeAreaView);
 
 /** Hauteur du bandeau de tête, bord à bord. */
 const HERO_HEIGHT = 230;
+/** Proportions des illustrations d'exercice fournies (≈ 414 × 216). */
+const EXERCISE_IMAGE_RATIO = 1.92;
+/** Place laissée au-dessus de l'illustration : barre d'état et encoche. */
+const HERO_IMAGE_TOP_INSET = 44;
 
 /**
  * Détail d'un exercice (prolonge l'écran 4f), ouvert depuis la grille de
@@ -29,11 +33,10 @@ const HERO_HEIGHT = 230;
  * `(tabs)/_layout.tsx` : la barre de navigation reste visible, comme pour
  * les autres destinations ouvertes depuis le hub.
  *
- * ⚠️ Le bandeau de tête est une composition (aplat pastel + emoji), pas une
- * photo : le catalogue n'a aucun visuel réel et `exercises.image_url` est
- * vide partout (point ouvert n°37). Traité comme un parti pris graphique
- * assumé plutôt que comme un trou — mais c'est bien la place d'une vraie
- * illustration le jour où il y en aura.
+ * Le bandeau de tête affiche l'illustration de l'exercice (`image`) quand
+ * elle existe — c'est le cas des 4 exercices du 1er trimestre, fournis par
+ * l'utilisateur. Pour les autres, il reste une composition aplat pastel +
+ * emoji (`exercises.image_url` est vide partout, point ouvert n°37).
  *
  * L'emplacement vidéo est un cadre blanc vide, en attente d'un lien
  * (demande explicite) : rien n'est lu ni téléchargé aujourd'hui.
@@ -182,6 +185,31 @@ function ExerciseHero({
   exercise: CatalogExercise;
   onBack: () => void;
 }) {
+  if (exercise.image) {
+    // Illustration montrée entière (pas de rognage) : elle commence sous la
+    // zone de la barre d'état, que la couleur de son bord haut prolonge, et
+    // la hauteur du bandeau suit ses proportions.
+    return (
+      <View
+        style={{
+          backgroundColor: exercise.imageTopColor ?? exercise.tint.bg,
+          paddingTop: HERO_IMAGE_TOP_INSET,
+        }}
+        className="overflow-hidden rounded-b-[32px]"
+      >
+        <Image
+          source={exercise.image}
+          resizeMode="cover"
+          style={{ width: '100%', aspectRatio: EXERCISE_IMAGE_RATIO }}
+        />
+
+        <View className="absolute left-6 top-14">
+          <BackButton onPress={onBack} />
+        </View>
+      </View>
+    );
+  }
+
   return (
     <View
       style={{ backgroundColor: exercise.tint.bg, height: HERO_HEIGHT }}
