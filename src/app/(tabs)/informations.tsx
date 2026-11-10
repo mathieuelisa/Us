@@ -5,6 +5,7 @@ import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import { withUniwind } from 'uniwind';
 
 import { InfoItemFormModal } from '@/components/household/info-item-form-modal';
+import { BlobFab } from '@/components/ui/blob-fab';
 import { ScreenCornerShapes } from '@/components/ui/screen-corner-shapes';
 import type { HouseholdInfoItem } from '@/features/household/api';
 import {
@@ -391,16 +392,11 @@ export default function InformationsScreen() {
         )}
       </ScrollView>
 
-      <Pressable
+      <BlobFab
         accessibilityLabel="Ajouter une information"
-        accessibilityRole="button"
         onPress={openCreate}
-        className="absolute bottom-6 right-6 h-16 w-16 items-center justify-center rounded-full bg-accent shadow-lg"
-      >
-        <Text className="text-[26px] font-medium leading-7 text-accent-foreground">
-          +
-        </Text>
-      </Pressable>
+        className="absolute bottom-6 right-6"
+      />
 
       <InfoItemFormModal
         visible={isModalOpen}

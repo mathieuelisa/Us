@@ -12,6 +12,7 @@ import { ContactsTab } from '@/components/health/contacts-tab';
 import { ExercisesTab } from '@/components/health/exercises-tab';
 import { JournalTab } from '@/components/health/journal-tab';
 import { SegmentedTabs } from '@/components/health/segmented-tabs';
+import { BlobFab } from '@/components/ui/blob-fab';
 import {
   GLASS_BODY_COLOR,
   GLASS_TITLE_COLOR,
@@ -20,7 +21,7 @@ import { ScreenCornerShapes } from '@/components/ui/screen-corner-shapes';
 import { useMyHousehold } from '@/features/household/hooks';
 import { useThemeAccent, useThemeBackground } from '@/features/settings/hooks';
 import { currentRoleAtom } from '@/lib/atoms/role';
-import { hexToRgba, lightenHex } from '@/lib/color';
+import { hexToRgba } from '@/lib/color';
 
 const SafeAreaView = withUniwind(RNSafeAreaView);
 
@@ -250,36 +251,13 @@ export default function HealthScreen() {
       </ScrollView>
 
       {activeTab === 'contacts' && !isAddingContact ? (
-        <Pressable
+        <BlobFab
+          icon="person-add"
+          iconSize={26}
           accessibilityLabel="Ajouter un contact"
-          accessibilityRole="button"
           onPress={() => setIsAddingContact(true)}
-          className="absolute bottom-6 right-6 h-16 w-16 items-center justify-center overflow-hidden rounded-full"
-          style={{
-            backgroundColor: accent,
-            shadowColor: accent,
-            shadowOffset: { width: 0, height: 10 },
-            shadowOpacity: 0.3,
-            shadowRadius: 16,
-            elevation: 8,
-          }}
-        >
-          {/* Reflet clair, même finition que les boutons en gélule. */}
-          <View
-            pointerEvents="none"
-            style={{
-              position: 'absolute',
-              right: -18,
-              top: -18,
-              width: 52,
-              height: 52,
-              borderRadius: 26,
-              backgroundColor: lightenHex(accent, 0.12),
-              opacity: 0.6,
-            }}
-          />
-          <Ionicons name="person-add" size={24} color="#ffffff" />
-        </Pressable>
+          className="absolute bottom-6 right-6"
+        />
       ) : null}
     </SafeAreaView>
   );
