@@ -20,8 +20,8 @@ export function StatusBadge({
   // n'ont pas de lien avec l'accent, ils gardent leurs couleurs fixes.
   if (status === 'fait') {
     return (
-      <View className="rounded-full bg-accent/10 px-2.5 py-1">
-        <Text className="text-[11px] font-medium text-accent">
+      <View className="rounded-full bg-accent/10 px-3 py-1.5">
+        <Text className="text-[12.5px] font-semibold text-accent">
           {getStatusLabel(status)}
         </Text>
       </View>
@@ -31,11 +31,11 @@ export function StatusBadge({
   if (status === 'a_faire' && todoColor) {
     return (
       <View
-        className="rounded-full px-2.5 py-1"
+        className="rounded-full px-3 py-1.5"
         style={{ backgroundColor: todoColor.bg }}
       >
         <Text
-          className="text-[11px] font-medium"
+          className="text-[12.5px] font-semibold"
           style={{ color: todoColor.text }}
         >
           {getStatusLabel(status)}
@@ -47,10 +47,13 @@ export function StatusBadge({
   const style = STATUS_STYLES[status] ?? STATUS_STYLES.a_faire;
   return (
     <View
-      className="rounded-full px-2.5 py-1"
+      className="rounded-full px-3 py-1.5"
       style={{ backgroundColor: style.bg }}
     >
-      <Text className="text-[11px] font-medium" style={{ color: style.text }}>
+      <Text
+        className="text-[12.5px] font-semibold"
+        style={{ color: style.text }}
+      >
         {getStatusLabel(status)}
       </Text>
     </View>

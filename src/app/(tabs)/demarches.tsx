@@ -2,7 +2,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useAtomValue } from 'jotai';
 import { useEffect, useRef, useState } from 'react';
-import type { NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
 import {
   Linking,
   Pressable,
@@ -11,18 +10,39 @@ import {
   Text,
   View,
 } from 'react-native';
+import Animated, {
+  interpolateColor,
+  useAnimatedStyle,
+  useSharedValue,
+  withDelay,
+  withSequence,
+  withSpring,
+  withTiming,
+} from 'react-native-reanimated';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
+import Svg, { Path } from 'react-native-svg';
 import { withUniwind } from 'uniwind';
+
+import { ProgressBar } from '@/components/organisation/progress-bar';
 
 import { StatusBadge } from '@/components/procedures/status-badge';
 import { StatusSelector } from '@/components/procedures/status-selector';
+import {
+  DashedLoopDoodle,
+  GLASS_BODY_COLOR,
+  GLASS_TITLE_COLOR,
+  GlassCard,
+  SPARKS_ABOVE,
+  SparkLines,
+} from '@/components/ui/glass-card';
+import { PillButton } from '@/components/ui/pill-button';
 import { ScreenCornerShapes } from '@/components/ui/screen-corner-shapes';
 import { useMyHousehold } from '@/features/household/hooks';
-import { CARD_SHADOW } from '@/features/hub/constants';
 import {
   formatDeadlineLabel,
   getPregnancyMonthLabel,
   getProcedureIconStyle,
+  getStatusLabel,
   PREGNANCY_MONTHS,
   PROCEDURE_PREGNANCY_MONTH,
 } from '@/features/procedures/constants';
@@ -33,9 +53,10 @@ import {
   useUpdateProcedureReminder,
   useUpdateProcedureStatus,
 } from '@/features/procedures/hooks';
-import { useThemeBackground } from '@/features/settings/hooks';
+import { useThemeAccent, useThemeBackground } from '@/features/settings/hooks';
 // ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
 import { devBypassAtom } from '@/lib/atoms/dev-bypass';
+import { hexToRgba } from '@/lib/color';
 
 const SafeAreaView = withUniwind(RNSafeAreaView);
 
@@ -50,6 +71,12 @@ const SafeAreaView = withUniwind(RNSafeAreaView);
  * santé. Étendu de 6 à 8 sur demande explicite (Assurance habitation,
  * Administration fiscale) — écart assumé avec CONCEPT.md, qui n'en liste
  * que 6.
+ *
+ * Habillage d'après une capture de référence (demande explicite, « moderne
+ * et facile à comprendre ») : titre souligné, avancement en texte **et** en
+ * barre, mois en pastilles « 9 / mois » encadrées de flèches (le mois choisi
+ * en pastille d'accent surmontée de petits traits), démarches en cartes
+ * translucides à grande pastille d'icône, statut et chevron.
  */
 export default function ProceduresScreen() {
   const router = useRouter();
@@ -106,15 +133,17 @@ export default function ProceduresScreen() {
     (procedure) => procedure.householdProcedureId === selectedId,
   );
 
-  // Le mois centré à l'écran est toujours le mois sélectionné (demande
-  // explicite) — plus de « tous les mois » désélectionné, il y a toujours
-  // exactement un mois actif. Démarre sur le premier.
+  // Il y a toujours exactement un mois actif (plus de « tous les mois »
+  // désélectionné). Démarre sur le premier. Il change au tap sur un mois ou
+  // via les flèches ; faire glisser la rangée ne fait que la parcourir.
   const [selectedMonth, setSelectedMonth] = useState<number>(1);
 
-  // `monthViewportWidth` en state (pas juste une ref) : sert de padding
-  // horizontal du contenu scrollable, pour que le premier et le dernier
-  // mois puissent eux aussi atteindre le centre de l'écran — sans cette
-  // marge, le scroll s'arrête à leurs bords naturels.
+  // Le mois actif est centré **quand c'est possible** : la rangée n'a plus
+  // de marge d'une demi-largeur d'écran de chaque côté (demande explicite —
+  // trop d'espace entre la flèche et « 1 mois »), donc les premiers et
+  // derniers mois restent collés aux bords au lieu d'atteindre le centre.
+  // C'est pour ça que le glissé ne sélectionne plus le mois centré : au
+  // bout de la rangée, ce serait le 3e ou le 7e mois, jamais le 1er ou le 9e.
   const [monthViewportWidth, setMonthViewportWidth] = useState(0);
   const monthScrollRef = useRef<ScrollView>(null);
   const monthLayoutsRef = useRef<Map<number, { x: number; width: number }>>(
@@ -137,40 +166,22 @@ export default function ProceduresScreen() {
     scrollToMonth(selectedMonth);
   }, [selectedMonth, monthViewportWidth]);
 
-  // Une fois le scroll relâché, le mois dont le centre est le plus proche
-  // du centre de l'écran devient le mois sélectionné — recentré
-  // précisément par l'effet ci-dessus (ou directement ici si le mois ne
-  // change pas, pour corriger tout écart de repos).
-  const handleMonthScrollSettle = (
-    event: NativeSyntheticEvent<NativeScrollEvent>,
-  ) => {
-    if (!monthViewportWidth) return;
-    const viewportCenter =
-      event.nativeEvent.contentOffset.x + monthViewportWidth / 2;
-
-    let closestMonth = selectedMonth;
-    let closestDistance = Number.POSITIVE_INFINITY;
-    monthLayoutsRef.current.forEach((layout, month) => {
-      const distance = Math.abs(layout.x + layout.width / 2 - viewportCenter);
-      if (distance < closestDistance) {
-        closestDistance = distance;
-        closestMonth = month;
-      }
-    });
-
-    if (closestMonth === selectedMonth) {
-      scrollToMonth(closestMonth);
-    } else {
-      setSelectedMonth(closestMonth);
-    }
-  };
-
   const visibleProcedures = procedures.filter(
     (procedure) => PROCEDURE_PREGNANCY_MONTH[procedure.slug] === selectedMonth,
   );
 
   const completedCount = procedures.filter((p) => p.status === 'fait').length;
+  const totalCount = procedures.length || 8;
+  const firstMonth = PREGNANCY_MONTHS[0];
+  const lastMonth = PREGNANCY_MONTHS[PREGNANCY_MONTHS.length - 1];
   const backgroundColor = useThemeBackground();
+  const accent = useThemeAccent();
+
+  const goToMonth = (month: number) => {
+    const clamped = Math.min(Math.max(month, firstMonth), lastMonth);
+    setSelectedMonth(clamped);
+    scrollToMonth(clamped);
+  };
 
   return (
     <SafeAreaView
@@ -180,24 +191,38 @@ export default function ProceduresScreen() {
       <ScreenCornerShapes />
 
       <ScrollView
-        contentContainerClassName="gap-5 px-6 pb-10 pt-4"
+        contentContainerClassName="gap-6 px-6 pb-6 pt-4"
         showsVerticalScrollIndicator={false}
       >
-        <Pressable
-          accessibilityLabel="Revenir en arrière"
-          accessibilityRole="button"
-          hitSlop={12}
-          style={CARD_SHADOW}
-          onPress={() => (selected ? setSelectedId(null) : router.back())}
-          className="h-9 w-9 items-center justify-center rounded-full bg-white"
-        >
-          <Text className="text-[17px] leading-5 text-[#1a1a1a]">‹</Text>
-        </Pressable>
+        <View>
+          <Ionicons
+            name="heart-outline"
+            size={44}
+            color={hexToRgba(accent, 0.4)}
+            style={{
+              position: 'absolute',
+              top: 30,
+              right: 8,
+              transform: [{ rotate: '14deg' }],
+            }}
+          />
+          <Pressable
+            accessibilityLabel="Revenir en arrière"
+            accessibilityRole="button"
+            hitSlop={12}
+            onPress={() => (selected ? setSelectedId(null) : router.back())}
+            style={tintedShadow(accent)}
+            className="h-12 w-12 items-center justify-center rounded-full bg-white"
+          >
+            <Ionicons name="chevron-back" size={22} color={GLASS_TITLE_COLOR} />
+          </Pressable>
+        </View>
 
         {selected ? (
           <ProcedureDetail
             procedure={selected}
             birthDate={household?.birth_date ?? null}
+            accent={accent}
             onChangeStatus={(status) =>
               changeStatus(selected.householdProcedureId, status)
             }
@@ -207,80 +232,104 @@ export default function ProceduresScreen() {
           />
         ) : (
           <>
-            <View className="gap-1">
-              <Text className="text-[26px] font-bold text-[#1a1a1a]">
+            <View className="gap-2">
+              <Text
+                className="text-[32px] font-extrabold leading-10"
+                style={{ color: GLASS_TITLE_COLOR, letterSpacing: -0.7 }}
+              >
                 Démarches
               </Text>
-              <Text className="text-[13px] text-[#6b6b6b]">
-                {completedCount} sur {procedures.length || 8} complétées
-              </Text>
+              <Svg width={130} height={12} viewBox="0 0 130 12">
+                <Path
+                  d="M4 8 C 40 3, 90 2, 126 5"
+                  stroke={hexToRgba(accent, 0.55)}
+                  strokeWidth={3.5}
+                  strokeLinecap="round"
+                  fill="none"
+                />
+              </Svg>
+              <View className="mt-1 gap-2">
+                <Text
+                  className="text-[15px]"
+                  style={{ color: GLASS_BODY_COLOR }}
+                >
+                  {completedCount} sur {totalCount} complétées
+                </Text>
+                {/* Ajout à la capture : rend l'avancement lisible d'un coup
+                    d'œil (demande « facile de compréhension »). */}
+                <ProgressBar progress={completedCount / totalCount} />
+              </View>
             </View>
 
-            <View className="gap-2">
-              <Text className="text-[11.5px] font-semibold tracking-wide text-[#8a8a8a]">
+            <View className="gap-3">
+              <Text
+                className="text-[12.5px] font-bold"
+                style={{ color: '#5b5470', letterSpacing: 1.1 }}
+              >
                 PAR MOIS DE GROSSESSE
               </Text>
-              <ScrollView
-                ref={monthScrollRef}
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                decelerationRate="fast"
-                onMomentumScrollEnd={handleMonthScrollSettle}
-                onScrollEndDrag={handleMonthScrollSettle}
-                contentContainerClassName="gap-2 py-1"
-                contentContainerStyle={{
-                  paddingHorizontal: monthViewportWidth / 2,
-                }}
-                onLayout={(event) => {
-                  const width = event.nativeEvent.layout.width;
-                  setMonthViewportWidth((current) =>
-                    current === width ? current : width,
-                  );
-                }}
-              >
-                {PREGNANCY_MONTHS.map((month) => {
-                  const isActive = month === selectedMonth;
-                  return (
-                    <Pressable
+              <View className="flex-row items-center gap-1.5">
+                <MonthArrow
+                  direction="back"
+                  isDisabled={selectedMonth <= firstMonth}
+                  accent={accent}
+                  onPress={() => goToMonth(selectedMonth - 1)}
+                />
+                <ScrollView
+                  ref={monthScrollRef}
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  className="flex-1"
+                  contentContainerClassName="items-center gap-2 pb-2 pt-7"
+                  contentContainerStyle={{ paddingHorizontal: 4 }}
+                  onLayout={(event) => {
+                    const width = event.nativeEvent.layout.width;
+                    setMonthViewportWidth((current) =>
+                      current === width ? current : width,
+                    );
+                  }}
+                >
+                  {PREGNANCY_MONTHS.map((month) => (
+                    <MonthPill
                       key={month}
-                      accessibilityRole="button"
-                      accessibilityState={{ selected: isActive }}
-                      onPress={() => {
-                        setSelectedMonth(month);
-                        scrollToMonth(month);
+                      month={month}
+                      isActive={month === selectedMonth}
+                      accent={accent}
+                      onPress={() => goToMonth(month)}
+                      onLayout={(x, width) => {
+                        monthLayoutsRef.current.set(month, { x, width });
+                        if (month === selectedMonth) scrollToMonth(month);
                       }}
-                      onLayout={(event) => {
-                        monthLayoutsRef.current.set(month, {
-                          x: event.nativeEvent.layout.x,
-                          width: event.nativeEvent.layout.width,
-                        });
-                        if (isActive) scrollToMonth(month);
-                      }}
-                      style={CARD_SHADOW}
-                      className={`rounded-full px-4 py-2.5 ${
-                        isActive ? 'bg-accent' : 'bg-white'
-                      }`}
-                    >
-                      <Text
-                        className={`text-[15px] ${
-                          isActive
-                            ? 'font-semibold text-accent-foreground'
-                            : 'text-[#6b6b6b]'
-                        }`}
-                      >
-                        {getPregnancyMonthLabel(month)}
-                      </Text>
-                    </Pressable>
-                  );
-                })}
-              </ScrollView>
+                    />
+                  ))}
+                </ScrollView>
+                <MonthArrow
+                  direction="forward"
+                  isDisabled={selectedMonth >= lastMonth}
+                  accent={accent}
+                  onPress={() => goToMonth(selectedMonth + 1)}
+                />
+              </View>
             </View>
 
-            <View className="gap-2.5">
+            <View className="gap-3">
               {visibleProcedures.length === 0 ? (
-                <Text className="px-1 text-[13px] text-[#8a8a8a]">
-                  Aucune démarche à faire ce mois-ci.
-                </Text>
+                <View
+                  className="items-center gap-2 rounded-[28px] px-5 py-6"
+                  style={{ backgroundColor: hexToRgba(accent, 0.07) }}
+                >
+                  <Ionicons
+                    name="checkmark-done-outline"
+                    size={26}
+                    color={accent}
+                  />
+                  <Text
+                    className="text-center text-[14px]"
+                    style={{ color: GLASS_BODY_COLOR }}
+                  >
+                    Aucune démarche à faire ce mois-ci.
+                  </Text>
+                </View>
               ) : null}
               {visibleProcedures.map((procedure) => {
                 const deadline = formatDeadlineLabel(
@@ -289,55 +338,72 @@ export default function ProceduresScreen() {
                 );
                 const iconStyle = getProcedureIconStyle(procedure.slug);
                 return (
-                  <Pressable
+                  <GlassCard
                     key={procedure.householdProcedureId}
-                    accessibilityRole="button"
-                    style={CARD_SHADOW}
+                    accessibilityLabel={`${procedure.title}, ${getStatusLabel(procedure.status)}`}
+                    accent={accent}
                     onPress={() =>
                       setSelectedId(procedure.householdProcedureId)
                     }
-                    className="flex-row items-center gap-3 rounded-2xl bg-white px-4 py-3.5"
                   >
-                    <View
-                      style={{ backgroundColor: iconStyle.bg }}
-                      className="h-11 w-11 items-center justify-center rounded-full"
-                    >
+                    <View className="flex-row items-center gap-3.5 py-4 pl-4 pr-3">
+                      <View
+                        style={{ backgroundColor: iconStyle.bg }}
+                        className="h-14 w-14 items-center justify-center rounded-full"
+                      >
+                        <Ionicons
+                          name={iconStyle.icon}
+                          size={26}
+                          color={iconStyle.color}
+                        />
+                      </View>
+                      <View className="flex-1 gap-1">
+                        <View className="flex-row items-center gap-1.5">
+                          <Text
+                            className="shrink text-[16px] font-bold"
+                            style={{ color: GLASS_TITLE_COLOR }}
+                          >
+                            {procedure.title}
+                          </Text>
+                          {procedure.reminderEnabled ? (
+                            <View
+                              accessibilityLabel="Rappel activé avant l’échéance"
+                              className="h-[18px] w-[18px] items-center justify-center rounded-full"
+                              style={{
+                                backgroundColor: hexToRgba(accent, 0.14),
+                              }}
+                            >
+                              <Ionicons
+                                name="notifications"
+                                size={10}
+                                color={accent}
+                              />
+                            </View>
+                          ) : null}
+                        </View>
+                        <Text
+                          className="text-[13px] leading-[18px]"
+                          style={{ color: GLASS_BODY_COLOR }}
+                        >
+                          {deadline}
+                        </Text>
+                      </View>
+                      <StatusBadge
+                        status={procedure.status}
+                        todoColor={{ bg: iconStyle.bg, text: iconStyle.color }}
+                      />
                       <Ionicons
-                        name={iconStyle.icon}
-                        size={20}
-                        color={iconStyle.color}
+                        name="chevron-forward"
+                        size={18}
+                        color="#a8a8b3"
                       />
                     </View>
-                    <View className="flex-1 gap-0.5">
-                      <View className="flex-row items-center gap-1.5">
-                        <Text className="text-[15px] font-medium text-[#1a1a1a]">
-                          {procedure.title}
-                        </Text>
-                        {procedure.reminderEnabled ? (
-                          <View
-                            accessibilityLabel="Rappel activé avant l’échéance"
-                            className="h-4 w-4 items-center justify-center rounded-full bg-accent/15"
-                          >
-                            <Ionicons
-                              name="notifications"
-                              size={10}
-                              color="#2D5E5A"
-                            />
-                          </View>
-                        ) : null}
-                      </View>
-                      <Text className="text-[13px] text-[#6b6b6b]">
-                        {deadline}
-                      </Text>
-                    </View>
-                    <StatusBadge
-                      status={procedure.status}
-                      todoColor={{ bg: iconStyle.bg, text: iconStyle.color }}
-                    />
-                  </Pressable>
+                  </GlassCard>
                 );
               })}
             </View>
+
+            <DashedLoopDoodle color={accent} />
           </>
         )}
       </ScrollView>
@@ -345,9 +411,189 @@ export default function ProceduresScreen() {
   );
 }
 
+const tintedShadow = (accent: string) =>
+  ({
+    shadowColor: accent,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.12,
+    shadowRadius: 16,
+    elevation: 4,
+  }) as const;
+
+/** Flèche ronde de part et d'autre des mois : un mois de plus ou de moins. */
+function MonthArrow({
+  direction,
+  isDisabled,
+  accent,
+  onPress,
+}: {
+  direction: 'back' | 'forward';
+  isDisabled: boolean;
+  accent: string;
+  onPress: () => void;
+}) {
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={
+        direction === 'back' ? 'Mois précédent' : 'Mois suivant'
+      }
+      accessibilityState={{ disabled: isDisabled }}
+      disabled={isDisabled}
+      onPress={onPress}
+      hitSlop={6}
+      style={[tintedShadow(accent), { opacity: isDisabled ? 0.35 : 1 }]}
+      className="mt-5 h-10 w-10 items-center justify-center rounded-full bg-white"
+    >
+      <Ionicons
+        name={direction === 'back' ? 'chevron-back' : 'chevron-forward'}
+        size={18}
+        color={GLASS_TITLE_COLOR}
+      />
+    </Pressable>
+  );
+}
+
+const INACTIVE_PILL_BG = 'rgba(255, 255, 255, 0.9)';
+const MONTH_PILL_HEIGHT = 56;
+const MONTH_PILL_ACTIVE_HEIGHT = 66;
+
+/**
+ * Un mois : numéro en grand et « mois » dessous. Le mois choisi devient une
+ * pastille d'accent plus haute, surmontée de petits traits.
+ *
+ * Animation à la sélection (demande explicite) : la pastille s'écrase un
+ * instant puis rebondit, grandit et se colore en fondu, et les traits
+ * jaillissent juste après — même vocabulaire que la bulle de la barre
+ * d'onglets. Le `Pressable` garde une hauteur fixe (celle de la pastille
+ * active) : la rangée ne bouge pas pendant que la pastille grandit, et
+ * les mesures `onLayout` du recentrage restent stables.
+ */
+function MonthPill({
+  month,
+  isActive,
+  accent,
+  onPress,
+  onLayout,
+}: {
+  month: number;
+  isActive: boolean;
+  accent: string;
+  onPress: () => void;
+  onLayout: (x: number, width: number) => void;
+}) {
+  const activeness = useSharedValue(isActive ? 1 : 0);
+  const pop = useSharedValue(1);
+  const sparks = useSharedValue(isActive ? 1 : 0);
+
+  useEffect(() => {
+    activeness.value = withTiming(isActive ? 1 : 0, { duration: 220 });
+    if (isActive) {
+      pop.value = withSequence(
+        withTiming(0.86, { duration: 90 }),
+        withSpring(1, { damping: 8, stiffness: 230 }),
+      );
+      sparks.value = 0;
+      sparks.value = withDelay(
+        150,
+        withSpring(1, { damping: 10, stiffness: 200 }),
+      );
+    } else {
+      sparks.value = withTiming(0, { duration: 120 });
+    }
+  }, [isActive, activeness, pop, sparks]);
+
+  const pillStyle = useAnimatedStyle(() => ({
+    height:
+      MONTH_PILL_HEIGHT +
+      (MONTH_PILL_ACTIVE_HEIGHT - MONTH_PILL_HEIGHT) * activeness.value,
+    backgroundColor: interpolateColor(
+      activeness.value,
+      [0, 1],
+      [INACTIVE_PILL_BG, accent],
+    ),
+    transform: [{ scale: pop.value }],
+  }));
+  const numberStyle = useAnimatedStyle(() => ({
+    color: interpolateColor(
+      activeness.value,
+      [0, 1],
+      [GLASS_TITLE_COLOR, '#ffffff'],
+    ),
+  }));
+  const unitStyle = useAnimatedStyle(() => ({
+    color: interpolateColor(
+      activeness.value,
+      [0, 1],
+      [GLASS_BODY_COLOR, 'rgba(255, 255, 255, 0.85)'],
+    ),
+  }));
+  const sparksStyle = useAnimatedStyle(() => ({
+    opacity: sparks.value,
+    transform: [
+      { translateY: (1 - sparks.value) * 6 },
+      { scale: 0.5 + 0.5 * sparks.value },
+    ],
+  }));
+
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={getPregnancyMonthLabel(month)}
+      accessibilityState={{ selected: isActive }}
+      onPress={onPress}
+      onLayout={(event) =>
+        onLayout(event.nativeEvent.layout.x, event.nativeEvent.layout.width)
+      }
+      className="w-14 items-center justify-center"
+      style={{ height: MONTH_PILL_ACTIVE_HEIGHT }}
+    >
+      <Animated.View
+        className="w-14 items-center justify-center rounded-[22px]"
+        style={[
+          isActive
+            ? {
+                shadowColor: accent,
+                shadowOffset: { width: 0, height: 6 },
+                shadowOpacity: 0.3,
+                shadowRadius: 10,
+                elevation: 6,
+              }
+            : { borderWidth: 1, borderColor: hexToRgba(accent, 0.1) },
+          pillStyle,
+        ]}
+      >
+        <Animated.Text
+          className="text-[19px] font-extrabold leading-6"
+          style={numberStyle}
+        >
+          {month}
+        </Animated.Text>
+        <Animated.Text className="text-[11.5px]" style={unitStyle}>
+          mois
+        </Animated.Text>
+      </Animated.View>
+      <Animated.View
+        pointerEvents="none"
+        style={[
+          { position: 'absolute', top: -26, left: 15, width: 26, height: 26 },
+          sparksStyle,
+        ]}
+      >
+        <SparkLines
+          color={hexToRgba(accent, 0.6)}
+          sparks={SPARKS_ABOVE}
+          style={{ top: 0, left: 0 }}
+        />
+      </Animated.View>
+    </Pressable>
+  );
+}
+
 function ProcedureDetail({
   procedure,
   birthDate,
+  accent,
   onChangeStatus,
   onToggleReminder,
 }: {
@@ -361,6 +607,7 @@ function ProcedureDetail({
     reminderEnabled: boolean;
   };
   birthDate: string | null;
+  accent: string;
   onChangeStatus: (status: 'a_faire' | 'en_cours' | 'fait') => void;
   onToggleReminder: (reminderEnabled: boolean) => void;
 }) {
@@ -371,12 +618,15 @@ function ProcedureDetail({
 
   return (
     <View className="gap-5">
-      <View className="gap-1">
-        <Text className="text-[24px] font-bold text-[#1a1a1a]">
+      <View className="gap-1.5">
+        <Text
+          className="text-[28px] font-extrabold leading-9"
+          style={{ color: GLASS_TITLE_COLOR, letterSpacing: -0.5 }}
+        >
           {procedure.title}
         </Text>
         {deadline ? (
-          <Text className="text-[13px] font-medium text-accent">
+          <Text className="text-[14px] font-semibold" style={{ color: accent }}>
             {deadline}
           </Text>
         ) : null}
@@ -418,7 +668,7 @@ function ProcedureDetail({
         <Switch
           value={procedure.reminderEnabled}
           onValueChange={onToggleReminder}
-          trackColor={{ true: '#2D5E5A' }}
+          trackColor={{ true: accent }}
         />
       </View>
 
@@ -427,15 +677,11 @@ function ProcedureDetail({
           un assureur privé propre à chaque foyer, aucun lien officiel
           générique n'existe. */}
       {procedure.official_link ? (
-        <Pressable
-          accessibilityRole="button"
+        <PillButton
+          label="Accéder au téléservice officiel"
+          icon="open-outline"
           onPress={() => Linking.openURL(procedure.official_link as string)}
-          className="items-center rounded-full bg-accent py-3.5"
-        >
-          <Text className="text-[15px] font-medium text-accent-foreground">
-            Accéder au téléservice officiel ↗
-          </Text>
-        </Pressable>
+        />
       ) : null}
     </View>
   );
