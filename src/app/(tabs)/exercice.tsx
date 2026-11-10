@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useState } from 'react';
 import { Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import { withUniwind } from 'uniwind';
@@ -187,27 +188,12 @@ function ExerciseHero({
   onBack: () => void;
 }) {
   if (exercise.image) {
-    // Illustration montrée entière (pas de rognage) : elle commence sous la
-    // zone de la barre d'état, que la couleur de son bord haut prolonge, et
-    // la hauteur du bandeau suit ses proportions.
     return (
-      <View
-        style={{
-          backgroundColor: exercise.imageTopColor ?? exercise.tint.bg,
-          paddingTop: HERO_IMAGE_TOP_INSET,
-        }}
-        className="overflow-hidden rounded-b-[32px]"
-      >
-        <Image
-          source={exercise.image}
-          resizeMode="cover"
-          style={{ width: '100%', aspectRatio: EXERCISE_IMAGE_RATIO }}
-        />
-
-        <View className="absolute left-6 top-14">
-          <BackButton onPress={onBack} />
-        </View>
-      </View>
+      <ExerciseImageHero
+        exercise={exercise}
+        image={exercise.image}
+        onBack={onBack}
+      />
     );
   }
 
@@ -226,6 +212,53 @@ function ExerciseHero({
       />
 
       <Text className="text-[84px]">{exercise.emoji}</Text>
+
+      <View className="absolute left-6 top-14">
+        <BackButton onPress={onBack} />
+      </View>
+    </View>
+  );
+}
+
+/**
+ * Bandeau illustré : l'image est montrée entière (pas de rognage), sous la
+ * zone de la barre d'état que prolonge la couleur de son bord haut.
+ *
+ * Hauteur **calculée** à partir de la largeur mesurée plutôt que confiée à
+ * `aspectRatio` : en web, `Image` ignore `aspectRatio` et prend la hauteur
+ * en pixels du fichier — les illustrations en 1320 × 696 occupaient alors
+ * tout l'écran, celles en 412 × 216 tombaient juste par hasard.
+ */
+function ExerciseImageHero({
+  exercise,
+  image,
+  onBack,
+}: {
+  exercise: CatalogExercise;
+  image: NonNullable<CatalogExercise['image']>;
+  onBack: () => void;
+}) {
+  const [width, setWidth] = useState(0);
+
+  return (
+    <View
+      onLayout={(event) => setWidth(event.nativeEvent.layout.width)}
+      style={{
+        backgroundColor: exercise.imageTopColor ?? exercise.tint.bg,
+        paddingTop: HERO_IMAGE_TOP_INSET,
+      }}
+      className="overflow-hidden rounded-b-[32px]"
+    >
+      <Image
+        source={image}
+        resizeMode="cover"
+        style={{
+          width: '100%',
+          height: width
+            ? width / EXERCISE_IMAGE_RATIO
+            : HERO_HEIGHT - HERO_IMAGE_TOP_INSET,
+        }}
+      />
 
       <View className="absolute left-6 top-14">
         <BackButton onPress={onBack} />
