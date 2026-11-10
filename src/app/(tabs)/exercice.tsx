@@ -34,9 +34,10 @@ const HERO_IMAGE_TOP_INSET = 44;
  * les autres destinations ouvertes depuis le hub.
  *
  * Le bandeau de tête affiche l'illustration de l'exercice (`image`) quand
- * elle existe — c'est le cas des 4 exercices du 1er trimestre, fournis par
- * l'utilisateur. Pour les autres, il reste une composition aplat pastel +
- * emoji (`exercises.image_url` est vide partout, point ouvert n°37).
+ * elle existe — c'est le cas des 12 exercices du catalogue, fournis par
+ * l'utilisateur. Un exercice ajouté sans image retombe sur une composition
+ * aplat pastel + emoji (`exercises.image_url` reste vide en base, point
+ * ouvert n°37).
  *
  * L'emplacement vidéo est un cadre blanc vide, en attente d'un lien
  * (demande explicite) : rien n'est lu ni téléchargé aujourd'hui.

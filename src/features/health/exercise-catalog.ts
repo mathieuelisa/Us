@@ -172,6 +172,8 @@ export const EXERCISE_CATALOG: CatalogExercise[] = [
       'Terminez allongée sur le côté gauche, quelques minutes.',
     ],
     emoji: '🧘',
+    image: require('@/assets/images/Exercise_yoga_prenatal.png'),
+    imageTopColor: '#e9e2f7',
     tint: TINT.mobilite,
   },
   {
@@ -191,6 +193,8 @@ export const EXERCISE_CATALOG: CatalogExercise[] = [
       'Refermez les jambes doucement, une à la fois.',
     ],
     emoji: '🦋',
+    image: require('@/assets/images/Exercise_ouverture_des_hanches.png'),
+    imageTopColor: '#fae3d6',
     tint: TINT.hanches,
   },
   {
@@ -210,6 +214,8 @@ export const EXERCISE_CATALOG: CatalogExercise[] = [
       'Sortez lentement, en vous tenant à l’échelle.',
     ],
     emoji: '🏊‍♀️',
+    image: require('@/assets/images/Exercise_natation.png'),
+    imageTopColor: '#dcf0ee',
     tint: TINT.eau,
   },
   {
@@ -229,6 +235,8 @@ export const EXERCISE_CATALOG: CatalogExercise[] = [
       'Répétez cinq fois, en récupérant entre chaque.',
     ],
     emoji: '🦵',
+    image: require('@/assets/images/Exercise_renfort_des_jambes.png'),
+    imageTopColor: '#e1f2e4',
     tint: TINT.dos,
   },
 
@@ -250,6 +258,8 @@ export const EXERCISE_CATALOG: CatalogExercise[] = [
       'Gardez un appui à portée de main pour les premières séances.',
     ],
     emoji: '🏐',
+    image: require('@/assets/images/Exercise_ballon_de_grossesse.png'),
+    imageTopColor: '#faf1cc',
     tint: TINT.endurance,
   },
   {
@@ -269,6 +279,8 @@ export const EXERCISE_CATALOG: CatalogExercise[] = [
       'Cinq répétitions suffisent — le relâchement compte plus que la contraction.',
     ],
     emoji: '🌸',
+    image: require('@/assets/images/Exercise_perinee.png'),
+    imageTopColor: '#f8e0e6',
     tint: TINT.bassin,
   },
   {
@@ -288,6 +300,8 @@ export const EXERCISE_CATALOG: CatalogExercise[] = [
       'Récupérez une minute, puis recommencez trois ou quatre fois.',
     ],
     emoji: '🕯️',
+    image: require('@/assets/images/Exercise_respiration_jour_j.png'),
+    imageTopColor: '#e9e2f7',
     tint: TINT.mobilite,
   },
   {
@@ -307,6 +321,8 @@ export const EXERCISE_CATALOG: CatalogExercise[] = [
       'Restez ainsi cinq minutes avant de vous relever doucement.',
     ],
     emoji: '💧',
+    image: require('@/assets/images/Exercise_jambes_legeres.png'),
+    imageTopColor: '#dcf0ee',
     tint: TINT.eau,
   },
 ];
