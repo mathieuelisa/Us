@@ -7,6 +7,7 @@ import { PremiumLockedScreen } from '@/components/hub/premium-locked-screen';
 import {
   CardWave,
   ChevronBubble,
+  DashedLoopDoodle,
   GLASS_BODY_COLOR,
   GLASS_TITLE_COLOR,
   GlassCard,
@@ -374,36 +375,7 @@ function BabyModulesGrid({ accent }: { accent: string }) {
         </View>
       </GlassCard>
 
-      <BottomDoodle accent={accent} />
-    </View>
-  );
-}
-
-/** Boucle en pointillés et petit cœur sous la grille — pure décoration. */
-function BottomDoodle({ accent }: { accent: string }) {
-  return (
-    <View pointerEvents="none" style={{ height: 90 }}>
-      <Svg width="100%" height="100%" viewBox="0 0 340 90">
-        <Path
-          d="M70 74 C 120 86, 170 80, 196 58 C 216 40, 204 16, 186 22 C 166 30, 178 62, 224 66 C 266 70, 300 48, 336 44"
-          stroke={hexToRgba(accent, 0.35)}
-          strokeWidth={2}
-          strokeDasharray="5 7"
-          strokeLinecap="round"
-          fill="none"
-        />
-      </Svg>
-      <Ionicons
-        name="heart-outline"
-        size={26}
-        color={hexToRgba(accent, 0.6)}
-        style={{
-          position: 'absolute',
-          right: '22%',
-          top: 0,
-          transform: [{ rotate: '10deg' }],
-        }}
-      />
+      <DashedLoopDoodle color={accent} />
     </View>
   );
 }

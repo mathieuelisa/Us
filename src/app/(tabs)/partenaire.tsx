@@ -1,28 +1,179 @@
+import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useAtomValue } from 'jotai';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import type { ComponentProps, ReactNode } from 'react';
+import { Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
+import Svg, { Path } from 'react-native-svg';
 import { withUniwind } from 'uniwind';
 
 import { WeekMoodStrip } from '@/components/together/week-mood-strip';
+import {
+  DashedLoopDoodle,
+  GLASS_BODY_COLOR,
+  GLASS_TITLE_COLOR,
+} from '@/components/ui/glass-card';
 import { getWeeksOfAmenorrhea } from '@/features/health/constants';
 import { useBabySize } from '@/features/health/hooks';
 import { useMyHousehold } from '@/features/household/hooks';
 import { getPartnerUserId } from '@/features/hub/api';
-import { CARD_SHADOW } from '@/features/hub/constants';
 import { useHubSummary } from '@/features/hub/hooks';
-import { getTipOfTheDay } from '@/features/partner/constants';
-import { useThemeBackground } from '@/features/settings/hooks';
+import { getTipOfTheDay, PARTNER_PINK } from '@/features/partner/constants';
 import { getCurrentWeekIsoDates } from '@/features/together/api';
 import { useWeekCheckinsFor } from '@/features/together/hooks';
 import { currentRoleAtom } from '@/lib/atoms/role';
 import { sessionAtom } from '@/lib/atoms/session';
+import { hexToRgba } from '@/lib/color';
 
 const SafeAreaView = withUniwind(RNSafeAreaView);
+
+type IoniconName = ComponentProps<typeof Ionicons>['name'];
+
+const PINK = PARTNER_PINK;
+const HEADER_IMAGE = require('@/assets/images/Father_feelings_mother.png');
+
+const PINK_SHADOW = {
+  shadowColor: PINK.accent,
+  shadowOffset: { width: 0, height: 10 },
+  shadowOpacity: 0.1,
+  shadowRadius: 20,
+  elevation: 4,
+} as const;
+
+/** Grandes taches roses floues aux coins de l'écran — fond décoratif. */
+function PinkBackdrop() {
+  const blob = (style: object) => (
+    <View
+      style={[
+        {
+          position: 'absolute',
+          borderRadius: 999,
+          backgroundColor: PINK.blob,
+          opacity: 0.55,
+        },
+        style,
+      ]}
+    />
+  );
+
+  return (
+    <View
+      pointerEvents="none"
+      style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 }}
+    >
+      {blob({ width: 300, height: 260, top: -150, left: -140 })}
+      {blob({ width: 220, height: 260, top: -60, right: -150 })}
+      {blob({ width: 360, height: 220, bottom: -120, left: -120 })}
+      {blob({ width: 240, height: 260, bottom: 40, right: -170 })}
+    </View>
+  );
+}
+
+/** Carte blanche translucide aux grands rayons, ombre rose. */
+function PinkCard({ children }: { children: ReactNode }) {
+  return (
+    <View
+      style={[
+        PINK_SHADOW,
+        {
+          borderRadius: 28,
+          backgroundColor: 'rgba(255, 255, 255, 0.9)',
+          borderWidth: 1,
+          borderColor: 'rgba(255, 255, 255, 0.95)',
+        },
+      ]}
+      className="flex-row items-center gap-4 px-4 py-4"
+    >
+      {children}
+    </View>
+  );
+}
+
+/**
+ * Tuile d'illustration : tache rose aux coins inégaux plutôt qu'un carré,
+ * pour l'effet « dessiné » de la capture de référence.
+ */
+function IllustrationTile({ emoji }: { emoji: string }) {
+  return (
+    <View
+      className="h-[68px] w-[68px] items-center justify-center"
+      style={{
+        backgroundColor: PINK.soft,
+        borderTopLeftRadius: 30,
+        borderTopRightRadius: 24,
+        borderBottomRightRadius: 32,
+        borderBottomLeftRadius: 22,
+      }}
+    >
+      <Text style={{ fontSize: 34 }}>{emoji}</Text>
+    </View>
+  );
+}
+
+/** Intitulé de section : icône rose, libellé espacé, filet jusqu'au bord. */
+function SectionHeading({ icon, label }: { icon: IoniconName; label: string }) {
+  return (
+    <View className="flex-row items-center gap-2.5">
+      <Ionicons name={icon} size={22} color={PINK.accent} />
+      <Text
+        className="text-[12.5px] font-bold"
+        style={{ color: PINK.heading, letterSpacing: 1.1 }}
+      >
+        {label}
+      </Text>
+      <View className="h-px flex-1" style={{ backgroundColor: PINK.line }} />
+    </View>
+  );
+}
+
+function TipCard({
+  emoji,
+  recipient,
+  tip,
+}: {
+  emoji: string;
+  recipient: string;
+  tip: string;
+}) {
+  return (
+    <PinkCard>
+      <IllustrationTile emoji={emoji} />
+      <View className="flex-1 items-start gap-2">
+        <View
+          className="rounded-full px-2.5 py-1"
+          style={{ backgroundColor: PINK.tag }}
+        >
+          <Text
+            className="text-[12px] font-semibold"
+            style={{ color: PINK.tagText }}
+          >
+            {recipient}
+          </Text>
+        </View>
+        <Text
+          className="text-[15px] font-semibold leading-5"
+          style={{ color: GLASS_TITLE_COLOR }}
+        >
+          {tip}
+        </Text>
+      </View>
+    </PinkCard>
+  );
+}
 
 /**
  * Section « Mon partenaire » — bloc indépendant ouvert depuis le hub, pas un
  * 4e pilier (CONCEPT.md).
+ *
+ * Habillage d'après une capture de référence (demande explicite) : grand
+ * titre souligné, illustration en haut à droite, intitulés de section à
+ * icône et filet, cartes blanches translucides à tuile d'illustration.
+ * **Toujours rose**, quel que soit le thème choisi en Réglages — exception
+ * voulue, cf. `PARTNER_PINK`.
+ *
+ * ⚠️ La capture montre des chevrons sur les cartes ; ils ne sont pas repris
+ * tant qu'aucune destination n'est définie pour ces cartes (un chevron
+ * promettrait une navigation qui n'existe pas).
  *
  * ⚠️ Vue de la personne enceinte pour l'instant (demande explicite). Deux
  * blocs propres au co-parent restent donc à faire : la reprise de ses
@@ -54,64 +205,150 @@ export default function PartnerScreen() {
   const otherRole = role === 'pregnant' ? 'partner' : 'pregnant';
   const myTip = getTipOfTheDay(role);
   const partnerTip = getTipOfTheDay(otherRole);
-  const backgroundColor = useThemeBackground();
+
+  const notJoinedText = partnerName
+    ? `${partnerName} n’a pas encore rejoint votre espace. Sa tendance d’humeur apparaîtra ici dès qu’il ou elle aura créé son compte.`
+    : 'Le co-parent n’a pas encore rejoint votre espace.';
 
   return (
-    <SafeAreaView className="flex-1" style={{ backgroundColor }}>
+    <SafeAreaView
+      className="flex-1"
+      style={{ backgroundColor: PINK.background }}
+    >
+      <PinkBackdrop />
+
       <ScrollView
-        contentContainerClassName="gap-6 px-6 pb-10 pt-4"
+        contentContainerClassName="gap-7 px-6 pb-6 pt-4"
         showsVerticalScrollIndicator={false}
       >
-        {router.canGoBack() ? (
-          <Pressable
-            accessibilityLabel="Revenir en arrière"
-            accessibilityRole="button"
-            hitSlop={12}
-            style={CARD_SHADOW}
-            onPress={() => router.back()}
-            className="h-9 w-9 items-center justify-center rounded-full bg-white"
+        <View>
+          {/* Illustration posée en haut à droite, derrière le titre, du
+              niveau du bouton retour jusqu'au sous-titre. */}
+          <View
+            pointerEvents="none"
+            style={{ position: 'absolute', top: 0, right: -10 }}
           >
-            <Text className="text-[17px] leading-5 text-[#1a1a1a]">‹</Text>
-          </Pressable>
-        ) : null}
+            <View
+              style={{
+                position: 'absolute',
+                width: 130,
+                height: 130,
+                borderRadius: 65,
+                backgroundColor: hexToRgba(PINK.accent, 0.1),
+                top: 30,
+                left: 14,
+              }}
+            />
+            <Image
+              source={HEADER_IMAGE}
+              style={{ width: 150, height: 170 }}
+              resizeMode="contain"
+            />
+            <Ionicons
+              name="heart-outline"
+              size={30}
+              color={hexToRgba(PINK.accent, 0.7)}
+              style={{
+                position: 'absolute',
+                top: 6,
+                left: -18,
+                transform: [{ rotate: '-12deg' }],
+              }}
+            />
+            <Ionicons
+              name="heart"
+              size={13}
+              color={hexToRgba(PINK.accent, 0.45)}
+              style={{ position: 'absolute', top: 44, left: -4 }}
+            />
+          </View>
 
-        <Text className="text-[26px] font-bold text-[#1a1a1a]">
-          {partnerName ? `Avec ${partnerName}` : 'Mon partenaire'}
-        </Text>
+          {router.canGoBack() ? (
+            <Pressable
+              accessibilityLabel="Revenir en arrière"
+              accessibilityRole="button"
+              hitSlop={12}
+              onPress={() => router.back()}
+              style={PINK_SHADOW}
+              className="h-12 w-12 items-center justify-center rounded-full bg-white"
+            >
+              <Ionicons
+                name="chevron-back"
+                size={22}
+                color={GLASS_TITLE_COLOR}
+              />
+            </Pressable>
+          ) : null}
+
+          <View className="mt-7 gap-2" style={{ maxWidth: '62%' }}>
+            <Text
+              className="text-[30px] font-extrabold leading-9"
+              style={{ color: GLASS_TITLE_COLOR, letterSpacing: -0.6 }}
+            >
+              {partnerName ? `Avec ${partnerName}` : 'Mon partenaire'}
+            </Text>
+            <Svg width={140} height={12} viewBox="0 0 140 12">
+              <Path
+                d="M4 9 C 40 3, 96 1.5, 136 5"
+                stroke={hexToRgba(PINK.accent, 0.5)}
+                strokeWidth={3.5}
+                strokeLinecap="round"
+                fill="none"
+              />
+            </Svg>
+            {partnerUserId ? null : (
+              <Text
+                className="mt-2 text-[15px] leading-[22px]"
+                style={{ color: GLASS_BODY_COLOR }}
+              >
+                {notJoinedText}
+              </Text>
+            )}
+          </View>
+        </View>
 
         {partnerUserId ? (
-          <View className="gap-3">
-            <Text className="text-[11.5px] font-semibold tracking-wide text-[#8a8a8a]">
-              SON HUMEUR CETTE SEMAINE
-            </Text>
-            <View className="shadow-sm rounded-2xl bg-white px-4 py-4">
+          <View className="gap-3.5">
+            <SectionHeading
+              icon="happy-outline"
+              label="SON HUMEUR CETTE SEMAINE"
+            />
+            <View
+              style={[
+                PINK_SHADOW,
+                {
+                  borderRadius: 28,
+                  backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                },
+              ]}
+              className="px-4 py-4"
+            >
               <WeekMoodStrip
                 weekDates={weekDates}
                 checkinsByDate={partnerCheckins}
               />
             </View>
           </View>
-        ) : (
-          <View className="rounded-2xl bg-white px-4 py-4">
-            <Text className="text-[14px] leading-5 text-[#6b6b6b]">
-              {partnerName
-                ? `${partnerName} n’a pas encore rejoint votre espace. Sa tendance d’humeur apparaîtra ici dès qu’il ou elle aura créé son compte.`
-                : 'Le co-parent n’a pas encore rejoint votre espace.'}
-            </Text>
-          </View>
-        )}
+        ) : null}
 
-        <View className="gap-3">
-          <Text className="text-[11.5px] font-semibold tracking-wide text-[#8a8a8a]">
-            VOTRE BÉBÉ CETTE SEMAINE
-          </Text>
-          <View className="flex-row shadow-sm items-center gap-3.5 rounded-2xl bg-white px-4 py-4">
-            <Text className="text-[28px]">🍼</Text>
-            <View className="flex-1 gap-0.5">
-              <Text className="text-[15px] font-medium text-[#1a1a1a]">
+        <View className="gap-3.5">
+          <SectionHeading
+            icon="heart-outline"
+            label="VOTRE BÉBÉ CETTE SEMAINE"
+          />
+          <PinkCard>
+            <IllustrationTile emoji="🍼" />
+            <View className="flex-1 gap-1">
+              <Text
+                className="text-[16px] font-bold"
+                style={{ color: GLASS_TITLE_COLOR }}
+              >
                 {babySize?.fruit_label ?? 'Taille bientôt disponible'}
               </Text>
-              <Text className="text-[13px] text-[#6b6b6b]">
+              <Text
+                className="text-[13px] leading-[18px]"
+                style={{ color: GLASS_BODY_COLOR }}
+              >
                 {weeks === null
                   ? 'Renseignez la date de terme pour suivre la croissance.'
                   : `${weeks} semaines d’aménorrhée${
@@ -119,39 +356,31 @@ export default function PartnerScreen() {
                     }`}
               </Text>
             </View>
-          </View>
+          </PinkCard>
         </View>
 
         {/* Les deux astuces sont visibles par les deux parents (CONCEPT.md :
             « une carte pour la femme, une carte pour le co-parent — partagé
             entre les deux »), d'où l'étiquetage explicite du destinataire. */}
-        <View className="gap-3">
-          <Text className="text-[11.5px] font-semibold tracking-wide text-[#8a8a8a]">
-            ASTUCES DU JOUR
-          </Text>
+        {myTip || partnerTip ? (
+          <View className="gap-3.5">
+            <SectionHeading icon="calendar-outline" label="ASTUCES DU JOUR" />
+            {myTip ? (
+              <TipCard emoji="💡" recipient="Pour vous" tip={myTip} />
+            ) : null}
+            {partnerTip ? (
+              <TipCard
+                emoji="💞"
+                recipient={
+                  partnerName ? `Pour ${partnerName}` : 'Pour le co-parent'
+                }
+                tip={partnerTip}
+              />
+            ) : null}
+          </View>
+        ) : null}
 
-          {myTip ? (
-            <View className="gap-1 shadow-sm rounded-2xl bg-white px-4 py-4">
-              <Text className="text-[11.5px] font-medium text-accent">
-                Pour vous
-              </Text>
-              <Text className="text-[14px] leading-5 text-[#1a1a1a]">
-                {myTip}
-              </Text>
-            </View>
-          ) : null}
-
-          {partnerTip ? (
-            <View className="gap-1 shadow-sm rounded-2xl border border-[#e8e8e8] bg-white px-4 py-4">
-              <Text className="text-[11.5px] font-medium text-[#8a8a8a]">
-                {partnerName ? `Pour ${partnerName}` : 'Pour le co-parent'}
-              </Text>
-              <Text className="text-[14px] leading-5 text-[#1a1a1a]">
-                {partnerTip}
-              </Text>
-            </View>
-          ) : null}
-        </View>
+        <DashedLoopDoodle color={PINK.accent} />
       </ScrollView>
     </SafeAreaView>
   );

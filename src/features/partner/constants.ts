@@ -2,6 +2,25 @@ import type { HouseholdRole } from '@/lib/atoms/role';
 import { pickForToday } from '@/lib/date';
 
 /**
+ * Palette rose propre à « Mon partenaire » : exception voulue au thème
+ * personnel (demande explicite) — la page reste rose quel que soit le
+ * thème choisi en Réglages, là où tous les autres écrans suivent
+ * `useThemeBackground`/`useThemeAccent`. `AppTabBar` reprend `background`
+ * sous la barre quand cette route est active, pour éviter une bande d'une
+ * autre teinte en bas d'écran.
+ */
+export const PARTNER_PINK = {
+  background: '#fdf0f6',
+  blob: '#f9d9e8',
+  accent: '#d6457f',
+  soft: '#fbe1ec',
+  tag: '#fcdbe9',
+  tagText: '#c2306b',
+  line: '#f1d3e1',
+  heading: '#5b5470',
+} as const;
+
+/**
  * Astuces du jour, une par rôle. Volontairement en constante côté client et
  * non en base, contrairement à `gesture_suggestions` : il s'agit d'un
  * contenu court et figé, et une table de plus n'apporterait rien tant que

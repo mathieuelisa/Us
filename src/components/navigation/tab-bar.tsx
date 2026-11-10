@@ -17,6 +17,7 @@ import Svg, {
   Stop,
 } from 'react-native-svg';
 
+import { PARTNER_PINK } from '@/features/partner/constants';
 import { useThemeAccent, useThemeBackground } from '@/features/settings/hooks';
 import { darkenHex, hexToRgba, lightenHex } from '@/lib/color';
 
@@ -126,6 +127,16 @@ const BUBBLE_PATH =
 const BUBBLE_OVERFLOW = -BUBBLE_TOP - BAR_PADDING_Y + 14;
 
 const DOT_SIZE = 6;
+
+/**
+ * Écrans dont le fond ne suit pas le thème : sous la barre, on reprend leur
+ * fond plutôt que le pastel du thème, sinon une bande d'une autre teinte
+ * apparaît en bas d'écran. Seul « Mon partenaire » (toujours rose) pour
+ * l'instant.
+ */
+const ROUTE_BACKGROUND_OVERRIDES: Record<string, string> = {
+  partenaire: PARTNER_PINK.background,
+};
 
 const SPRING = { damping: 15, stiffness: 190, mass: 0.9 };
 
@@ -241,7 +252,9 @@ export function AppTabBar({
   return (
     <View
       style={{
-        backgroundColor: pastelBackground,
+        backgroundColor:
+          ROUTE_BACKGROUND_OVERRIDES[focusedRouteName ?? ''] ??
+          pastelBackground,
         paddingTop: BUBBLE_OVERFLOW,
       }}
     >
