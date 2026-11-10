@@ -201,3 +201,56 @@ export function DashedLoopDoodle({ color }: { color: string }) {
     </View>
   );
 }
+
+type Spark = { left: number; top: number; rotate: string };
+
+/** Trois traits en éventail vers le haut à droite (coin d'un élément). */
+export const SPARKS_TOP_RIGHT: Spark[] = [
+  { left: 4, top: 2, rotate: '20deg' },
+  { left: 12, top: 8, rotate: '50deg' },
+  { left: 16, top: 18, rotate: '80deg' },
+];
+
+/** Trois traits en éventail droit au-dessus d'un élément (\ | /). */
+export const SPARKS_ABOVE: Spark[] = [
+  { left: 2, top: 6, rotate: '-35deg' },
+  { left: 11.5, top: 2, rotate: '0deg' },
+  { left: 21, top: 6, rotate: '35deg' },
+];
+
+/**
+ * Petits traits qui « jaillissent » d'un élément actif — même motif que la
+ * bulle de la barre d'onglets. Boîte de 26 × 26 à positionner via `style`.
+ */
+export function SparkLines({
+  color,
+  sparks = SPARKS_TOP_RIGHT,
+  style,
+}: {
+  color: string;
+  sparks?: Spark[];
+  style?: object;
+}) {
+  return (
+    <View
+      pointerEvents="none"
+      style={[{ position: 'absolute', width: 26, height: 26 }, style]}
+    >
+      {sparks.map((spark) => (
+        <View
+          key={spark.rotate}
+          style={{
+            position: 'absolute',
+            left: spark.left,
+            top: spark.top,
+            width: 3.5,
+            height: 11,
+            borderRadius: 2,
+            backgroundColor: color,
+            transform: [{ rotate: spark.rotate }],
+          }}
+        />
+      ))}
+    </View>
+  );
+}
