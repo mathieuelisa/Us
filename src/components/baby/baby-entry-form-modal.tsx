@@ -12,10 +12,10 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
+import { BlobIllustration } from '@/components/ui/blob-illustration';
 import {
   GLASS_BODY_COLOR,
   GLASS_TITLE_COLOR,
-  SparkLines,
 } from '@/components/ui/glass-card';
 import {
   IconBubble,
@@ -237,7 +237,9 @@ export function BabyEntryFormModal({
             <View className="h-1.5 w-11 self-center rounded-full bg-[#e6e6ea]" />
 
             <View className="flex-row items-center gap-3.5">
-              <ModuleIllustration emoji={module.emoji} accent={accent} />
+              <BlobIllustration accent={accent}>
+                <Text style={{ fontSize: 40 }}>{module.emoji}</Text>
+              </BlobIllustration>
               <View className="flex-1 gap-1">
                 <Text
                   className="text-[21px] font-extrabold leading-[26px]"
@@ -823,58 +825,6 @@ function FieldLabel({
       >
         {label}
       </Text>
-    </View>
-  );
-}
-
-/**
- * Illustration de tête : l'emoji du module sur une tache d'accent, avec
- * feuille, cœur et petits traits — composée, faute d'illustration dédiée.
- */
-function ModuleIllustration({
-  emoji,
-  accent,
-}: {
-  emoji: string;
-  accent: string;
-}) {
-  return (
-    <View pointerEvents="none" style={{ width: 76, height: 76 }}>
-      <View
-        style={{
-          position: 'absolute',
-          inset: 0,
-          borderTopLeftRadius: 40,
-          borderTopRightRadius: 34,
-          borderBottomRightRadius: 40,
-          borderBottomLeftRadius: 30,
-          backgroundColor: hexToRgba(accent, 0.12),
-        }}
-      />
-      <Ionicons
-        name="leaf"
-        size={24}
-        color={hexToRgba(accent, 0.35)}
-        style={{
-          position: 'absolute',
-          left: 2,
-          bottom: 4,
-          transform: [{ rotate: '-30deg' }],
-        }}
-      />
-      <View className="flex-1 items-center justify-center">
-        <Text style={{ fontSize: 40 }}>{emoji}</Text>
-      </View>
-      <Ionicons
-        name="heart"
-        size={14}
-        color="#f08aa8"
-        style={{ position: 'absolute', right: 2, top: 6 }}
-      />
-      <SparkLines
-        color={hexToRgba(accent, 0.55)}
-        style={{ left: -10, top: -10, transform: [{ rotate: '-70deg' }] }}
-      />
     </View>
   );
 }

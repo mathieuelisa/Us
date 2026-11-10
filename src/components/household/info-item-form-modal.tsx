@@ -1,10 +1,16 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Button } from 'heroui-native';
 import { useEffect, useState } from 'react';
 import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import Animated, { SlideInDown, SlideOutDown } from 'react-native-reanimated';
+import Svg, { Path } from 'react-native-svg';
 
 import { PlainInput } from '@/components/plain-input';
+import { BlobIllustration } from '@/components/ui/blob-illustration';
+import {
+  GLASS_BODY_COLOR,
+  GLASS_TITLE_COLOR,
+} from '@/components/ui/glass-card';
+import { PillButton } from '@/components/ui/pill-button';
 import { WheelDatePicker } from '@/components/wheel-date-picker';
 import type { HouseholdInfoItem } from '@/features/household/api';
 import {
@@ -14,6 +20,8 @@ import {
   type InfoCategory,
   isInfoCategory,
 } from '@/features/household/constants';
+import { useThemeAccent } from '@/features/settings/hooks';
+import { hexToRgba, lightenHex } from '@/lib/color';
 import { todayIso } from '@/lib/date';
 
 /**
@@ -29,6 +37,12 @@ import { todayIso } from '@/lib/date';
  * `animationType="none"` sur `Modal` : même parti pris que
  * `AppointmentFormModal`/`HowItWorksModal`, le fond opaque apparaît
  * instantanément, seule la carte glisse.
+ *
+ * Habillage d'après une capture de référence (demande explicite) :
+ * illustration, titre souligné et sous-titre, bouton de fermeture, grille de
+ * catégories en cartes horizontales (pastille d'icône, libellé, chevron,
+ * contour d'accent à l'appui). Le formulaire reprend la même feuille et
+ * `PillButton`.
  */
 export function InfoItemFormModal({
   visible,
@@ -47,6 +61,7 @@ export function InfoItemFormModal({
     value: string;
   }) => void;
 }) {
+  const accent = useThemeAccent();
   const [category, setCategory] = useState<InfoCategory | null>(null);
   const [label, setLabel] = useState('');
   const [value, setValue] = useState('');
@@ -100,26 +115,95 @@ export function InfoItemFormModal({
         <Animated.View
           entering={SlideInDown.duration(300)}
           exiting={SlideOutDown.duration(300)}
-          className="max-h-[88%] rounded-t-3xl bg-white px-6 pb-8 pt-6"
+          className="max-h-[92%] overflow-hidden rounded-t-[32px] bg-white"
         >
+          <View
+            pointerEvents="none"
+            className="absolute inset-0 overflow-hidden"
+          >
+            <View
+              style={{
+                position: 'absolute',
+                top: -70,
+                right: -60,
+                width: 220,
+                height: 200,
+                borderRadius: 110,
+                backgroundColor: lightenHex(accent, 0.55),
+                opacity: 0.35,
+              }}
+            />
+          </View>
+
           <ScrollView
             showsVerticalScrollIndicator={false}
-            contentContainerClassName="gap-4"
+            keyboardShouldPersistTaps="handled"
+            contentContainerClassName="gap-4 px-5 pb-8 pt-2.5"
           >
+            <View className="h-1.5 w-11 self-center rounded-full bg-[#e6e6ea]" />
+
             {category === null ? (
               <>
-                <Text className="text-[18px] font-bold text-[#1a1a1a]">
-                  Que voulez-vous ajouter ?
+                <View className="flex-row items-center gap-3.5">
+                  <BlobIllustration accent={accent}>
+                    <Ionicons
+                      name="clipboard-outline"
+                      size={36}
+                      color={hexToRgba(accent, 0.85)}
+                    />
+                  </BlobIllustration>
+                  <View className="flex-1 gap-1.5">
+                    <Text
+                      className="text-[22px] font-extrabold leading-7"
+                      style={{ color: GLASS_TITLE_COLOR, letterSpacing: -0.4 }}
+                    >
+                      Que voulez-vous ajouter ?
+                    </Text>
+                    <Svg width={96} height={10} viewBox="0 0 96 10">
+                      <Path
+                        d="M3 7 C 28 2, 64 1.5, 93 4"
+                        stroke={hexToRgba(accent, 0.5)}
+                        strokeWidth={3}
+                        strokeLinecap="round"
+                        fill="none"
+                      />
+                    </Svg>
+                  </View>
+                  <CloseButton accent={accent} onPress={onCancel} />
+                </View>
+
+                <Text
+                  className="text-[13.5px] leading-[19px]"
+                  style={{ color: GLASS_BODY_COLOR }}
+                >
+                  Sélectionnez la catégorie à laquelle vous souhaitez ajouter
+                  une information.
                 </Text>
-                <View className="flex-row flex-wrap gap-2.5">
+
+                <View className="flex-row flex-wrap justify-between gap-y-2.5">
                   {INFO_CATEGORY_ORDER.map((option) => {
                     const optionMeta = INFO_CATEGORY_META[option];
                     return (
                       <Pressable
                         key={option}
                         accessibilityRole="button"
+                        accessibilityLabel={optionMeta.pickerLabel}
                         onPress={() => selectCategory(option)}
-                        className="w-[47%] gap-2.5 rounded-2xl border border-[#ececec] bg-white px-3.5 py-4"
+                        className="w-[48.5%] flex-row items-center gap-2.5 rounded-[22px] py-2.5 pl-2.5 pr-2"
+                        style={({ pressed }) => ({
+                          backgroundColor: pressed
+                            ? hexToRgba(accent, 0.06)
+                            : 'rgba(255, 255, 255, 0.95)',
+                          borderWidth: 1.5,
+                          borderColor: pressed
+                            ? hexToRgba(accent, 0.5)
+                            : 'rgba(0, 0, 0, 0.05)',
+                          shadowColor: accent,
+                          shadowOffset: { width: 0, height: 6 },
+                          shadowOpacity: 0.08,
+                          shadowRadius: 12,
+                          elevation: 2,
+                        })}
                       >
                         <View
                           className="h-10 w-10 items-center justify-center rounded-full"
@@ -131,9 +215,18 @@ export function InfoItemFormModal({
                             color={optionMeta.color}
                           />
                         </View>
-                        <Text className="text-[14px] font-medium text-[#1a1a1a]">
+                        <Text
+                          numberOfLines={2}
+                          className="flex-1 text-[13.5px] font-semibold leading-[17px]"
+                          style={{ color: GLASS_TITLE_COLOR }}
+                        >
                           {optionMeta.pickerLabel}
                         </Text>
+                        <Ionicons
+                          name="chevron-forward"
+                          size={15}
+                          color="#a8a8b3"
+                        />
                       </Pressable>
                     );
                   })}
@@ -141,10 +234,15 @@ export function InfoItemFormModal({
 
                 <Pressable
                   accessibilityRole="button"
-                  className="items-center py-1"
+                  className="mt-1 items-center"
                   onPress={onCancel}
                 >
-                  <Text className="text-[14px] text-[#6b6b6b]">Annuler</Text>
+                  <Text
+                    className="text-[14.5px] font-semibold"
+                    style={{ color: GLASS_TITLE_COLOR }}
+                  >
+                    Annuler
+                  </Text>
                 </Pressable>
               </>
             ) : (
@@ -156,19 +254,28 @@ export function InfoItemFormModal({
                       accessibilityRole="button"
                       hitSlop={8}
                       onPress={() => setCategory(null)}
+                      className="h-9 w-9 items-center justify-center rounded-full bg-[#f4f3f7]"
                     >
-                      <Text className="text-[20px] text-[#6b6b6b]">‹</Text>
+                      <Ionicons
+                        name="chevron-back"
+                        size={18}
+                        color={GLASS_TITLE_COLOR}
+                      />
                     </Pressable>
                   )}
                   <View
-                    className="h-9 w-9 items-center justify-center rounded-full"
+                    className="h-10 w-10 items-center justify-center rounded-full"
                     style={{ backgroundColor: meta?.tint }}
                   >
-                    <Ionicons name={meta?.icon} size={17} color={meta?.color} />
+                    <Ionicons name={meta?.icon} size={19} color={meta?.color} />
                   </View>
-                  <Text className="text-[17px] font-bold text-[#1a1a1a]">
+                  <Text
+                    className="flex-1 text-[18px] font-extrabold"
+                    style={{ color: GLASS_TITLE_COLOR, letterSpacing: -0.3 }}
+                  >
                     {isEditing ? 'Modifier' : 'Ajouter'} — {meta?.pickerLabel}
                   </Text>
+                  <CloseButton accent={accent} onPress={onCancel} />
                 </View>
 
                 {meta?.needsLabel ? (
@@ -251,35 +358,64 @@ export function InfoItemFormModal({
                   />
                 )}
 
-                <View className="flex-row gap-2">
-                  <Pressable
-                    accessibilityRole="button"
-                    className="flex-1 items-center justify-center rounded-full border border-[#d0d0d0] py-3"
-                    onPress={onCancel}
+                <PillButton
+                  label={
+                    isSaving
+                      ? 'Enregistrement…'
+                      : isEditing
+                        ? 'Enregistrer'
+                        : 'Ajouter'
+                  }
+                  icon={isEditing ? 'save-outline' : 'add-circle-outline'}
+                  size="compact"
+                  isDisabled={!canSubmit}
+                  onPress={submit}
+                />
+                <Pressable
+                  accessibilityRole="button"
+                  className="items-center"
+                  onPress={onCancel}
+                >
+                  <Text
+                    className="text-[14.5px] font-semibold"
+                    style={{ color: GLASS_TITLE_COLOR }}
                   >
-                    <Text className="text-[15px] font-medium text-[#1a1a1a]">
-                      Annuler
-                    </Text>
-                  </Pressable>
-                  <Button
-                    className="flex-1"
-                    isDisabled={!canSubmit}
-                    onPress={submit}
-                  >
-                    <Button.Label>
-                      {isSaving
-                        ? 'Enregistrement…'
-                        : isEditing
-                          ? 'Enregistrer'
-                          : 'Ajouter'}
-                    </Button.Label>
-                  </Button>
-                </View>
+                    Annuler
+                  </Text>
+                </Pressable>
               </>
             )}
           </ScrollView>
         </Animated.View>
       </View>
     </Modal>
+  );
+}
+
+/** Bouton de fermeture rond, en haut à droite de la feuille. */
+function CloseButton({
+  accent,
+  onPress,
+}: {
+  accent: string;
+  onPress: () => void;
+}) {
+  return (
+    <Pressable
+      accessibilityLabel="Fermer"
+      accessibilityRole="button"
+      hitSlop={8}
+      onPress={onPress}
+      className="h-9 w-9 items-center justify-center self-start rounded-full bg-white"
+      style={{
+        shadowColor: accent,
+        shadowOffset: { width: 0, height: 5 },
+        shadowOpacity: 0.14,
+        shadowRadius: 10,
+        elevation: 4,
+      }}
+    >
+      <Ionicons name="close" size={19} color={GLASS_TITLE_COLOR} />
+    </Pressable>
   );
 }
