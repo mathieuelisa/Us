@@ -49,6 +49,10 @@ const SafeAreaView = withUniwind(RNSafeAreaView);
  * `useThemeBackground`). L'appelant reste responsable de l'accorder au thème
  * actif : `/bebe` passe pour cela `useThemeBabyWallpaper()`, qui décline le
  * motif dans les quatre teintes.
+ *
+ * `header` optionnel : remplace le bloc titre + image + description par un
+ * en-tête sur mesure (`/bebe`, demande explicite d'un rendu plus moderne).
+ * `title` et `image` restent requis : le paywall s'en sert dans tous les cas.
  */
 export function PremiumLockedScreen({
   title,
@@ -58,6 +62,7 @@ export function PremiumLockedScreen({
   modules,
   gridContent,
   backgroundImage,
+  header,
 }: {
   title: string;
   image: ImageSourcePropType;
@@ -66,6 +71,7 @@ export function PremiumLockedScreen({
   modules?: { emoji: string; label: string }[];
   gridContent?: ReactNode;
   backgroundImage?: ImageSourcePropType;
+  header?: ReactNode;
 }) {
   const backgroundColor = useThemeBackground();
   const [isPaywallVisible, setIsPaywallVisible] = useState(true);
@@ -93,14 +99,24 @@ export function PremiumLockedScreen({
           <Text className="text-[17px] leading-5 text-[#1a1a1a]">‹</Text>
         </Pressable>
 
-        <Text className="text-[24px] font-bold text-[#1a1a1a]">{title}</Text>
+        {header ?? (
+          <>
+            <Text className="text-[24px] font-bold text-[#1a1a1a]">
+              {title}
+            </Text>
 
-        <View className="items-center gap-2 px-4">
-          <Image source={image} className="h-30 w-20" resizeMode="contain" />
-          <Text className="text-center text-[13.5px] leading-5 text-[#6b6b6b]">
-            {description}
-          </Text>
-        </View>
+            <View className="items-center gap-2 px-4">
+              <Image
+                source={image}
+                className="h-30 w-20"
+                resizeMode="contain"
+              />
+              <Text className="text-center text-[13.5px] leading-5 text-[#6b6b6b]">
+                {description}
+              </Text>
+            </View>
+          </>
+        )}
 
         {gridContent ?? (
           <View className="flex-row flex-wrap gap-3">
