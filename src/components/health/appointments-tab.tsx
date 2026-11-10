@@ -3,6 +3,7 @@ import { Pressable, Text, View } from 'react-native';
 
 import { AppointmentFormModal } from '@/components/health/appointment-form-modal';
 import { MonthCalendar } from '@/components/health/month-calendar';
+import { PillButton } from '@/components/ui/pill-button';
 import { formatAppointmentSummary } from '@/features/health/constants';
 import {
   useAppointments,
@@ -128,15 +129,13 @@ export function AppointmentsTab({
         )}
 
         {isPregnant ? (
-          <Pressable
-            accessibilityRole="button"
-            onPress={() => openFormFor(null)}
-            className="items-center rounded-full bg-accent py-3"
-          >
-            <Text className="text-[15px] font-medium text-accent-foreground">
-              + Ajouter un rendez-vous
-            </Text>
-          </Pressable>
+          <View className="mt-2">
+            <PillButton
+              label="Ajouter un rendez-vous"
+              icon="add-circle-outline"
+              onPress={() => openFormFor(null)}
+            />
+          </View>
         ) : null}
       </View>
 

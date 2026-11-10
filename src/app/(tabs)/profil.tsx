@@ -1,10 +1,10 @@
-import { Button } from 'heroui-native';
 import { useAtomValue } from 'jotai';
 import { useEffect, useState } from 'react';
 import { Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import { withUniwind } from 'uniwind';
 import { PlainInput } from '@/components/plain-input';
+import { PillButton } from '@/components/ui/pill-button';
 import { ScreenCornerShapes } from '@/components/ui/screen-corner-shapes';
 import { useMyProfile, useUpdateMyProfile } from '@/features/profile/hooks';
 import { useThemeBackground } from '@/features/settings/hooks';
@@ -72,16 +72,14 @@ export default function ProfileScreen() {
             autoCapitalize="words"
           />
 
-          <Button
+          <PillButton
+            label={updateProfile.isPending ? 'Enregistrement…' : 'Enregistrer'}
+            icon="save-outline"
             isDisabled={
               !hasChanges || updateProfile.isPending || firstName.trim() === ''
             }
             onPress={() => updateProfile.mutate(firstName.trim())}
-          >
-            <Button.Label>
-              {updateProfile.isPending ? 'Enregistrement…' : 'Enregistrer'}
-            </Button.Label>
-          </Button>
+          />
 
           {updateProfile.isError ? (
             <Text className="text-center text-[12.5px] text-red-600">

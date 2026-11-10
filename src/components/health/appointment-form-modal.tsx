@@ -1,4 +1,3 @@
-import { Button } from 'heroui-native';
 import { useEffect, useState } from 'react';
 import {
   Modal,
@@ -11,6 +10,7 @@ import {
 } from 'react-native';
 import Animated, { SlideInDown, SlideOutDown } from 'react-native-reanimated';
 
+import { PillButton } from '@/components/ui/pill-button';
 import { WheelDatePicker } from '@/components/wheel-date-picker';
 import { parseTimeInput } from '@/features/health/constants';
 import { todayIso } from '@/lib/date';
@@ -128,7 +128,9 @@ export function AppointmentFormModal({
               />
             </View>
 
-            <Button
+            <PillButton
+              label={isSaving ? 'Ajout en cours…' : 'Ajouter au calendrier'}
+              icon="calendar-outline"
               isDisabled={!canSubmit}
               onPress={() =>
                 onSubmit({
@@ -139,11 +141,7 @@ export function AppointmentFormModal({
                   isShared,
                 })
               }
-            >
-              <Button.Label>
-                {isSaving ? 'Ajout en cours…' : 'Ajouter au calendrier'}
-              </Button.Label>
-            </Button>
+            />
 
             <Pressable
               accessibilityRole="button"

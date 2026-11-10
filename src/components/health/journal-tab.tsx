@@ -8,6 +8,7 @@ import {
   SPARKS_ABOVE,
   SparkLines,
 } from '@/components/ui/glass-card';
+import { PillButton } from '@/components/ui/pill-button';
 import { SYMPTOM_OPTIONS } from '@/features/health/constants';
 import {
   useSaveSymptoms,
@@ -17,7 +18,7 @@ import {
 import type { Household } from '@/features/household/api';
 import { useThemeAccent } from '@/features/settings/hooks';
 import { getCurrentWeekIsoDates } from '@/features/together/api';
-import { hexToRgba, lightenHex } from '@/lib/color';
+import { hexToRgba } from '@/lib/color';
 import { todayIso } from '@/lib/date';
 
 const DAY_LETTERS = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
@@ -151,49 +152,14 @@ export function JournalTab({
       </View>
 
       <View className="gap-2">
-        <Pressable
-          accessibilityRole="button"
-          accessibilityState={{ disabled: isSaveDisabled }}
-          disabled={isSaveDisabled}
+        <PillButton
+          label={saveSymptoms.isPending ? 'Enregistrement…' : 'Enregistrer'}
+          icon="save-outline"
+          isDisabled={isSaveDisabled}
           onPress={() =>
             saveSymptoms.mutate({ logDate: selectedDate, symptoms: selected })
           }
-          style={[
-            CARD_SHADOW_TINTED(accent),
-            { opacity: isSaveDisabled ? 0.45 : 1 },
-          ]}
-          className="h-[60px] overflow-hidden rounded-full"
-        >
-          <View
-            className="flex-1 flex-row items-center justify-center gap-2.5"
-            style={{ backgroundColor: accent }}
-          >
-            {/* Reflet clair à droite, pour le volume de la capture. */}
-            <View
-              pointerEvents="none"
-              style={{
-                position: 'absolute',
-                right: -30,
-                top: -20,
-                width: 120,
-                height: 120,
-                borderRadius: 60,
-                backgroundColor: lightenHex(accent, 0.12),
-                opacity: 0.6,
-              }}
-            />
-            <Ionicons name="save-outline" size={20} color="#ffffff" />
-            <Text className="text-[17px] font-bold text-white">
-              {saveSymptoms.isPending ? 'Enregistrement…' : 'Enregistrer'}
-            </Text>
-          </View>
-        </Pressable>
-        {isSaveDisabled ? null : (
-          <SparkLines
-            color={hexToRgba(accent, 0.7)}
-            style={{ right: -6, top: -20 }}
-          />
-        )}
+        />
 
         {saveSymptoms.isError ? (
           <Text className="text-center text-[12.5px] text-red-600">
