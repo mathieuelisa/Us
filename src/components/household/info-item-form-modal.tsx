@@ -23,6 +23,7 @@ import {
 import { useThemeAccent } from '@/features/settings/hooks';
 import { hexToRgba, lightenHex } from '@/lib/color';
 import { todayIso } from '@/lib/date';
+import { formatPhoneNumber } from '@/lib/phone';
 
 /**
  * Modale à deux temps : choix de la catégorie (grille), puis formulaire
@@ -72,7 +73,11 @@ export function InfoItemFormModal({
     if (editingItem && isInfoCategory(editingItem.category)) {
       setCategory(editingItem.category);
       setLabel(editingItem.label);
-      setValue(editingItem.value ?? '');
+      setValue(
+        editingItem.category === 'phone'
+          ? formatPhoneNumber(editingItem.value ?? '')
+          : (editingItem.value ?? ''),
+      );
     } else {
       setCategory(null);
       setLabel('');
@@ -349,7 +354,11 @@ export function InfoItemFormModal({
                       setValue(
                         category === 'social_security'
                           ? formatSocialSecurityNumber(text)
-                          : text,
+                          : category === 'phone'
+                            ? // Espaces ajoutés pendant la saisie, comme
+                              // pour les contacts : « 01 89 87 72 89 ».
+                              formatPhoneNumber(text)
+                            : text,
                       )
                     }
                     keyboardType={meta?.valueKeyboardType ?? 'default'}

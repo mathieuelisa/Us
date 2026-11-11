@@ -22,6 +22,7 @@ import {
 import type { Household } from '@/features/household/api';
 import { useThemeAccent } from '@/features/settings/hooks';
 import { hexToRgba, lightenHex } from '@/lib/color';
+import { formatPhoneNumber } from '@/lib/phone';
 
 const EMERGENCY_RED = '#d64545';
 
@@ -173,7 +174,8 @@ export function ContactsTab({
             icon="call-outline"
             placeholder="Téléphone"
             value={phone}
-            onChangeText={setPhone}
+            // Espaces ajoutés pendant la saisie : « 01 89 87 72 89 ».
+            onChangeText={(text) => setPhone(formatPhoneNumber(text))}
             accent={accent}
             keyboardType="phone-pad"
           />
@@ -305,7 +307,10 @@ export function ContactsTab({
                   className="text-[13px]"
                   style={{ color: GLASS_BODY_COLOR }}
                 >
-                  {[contact.role_label, contact.phone]
+                  {[
+                    contact.role_label,
+                    contact.phone ? formatPhoneNumber(contact.phone) : null,
+                  ]
                     .filter(Boolean)
                     .join(' · ')}
                 </Text>

@@ -33,6 +33,7 @@ import { useThemeAccent, useThemeBackground } from '@/features/settings/hooks';
 import { devBypassAtom } from '@/lib/atoms/dev-bypass';
 import { hexToRgba } from '@/lib/color';
 import { shiftIsoDate, todayIso } from '@/lib/date';
+import { formatPhoneNumber } from '@/lib/phone';
 
 const SafeAreaView = withUniwind(RNSafeAreaView);
 
@@ -158,9 +159,10 @@ const HEADER_IMAGE = require('@/assets/images/Baby_said_hi.png');
 
 function displayValue(item: HouseholdInfoItem, category: InfoCategory) {
   if (!item.value) return '';
-  return INFO_CATEGORY_META[category].isDate
-    ? formatInfoDate(item.value)
-    : item.value;
+  if (INFO_CATEGORY_META[category].isDate) return formatInfoDate(item.value);
+  // Groupé par paires même pour un numéro saisi avant le formatage auto.
+  if (category === 'phone') return formatPhoneNumber(item.value);
+  return item.value;
 }
 
 /**
