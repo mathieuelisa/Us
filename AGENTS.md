@@ -49,7 +49,7 @@ bun run db:types     # régénère src/lib/supabase/database.types.ts
 ```
 
 Copier `.env.example` en `.env` et renseigner les clés Supabase avant de
-tester l'auth (magic link) ou toute requête réseau — voir
+tester l'auth (email + mot de passe, Google) ou toute requête réseau — voir
 [`DOCS/04-ARCHITECTURE.md`](./DOCS/04-ARCHITECTURE.md#supabase--points-de-vigilance).
 
 ## Périmètre

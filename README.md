@@ -72,9 +72,15 @@ bunx supabase db push
 bun run db:types
 ```
 
+## Connexion
+
+On se connecte par **email + mot de passe** ou **Google** (à activer dans
+le dashboard Supabase). Les réglages Auth à faire côté Supabase sont listés
+dans [`DOCS/04-ARCHITECTURE.md`](./DOCS/04-ARCHITECTURE.md#connexion--email--mot-de-passe-google).
+
 ## Tester sans compte
 
-Tant que le retour du lien magique n'est pas fiable, l'écran de connexion
+Tant que le SMTP n'est pas configuré, l'écran de connexion
 propose en développement un bouton **« DEV — passer à l'onboarding sans
 connexion »** : il permet de parcourir l'onboarding puis toute l'app sans
 session ni foyer réel (rien n'est écrit en base, tout est perdu au

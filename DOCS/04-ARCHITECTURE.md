@@ -119,7 +119,7 @@ modale.
 src/
   app/
     _layout.tsx              # AuthGate : connexion → onboarding → app (Stack.Protected)
-    (auth)/login.tsx         # 1a — lien magique (+ bouton DEV, cf. dette n°1)
+    (auth)/login.tsx         # 1a — connexion/inscription email + mot de passe, Google (+ bouton DEV, cf. dette n°1)
     (onboarding)/            # bienvenue (4 slides) → index (1/6 accompagnement)
                              # → prenoms (2/6) → bebe (3/6 date de terme)
                              # → statut (4/6) → priorites (5/6) → rappels (6/6)
@@ -136,14 +136,14 @@ src/
       legal.tsx              # depuis Réglages
   components/                # par domaine : baby, birth, health, household,
                              # hub, navigation, onboarding, organisation,
-                             # procedures, together, ui
+                             # procedures, settings, together, ui
   features/<domaine>/        # api.ts (appels Supabase), hooks.ts (TanStack
                              # Query), constants.ts (catalogues, formatage)
-                             # domaines : baby, birth, health, household, hub,
-                             # onboarding, organisation, partner, procedures,
-                             # profile, settings, together
+                             # domaines : auth, baby, birth, health, household,
+                             # hub, onboarding, organisation, partner,
+                             # procedures, profile, settings, together
   lib/
-    supabase/                # client, magic-link, database.types.ts
+    supabase/                # client, auth-redirect (retours d'Auth par URL), database.types.ts
     query/                   # queryClient, keys.ts (une clé par domaine)
     atoms/                   # session, role, onboarding (brouillon), dev-bypass
     date.ts color.ts         # dates ISO locales, helpers de couleur
@@ -162,28 +162,28 @@ filer bord à bord (`exercice.tsx`, une route).
 | `/` | Hub : salutation, « J'ai accouché », humeur du partenaire ou invitation, bloc « Aujourd'hui », 3 piliers + Organisation, teaser « Votre bébé », « Mon partenaire », « Nos prochains rendez-vous » | `households`, `mood_checkins`, `household_procedures`, `appointments`, `symptoms_log` | « J'ai accouché » réservé à la personne enceinte |
 | `/demarches` | Liste par mois de grossesse (ouverte sur le mois en cours) + détail | `procedure_templates`, `household_procedures` | Aucune |
 | `/ensemble` | Check-in humeur, besoin, semaine, geste du jour | `mood_checkins`, `gesture_suggestions` | Écran symétrique (dette n°22) |
-| `/sante?tab=` | Journal, Rendez-vous, Contacts, Exercices | `symptoms_log`, `appointments`, `contacts`, catalogue client | Journal absent pour le co-parent ; rendez-vous non partagés filtrés par RLS |
+| `/sante?tab=` | Journal, Rendez-vous, Contacts, Exercices | `symptoms_log`, `appointments`, `contacts`, catalogue client | Journal absent pour le co-parent ; les deux parents créent des rendez-vous, chacun voit les siens + ceux que l'autre a partagés (RLS) |
 | `/exercice?slug=` | Fiche d'exercice illustrée | `EXERCISE_CATALOG` (client) | Aucune |
 | `/organisation` | Valise de maternité, valise en salle de naissance (Maman/Bébé/Co-parent + articles personnalisés), teaser « Le match des prénoms » | `household_checklist_items`, `household_custom_checklist_items` | Sous-section Co-parent masquée si « Seul·e » |
 | `/partenaire` | Humeur du partenaire, taille du bébé, astuces | `mood_checkins`, `baby_size_by_week` | Vue personne enceinte seulement (dette n°26) |
 | `/naissance` | 7a — déclaration de naissance | `households.birth_date` | Personne enceinte |
 | `/informations` | Informations importantes par catégorie | `household_info_items` | Aucune (les deux lisent et écrivent) |
-| `/profil`, `/reglages`, `/legal` | Prénom, thème, liens légaux | `profiles` | Personnel |
+| `/profil`, `/reglages`, `/legal` | Prénom, thème, compte (email, mot de passe, suppression), liens légaux | `profiles`, Auth, Edge Function `delete-account` | Personnel |
 | `/bebe`, `/bebe-*`, `/prenoms`, `/premium` | Vitrine premium (paywall inerte) ; suivis bébé en état local | aucune | Dette n°53 |
 
 ## Mode contournement DEV et données fictives
 
-Le retour du lien magique dans l'app n'étant pas encore fiable (dette n°6 et
-n°8), un **mode contournement** (`devBypassAtom`, `__DEV__` uniquement) permet
+Faute de SMTP configuré (dette n°8) et de comptes de test, un **mode contournement** (`devBypassAtom`, `__DEV__` uniquement) permet
 de parcourir l'onboarding puis l'app sans session. Sans foyer réel, plusieurs
 écrans s'appuient sur des fixtures ou des atomes dédiés : démarches et
 checklists (`dev-fixture.ts`), prénom, type d'accompagnement et date de terme
 saisis à l'onboarding (`devBypass*Atom`). Tout ce qui est modifié dans ce mode
 reste en mémoire et disparaît au rechargement de la page.
 
-À ne pas confondre avec les **données fictives de rendu** (`MOCK_APPOINTMENTS`
-du hub, `MOCK_INFO_ITEMS` des Informations), affichées dès qu'une liste est
-vide, **y compris hors mode DEV** — à retirer avant production (dette n°48).
+Les **données fictives de rendu** (`MOCK_APPOINTMENTS` du hub,
+`MOCK_INFO_ITEMS` des Informations) ne s'affichent plus qu'en mode
+contournement : un vrai foyer sans données voit un état vide (corrigé le
+2026-11-11). Elles disparaîtront avec le mode contournement.
 
 ## Supabase — points de vigilance
 
@@ -193,34 +193,57 @@ vide, **y compris hors mode DEV** — à retirer avant production (dette n°48).
 - **Types générés** : `bun run db:types` génère depuis le projet **lié** (`--linked`), `bun run db:types:local` depuis le stack local (`bun run db:start`, requiert Docker). Régénérer après chaque `db push`, jamais éditer `database.types.ts` à la main.
 - **CLI** : `supabase/config.toml` posé en Phase 0 via `supabase init`. Le projet Supabase cloud existe (`EXPO_PUBLIC_SUPABASE_URL` / `EXPO_PUBLIC_SUPABASE_KEY` dans `.env`, jamais commité — `.env.example` ne contient que des placeholders). Sans ces variables, `src/lib/supabase/client.ts` fonctionne quand même avec des valeurs placeholder (l'app se lance, les appels Supabase échouent proprement).
 
-### Liens magiques — redirection et deep links
+### Connexion — email + mot de passe, Google
 
-Le lien magique doit ramener l'utilisateur **dans l'app**, ce qui suppose
-deux réglages qui n'ont rien d'automatique :
+Depuis le 2026-11-11, on se connecte par **email + mot de passe** ou par
+**Google** ; le lien magique est abandonné. Tout passe par
+`src/features/auth/api.ts` (connexion, inscription, mot de passe oublié,
+Google, changement de mot de passe, suppression du compte, messages
+d'erreur en français). La session ouverte est captée par
+`onAuthStateChange` dans le layout racine, qui route seul vers
+l'onboarding (pas encore de foyer) ou le hub.
 
-1. **Côté app** : `signInWithOtp` passe systématiquement `emailRedirectTo`,
-   calculé par `getAuthRedirectTo()` (`src/lib/supabase/magic-link.ts`) —
+Trois parcours ramènent encore l'utilisateur dans l'app par une URL
+portant ses jetons — retour de Google, lien de confirmation d'email, lien
+de réinitialisation du mot de passe. Ils supposent deux réglages :
+
+1. **Côté app** : `emailRedirectTo` / `redirectTo` sont calculés par
+   `getAuthRedirectTo()` (`src/lib/supabase/auth-redirect.ts`) —
    l'origine courante en web, un deep link `Linking.createURL('/')` en
-   natif. Sans ce paramètre, Supabase retombe sur le `Site URL` du projet.
-2. **Côté Supabase** (`Authentication > URL Configuration`) :
+   natif. La récupération de session vit dans le même module :
+   `initialSessionRecovery` (app **ouverte par** l'URL) et
+   `useAuthRedirectListener()` (app **déjà lancée**). Les jetons arrivent
+   dans le fragment `#` (flux « implicit » du client). En natif, Google
+   s'ouvre dans une session de navigateur dédiée
+   (`WebBrowser.openAuthSessionAsync`) et la session est créée à partir de
+   l'URL de retour.
+2. **Côté Supabase** (dashboard — **le MCP Supabase ne donne pas accès aux
+   réglages Auth**) :
 
    | Réglage | Valeur |
    |---|---|
+   | Providers → Email | Activé, avec mot de passe. « Confirm email » activé (sinon n'importe qui peut s'inscrire avec une adresse qui n'est pas la sienne) |
+   | Providers → Google | À activer : identifiants OAuth créés dans Google Cloud, URL de rappel `https://hsclyntlnoyevstdhgvu.supabase.co/auth/v1/callback` |
    | Site URL | `us://` |
    | Redirect URLs | `us://**`, `exp://**`, `exp+us://**`, `http://localhost:8081/**` |
+   | Password security | Longueur minimale 8 (l'app l'impose déjà), protection contre les mots de passe compromis si l'offre le permet |
 
-   ⚠️ Les trois dernières entrées servent **au développement** (Expo Go,
-   build de dev, web local). Elles élargissent la surface d'open-redirect
-   et sont **à retirer avant la mise en production**.
+   ⚠️ Les trois dernières Redirect URLs servent **au développement** (Expo
+   Go, build de dev, web local) et sont **à retirer avant la mise en
+   production**. Toute URL non listée est refusée silencieusement — le
+   symptôme est un lien qui n'ouvre pas l'app.
 
-Toute URL non listée est refusée par Supabase, silencieusement du point de
-vue de l'utilisateur — le symptôme est un lien qui n'ouvre pas l'app.
+**Co-parent** : l'invitation n'envoie plus d'email ; elle enregistre
+l'adresse dans `household_invites`. Le co-parent s'inscrit avec cette
+adresse et `accept_household_invite()` le rattache — seulement si son
+email est **confirmé** (`auth.users.email_confirmed_at`), seule preuve
+qu'il possède l'adresse.
 
-La récupération de session est traitée dans le même module, avec deux
-chemins distincts : `initialSessionRecovery` (app **ouverte par** le lien —
-fragment d'URL en web, `getInitialURL()` en natif) et
-`useMagicLinkListener()` (app **déjà lancée**, cas courant sur mobile).
-Les jetons arrivent dans le fragment `#`, jamais dans la query string.
+**Suppression du compte** : Edge Function `delete-account`
+(`supabase/functions/delete-account/`, `verify_jwt` activé) appelée depuis
+Réglages. Elle supprime toujours l'appelant, jamais un autre compte ; les
+données suivent par cascade (tout le foyer si c'est la personne enceinte,
+seulement ses propres données si c'est le co-parent).
 
 ### Stratégie de synchronisation temps réel (décision Phase 0)
 

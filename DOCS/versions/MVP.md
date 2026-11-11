@@ -17,7 +17,7 @@ Correspondance avec les sections du [Design Overview](../01-DESIGN-OVERVIEW.md#c
 
 | Inclus | Section design | Détail |
 |---|---|---|
-| ✅ | 1 — Onboarding | Connexion par magic link (Supabase Auth), 6 étapes complètes, écran de réassurance sociale |
+| ✅ | 1 — Onboarding | Connexion par email + mot de passe ou Google (Supabase Auth — le lien magique a été abandonné le 2026-11-11), 6 étapes complètes, écran de réassurance sociale |
 | ⚠️ | 1g — Paywall | Écran affiché tel quel, mais **bouton "Débloquer" désactivé / "bientôt disponible"** — pas d'intégration paiement en MVP |
 | ✅ | 2 — Hub post-onboarding | Hub complet, invitation partenaire (email/téléphone → lien de rattachement au household) |
 | ✅ | 3 — Pilier Ensemble | Check-in humeur, historique 7j, overlay "besoin de...", geste du jour, profil, infos importantes |
@@ -27,7 +27,7 @@ Correspondance avec les sections du [Design Overview](../01-DESIGN-OVERVIEW.md#c
 | ✅ | 7 — Déclaration de naissance | Formulaire + recalcul des échéances de démarches |
 | ❌ | 8 — Votre bébé (premium) | **Hors MVP** — écran d'accès affiché comme "verrouillé", contenu réel reporté à [V1](./V1.md). ⚠️ Écart actuel : les 4 écrans de suivi existent et s'ouvrent sans payer, sans persistance ([dette n°53](../05-DETTE-ET-POINTS-OUVERTS.md)) |
 | ⚠️ | 9 — Demande d'avis | Bannière + note 5 étoiles, sans intégration store review native (juste stockage du feedback). **Pas encore construit** (table `app_feedback` seule) |
-| ⚠️ | 10 — Réglages | Compte, langue FR uniquement, infos importantes, aide & support, légal. **Thème sombre et couleur d'accent hors MVP**. Construit : 4 thèmes prédéfinis, liens légaux (textes non rédigés), déconnexion |
+| ⚠️ | 10 — Réglages | Compte, langue FR uniquement, infos importantes, aide & support, légal. **Thème sombre et couleur d'accent hors MVP**. Construit : compte (email, changement de mot de passe, suppression du compte), 4 thèmes prédéfinis, liens légaux (textes non rédigés), déconnexion |
 | ➕ | Hors design — Organisation & Préparation | Valises de maternité et de salle de naissance à cocher à deux, articles personnalisés (ajout sur demande explicite, cf. [plan d'action](../02-ACTION-PLAN.md#ajouts-hors-plan-août--novembre-2026)) |
 
 ## Hors périmètre explicite (reporté)
@@ -47,9 +47,9 @@ Correspondance avec les sections du [Design Overview](../01-DESIGN-OVERVIEW.md#c
       réels une fois un SMTP configuré*
 - [ ] Les 3 piliers gratuits sont fonctionnels avec persistance Supabase (pas de mock)
       — *écrans construits, mais toute la vérification s'est faite en mode
-      contournement DEV ; le hub et les Informations affichent encore des
-      données fictives quand une liste est vide (dette n°48) et deux
-      migrations manquent sur le cloud (dette n°49)*
+      contournement DEV. Base à jour et exemples fictifs limités au mode
+      DEV depuis le 2026-11-11 ; reste à tester avec deux vrais comptes
+      (dette n°5)*
 - [ ] La déclaration de naissance recalcule correctement les échéances de démarches
 - [ ] RLS Supabase vérifiée sur toutes les tables (un household ne voit jamais les données d'un autre)
 - [ ] Testé sur iOS et Android (Expo), pas seulement en simulateur

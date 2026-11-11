@@ -46,14 +46,29 @@ bun run db:types                                       # régénère database.ty
 
 ## État sur le projet cloud
 
-Vérifié le 2026-11-11 (liste des migrations appliquées au projet Paris) :
-**toutes les migrations jusqu'à `20260814120000` sont appliquées, les deux
-suivantes ne le sont pas** (marquées ⏳ dans le catalogue). Tant qu'elles ne
-sont pas poussées, l'ajout d'un groupe sanguin et celui d'un article
-personnalisé dans les valises échouent côté serveur — cf.
-[dette n°49](../05-DETTE-ET-POINTS-OUVERTS.md). Le linter de sécurité
-Supabase signale aussi des fonctions `SECURITY DEFINER` exécutables via
-l'API (dette n°50).
+Vérifié le 2026-11-11 après mise à jour : **toutes les migrations du dépôt
+sont appliquées** sur le projet Paris, avec les mêmes numéros de version
+(`supabase migration list` doit montrer deux colonnes identiques). Les
+migrations ont été appliquées via le MCP Supabase, qui attribue sa propre
+version : elle a ensuite été recalée sur le nom du fichier dans
+`supabase_migrations.schema_migrations`. À refaire à chaque application
+par le MCP, sinon `db push` tentera de rejouer la migration.
+
+Linter de sécurité après mise à jour : il ne reste que les avertissements
+attendus sur `is_household_member`, `household_role` (utilisées par les
+policies) et `accept_household_invite` (porte d'entrée du co-parent),
+exécutables par `authenticated` seulement, et la protection contre les
+mots de passe compromis (réglage Auth du dashboard).
+
+## Edge Functions
+
+| Fonction | Rôle |
+|---|---|
+| [`delete-account`](../../supabase/functions/delete-account/index.ts) | Supprime le compte de l'appelant (Réglages → « Supprimer mon compte »). `verify_jwt` activé, aucun paramètre : impossible de viser un autre compte. Les données suivent par cascade |
+
+Déploiement : MCP Supabase (`deploy_edge_function`) ou
+`bunx supabase functions deploy delete-account`. Le dossier
+`supabase/functions/` est exclu du typecheck de l'app (code Deno).
 
 ## Catalogue
 
@@ -81,8 +96,12 @@ l'API (dette n°50).
 | [`20260814100000_checklist_categories.sql`](../../supabase/migrations/20260814100000_checklist_categories.sql) | `checklist_item_templates` | "La Valise de maternité" se décline en 3 sous-sections Maman/Bébé/Co-parent (colonne `category` nullable — "sac-naissance" reste une liste plate) |
 | [`20260814110000_sac_naissance_categories.sql`](../../supabase/migrations/20260814110000_sac_naissance_categories.sql) | `checklist_item_templates` | Même déclinaison Maman/Bébé/Co-parent pour « La valise en salle de naissance » (ex « Le sac en salle d'accouchement », renommage client uniquement) |
 | [`20260814120000_household_info_items_category.sql`](../../supabase/migrations/20260814120000_household_info_items_category.sql) | `household_info_items` | Ajoute `category` (téléphone/adresse/date/allergie/n° sécurité sociale/point de vigilance) pour que l'écran "Informations importantes" affiche une icône et un formulaire dédiés par type plutôt qu'une liste libellé/valeur générique. RLS déjà couvert par la policy table-level existante — pas de nouvelle policy |
-| ⏳ [`20260814130000_household_info_items_blood_type.sql`](../../supabase/migrations/20260814130000_household_info_items_blood_type.sql) | `household_info_items` | Ajoute la catégorie `blood_type` (groupe sanguin) à la contrainte `category`. Même policy table-level, pas de nouvelle policy. **Non appliquée sur le cloud** |
-| ⏳ [`20260829120000_household_custom_checklist_items.sql`](../../supabase/migrations/20260829120000_household_custom_checklist_items.sql) | `household_custom_checklist_items` | Articles ajoutés par le foyer aux valises (« Ajouter un article »). Table à part pour que le catalogue `household_checklist_items` reste écrit uniquement par trigger ; RLS select/insert/update/delete réservée aux membres du foyer, sans règle par rôle. **Non appliquée sur le cloud** |
+| [`20260814130000_household_info_items_blood_type.sql`](../../supabase/migrations/20260814130000_household_info_items_blood_type.sql) | `household_info_items` | Ajoute la catégorie `blood_type` (groupe sanguin) à la contrainte `category`. Même policy table-level, pas de nouvelle policy |
+| [`20260829120000_household_custom_checklist_items.sql`](../../supabase/migrations/20260829120000_household_custom_checklist_items.sql) | `household_custom_checklist_items` | Articles ajoutés par le foyer aux valises (« Ajouter un article »). Table à part pour que le catalogue `household_checklist_items` reste écrit uniquement par trigger ; RLS select/insert/update/delete réservée aux membres du foyer, sans règle par rôle |
+| [`20261111120000_security_hardening.sql`](../../supabase/migrations/20261111120000_security_hardening.sql) | fonctions | Retire le droit d'exécution via l'API aux fonctions de trigger, et à `anon` sur les fonctions des policies. `accept_household_invite()` exige désormais un **email confirmé** : avec la connexion par mot de passe, s'inscrire avec l'adresse invitée ne prouve plus qu'on la possède |
+| [`20261111120100_appointments_both_parents.sql`](../../supabase/migrations/20261111120100_appointments_both_parents.sql) | `appointments` | Les deux parents créent des rendez-vous. Lecture : membre du foyer et (créateur ou partagé) ; modification et suppression : le créateur seul. Policies réécrites par `alter policy` (sans suppression) + index `(household_id, appointment_date)` |
+| [`20261111120200_procedure_templates_pregnancy_month.sql`](../../supabase/migrations/20261111120200_procedure_templates_pregnancy_month.sql) | `procedure_templates` | Ajoute `pregnancy_month` (1-9) et le renseigne pour les 8 démarches — la correspondance vivait dans le code |
+| [`20261111120300_gesture_suggestions_emoji.sql`](../../supabase/migrations/20261111120300_gesture_suggestions_emoji.sql) | `gesture_suggestions` | Ajoute `emoji` et le renseigne pour les 8 gestes — il était retrouvé par correspondance exacte du texte |
 
 ## Décisions de modélisation
 

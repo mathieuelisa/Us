@@ -21,6 +21,10 @@ title: Plan d'action Supabase — US
 | D1 | Le premium s'achète par personne ou par foyer ? | **Par foyer** : un achat débloque les deux parents. Le droit est porté par le foyer, pas par le compte. |
 | D2 | Exercices et astuces du jour passent-ils en base pour le MVP ? | **Non, plus tard.** Le catalogue d'exercices (`EXERCISE_CATALOG`) et les astuces restent dans l'app pour l'instant. Le passage en base (et les illustrations dans Storage) est repoussé au [lot 6](#lot-6--plus-tard). |
 | D3 | Le co-parent peut-il créer des rendez-vous ? | **Oui.** Les deux parents créent des rendez-vous. Voir [lot 3](#lot-3--compléments-mvp) pour la règle de visibilité qui en découle. |
+| D4 | Qui voit un rendez-vous non partagé ? | **Son créateur seul**, quel que soit son rôle. Seul le créateur modifie ou supprime. |
+| D5 | Comment se connecte-t-on ? | **Email + mot de passe, ou Google.** Le lien magique est abandonné (écart avec CONCEPT.md, dette n°58). |
+| D6 | Que fait l'invitation du co-parent sans lien magique ? | **Elle enregistre l'adresse, sans email.** Le co-parent s'inscrit avec cette adresse et rejoint le foyer une fois son email confirmé. |
+| D7 | Que contient le compte dans Réglages ? | Email et moyen de connexion, **changement de mot de passe**, **suppression du compte**. |
 
 ## Principes
 
@@ -38,7 +42,29 @@ title: Plan d'action Supabase — US
   sécurité Supabase sans avertissement et tests RLS au vert avant chaque
   livraison.
 
-## État des lieux (2026-11-11)
+## Fait le 2026-11-11
+
+- Les 2 migrations en retard appliquées, plus 4 nouvelles : durcissement de
+  sécurité (dont email confirmé exigé pour rejoindre un foyer), rendez-vous
+  créés par les deux parents (D3, D4), mois de grossesse des démarches,
+  émoji des gestes. Versions recalées : dépôt et cloud identiques.
+- Types régénérés depuis le cloud, code de l'app adapté (Démarches,
+  Ensemble, Rendez-vous, invitation sans email, exemples fictifs limités
+  au mode DEV, état vide des Informations).
+- Connexion/inscription par email + mot de passe et Google, mot de passe
+  oublié, section Compte des Réglages (D5, D7).
+- Edge Function `delete-account` déployée.
+- Vérifié : règles des rendez-vous et rattachement du co-parent par
+  simulation SQL annulée ; advisors de sécurité propres hors exceptions
+  voulues ; fonction de suppression refusant un appel sans session.
+
+**Reste à faire dans le dashboard** (le MCP Supabase n'a pas accès aux
+réglages Auth) : activer Google (identifiants OAuth Google Cloud),
+vérifier « Confirm email » et la longueur minimale des mots de passe (8),
+activer si possible la protection contre les mots de passe compromis,
+configurer le SMTP. Détail dans l'[architecture](./04-ARCHITECTURE.md#connexion--email--mot-de-passe-google).
+
+## État des lieux (avant la mise à jour du 2026-11-11)
 
 | Élément | État |
 |---|---|
@@ -72,13 +98,13 @@ Les lots 1 et 2 peuvent avancer en parallèle une fois le lot 0 fait.
 Objectif : que la base en ligne corresponde au dépôt et ne présente plus
 d'avertissement de sécurité. Petit, mais tout le reste en dépend.
 
-- [ ] **Appliquer les 2 migrations manquantes** (`bunx supabase db push`) :
+- [x] **Appliquer les 2 migrations manquantes** (`bunx supabase db push`) :
       `20260814130000_household_info_items_blood_type` et
       `20260829120000_household_custom_checklist_items`. Vérifier ensuite
       avec `bunx supabase migration list`. → dette n°49
-- [ ] **Régénérer les types** (`bun run db:types`) et vérifier que le diff
+- [x] **Régénérer les types** (`bun run db:types`) et vérifier que le diff
       est vide ou attendu.
-- [ ] **Durcir les fonctions `SECURITY DEFINER`** (nouvelle migration) →
+- [x] **Durcir les fonctions `SECURITY DEFINER`** (nouvelle migration) →
       dette n°50 :
   - `revoke execute ... from public, anon, authenticated` sur les fonctions
     de trigger : `handle_new_user`, `create_default_household_procedures`,
@@ -93,8 +119,10 @@ d'avertissement de sécurité. Petit, mais tout le reste en dépend.
     session, mais à couvrir par les tests du lot 2 ;
   - relancer les advisors de sécurité : il ne doit rester que
     l'avertissement voulu sur `accept_household_invite` (porte d'entrée
-    documentée du co-parent) et celui sur les mots de passe compromis, sans
-    objet tant que la connexion se fait par lien magique.
+    documentée du co-parent), ceux sur `is_household_member` /
+    `household_role` (nécessaires aux policies) et celui sur les mots de
+    passe compromis — **à traiter** depuis le passage au mot de passe
+    (réglage du dashboard).
 - [ ] **Supprimer l'ancien projet de Londres** et renommer « US app (Paris) »
       en « US app ». → dette n°4
 - [ ] **Vérification CI des types** : ajouter une étape qui échoue si
@@ -115,25 +143,30 @@ puissent enfin l'être.
       UE, 300 emails/jour gratuits) — nécessite un nom de domaine pour
       SPF/DKIM. Débloque l'envoi réel des liens et des invitations.
       → dette n°8
-- [ ] **Modèles d'email en français** (connexion, invitation), au ton de
-      l'app. → dette n°9
+- [ ] **Modèles d'email en français** (confirmation d'inscription,
+      réinitialisation du mot de passe), au ton de l'app. → dette n°9
+- [ ] **Réglages Auth du dashboard** : activer Google (dette n°56),
+      vérifier « Confirm email » et la longueur minimale (8), protection
+      contre les mots de passe compromis.
 - [ ] **Jeu de données local** (`supabase/seed.sql`) pour le Supabase local :
       deux comptes de test (personne enceinte, co-parent), un foyer complet
       avec date de terme, quelques humeurs, symptômes, rendez-vous (partagés
       et non partagés), contacts et informations. Permet de tester chaque
       rôle sans email ni contournement.
-- [ ] **Retirer les données fictives de l'app** (`MOCK_APPOINTMENTS`,
+- [x] **Retirer les données fictives de l'app** (`MOCK_APPOINTMENTS`,
       `MOCK_INFO_ITEMS`) au profit de vrais états vides — sans quoi un
       foyer réel verrait de faux rendez-vous et un faux groupe sanguin.
-      Changement côté app, mais préalable à tout test réel. → dette n°48
+      Changement côté app, mais préalable à tout test réel. Fait : elles ne
+      s'affichent plus qu'en mode contournement DEV.
 - [ ] **Parcours de bout en bout sur le cloud**, avec deux vrais comptes :
       inscription, onboarding, création du foyer (vérifier que les triggers
       ont bien créé 8 démarches et les articles de valise), invitation,
       rattachement du co-parent, puis une écriture dans chaque pilier
       (humeur, symptôme, rendez-vous, démarche, valise, information,
       déclaration de naissance). Noter chaque résultat dans la dette.
-- [ ] **Retour du lien magique dans l'app** testé depuis un simulateur et un
-      appareil réel. → dette n°6
+- [ ] **Retours d'Auth par URL** (Google, confirmation d'email,
+      réinitialisation) testés depuis un simulateur et un appareil réel.
+      → dette n°6
 - [ ] **Retirer le mode contournement DEV** une fois ce parcours validé.
       → dette n°1
 
@@ -174,32 +207,33 @@ Objectif : combler ce qui manque côté serveur pour les critères de sortie du
 
 ### Rendez-vous créés par les deux parents (D3)
 
-Aujourd'hui, seule la personne enceinte crée, modifie et supprime ; elle voit
-tout, le co-parent ne voit que les rendez-vous partagés. Avec D3, la règle
-proposée est **symétrique** :
+Avant le 2026-11-11, seule la personne enceinte créait, modifiait et
+supprimait ; elle voyait tout, le co-parent ne voyait que les rendez-vous
+partagés. Règle en place depuis (D3, D4), **symétrique** :
 
-| Action | Règle proposée |
+| Action | Règle |
 |---|---|
 | Lire | Membre du foyer **et** (créateur du rendez-vous **ou** rendez-vous partagé) |
 | Créer | Membre du foyer, `created_by` = soi-même |
 | Modifier / supprimer | Le créateur seulement |
 
-⚠️ **À confirmer** : avec cette règle, la personne enceinte **ne voit plus**
-les rendez-vous non partagés du co-parent (aujourd'hui, elle voit tout ce
-qui existe — mais seule elle pouvait créer). C'est la lecture la plus
-cohérente de « non partagé ». Si la personne enceinte doit tout voir, la
-règle de lecture devient : rôle enceinte **ou** créateur **ou** partagé.
+La personne enceinte ne voit donc plus les rendez-vous non partagés du
+co-parent (choix confirmé, D4).
 
-- [ ] Migration : remplacer les 4 policies `appointments_*` par les
-      nouvelles règles.
-- [ ] App : afficher le formulaire et le bouton d'ajout aux deux rôles
-      (`appointments-tab.tsx`, aujourd'hui réservé à `isPregnant`).
+- [x] Migration `20261111120100_appointments_both_parents` (policies
+      réécrites par `alter policy`, sans suppression).
+- [x] App : formulaire et bouton d'ajout pour les deux rôles ; croix de
+      suppression et badge « Partagé / Non partagé » sur ses propres
+      rendez-vous, badge « De votre co-parent » sur ceux de l'autre.
 - [ ] App : **modification d'un rendez-vous** — la policy de mise à jour
       existe déjà, il ne manque que l'écran. → dette n°30
 - [ ] Tests RLS du lot 2 mis à jour.
 
 ### Invitation du co-parent après l'onboarding
 
+- [x] L'invitation n'envoie plus d'email (D6) : elle enregistre l'adresse,
+      le co-parent s'inscrit avec. `accept_household_invite()` exige un
+      email confirmé.
 - [ ] Permettre d'envoyer ou de renvoyer l'invitation depuis le hub (bouton
       « Ajouter le co-parent ») : la table `household_invites` et
       `invitePartner()` existent, il manque le point d'entrée. → dette n°31
@@ -226,19 +260,19 @@ règle de lecture devient : rôle enceinte **ou** créateur **ou** partagé.
 
 ### Suppression de compte
 
-- [ ] Edge Function `delete-account` (clé de service, jamais dans l'app) :
-      supprime l'utilisateur d'Auth ; les cascades existantes suppriment
-      ses données personnelles. **À trancher** : que devient le foyer quand
-      un des deux parents part (le garder pour l'autre, en retirant ses
-      données personnelles) ? Obligatoire pour la publication sur
-      l'App Store.
+- [x] Edge Function `delete-account` (clé de service, jamais dans l'app),
+      déployée le 2026-11-11, appelée depuis Réglages avec une
+      confirmation qui explique les conséquences.
+- [ ] **À trancher** : aujourd'hui, supprimer le compte de la personne
+      enceinte supprime tout le foyer, co-parent compris (cascade) ; faut-il
+      plutôt le transférer au co-parent ? → dette n°59
 
 ### Nettoyage du schéma
 
-- [ ] `procedure_templates.pregnancy_month` : sortir du code la
+- [x] `procedure_templates.pregnancy_month` : sortir du code la
       correspondance démarche → mois (`PROCEDURE_PREGNANCY_MONTH`).
-- [ ] `gesture_suggestions.emoji` : remplacer l'association par texte
-      exact. → dette n°24
+- [x] `gesture_suggestions.emoji` : remplacer l'association par texte
+      exact.
 - [ ] `baby_size_by_week` : compléter les semaines manquantes (aujourd'hui
       9 lignes, une toutes les 4 semaines).
 - [ ] Décider du sort de `contacts.role_label` (plus rempli depuis le retrait

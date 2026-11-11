@@ -244,7 +244,9 @@ par onglet** :
   enceinte peut décocher au cas par cas si un rendez-vous doit rester
   personnel (écart avec le choix initial « non partagé », demande
   explicite). Depuis le 2026-11-11, la création refuse une date passée
-  (molette bornée à aujourd'hui, `minDate`).
+  (molette bornée à aujourd'hui, `minDate`), et **les deux parents créent
+  des rendez-vous** : chacun voit les siens et ceux que l'autre a
+  partagés, seul le créateur supprime (RLS `appointments_*`, réécrites).
 - [x] **Contacts** — visible et modifiable par les deux, réorganisable.
   Boutons haut/bas plutôt qu'un vrai glisser-déposer (cf.
   [05](./05-DETTE-ET-POINTS-OUVERTS.md) n° 12). Formulaire d'ajout limité
@@ -336,7 +338,7 @@ partenaire » (dette n°26).
       paragraphe de contexte, pas un mode d'emploi pas-à-pas.
 
 - [x] **Classement par mois de grossesse** (ajout, demande explicite) :
-      chaque démarche est rattachée à un mois (`PROCEDURE_PREGNANCY_MONTH`
+      chaque démarche est rattachée à un mois (`procedure_templates.pregnancy_month`
       — mode de garde au 3ᵉ, assurance habitation au 5ᵉ, sécurité sociale
       au 6ᵉ, impôts au 7ᵉ, les 4 autres au 9ᵉ) et la liste se lit mois par
       mois, en pastilles « N / mois ».
@@ -486,6 +488,16 @@ le plan.
 - [x] **Dates passées interdites** (2026-11-11) : la date de terme de
       l'onboarding (étape 3) et la date d'un nouveau rendez-vous ne peuvent
       plus être antérieures à aujourd'hui (`WheelDatePicker` `minDate`).
+- [x] **Connexion par email + mot de passe ou Google** (2026-11-11) :
+      remplace le lien magique (écart avec CONCEPT.md, dette n°58).
+      Connexion, inscription, mot de passe oublié ; l'invitation du
+      co-parent n'envoie plus d'email ; Réglages gagne une section Compte
+      (changement de mot de passe, suppression du compte via l'Edge
+      Function `delete-account`). Google reste à activer dans le dashboard
+      (dette n°56). Détail dans le [plan Supabase](./06-PLAN-SUPABASE.md#fait-le-2026-11-11).
+- [x] **Base mise à jour** (2026-11-11) : migrations en retard appliquées,
+      fonctions durcies, rendez-vous créés par les deux parents, mois de
+      grossesse des démarches et émoji des gestes en base.
 
 ## Phase 2 — Déclaration de naissance & durcissement MVP
 
