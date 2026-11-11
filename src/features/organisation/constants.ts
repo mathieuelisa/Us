@@ -53,12 +53,15 @@ export const CHECKLIST_CATEGORY_ORDER = ['maman', 'bebe', 'co_parent'];
 /**
  * Sous-sections où l'on peut ajouter ses propres articles, par checklist.
  *
- * Les 3 sous-sections de la valise de maternité (demande explicite) ; la
- * valise de salle de naissance n'en a pas. Une table plutôt qu'un booléen
- * en dur dans l'écran : étendre le périmètre se fait ici, en une ligne.
+ * Les 3 sous-sections des deux valises (demande explicite, d'abord pour la
+ * valise de maternité, puis étendue à la salle de naissance). La table
+ * `household_custom_checklist_items` accepte déjà les deux `checklist_slug`.
+ * Une table plutôt qu'un booléen en dur dans l'écran : étendre le
+ * périmètre se fait ici, en une ligne.
  */
 export const CUSTOM_ITEM_CATEGORIES: Record<string, string[]> = {
   'valise-maternite': ['maman', 'bebe', 'co_parent'],
+  'sac-naissance': ['maman', 'bebe', 'co_parent'],
 };
 
 export function canAddCustomItem(slug: string, category: string): boolean {
@@ -108,18 +111,26 @@ export function filterVisibleChecklistItems(
 /**
  * Groupe par catégorie (Maman / Bébé / Co-parent) ; vide pour une liste
  * plate. Une sous-section vide reste affichée si elle accepte des ajouts —
- * sinon la ligne « Ajouter un élément » disparaîtrait avec elle.
+ * sinon la ligne « Ajouter un élément » disparaîtrait avec elle — sauf
+ * « Co-parent » quand `hideCoParent` : vidée par
+ * `filterVisibleChecklistItems`, elle ne doit pas réapparaître vide.
  */
 export function groupChecklistItemsByCategory(
   items: ChecklistItem[],
   slug: string,
+  { hideCoParent = false }: { hideCoParent?: boolean } = {},
 ): { category: string; items: ChecklistItem[] }[] {
-  return CHECKLIST_CATEGORY_ORDER.map((category) => ({
-    category,
-    items: items
-      .filter((item) => item.category === category)
-      .sort(sortChecklistItems),
-  })).filter(
-    (group) => group.items.length > 0 || canAddCustomItem(slug, group.category),
-  );
+  return CHECKLIST_CATEGORY_ORDER.filter(
+    (category) => !(hideCoParent && category === 'co_parent'),
+  )
+    .map((category) => ({
+      category,
+      items: items
+        .filter((item) => item.category === category)
+        .sort(sortChecklistItems),
+    }))
+    .filter(
+      (group) =>
+        group.items.length > 0 || canAddCustomItem(slug, group.category),
+    );
 }

@@ -214,6 +214,7 @@ export default function OrganisationScreen() {
         {selectedSlug ? (
           <ChecklistDetail
             slug={selectedSlug}
+            hideCoParent={hideCoParent}
             items={selectedItems}
             onToggleItem={toggleChecked}
             onAddItem={addItem}
@@ -468,12 +469,14 @@ function NameCardsIllustration() {
 
 function ChecklistDetail({
   slug,
+  hideCoParent,
   items,
   onToggleItem,
   onAddItem,
   onRemoveItem,
 }: {
   slug: string;
+  hideCoParent: boolean;
   items: ChecklistItem[];
   onToggleItem: (item: ChecklistItem) => void;
   onAddItem: (input: {
@@ -487,7 +490,9 @@ function ChecklistDetail({
   const meta = CHECKLIST_META[slug];
   const checkedCount = items.filter((item) => item.checked).length;
   const progress = items.length === 0 ? 0 : checkedCount / items.length;
-  const categoryGroups = groupChecklistItemsByCategory(items, slug);
+  const categoryGroups = groupChecklistItemsByCategory(items, slug, {
+    hideCoParent,
+  });
 
   return (
     <View className="gap-5">
