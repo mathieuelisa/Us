@@ -16,8 +16,9 @@ import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import { withUniwind } from 'uniwind';
 
 import { PremiumPaywallModal } from '@/components/hub/premium-paywall-modal';
+import { GLASS_TITLE_COLOR } from '@/components/ui/glass-card';
 import { CARD_SHADOW } from '@/features/hub/constants';
-import { useThemeBackground } from '@/features/settings/hooks';
+import { useThemeAccent, useThemeBackground } from '@/features/settings/hooks';
 
 const SafeAreaView = withUniwind(RNSafeAreaView);
 
@@ -74,6 +75,7 @@ export function PremiumLockedScreen({
   header?: ReactNode;
 }) {
   const backgroundColor = useThemeBackground();
+  const accent = useThemeAccent();
   const [isPaywallVisible, setIsPaywallVisible] = useState(true);
 
   useFocusEffect(
@@ -92,11 +94,17 @@ export function PremiumLockedScreen({
           accessibilityLabel="Revenir en arrière"
           accessibilityRole="button"
           hitSlop={12}
-          style={CARD_SHADOW}
           onPress={() => router.back()}
-          className="h-9 w-9 items-center justify-center rounded-full bg-white"
+          className="h-12 w-12 items-center justify-center rounded-full bg-white"
+          style={{
+            shadowColor: accent,
+            shadowOffset: { width: 0, height: 8 },
+            shadowOpacity: 0.12,
+            shadowRadius: 16,
+            elevation: 4,
+          }}
         >
-          <Text className="text-[17px] leading-5 text-[#1a1a1a]">‹</Text>
+          <Ionicons name="chevron-back" size={22} color={GLASS_TITLE_COLOR} />
         </Pressable>
 
         {header ?? (
