@@ -123,7 +123,7 @@ export default function SettingsScreen() {
   // Hors ligne, `signOut()` se rabat sur une déconnexion locale ; en mode
   // contournement DEV, il n'y a pas de session : on sort du mode à la place.
   // Le nettoyage du cache suit le changement de compte
-  // (`useResetOnAccountChange`, layout racine).
+  // (`useApplySession`, layout racine).
   const handleSignOut = async () => {
     setIsSigningOut(true);
     try {

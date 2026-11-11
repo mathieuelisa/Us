@@ -5,14 +5,14 @@ import { useFonts } from 'expo-font';
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { HeroUINativeProvider } from 'heroui-native';
-import { useAtomValue, useSetAtom } from 'jotai';
+import { useAtomValue } from 'jotai';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, useColorScheme, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Uniwind } from 'uniwind';
 
 import { AnimatedSplashOverlay } from '@/components/animated-icon';
-import { useResetOnAccountChange } from '@/features/auth/hooks';
+import { useApplySession } from '@/features/auth/hooks';
 import { useMyHousehold, useSyncCurrentRole } from '@/features/household/hooks';
 import { useMyProfile } from '@/features/profile/hooks';
 import {
@@ -107,7 +107,9 @@ function AuthGate() {
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
-  const setSession = useSetAtom(sessionAtom);
+  // Enregistre la session et remet l'app à zéro si le compte a changé —
+  // avant que les écrans du nouveau compte ne lancent leurs requêtes.
+  const setSession = useApplySession();
   const [isSessionReady, setIsSessionReady] = useState(false);
   // Titres de l'onboarding (demande explicite) — voir `ONBOARDING_TITLE_FONT`
   // dans `step-shell.tsx` pour l'usage.
@@ -123,9 +125,6 @@ export default function RootLayout() {
   // URL de retour d'Auth (confirmation, réinitialisation) reçues pendant
   // que l'app tourne déjà (mobile).
   useAuthRedirectListener();
-
-  // Cache, rôle, brouillon et thème remis à zéro quand le compte change.
-  useResetOnAccountChange();
 
   useEffect(() => {
     initialSessionRecovery.finally(() => {
