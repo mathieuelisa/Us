@@ -111,30 +111,35 @@ export default function AccompanimentStep() {
         />
       ))}
 
-      <View
-        className="mt-2 gap-3 rounded-[24px] p-3.5"
-        style={{ backgroundColor: hexToRgba(accent, 0.07) }}
-      >
-        <View className="flex-row items-center gap-2.5 px-1">
-          <Ionicons
-            name="information-circle-outline"
-            size={20}
-            color={accent}
+      {/* Sans objet pour « Seul·e » : il n'y a pas de co-parent à qui poser
+          la question (et sa réponse par défaut, Oui, finissait enregistrée
+          en base). */}
+      {draft.accompanimentType === 'seul' ? null : (
+        <View
+          className="mt-2 gap-3 rounded-[24px] p-3.5"
+          style={{ backgroundColor: hexToRgba(accent, 0.07) }}
+        >
+          <View className="flex-row items-center gap-2.5 px-1">
+            <Ionicons
+              name="information-circle-outline"
+              size={20}
+              color={accent}
+            />
+            <Text
+              className="flex-1 text-[14.5px] font-medium"
+              style={{ color: GLASS_TITLE_COLOR }}
+            >
+              Le co-parent utilisera-t-il aussi l’app ?
+            </Text>
+          </View>
+          <YesNoChoice
+            value={draft.partnerUsesApp}
+            onChange={(partnerUsesApp) =>
+              setDraft((current) => ({ ...current, partnerUsesApp }))
+            }
           />
-          <Text
-            className="flex-1 text-[14.5px] font-medium"
-            style={{ color: GLASS_TITLE_COLOR }}
-          >
-            Le co-parent utilisera-t-il aussi l’app ?
-          </Text>
         </View>
-        <YesNoChoice
-          value={draft.partnerUsesApp}
-          onChange={(partnerUsesApp) =>
-            setDraft((current) => ({ ...current, partnerUsesApp }))
-          }
-        />
-      </View>
+      )}
     </OnboardingStepShell>
   );
 }

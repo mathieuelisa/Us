@@ -1,3 +1,4 @@
+import { shouldInvitePartner } from '@/features/onboarding/constants';
 import type { OnboardingDraft } from '@/lib/atoms/onboarding';
 import { supabase } from '@/lib/supabase/client';
 import type { Database } from '@/lib/supabase/database.types';
@@ -24,13 +25,24 @@ export async function completeOnboarding(
 
   if (profileError) throw profileError;
 
+  // Une seule règle décide s'il y a un co-parent (« Seul·e » l'exclut,
+  // quelle que soit la réponse à « Le co-parent utilisera-t-il l'app ? ») :
+  // la même que celle qui pilote les écrans de l'onboarding. La base le
+  // vérifie aussi (contrainte `households_solo_without_partner`).
+  const hasPartner = shouldInvitePartner(
+    draft.accompanimentType,
+    draft.partnerUsesApp,
+  );
+
   const { data, error } = await supabase
     .from('households')
     .insert({
       pregnant_user_id: userId,
       accompaniment_type: draft.accompanimentType,
-      partner_uses_app: draft.partnerUsesApp,
-      partner_first_name: draft.partnerFirstName.trim() || null,
+      partner_uses_app: hasPartner,
+      partner_first_name: hasPartner
+        ? draft.partnerFirstName.trim() || null
+        : null,
       professional_status: draft.professionalStatus,
       priorities: draft.priorities,
       reminder_frequency: draft.reminderFrequency,
