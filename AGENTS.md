@@ -27,8 +27,9 @@ React Native, pas à copier tel quel (c'est du HTML/CSS de prototype).
 
 - TypeScript strict partout, pas de `any` non justifié
 - Biome pour lint/format — lancer `biome check --write` avant de considérer une tâche terminée
-- Composants UI via Hero UI Native, pas de styles inline dupliquant ce que le kit fournit déjà
-- État serveur → TanStack Query uniquement. État UI éphémère → Jotai. Formulaires → TanStack Form.
+- Composants UI : réutiliser d'abord les briques maison de `src/components/ui/` (cartes, `PillButton`, `IconInput`, `WheelDatePicker`…), décrites dans [`DOCS/04-ARCHITECTURE.md`](./DOCS/04-ARCHITECTURE.md#design-system-interne) ; Hero UI Native n'est plus qu'en appoint
+- Couleurs : accent et fond via `useThemeAccent()` / `useThemeBackground()` ou le token `accent`, jamais une couleur de thème en dur
+- État serveur → TanStack Query uniquement. État UI éphémère → Jotai. Formulaires → état React contrôlé (`useState`) tant que TanStack Form n'est pas réessayé (cf. architecture)
 - Toute nouvelle table Supabase doit avoir sa policy RLS écrite dans le même changement, jamais différée
 
 ## Commandes

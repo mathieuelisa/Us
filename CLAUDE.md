@@ -32,8 +32,8 @@ avec Hero UI Native, pas reproduire la structure HTML/CSS du prototype.
 
 - Expo + React Native + TypeScript strict + Expo Router
 - Supabase (Auth, Postgres, RLS, Storage, Edge Functions)
-- TanStack Query (données serveur) / TanStack Form (formulaires) / Jotai (état UI éphémère)
-- Hero UI Native (composants)
+- TanStack Query (données serveur) / Jotai (état UI éphémère) — formulaires en `useState`, TanStack Form suspendu
+- Briques UI maison (`src/components/ui/`) d'abord, Hero UI Native en appoint
 - Biome (lint + format)
 
 ## Règles spécifiques à ce projet
@@ -44,9 +44,10 @@ avec Hero UI Native, pas reproduire la structure HTML/CSS du prototype.
 - Le module "Votre bébé" (premium) et le paiement sont **hors périmètre
   MVP** — voir [`DOCS/versions/MVP.md`](./DOCS/versions/MVP.md) avant d'y
   toucher.
-- Les écrans changent de fond/contenu selon le rôle (personne
-  enceinte/partenaire) — traiter ça comme un thème dérivé du rôle courant,
-  pas comme des écrans dupliqués (détail dans `DOCS/04-ARCHITECTURE.md`).
+- Les écrans changent de contenu selon le rôle (personne
+  enceinte/partenaire) — un seul composant d'écran, jamais dupliqué. La
+  couleur, elle, vient du thème personnel (`useThemeAccent` /
+  `useThemeBackground`), pas du rôle (détail dans `DOCS/04-ARCHITECTURE.md`).
 - Toute table touchant des données de santé (`important_info`,
   `symptoms_log`) doit avoir une policy RLS Supabase revue explicitement, ne
   jamais la reporter "pour plus tard".

@@ -31,9 +31,16 @@ title: Plan d'action de développement — US
 | 1.5 Suivi santé + Mon partenaire | ✅ implémentée pour la **vue femme enceinte** ; vue co-parent reportée (demande explicite) |
 | 1.6 Pilier Démarches | ✅ terminée |
 | 1.7 Réglages MVP | ✅ terminée |
-| Phases 2 à 5 | ⬜ à faire |
+| Ajouts hors plan (Organisation & Préparation, vitrine premium, refonte visuelle) | ✅ voir [Ajouts hors plan](#ajouts-hors-plan-août--novembre-2026) |
+| Phase 2 — Déclaration de naissance & durcissement | 🟡 écran 7a fait ; avis, tests RLS, tests device à faire |
+| Phases 3 à 5 | ⬜ à faire (la vitrine premium n'est pas la Phase 3 : rien n'est payé ni persisté) |
 
-**Prochaine étape : [Phase 2 — Déclaration de naissance & durcissement MVP](#phase-2--déclaration-de-naissance--durcissement-mvp).**
+Dernière mise à jour de ce tableau : 2026-11-11.
+
+**Prochaine étape : finir la [Phase 2](#phase-2--déclaration-de-naissance--durcissement-mvp)**,
+en commençant par ce qui fausse les tests réels : pousser les deux
+migrations manquantes sur le cloud (dette n°49) et retirer les données
+fictives affichées hors mode DEV (dette n°48).
 
 ⚠️ **La 1.2 porte une dette de vérification** : aucune écriture Supabase
 authentifiée (création du foyer, invitation, rattachement du co-parent) n'a
@@ -89,12 +96,13 @@ sections du design.
       affiché modifiable ; avatar = fonctionnalité future, ne pas bloquer dessus)
 - [x] Onglet **Information** : fiche partagée et modifiable par les deux
       parents (groupe sanguin, allergies, n° sécu, adresse maternité...),
-      **réorganisable** — ⚠️ données de santé, RLS stricte dès
-      l'implémentation (déjà en place depuis la migration
-      `household_info_items`). Réordonnancement implémenté via boutons
-      haut/bas (persisté en base) plutôt qu'un vrai geste de
-      glisser-déposer — à remplacer par un geste tactile (Reanimated +
-      Gesture Handler) dans une passe dédiée si le besoin se confirme.
+      ⚠️ données de santé, RLS stricte dès l'implémentation.
+      **Plus réorganisable** depuis le 2026-08-14 (demande explicite) :
+      chaque entrée porte une catégorie typée (groupe sanguin, point de
+      vigilance, allergie, téléphone, adresse, date, n° de sécurité
+      sociale) qui fixe son icône, son formulaire dédié
+      (`InfoItemFormModal`) et sa place à l'écran — le plus utile en urgence
+      en tête. Écart assumé avec CONCEPT.md (« réorganisable »).
 
 ### 1.2 Onboarding et mise en place de l'espace partagé
 
@@ -159,7 +167,23 @@ authentifiée disponible en vérification automatisée.
 Les sections ouvertes depuis le hub (Démarches, Ensemble, Suivi santé, Mon
 partenaire, J'ai accouché) menaient à des écrans d'attente jusqu'à leur
 phase respective ; elles ont toutes leur contenu réel depuis la Phase 2, et
-la barre reste à 4 onglets fixes.
+la barre reste à 4 onglets fixes (plus une entrée « Premium », cf. ajouts
+hors plan).
+
+Ajouts au hub depuis (demandes explicites), de haut en bas :
+
+- [x] Bloc d'invitation « Partager vos infos à deux » (`ShareInviteCard`)
+      tant que le co-parent n'a pas rejoint, avec la pop-up « Comment ça
+      marche ? » — ⚠️ le bouton n'invite pas réellement (dette n°31).
+- [x] Bloc **« Aujourd'hui »** (`HealthTodayCard`) au-dessus des sections :
+      symptômes du jour de la personne enceinte + astuce du jour. Visible
+      des **deux** parents (choix explicite) ; la RLS de `symptoms_log`
+      autorisait déjà la lecture au co-parent, aucune policy élargie.
+- [x] Carte « Organisation & Préparation » sous les 3 piliers, et teaser
+      premium « Votre bébé ».
+- [x] Section **« Nos prochains rendez-vous »** (3 prochains, date en pavé
+      teinté) — ⚠️ affiche des rendez-vous fictifs quand il n'y en a aucun
+      (dette n°48, bloquant avant production).
 
 ### 1.4 Pilier Ensemble
 
@@ -218,23 +242,28 @@ par onglet** :
   visibilité finiraient par diverger. Défaut : **partagé** — la femme
   enceinte peut décocher au cas par cas si un rendez-vous doit rester
   personnel (écart avec le choix initial « non partagé », demande
-  explicite).
+  explicite). Depuis le 2026-11-11, la création refuse une date passée
+  (molette bornée à aujourd'hui, `minDate`).
 - [x] **Contacts** — visible et modifiable par les deux, réorganisable.
-  Boutons haut/bas plutôt qu'un vrai glisser-déposer, comme l'onglet
-  Information (même dette, cf. [05](./05-DETTE-ET-POINTS-OUVERTS.md) n° 12).
+  Boutons haut/bas plutôt qu'un vrai glisser-déposer (cf.
+  [05](./05-DETTE-ET-POINTS-OUVERTS.md) n° 12). Formulaire d'ajout limité
+  au nom, au téléphone et au choix « Numéro d'urgence » (le champ « Rôle »
+  a été retiré le 2026-11-11 ; `contacts.role_label` reste en base et
+  s'affiche encore pour les contacts qui en ont un).
 - [x] **Exercices** — visible par les deux, filtré automatiquement selon le
   trimestre de grossesse en cours, déduit de la date de terme.
   ⚠️ La maquette 4f liste les **trois** trimestres ; `CONCEPT.md` demande un
   filtrage. CLAUDE.md tranche pour `CONCEPT.md`. Repli assumé : si la date
   de terme est inconnue, on affiche les trois groupes plutôt que de deviner
   un trimestre.
-  - [x] **Écran de détail** (hors maquette, ajout ultérieur) : chaque
-    exercice ouvre une fiche avec titre, durée, et une section image
-    (`exercises.image_url`). Même parti pris que Démarches — liste et
-    détail dans un seul écran, basculé par état local. Le catalogue n'a
-    aucune photo réelle pour l'instant (`image_url` toujours `null`) : un
-    repli visuel neutre s'affiche à la place, voir
-    [05](./05-DETTE-ET-POINTS-OUVERTS.md).
+  - [x] **Contenu réel** : 12 exercices (4 par trimestre) avec durée, zone
+    travaillée, description, étapes et illustration, portés par un
+    catalogue **côté client** (`EXERCISE_CATALOG`), pas par la table
+    `exercises` (dette n°46). Rédigés sans relecture professionnelle
+    (dette n°47) ; chaque fiche porte un avertissement.
+  - [x] **Écran de détail** (hors maquette) : une **route**
+    `/exercice?slug=…` et non un état local, pour que l'illustration file
+    bord à bord. Emplacement vidéo vide, en attente d'un lien.
 
 **Section "Mon partenaire"** (bloc hub indépendant, contenu partiellement
 symétrique) :
@@ -252,9 +281,13 @@ symétrique) :
   pas accès direct à l'onglet Journal) — *reporté avec la vue co-parent*
 
 ⚠️ **Écart de périmètre** (demande explicite) : seule la vue de la personne
-enceinte est implémentée. Restent à faire, côté co-parent : la reprise de ses
-rendez-vous partagés et l'accès en lecture seule aux symptômes — sa seule
-porte d'entrée vers cette donnée de santé.
+enceinte est implémentée. Le co-parent voit déjà les symptômes **du jour**
+(bloc « Aujourd'hui » du hub). Restent à faire : l'historique des symptômes
+en lecture seule et la reprise de ses rendez-vous partagés dans « Mon
+partenaire » (dette n°26).
+
+« Mon partenaire » est **toujours rose**, quel que soit le thème choisi
+(`PARTNER_PINK`, demande explicite) — seule exception au thème personnel.
 
 ### 1.6 Pilier Démarches
 
@@ -294,12 +327,26 @@ porte d'entrée vers cette donnée de santé.
       échéance calculée **uniquement après validation via "J'ai accouché"**
       (ex. "jusqu'au 6 septembre") ; avant validation, affichage informatif
       sans date précise (ex. "5 jours à partir de la naissance").
-      ⚠️ `households.birth_date` n'est encore jamais renseigné (la Phase 2
-      n'est pas construite) : le calcul de date précise n'a donc jamais
-      tourné en conditions réelles, seul l'affichage informatif l'a été.
+      `households.birth_date` est renseigné par l'écran 7a depuis la
+      Phase 2 ; le calcul de date précise n'a tourné qu'en mode
+      contournement DEV (dette n°32 et n°43).
       Description étoffée sur demande explicite (texte fourni par
       l'utilisateur) pour expliquer à quoi sert la démarche — reste un
       paragraphe de contexte, pas un mode d'emploi pas-à-pas.
+
+- [x] **Classement par mois de grossesse** (ajout, demande explicite) :
+      chaque démarche est rattachée à un mois (`PROCEDURE_PREGNANCY_MONTH`
+      — mode de garde au 3ᵉ, assurance habitation au 5ᵉ, sécurité sociale
+      au 6ᵉ, impôts au 7ᵉ, les 4 autres au 9ᵉ) et la liste se lit mois par
+      mois, en pastilles « N / mois ».
+  - L'écran s'**ouvre sur le mois de grossesse en cours**, calculé depuis
+    la date de terme saisie à l'onboarding (`getPregnancyMonth`, semaines
+    d'aménorrhée → mois 1 à 9).
+  - Chaque pastille de mois montre le nombre de démarches restantes, ou une
+    coche quand tout est fait ; le mois en cours est cerclé.
+  - Un mois sans démarche affiche la **prochaine étape** (« Prochaine étape
+    · 3ᵉ mois » + « Voir ») au lieu d'un simple état vide.
+  - Préselection jamais vérifiée sur un vrai foyer (dette n°51).
 
 ### 1.7 Réglages MVP
 
@@ -354,9 +401,10 @@ sans condition dès le montage, indépendamment du profil.
 
 ⚠️ **Libellés du footer traduits** (demande explicite, écart avec
 CONCEPT.md) : CONCEPT.md nomme les 4 onglets en anglais (Home / User /
-Information / Setting) ; ils s'affichent désormais en français (Accueil /
-Profil / Information / Réglages) dans `src/app/(tabs)/_layout.tsx`. Les noms
-de route ne changent pas.
+Information / Setting) ; ils s'affichent désormais en français et en court
+(Accueil / Profil / Infos / Réglage) dans `src/app/(tabs)/_layout.tsx`, et
+une 5ᵉ entrée « Premium » mène à la page `/premium`. Les noms de route ne
+changent pas.
 
 ⚠️ **Sous-section Confidentialité ajoutée aux Réglages** (demande
 explicite, hors périmètre initial de la 1.7) : 3 liens (Politique de
@@ -398,6 +446,46 @@ recopié tel quel. Les contournements `PlainInput`/`bg-accent/10` restent en
 place (plus robustes, n'importe pas la logique interne de la librairie),
 mais ne sont plus la seule protection contre ce crash.
 
+## Ajouts hors plan (août → novembre 2026)
+
+Construits sur demande explicite, sans phase dédiée ni maquette (sauf
+mention). Ils sont dans le code et doivent être connus avant de reprendre
+le plan.
+
+- [x] **Écran de bienvenue de l'onboarding** (`bienvenue.tsx`) : 4 slides de
+      présentation avant l'étape 1/6, skippables, hors décompte.
+- [x] **Organisation & Préparation** (`/organisation`, nouvelle section du
+      hub, absente des maquettes et de CONCEPT.md) : deux checklists
+      partagées par le foyer — « La valise de maternité » et « La valise en
+      salle de naissance » —, chacune en sous-sections Maman / Bébé /
+      Co-parent (masquée si le foyer est « Seul·e »), barre de progression,
+      et **articles personnalisés** ajoutables en fin de sous-section. Le
+      contenu des listes a été rédigé faute de liste fournie. Tables :
+      `checklist_item_templates`, `household_checklist_items` (seedées par
+      trigger), `household_custom_checklist_items` (⚠️ migration non
+      appliquée sur le cloud, dette n°49).
+- [x] **Vitrine premium** (le paiement reste hors MVP) :
+  - Écrans d'accès `/bebe` (« Votre bébé », depuis le hub) et `/prenoms`
+    (« Le match des prénoms », depuis Organisation), partagés via
+    `PremiumLockedScreen` : paywall central qui s'ouvre à chaque arrivée,
+    page floutée tant qu'il est ouvert.
+  - Page `/premium`, ouverte depuis l'entrée « Premium » de la barre
+    d'onglets, au même contenu que le paywall (`PremiumOffer`). Bouton
+    d'achat inerte (« bientôt disponible »).
+  - ⚠️ **Les 4 suivis de « Votre bébé » existent** (`/bebe-croissance`,
+    `-biberon`, `-allaitement`, `-bain`) avec historique et formulaire
+    d'ajout complet (écrans 8d/8f/8g/8h), accessibles en fermant le paywall
+    — mais **sans persistance** (état local) ni contrôle d'achat. C'est un
+    écart avec MVP.md à trancher (dette n°53), pas un début de Phase 3.
+- [x] **Refonte visuelle complète** (2026-11-10 → 11), écran par écran
+      d'après des captures de référence : barre d'onglets à bulle, cartes
+      « verre dépoli », boutons en gélule, champs à icône, illustrations
+      fournies par l'utilisateur (`assets/images/`). Les briques communes
+      sont décrites dans l'[architecture](./04-ARCHITECTURE.md#design-system-interne).
+- [x] **Dates passées interdites** (2026-11-11) : la date de terme de
+      l'onboarding (étape 3) et la date d'un nouveau rendez-vous ne peuvent
+      plus être antérieures à aujourd'hui (`WheelDatePicker` `minDate`).
+
 ## Phase 2 — Déclaration de naissance & durcissement MVP
 
 - [x] Bouton/flux "J'ai accouché" (7a) + recalcul des échéances de
@@ -416,6 +504,11 @@ mais ne sont plus la seule protection contre ce crash.
       restée en Phase 3, et le chemin Supabase réel n'a pas encore tourné
       (vérifié en mode contournement DEV — cf. points ouverts 43 à 45).
 - [ ] Demande d'avis MVP (stockage du feedback, sans store review natif)
+      — la table `app_feedback` existe, aucun écran
+- [ ] Retirer ce qui ne doit pas partir en production : données fictives
+      (dette n°48), mode contournement DEV (n°1), et appliquer les
+      migrations manquantes + durcir les fonctions `SECURITY DEFINER`
+      (n°49, n°50)
 - [ ] Vérification de bout en bout des règles de visibilité par rôle
       (Journal, Rendez-vous non partagés, Réglages) — ce sont les policies
       RLS les plus sensibles du MVP, à tester explicitement par des tests

@@ -11,8 +11,11 @@ grossesse et les premiers mois du bébé.
 
 - [Expo](https://expo.dev) + React Native + TypeScript strict + Expo Router
 - [Supabase](https://supabase.com) (Auth, Postgres, RLS, Storage, Edge Functions)
-- TanStack Query (données serveur) / TanStack Form (formulaires) / Jotai (état UI éphémère)
-- Hero UI Native (composants)
+- TanStack Query (données serveur) / Jotai (état UI éphémère) — formulaires
+  en état React contrôlé, TanStack Form prévu mais non installé
+- Uniwind (Tailwind v4) + briques UI maison (`src/components/ui/`), Hero UI
+  Native en appoint
+- Reanimated 4 + react-native-svg (animations, illustrations)
 - Biome (lint + format)
 - Bun (gestionnaire de paquets)
 
@@ -51,7 +54,8 @@ bun run web
 | `bun run format`     | Formate le code avec Biome                         |
 | `bun run typecheck`  | Vérifie les types TypeScript (`tsc --noEmit`)      |
 | `bun run db:start`   | Démarre Supabase en local (nécessite Docker)       |
-| `bun run db:types`   | Régénère les types TypeScript depuis le schéma DB  |
+| `bun run db:types`   | Régénère les types TypeScript depuis le projet lié |
+| `bun run db:types:local` | Idem depuis le Supabase local                  |
 
 ## Base de données
 
@@ -63,8 +67,18 @@ migrations vers le projet distant :
 ```bash
 bunx supabase login
 bunx supabase link --project-ref <project-ref>
+bunx supabase migration list   # vérifier ce qui manque sur le cloud
 bunx supabase db push
+bun run db:types
 ```
+
+## Tester sans compte
+
+Tant que le retour du lien magique n'est pas fiable, l'écran de connexion
+propose en développement un bouton **« DEV — passer à l'onboarding sans
+connexion »** : il permet de parcourir l'onboarding puis toute l'app sans
+session ni foyer réel (rien n'est écrit en base, tout est perdu au
+rechargement). Voir [`DOCS/04-ARCHITECTURE.md`](./DOCS/04-ARCHITECTURE.md#mode-contournement-dev-et-données-fictives).
 
 ## Documentation
 

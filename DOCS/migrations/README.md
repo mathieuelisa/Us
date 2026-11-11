@@ -37,11 +37,23 @@ durées de conservation et le DPA Supabase.
 ## Comment appliquer ces migrations
 
 ```bash
-npm run db:start                        # démarre Supabase en local (requiert Docker)
-supabase link --project-ref hsclyntlnoyevstdhgvu   # relie le projet cloud (1x, demande le mot de passe DB)
-supabase db push                         # applique les migrations en attente sur le projet lié
-npm run db:types                         # régénère src/lib/supabase/database.types.ts
+bun run db:start                                       # Supabase en local (requiert Docker), facultatif
+bunx supabase link --project-ref hsclyntlnoyevstdhgvu   # relie le projet cloud (1x, demande le mot de passe DB)
+bunx supabase migration list                           # compare dépôt et projet cloud
+bunx supabase db push                                  # applique les migrations en attente sur le projet lié
+bun run db:types                                       # régénère database.types.ts depuis le projet lié
 ```
+
+## État sur le projet cloud
+
+Vérifié le 2026-11-11 (liste des migrations appliquées au projet Paris) :
+**toutes les migrations jusqu'à `20260814120000` sont appliquées, les deux
+suivantes ne le sont pas** (marquées ⏳ dans le catalogue). Tant qu'elles ne
+sont pas poussées, l'ajout d'un groupe sanguin et celui d'un article
+personnalisé dans les valises échouent côté serveur — cf.
+[dette n°49](../05-DETTE-ET-POINTS-OUVERTS.md). Le linter de sécurité
+Supabase signale aussi des fonctions `SECURITY DEFINER` exécutables via
+l'API (dette n°50).
 
 ## Catalogue
 
@@ -69,6 +81,8 @@ npm run db:types                         # régénère src/lib/supabase/database
 | [`20260814100000_checklist_categories.sql`](../../supabase/migrations/20260814100000_checklist_categories.sql) | `checklist_item_templates` | "La Valise de maternité" se décline en 3 sous-sections Maman/Bébé/Co-parent (colonne `category` nullable — "sac-naissance" reste une liste plate) |
 | [`20260814110000_sac_naissance_categories.sql`](../../supabase/migrations/20260814110000_sac_naissance_categories.sql) | `checklist_item_templates` | Même déclinaison Maman/Bébé/Co-parent pour « La valise en salle de naissance » (ex « Le sac en salle d'accouchement », renommage client uniquement) |
 | [`20260814120000_household_info_items_category.sql`](../../supabase/migrations/20260814120000_household_info_items_category.sql) | `household_info_items` | Ajoute `category` (téléphone/adresse/date/allergie/n° sécurité sociale/point de vigilance) pour que l'écran "Informations importantes" affiche une icône et un formulaire dédiés par type plutôt qu'une liste libellé/valeur générique. RLS déjà couvert par la policy table-level existante — pas de nouvelle policy |
+| ⏳ [`20260814130000_household_info_items_blood_type.sql`](../../supabase/migrations/20260814130000_household_info_items_blood_type.sql) | `household_info_items` | Ajoute la catégorie `blood_type` (groupe sanguin) à la contrainte `category`. Même policy table-level, pas de nouvelle policy. **Non appliquée sur le cloud** |
+| ⏳ [`20260829120000_household_custom_checklist_items.sql`](../../supabase/migrations/20260829120000_household_custom_checklist_items.sql) | `household_custom_checklist_items` | Articles ajoutés par le foyer aux valises (« Ajouter un article »). Table à part pour que le catalogue `household_checklist_items` reste écrit uniquement par trigger ; RLS select/insert/update/delete réservée aux membres du foyer, sans règle par rôle. **Non appliquée sur le cloud** |
 
 ## Décisions de modélisation
 
@@ -83,10 +97,19 @@ npm run db:types                         # régénère src/lib/supabase/database
   `is_first_child`) plutôt qu'une table `onboarding_answers` séparée : ce
   sont des données 1:1 avec le foyer, pas un historique à versionner.
 - **`household_info_items` en liste libre** (`label`/`value`/`sort_order`)
-  plutôt qu'en colonnes figées (groupe sanguin, allergies, etc.) : le
-  concept exige que ces cartes soient réorganisables par
-  glisser-déposer — une liste ordonnée sert directement ce besoin sans
-  migration future.
+  plutôt qu'en colonnes figées, typée depuis par une `category` (7 valeurs)
+  qui pilote l'icône et le formulaire. L'écran ne propose plus de
+  réordonnancement : les entrées sont rangées par catégorie (groupe sanguin,
+  vigilance et allergies en tête). `sort_order` reste en base, sans usage
+  visible aujourd'hui.
+- **Catalogue + statut par foyer, seedé par trigger** pour les démarches
+  (`procedure_templates` / `household_procedures`) comme pour les valises
+  (`checklist_item_templates` / `household_checklist_items`) : le client ne
+  fait que lire et mettre à jour. Seuls les articles personnalisés
+  (`household_custom_checklist_items`) sont insérés par le client.
+- **Rien pour le module « Votre bébé »** : les écrans de suivi existent
+  (vitrine, cf. dette n°53) mais aucune table `baby_*` ni `subscriptions`
+  n'a été créée — elles arrivent avec la Phase 3.
 - **`household_procedures` auto-peuplée par trigger** : les clients n'ont
   jamais besoin d'un droit `INSERT` dessus, seulement `UPDATE` du statut.
 - **Pas d'échéance stockée** sur `household_procedures` : elle se calcule à

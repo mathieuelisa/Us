@@ -10,10 +10,11 @@ architecture). Design source : [`design/onboarding-parental-us/`](../design/onbo
 ## Conventions à respecter dans les suggestions
 
 - TypeScript strict, pas de `any`
-- État serveur → TanStack Query. État UI éphémère (rôle courant, thème en
-  cours d'édition, ouverture de bottom sheet) → Jotai. Formulaires →
-  TanStack Form. Ne pas mélanger.
-- Composants via Hero UI Native plutôt que du style inline dupliqué
+- État serveur → TanStack Query. État UI éphémère (rôle courant, brouillon
+  d'onboarding) → Jotai. Formulaires → état React contrôlé (`useState`),
+  TanStack Form étant suspendu (cf. architecture). Ne pas mélanger.
+- Composants : briques maison de `src/components/ui/` d'abord (cf.
+  architecture, « Design system interne »), Hero UI Native en appoint
 - Toute requête Supabase touchant des données de couple/santé doit passer
   par une policy RLS scoped `household_id` — ne jamais suggérer un accès
   non filtré

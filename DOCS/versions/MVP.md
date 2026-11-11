@@ -23,11 +23,12 @@ Correspondance avec les sections du [Design Overview](../01-DESIGN-OVERVIEW.md#c
 | ✅ | 3 — Pilier Ensemble | Check-in humeur, historique 7j, overlay "besoin de...", geste du jour, profil, infos importantes |
 | ✅ | 4 — Pilier Suivi santé | Journal symptômes, rendez-vous (CRUD), contacts (CRUD + réordonnancement), exercices (contenu statique par trimestre) |
 | ✅ | 5 — Pilier Démarches | Liste + détail + statuts, référentiel de démarches françaises seedé en base, lien téléservice officiel |
-| ✅ | 6 — Aujourd'hui | État du jour croisé, taille du bébé par semaine (référentiel statique) |
+| ⚠️ | 6 — Aujourd'hui | Pas d'écran dédié : bloc « Aujourd'hui » du hub (symptômes du jour + astuce) et taille du bébé dans « Mon partenaire » — à confirmer ([dette n°55](../05-DETTE-ET-POINTS-OUVERTS.md)) |
 | ✅ | 7 — Déclaration de naissance | Formulaire + recalcul des échéances de démarches |
-| ❌ | 8 — Votre bébé (premium) | **Hors MVP** — écran d'accès affiché comme "verrouillé", contenu réel reporté à [V1](./V1.md) |
-| ⚠️ | 9 — Demande d'avis | Bannière + note 5 étoiles, sans intégration store review native (juste stockage du feedback) |
-| ⚠️ | 10 — Réglages | Compte, langue FR uniquement, infos importantes, aide & support, légal. **Thème sombre et couleur d'accent hors MVP** |
+| ❌ | 8 — Votre bébé (premium) | **Hors MVP** — écran d'accès affiché comme "verrouillé", contenu réel reporté à [V1](./V1.md). ⚠️ Écart actuel : les 4 écrans de suivi existent et s'ouvrent sans payer, sans persistance ([dette n°53](../05-DETTE-ET-POINTS-OUVERTS.md)) |
+| ⚠️ | 9 — Demande d'avis | Bannière + note 5 étoiles, sans intégration store review native (juste stockage du feedback). **Pas encore construit** (table `app_feedback` seule) |
+| ⚠️ | 10 — Réglages | Compte, langue FR uniquement, infos importantes, aide & support, légal. **Thème sombre et couleur d'accent hors MVP**. Construit : 4 thèmes prédéfinis, liens légaux (textes non rédigés), déconnexion |
+| ➕ | Hors design — Organisation & Préparation | Valises de maternité et de salle de naissance à cocher à deux, articles personnalisés (ajout sur demande explicite, cf. [plan d'action](../02-ACTION-PLAN.md#ajouts-hors-plan-août--novembre-2026)) |
 
 ## Hors périmètre explicite (reporté)
 
@@ -45,6 +46,10 @@ Correspondance avec les sections du [Design Overview](../01-DESIGN-OVERVIEW.md#c
       mais jamais exécuté pour de vrai : reste à valider avec deux comptes
       réels une fois un SMTP configuré*
 - [ ] Les 3 piliers gratuits sont fonctionnels avec persistance Supabase (pas de mock)
+      — *écrans construits, mais toute la vérification s'est faite en mode
+      contournement DEV ; le hub et les Informations affichent encore des
+      données fictives quand une liste est vide (dette n°48) et deux
+      migrations manquent sur le cloud (dette n°49)*
 - [ ] La déclaration de naissance recalcule correctement les échéances de démarches
 - [ ] RLS Supabase vérifiée sur toutes les tables (un household ne voit jamais les données d'un autre)
 - [ ] Testé sur iOS et Android (Expo), pas seulement en simulateur

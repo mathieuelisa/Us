@@ -13,17 +13,18 @@ title: Architecture technique — US
 |---|---|
 | Framework app | Expo (React Native), TypeScript strict |
 | Navigation | Expo Router (file-based) |
-| UI Kit | Hero UI Native |
+| UI Kit | Hero UI Native en principe — dans les faits, briques maison de `src/components/ui/` (voir [Design system interne](#design-system-interne)) |
 | Backend | Supabase (Auth, Postgres, Storage, Edge Functions, Realtime) |
 | Données serveur / cache | TanStack Query |
-| Formulaires | TanStack Form |
+| Formulaires | TanStack Form en principe — **non installé**, tous les formulaires sont en `useState` (voir plus bas) |
 | État client global | Jotai |
 | Lint / format | Biome |
 | Paiement premium | À trancher en phase MVP+1 (RevenueCat recommandé pour achat unique + restauration cross-plateforme) |
-| Notifications push | Expo Notifications + Supabase Edge Functions (scheduling) |
+| Notifications push | Expo Notifications + Supabase Edge Functions (scheduling) — Phase 4, rien d'installé |
+| Animations | Reanimated 4 (+ worklets), `react-native-svg` pour les doodles et formes, `expo-blur` pour le flou des écrans premium |
 | Styles / theming | Tailwind v4 via [Uniwind](https://docs.uniwind.dev) — Hero UI Native est bâti dessus, `className` sur les composants plutôt que `StyleSheet.create` pour tout ce que le kit ne fournit pas déjà |
 | Gestionnaire de paquets | [bun](https://bun.sh) (lockfile `bun.lock`) |
-| Runtime Node | Version LTS active (`.nvmrc`) — bun gère les paquets, certains sous-processus Expo/Metro/Husky s'appuient encore sur `node` |
+| Runtime Node | `.nvmrc` (v24.19.0, `engines` ≥ 24.19.0) — bun gère les paquets, certains sous-processus Expo/Metro/Husky s'appuient encore sur `node` |
 
 L'app vit sous `src/` (convention du scaffold Expo par défaut : `src/app`,
 `src/components`, `src/constants`, `src/hooks`, `src/lib`) plutôt qu'à la
@@ -61,56 +62,135 @@ projet — il fonctionne et reste trivial à remplacer.
 
 Règle simple : si la donnée doit survivre à un redémarrage de l'app ou être partagée entre utilisateurs → Supabase + TanStack Query. Sinon → Jotai.
 
-## Thématisation par rôle
+## Thématisation
 
-Le design distingue systématiquement le fond "vue personne enceinte" (`#EAF5F0`)
-du fond "vue partenaire" (`#FDF6E3`). À implémenter comme un **thème dérivé du
-rôle courant** (atom Jotai `currentRoleAtom`), pas comme des écrans dupliqués.
-Un seul jeu de composants d'écran, qui lisent la couleur de fond depuis le
-thème actif.
+Le design distinguait le fond « vue personne enceinte » (`#EAF5F0`) du fond
+« vue partenaire » (`#FDF6E3`). **Ce n'est plus le rôle qui pilote la
+couleur** depuis la Phase 1.7 : chaque compte choisit l'un des 4 thèmes
+prédéfinis (sauge, corail, lavande, ocre — `profiles.theme`, personnel et non
+partagé), appliqué via `Uniwind.setTheme`.
 
-## Modules applicatifs proposés (arborescence)
+- **Accent** : `useThemeAccent()` pour les couleurs calculées en JS (ombres
+  teintées, dégradés, SVG) ; token `accent` (`bg-accent`, `text-accent/10`…)
+  pour les `className`. Ne jamais coder un vert en dur pour un état
+  sélectionné.
+- **Fond** : `useThemeBackground()` (pastel du thème) sur tous les écrans,
+  y compris l'onboarding ; `useThemeBabyWallpaper()` pour le wallpaper de
+  `/bebe`, décliné dans les 4 teintes.
+- **Exception voulue** : « Mon partenaire » reste **rose** quel que soit le
+  thème (`PARTNER_PINK`, `features/partner/constants.ts`) ; la barre
+  d'onglets reprend ce rose quand la route est active.
+- Le **rôle** (`currentRoleAtom`, synchronisé depuis le foyer par
+  `useSyncCurrentRole`) continue de piloter la visibilité (onglet Journal,
+  bouton « J'ai accouché ») et le contenu (gestes, astuces), jamais la
+  couleur. Un seul composant d'écran pour les deux rôles, jamais dupliqué.
+- **Polices** : Provicali (titres d'onboarding) et Tondu (slides de
+  bienvenue), chargées dans `src/app/_layout.tsx` — licences à régulariser,
+  cf. [point 42](./05-DETTE-ET-POINTS-OUVERTS.md).
+
+## Design system interne
+
+Les écrans ont été modernisés un par un d'après des captures de référence
+(août → novembre 2026). Plutôt que Hero UI Native, ils reposent sur un petit
+jeu de briques maison, à réutiliser avant d'en créer de nouvelles :
+
+| Brique | Rôle |
+|---|---|
+| [`ui/glass-card.tsx`](../src/components/ui/glass-card.tsx) | Cartes « verre dépoli » à vague pastel, `IconTile`, `ChevronBubble`, doodles (`SparkLines`, `DashedLoopDoodle`), couleurs de texte `GLASS_TITLE_COLOR` / `GLASS_BODY_COLOR` |
+| [`ui/pill-button.tsx`](../src/components/ui/pill-button.tsx) | Bouton principal en gélule d'accent (variante `compact`) — remplace les `Button` Hero UI |
+| [`ui/icon-input.tsx`](../src/components/ui/icon-input.tsx) | Champ en gélule à pastille d'icône (`IconInput`, `IconBubble`) |
+| [`ui/blob-fab.tsx`](../src/components/ui/blob-fab.tsx) | Bouton flottant « + », même langage que la bulle de la barre d'onglets |
+| [`ui/blob-illustration.tsx`](../src/components/ui/blob-illustration.tsx) | Illustration de tête de modale (pictogramme sur tache d'accent) |
+| [`ui/screen-corner-shapes.tsx`](../src/components/ui/screen-corner-shapes.tsx) | Ronds blancs translucides en fond d'écran |
+| [`wheel-date-picker.tsx`](../src/components/wheel-date-picker.tsx) | **Seul sélecteur de date de l'app** : trois molettes jour/mois/année, variante `compact` pour les modales, `minDate` optionnel (date de terme et rendez-vous refusent une date passée) |
+| [`navigation/tab-bar.tsx`](../src/components/navigation/tab-bar.tsx) | Barre d'onglets flottante à bulle débordante, + entrée « Premium » |
+| [`hub/premium-*.tsx`](../src/components/hub/) | Vitrine premium : `PremiumLockedScreen`, `PremiumOffer`, `PremiumPaywallModal`, `PremiumTeaserCard` |
+
+Hero UI Native n'est plus utilisé que dans 5 fichiers (fournisseur racine,
+connexion, bienvenue, finalisation, `NeedNoteOverlay`) — décision à prendre,
+cf. [point 54](./05-DETTE-ET-POINTS-OUVERTS.md). Les modales sont des `Modal`
+React Native avec `animationType="none"` et une feuille qui glisse
+(`SlideInDown`, Reanimated) : ne pas introduire un troisième langage de
+modale.
+
+## Arborescence réelle
 
 ```
 src/
   app/
-    (auth)/                  # login, magic link
-    (onboarding)/            # étapes 1a → 1g
-    (tabs)/
-      index/                 # Hub d'accueil (2b)
-      ensemble/              # pilier 3
-      sante/                 # pilier 4
-      demarches/             # pilier 5
-      aujourdhui/            # pilier 6
-      bebe/                  # pilier 8 (premium)
-      profil/                # 3y — onglet "User"
-      informations/          # 3z — onglet "Information" (infos importantes)
-      reglages/              # 10a — onglet "Setting"
-    naissance/               # 7a déclaration de naissance
-  features/
-    onboarding/
-    ensemble/
-    sante/
-    demarches/
-    bebe/
-    paywall/
-    notifications/
+    _layout.tsx              # AuthGate : connexion → onboarding → app (Stack.Protected)
+    (auth)/login.tsx         # 1a — lien magique (+ bouton DEV, cf. dette n°1)
+    (onboarding)/            # bienvenue (4 slides) → index (1/6 accompagnement)
+                             # → prenoms (2/6) → bebe (3/6 date de terme)
+                             # → statut (4/6) → priorites (5/6) → rappels (6/6)
+                             # → reassurance (+ PaywallModal) → invitation
+                             # (si co-parent) → finalisation (écrit tout en base)
+    (tabs)/                  # 4 onglets + destinations `href: null`
+      index.tsx              # hub
+      profil.tsx  informations.tsx  reglages.tsx   # onglets fixes
+      demarches.tsx ensemble.tsx sante.tsx organisation.tsx
+      partenaire.tsx naissance.tsx                 # ouverts depuis le hub
+      exercice.tsx           # détail d'exercice (depuis Suivi santé)
+      bebe.tsx prenoms.tsx premium.tsx             # vitrine premium
+      bebe-{croissance,biberon,allaitement,bain}.tsx
+      legal.tsx              # depuis Réglages
+  components/                # par domaine : baby, birth, health, household,
+                             # hub, navigation, onboarding, organisation,
+                             # procedures, together, ui
+  features/<domaine>/        # api.ts (appels Supabase), hooks.ts (TanStack
+                             # Query), constants.ts (catalogues, formatage)
+                             # domaines : baby, birth, health, household, hub,
+                             # onboarding, organisation, partner, procedures,
+                             # profile, settings, together
   lib/
-    supabase/                # client + types générés (database.types.ts)
-    query/                   # queryClient, query keys
-    atoms/                   # atoms Jotai globaux (session, rôle)
-  components/                # composants Hero UI Native partagés
+    supabase/                # client, magic-link, database.types.ts
+    query/                   # queryClient, keys.ts (une clé par domaine)
+    atoms/                   # session, role, onboarding (brouillon), dev-bypass
+    date.ts color.ts         # dates ISO locales, helpers de couleur
 ```
 
-Posé en Phase 0 : `src/lib/supabase/client.ts`, `src/lib/query/query-client.ts`
-+ `keys.ts`, `src/lib/atoms/session.ts` + `role.ts`. Le reste de l'arborescence
-(`features/`, les onglets du hub) se construit au fil de la Phase 1.
+Convention par domaine : un écran n'appelle jamais Supabase directement, il
+passe par `features/<domaine>/hooks.ts`, qui s'appuie sur `api.ts`. Les
+listes et détails d'un même pilier vivent dans un seul écran, basculés par
+état local (Démarches, Organisation, Suivi santé) — sauf quand un visuel doit
+filer bord à bord (`exercice.tsx`, une route).
+
+### Carte des routes
+
+| Route | Écran | Données | Visibilité par rôle |
+|---|---|---|---|
+| `/` | Hub : salutation, « J'ai accouché », humeur du partenaire ou invitation, bloc « Aujourd'hui », 3 piliers + Organisation, teaser « Votre bébé », « Mon partenaire », « Nos prochains rendez-vous » | `households`, `mood_checkins`, `household_procedures`, `appointments`, `symptoms_log` | « J'ai accouché » réservé à la personne enceinte |
+| `/demarches` | Liste par mois de grossesse (ouverte sur le mois en cours) + détail | `procedure_templates`, `household_procedures` | Aucune |
+| `/ensemble` | Check-in humeur, besoin, semaine, geste du jour | `mood_checkins`, `gesture_suggestions` | Écran symétrique (dette n°22) |
+| `/sante?tab=` | Journal, Rendez-vous, Contacts, Exercices | `symptoms_log`, `appointments`, `contacts`, catalogue client | Journal absent pour le co-parent ; rendez-vous non partagés filtrés par RLS |
+| `/exercice?slug=` | Fiche d'exercice illustrée | `EXERCISE_CATALOG` (client) | Aucune |
+| `/organisation` | Valise de maternité, valise en salle de naissance (Maman/Bébé/Co-parent + articles personnalisés), teaser « Le match des prénoms » | `household_checklist_items`, `household_custom_checklist_items` | Sous-section Co-parent masquée si « Seul·e » |
+| `/partenaire` | Humeur du partenaire, taille du bébé, astuces | `mood_checkins`, `baby_size_by_week` | Vue personne enceinte seulement (dette n°26) |
+| `/naissance` | 7a — déclaration de naissance | `households.birth_date` | Personne enceinte |
+| `/informations` | Informations importantes par catégorie | `household_info_items` | Aucune (les deux lisent et écrivent) |
+| `/profil`, `/reglages`, `/legal` | Prénom, thème, liens légaux | `profiles` | Personnel |
+| `/bebe`, `/bebe-*`, `/prenoms`, `/premium` | Vitrine premium (paywall inerte) ; suivis bébé en état local | aucune | Dette n°53 |
+
+## Mode contournement DEV et données fictives
+
+Le retour du lien magique dans l'app n'étant pas encore fiable (dette n°6 et
+n°8), un **mode contournement** (`devBypassAtom`, `__DEV__` uniquement) permet
+de parcourir l'onboarding puis l'app sans session. Sans foyer réel, plusieurs
+écrans s'appuient sur des fixtures ou des atomes dédiés : démarches et
+checklists (`dev-fixture.ts`), prénom, type d'accompagnement et date de terme
+saisis à l'onboarding (`devBypass*Atom`). Tout ce qui est modifié dans ce mode
+reste en mémoire et disparaît au rechargement de la page.
+
+À ne pas confondre avec les **données fictives de rendu** (`MOCK_APPOINTMENTS`
+du hub, `MOCK_INFO_ITEMS` des Informations), affichées dès qu'une liste est
+vide, **y compris hors mode DEV** — à retirer avant production (dette n°48).
 
 ## Supabase — points de vigilance
 
 - **Schéma et RLS** : voir [`DOCS/migrations/README.md`](./migrations/README.md) pour le catalogue complet. `households` porte directement `pregnant_user_id`/`partner_user_id` (pas de table de jointure générique — un foyer ne dépasse jamais 2 personnes), et deux fonctions SQL `is_household_member(household_id)` / `household_role(household_id)` factorisent toutes les policies.
-- **Données de santé** (`symptoms_log`) : lecture ouverte aux deux membres, écriture réservée à la personne enceinte — la policy la plus restrictive du schéma.
-- **Types générés** : `bun run db:types` (= `supabase gen types typescript --local --schema public > src/lib/supabase/database.types.ts`). Nécessite le stack Supabase local (`bun run db:start`, requiert Docker) ou un projet lié (`supabase link`).
+- **Données de santé** (`symptoms_log`) : lecture ouverte aux deux membres, écriture réservée à la personne enceinte — la policy la plus restrictive du schéma. Le co-parent lit les symptômes du jour depuis le bloc « Aujourd'hui » du hub (`usePregnantSymptomsForDate`), sans élargir aucune policy. `household_info_items` (groupe sanguin, allergies, n° de sécurité sociale) est lisible et modifiable par les deux membres.
+- **Migrations à jour ?** Vérifier que le projet cloud a bien reçu toutes les migrations du dépôt (`bunx supabase migration list`) — au 2026-11-11, les deux dernières n'y sont pas (dette n°49).
+- **Types générés** : `bun run db:types` génère depuis le projet **lié** (`--linked`), `bun run db:types:local` depuis le stack local (`bun run db:start`, requiert Docker). Régénérer après chaque `db push`, jamais éditer `database.types.ts` à la main.
 - **CLI** : `supabase/config.toml` posé en Phase 0 via `supabase init`. Le projet Supabase cloud existe (`EXPO_PUBLIC_SUPABASE_URL` / `EXPO_PUBLIC_SUPABASE_KEY` dans `.env`, jamais commité — `.env.example` ne contient que des placeholders). Sans ces variables, `src/lib/supabase/client.ts` fonctionne quand même avec des valeurs placeholder (l'app se lance, les appels Supabase échouent proprement).
 
 ### Liens magiques — redirection et deep links
@@ -167,5 +247,18 @@ Phase 0/1.
 
 ## Qualité
 
-- Biome pour lint + format (remplace ESLint/Prettier), configuré en pre-commit.
+- Biome pour lint + format (remplace ESLint/Prettier). Le hook Husky
+  `pre-commit` lance `biome check --staged` : un commit qui échoue au lint
+  est refusé (y compris `useExhaustiveDependencies`).
 - TypeScript strict activé dès le scaffold initial (pas de relâchement progressif).
+- CI GitHub Actions (`.github/workflows/ci.yml`, sur PR et push `main`) :
+  `bun install --frozen-lockfile`, `expo export --platform web` (génère les
+  types Expo/Uniwind et sert de test de build), `bun run lint`,
+  `bun run typecheck`.
+- **Aucun test automatisé** à ce jour (ni unitaire, ni intégration RLS) — la
+  vérification se fait à la main dans le navigateur, en mode contournement
+  DEV. Les tests d'intégration des policies RLS sont demandés en Phase 2.
+- Vérifications visuelles en web (`bun run web`, port 8081) : comportements
+  propres au web à connaître — la molette de souris peut laisser une molette
+  de date entre deux lignes, et un rechargement de page perd le mode
+  contournement DEV (il faut rejouer l'onboarding).

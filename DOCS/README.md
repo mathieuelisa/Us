@@ -13,6 +13,18 @@ grossesse et les premiers mois du bébé.
 4. [Architecture technique](./04-ARCHITECTURE.md) — stack, conventions d'état, arborescence, Supabase
 5. [Dette et points ouverts](./05-DETTE-ET-POINTS-OUVERTS.md) — contournements temporaires, vérifications jamais faites, décisions prises par défaut. **À relire avant chaque jalon**
 
+## Où en est le projet (2026-11-11)
+
+- **Avancement** : Phase 1 terminée, Phase 2 en cours — tableau d'état en
+  tête du [plan d'action](./02-ACTION-PLAN.md#état-davancement), y compris
+  les ajouts faits hors plan (Organisation & Préparation, vitrine premium,
+  refonte visuelle).
+- **Ce que fait chaque écran** et quelles données il lit :
+  [carte des routes](./04-ARCHITECTURE.md#carte-des-routes).
+- **Avant de tester en conditions réelles** : relire les points 🔴 de la
+  [dette](./05-DETTE-ET-POINTS-OUVERTS.md) — données fictives affichées
+  hors mode DEV, migrations non appliquées sur le cloud.
+
 Le contenu détaillé de chaque version livrable vit dans [`versions/`](./versions/) :
 [MVP](./versions/MVP.md), [V1](./versions/V1.md), [V2](./versions/V2.md).
 
