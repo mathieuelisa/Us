@@ -18,8 +18,10 @@ import { atom } from 'jotai';
  * Pour retirer ce contournement : supprimer ce fichier, puis les usages
  * dans `src/app/_layout.tsx`, `src/app/(auth)/login.tsx`,
  * `src/app/(onboarding)/finalisation.tsx`, `src/app/(tabs)/index.tsx`,
- * `src/app/(tabs)/profil.tsx`, `src/app/(tabs)/organisation.tsx`, `src/app/(tabs)/demarches.tsx` et
- * `src/app/(tabs)/naissance.tsx` (le compilateur les signalera).
+ * `src/app/(tabs)/profil.tsx`, `src/app/(tabs)/organisation.tsx`,
+ * `src/app/(tabs)/demarches.tsx`, `src/app/(tabs)/informations.tsx`,
+ * `src/app/(tabs)/reglages.tsx` et `src/app/(tabs)/naissance.tsx` (le
+ * compilateur les signalera).
  */
 export type DevBypassStage = 'off' | 'onboarding' | 'app';
 
@@ -49,3 +51,16 @@ export const devBypassAccompanimentTypeAtom = atom<string>('');
  * pour lire `households.due_date`).
  */
 export const devBypassDueDateAtom = atom<string | null>(null);
+
+/**
+ * Sortie du mode contournement (« Se déconnecter » dans Réglages) : retour à
+ * l'écran de connexion et oubli de tout ce que le parcours DEV avait gardé.
+ * Sans elle, le bouton ne faisait rien en mode DEV — il n'y a pas de session
+ * Supabase à fermer.
+ */
+export const resetDevBypassAtom = atom(null, (_get, set) => {
+  set(devBypassAtom, 'off');
+  set(devBypassFirstNameAtom, '');
+  set(devBypassAccompanimentTypeAtom, '');
+  set(devBypassDueDateAtom, null);
+});

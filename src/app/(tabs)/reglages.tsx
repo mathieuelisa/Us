@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { useAtomValue } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { type ComponentProps, useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
@@ -18,6 +18,7 @@ import {
   SparkLines,
 } from '@/components/ui/glass-card';
 import { ScreenCornerShapes } from '@/components/ui/screen-corner-shapes';
+import { signOut } from '@/features/auth/api';
 import { useUpdateMyTheme } from '@/features/profile/hooks';
 import {
   resolveThemeId,
@@ -25,10 +26,11 @@ import {
   type ThemeId,
 } from '@/features/settings/constants';
 import { useThemeAccent, useThemeBackground } from '@/features/settings/hooks';
+// ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
+import { devBypassAtom, resetDevBypassAtom } from '@/lib/atoms/dev-bypass';
 import { currentRoleAtom } from '@/lib/atoms/role';
 import { sessionAtom } from '@/lib/atoms/session';
 import { hexToRgba, lightenHex } from '@/lib/color';
-import { supabase } from '@/lib/supabase/client';
 
 const SafeAreaView = withUniwind(RNSafeAreaView);
 
@@ -87,6 +89,9 @@ export default function SettingsScreen() {
   const backgroundColor = useThemeBackground();
   const accent = useThemeAccent();
   const [isSigningOut, setIsSigningOut] = useState(false);
+  // ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
+  const isDevBypass = useAtomValue(devBypassAtom) !== 'off';
+  const resetDevBypass = useSetAtom(resetDevBypassAtom);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const isPregnant =
@@ -115,10 +120,21 @@ export default function SettingsScreen() {
     }
   };
 
+  // Hors ligne, `signOut()` se rabat sur une déconnexion locale ; en mode
+  // contournement DEV, il n'y a pas de session : on sort du mode à la place.
+  // Le nettoyage du cache suit le changement de compte
+  // (`useResetOnAccountChange`, layout racine).
   const handleSignOut = async () => {
     setIsSigningOut(true);
-    await supabase.auth.signOut();
-    setIsSigningOut(false);
+    try {
+      if (isDevBypass) {
+        resetDevBypass();
+        return;
+      }
+      await signOut();
+    } finally {
+      setIsSigningOut(false);
+    }
   };
 
   return (

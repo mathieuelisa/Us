@@ -92,6 +92,21 @@ export async function signInWithGoogle(): Promise<boolean> {
   return createSessionFromUrl(result.url);
 }
 
+/**
+ * Déconnexion. On tente d'abord de fermer la session côté serveur (portée
+ * `global` par défaut) ; si l'appel échoue — hors ligne, typiquement —
+ * Supabase garde la session sur l'appareil et l'utilisateur resterait
+ * connecté sans explication. On se rabat alors sur une déconnexion
+ * **locale**, qui efface toujours la session de l'appareil : c'est ce que
+ * l'utilisateur demande en appuyant sur le bouton.
+ */
+export async function signOut() {
+  const { error } = await supabase.auth.signOut();
+  if (error) {
+    await supabase.auth.signOut({ scope: 'local' });
+  }
+}
+
 export async function updatePassword(password: string) {
   const { error } = await supabase.auth.updateUser({ password });
   if (error) throw error;

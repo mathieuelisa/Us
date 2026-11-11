@@ -12,6 +12,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Uniwind } from 'uniwind';
 
 import { AnimatedSplashOverlay } from '@/components/animated-icon';
+import { useResetOnAccountChange } from '@/features/auth/hooks';
 import { useMyHousehold, useSyncCurrentRole } from '@/features/household/hooks';
 import { useMyProfile } from '@/features/profile/hooks';
 import {
@@ -122,6 +123,9 @@ export default function RootLayout() {
   // URL de retour d'Auth (confirmation, réinitialisation) reçues pendant
   // que l'app tourne déjà (mobile).
   useAuthRedirectListener();
+
+  // Cache, rôle, brouillon et thème remis à zéro quand le compte change.
+  useResetOnAccountChange();
 
   useEffect(() => {
     initialSessionRecovery.finally(() => {
