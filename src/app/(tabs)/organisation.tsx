@@ -67,18 +67,18 @@ const tintedShadow = (accent: string) =>
 /** Icône de la pastille de chaque sous-section (Maman / Bébé / Co-parent). */
 const CATEGORY_ICONS: Record<string, ComponentProps<typeof Ionicons>['name']> =
   {
-    bebe: 'happy-outline',
     co_parent: 'man-outline',
   };
 
 /**
- * Pictogramme dessiné pour « Maman » (mère portant son bébé, fourni par
- * l'utilisateur) à la place de l'icône générique `woman-outline`. Image
- * transparente recolorée par `tintColor` : elle suit la couleur d'accent du
- * thème comme les icônes des deux autres sous-sections.
+ * Pictogrammes dessinés (fournis par l'utilisateur) à la place des icônes
+ * génériques : mère portant son bébé pour « Maman », visage de bébé pour
+ * « Bébé ». Images transparentes recolorées par `tintColor` : elles suivent
+ * la couleur d'accent du thème, comme l'icône de « Co-parent ».
  */
 const CATEGORY_IMAGES: Record<string, number> = {
   maman: require('@/assets/images/Icon_maman.png'),
+  bebe: require('@/assets/images/Icon_bebe.png'),
 };
 
 /**
@@ -546,32 +546,7 @@ function ChecklistDetail({
         <View className="gap-5">
           {categoryGroups.map((group) => (
             <View key={group.category} className="gap-3">
-              <View
-                className="flex-row items-center gap-2 self-start rounded-full py-1.5 pl-1.5 pr-4"
-                style={{ backgroundColor: hexToRgba(accent, 0.1) }}
-              >
-                <View className="h-8 w-8 items-center justify-center rounded-full bg-white">
-                  {CATEGORY_IMAGES[group.category] ? (
-                    <Image
-                      source={CATEGORY_IMAGES[group.category]}
-                      style={{ width: 20, height: 20, tintColor: accent }}
-                      resizeMode="contain"
-                    />
-                  ) : (
-                    <Ionicons
-                      name={CATEGORY_ICONS[group.category] ?? 'list-outline'}
-                      size={17}
-                      color={accent}
-                    />
-                  )}
-                </View>
-                <Text
-                  className="text-[14.5px] font-bold"
-                  style={{ color: GLASS_TITLE_COLOR }}
-                >
-                  {CHECKLIST_CATEGORY_META[group.category].title}
-                </Text>
-              </View>
+              <CategoryHeader category={group.category} accent={accent} />
               <View className="gap-2.5">
                 {group.items.map((item) => (
                   <ChecklistItemRow
@@ -772,5 +747,48 @@ function ChecklistItemRow({
         </Pressable>
       ) : null}
     </Pressable>
+  );
+}
+
+/**
+ * En-tête d'une sous-section (Maman / Bébé / Co-parent) d'une valise : une
+ * pastille teintée d'accent, pictogramme et titre côte à côte (maquette
+ * fournie). Pas de rond blanc derrière le pictogramme (demande explicite) :
+ * il se pose directement sur la pastille, recoloré à l'accent du thème.
+ */
+function CategoryHeader({
+  category,
+  accent,
+}: {
+  category: string;
+  accent: string;
+}) {
+  const image = CATEGORY_IMAGES[category];
+
+  return (
+    <View
+      className="flex-row items-center gap-2.5 self-start rounded-full py-2 pl-3 pr-5"
+      style={{ backgroundColor: hexToRgba(accent, 0.1) }}
+    >
+      {image ? (
+        <Image
+          source={image}
+          style={{ width: 24, height: 24, tintColor: accent }}
+          resizeMode="contain"
+        />
+      ) : (
+        <Ionicons
+          name={CATEGORY_ICONS[category] ?? 'list-outline'}
+          size={22}
+          color={accent}
+        />
+      )}
+      <Text
+        className="text-[16px] font-bold"
+        style={{ color: GLASS_TITLE_COLOR }}
+      >
+        {CHECKLIST_CATEGORY_META[category].title}
+      </Text>
+    </View>
   );
 }
