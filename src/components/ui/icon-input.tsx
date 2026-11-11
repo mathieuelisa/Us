@@ -4,6 +4,7 @@ import { TextInput, type TextInputProps, View } from 'react-native';
 
 import { GLASS_TITLE_COLOR } from '@/components/ui/glass-card';
 import { hexToRgba } from '@/lib/color';
+import { NO_WEB_FOCUS_OUTLINE } from '@/lib/web-styles';
 
 export type IoniconName = ComponentProps<typeof Ionicons>['name'];
 
@@ -111,7 +112,12 @@ export function IconInput({
         onSubmitEditing={onSubmitEditing}
         autoCorrect={secureTextEntry ? false : undefined}
         className="flex-1 text-[14.5px]"
-        style={{ color: GLASS_TITLE_COLOR, paddingVertical: 0 }}
+        // Pas de contour de focus du navigateur (web) : la gélule prend
+        // déjà un contour d'accent quand le champ est actif.
+        style={[
+          { color: GLASS_TITLE_COLOR, paddingVertical: 0 },
+          NO_WEB_FOCUS_OUTLINE,
+        ]}
       />
       {trailing}
     </View>
