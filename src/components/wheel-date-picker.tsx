@@ -182,6 +182,9 @@ function WheelColumn({
     items.findIndex((item) => item.value === selected),
     0,
   );
+  // Dernier index voulu par le parent, lisible depuis un minuteur.
+  const selectedIndexRef = useRef(selectedIndex);
+  selectedIndexRef.current = selectedIndex;
 
   const scrollHandler = useAnimatedScrollHandler((event) => {
     offset.value = event.contentOffset.y;
@@ -233,6 +236,18 @@ function WheelColumn({
       if (index === settledIndexRef.current) return;
       settledIndexRef.current = index;
       onSelect(items[index].value);
+      // Le parent peut refuser le choix (date antérieure à `minDate`) sans
+      // que sa valeur change : l'effet sur `selectedIndex` ne se relance
+      // alors pas, et la molette resterait sur la ligne refusée. On la
+      // ramène donc nous-mêmes sur la valeur retenue — après un délai qui
+      // laisse le parent se re-rendre, pour ne pas confondre un choix accepté
+      // pas encore affiché avec un choix refusé.
+      commitTimeoutRef.current = setTimeout(() => {
+        commitTimeoutRef.current = null;
+        if (settledIndexRef.current !== selectedIndexRef.current) {
+          scrollToIndex(selectedIndexRef.current, true);
+        }
+      }, 120);
     }, 160);
   };
 
@@ -302,10 +317,18 @@ export function WheelDatePicker({
   value,
   onChange,
   compact = false,
+  minDate,
 }: {
   value: string | null;
   onChange: (isoDate: string) => void;
   compact?: boolean;
+  /**
+   * Date la plus tôt sélectionnable (ISO). Les années antérieures
+   * disparaissent de la molette ; une date plus tôt dans l'année est
+   * ramenée à `minDate` dès que la molette s'arrête, comme le
+   * `minimumDate` du picker iOS.
+   */
+  minDate?: string;
 }) {
   const size = compact ? WHEEL_SIZES.compact : WHEEL_SIZES.regular;
   const wheelHeight = size.itemHeight * size.visibleItems;
@@ -327,10 +350,21 @@ export function WheelDatePicker({
     value: index + 1,
     label,
   }));
-  const yearItems = Array.from({ length: 4 }, (_, index) => {
-    const yearValue = currentYear - 1 + index;
-    return { value: yearValue, label: String(yearValue) };
-  });
+  const firstYear = minDate ? Number(minDate.slice(0, 4)) : currentYear - 1;
+  const yearItems = Array.from(
+    { length: currentYear + 3 - firstYear },
+    (_, index) => {
+      const yearValue = firstYear + index;
+      return { value: yearValue, label: String(yearValue) };
+    },
+  );
+
+  // Toute sélection passe par ici : une date antérieure à `minDate` est
+  // ramenée au plus tôt autorisé, et la molette se recale d'elle-même
+  // (elle suit `value`).
+  const select = (isoDate: string) => {
+    onChange(minDate && isoDate < minDate ? minDate : isoDate);
+  };
 
   const weekday = WEEKDAY_LABELS[new Date(year, month - 1, day).getDay()];
 
@@ -355,7 +389,7 @@ export function WheelDatePicker({
               selected={day}
               onSelect={(nextDay) => {
                 desiredDayRef.current = nextDay;
-                onChange(toIsoDate(year, month, nextDay));
+                select(toIsoDate(year, month, nextDay));
               }}
               accessibilityLabel="Jour"
               flex={0.8}
@@ -365,7 +399,7 @@ export function WheelDatePicker({
               items={monthItems}
               selected={month}
               onSelect={(nextMonth) =>
-                onChange(toIsoDate(year, nextMonth, desiredDayRef.current))
+                select(toIsoDate(year, nextMonth, desiredDayRef.current))
               }
               accessibilityLabel="Mois"
               flex={1.4}
@@ -375,7 +409,7 @@ export function WheelDatePicker({
               items={yearItems}
               selected={year}
               onSelect={(nextYear) =>
-                onChange(toIsoDate(nextYear, month, desiredDayRef.current))
+                select(toIsoDate(nextYear, month, desiredDayRef.current))
               }
               accessibilityLabel="Année"
               flex={1}
