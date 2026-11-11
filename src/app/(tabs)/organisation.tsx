@@ -67,10 +67,19 @@ const tintedShadow = (accent: string) =>
 /** Icône de la pastille de chaque sous-section (Maman / Bébé / Co-parent). */
 const CATEGORY_ICONS: Record<string, ComponentProps<typeof Ionicons>['name']> =
   {
-    maman: 'woman-outline',
     bebe: 'happy-outline',
     co_parent: 'man-outline',
   };
+
+/**
+ * Pictogramme dessiné pour « Maman » (mère portant son bébé, fourni par
+ * l'utilisateur) à la place de l'icône générique `woman-outline`. Image
+ * transparente recolorée par `tintColor` : elle suit la couleur d'accent du
+ * thème comme les icônes des deux autres sous-sections.
+ */
+const CATEGORY_IMAGES: Record<string, number> = {
+  maman: require('@/assets/images/Icon_maman.png'),
+};
 
 /**
  * Écran « Organisation & Préparation » — nouvelle section, hors maquettes
@@ -542,11 +551,19 @@ function ChecklistDetail({
                 style={{ backgroundColor: hexToRgba(accent, 0.1) }}
               >
                 <View className="h-8 w-8 items-center justify-center rounded-full bg-white">
-                  <Ionicons
-                    name={CATEGORY_ICONS[group.category] ?? 'list-outline'}
-                    size={17}
-                    color={accent}
-                  />
+                  {CATEGORY_IMAGES[group.category] ? (
+                    <Image
+                      source={CATEGORY_IMAGES[group.category]}
+                      style={{ width: 20, height: 20, tintColor: accent }}
+                      resizeMode="contain"
+                    />
+                  ) : (
+                    <Ionicons
+                      name={CATEGORY_ICONS[group.category] ?? 'list-outline'}
+                      size={17}
+                      color={accent}
+                    />
+                  )}
                 </View>
                 <Text
                   className="text-[14.5px] font-bold"
