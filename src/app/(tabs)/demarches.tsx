@@ -37,6 +37,7 @@ import {
 } from '@/components/ui/glass-card';
 import { PillButton } from '@/components/ui/pill-button';
 import { ScreenCornerShapes } from '@/components/ui/screen-corner-shapes';
+import { getPregnancyMonth } from '@/features/health/constants';
 import { useMyHousehold } from '@/features/household/hooks';
 import {
   formatDeadlineLabel,
@@ -55,7 +56,7 @@ import {
 } from '@/features/procedures/hooks';
 import { useThemeAccent, useThemeBackground } from '@/features/settings/hooks';
 // ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
-import { devBypassAtom } from '@/lib/atoms/dev-bypass';
+import { devBypassAtom, devBypassDueDateAtom } from '@/lib/atoms/dev-bypass';
 import { hexToRgba } from '@/lib/color';
 
 const SafeAreaView = withUniwind(RNSafeAreaView);
@@ -133,10 +134,30 @@ export default function ProceduresScreen() {
     (procedure) => procedure.householdProcedureId === selectedId,
   );
 
+  // Mois de grossesse en cours, déduit de la date de terme saisie à
+  // l'onboarding (demande explicite) — `null` si elle est inconnue.
+  // ⚠️ TEMPORAIRE — en mode contournement, pas de foyer réel : la date de
+  // terme vient de l'onboarding, conservée à part (cf. dev-bypass.ts).
+  const devBypassDueDate = useAtomValue(devBypassDueDateAtom);
+  const dueDate = isDevBypass
+    ? devBypassDueDate
+    : (household?.due_date ?? null);
+  const currentMonth = getPregnancyMonth(dueDate);
+
   // Il y a toujours exactement un mois actif (plus de « tous les mois »
-  // désélectionné). Démarre sur le premier. Il change au tap sur un mois ou
-  // via les flèches ; faire glisser la rangée ne fait que la parcourir.
-  const [selectedMonth, setSelectedMonth] = useState<number>(1);
+  // désélectionné). Démarre sur le mois de grossesse en cours (1er à
+  // défaut). Il change au tap sur un mois ou via les flèches ; faire
+  // glisser la rangée ne fait que la parcourir.
+  const [selectedMonth, setSelectedMonth] = useState<number>(currentMonth ?? 1);
+
+  // Le foyer arrive en différé : tant que l'utilisateur n'a pas choisi de
+  // mois lui-même, on se cale sur le mois en cours dès qu'il est connu.
+  const hasPickedMonthRef = useRef(false);
+  useEffect(() => {
+    if (currentMonth !== null && !hasPickedMonthRef.current) {
+      setSelectedMonth(currentMonth);
+    }
+  }, [currentMonth]);
 
   // Le mois actif est centré **quand c'est possible** : la rangée n'a plus
   // de marge d'une demi-largeur d'écran de chaque côté (demande explicite —
@@ -177,7 +198,38 @@ export default function ProceduresScreen() {
   const backgroundColor = useThemeBackground();
   const accent = useThemeAccent();
 
+  // Démarches par mois : total et restantes (non faites), pour les
+  // pastilles des mois et l'état vide.
+  const monthStats = new Map<number, { total: number; remaining: number }>();
+  for (const procedure of procedures) {
+    const month = PROCEDURE_PREGNANCY_MONTH[procedure.slug];
+    if (month === undefined) continue;
+    const stats = monthStats.get(month) ?? { total: 0, remaining: 0 };
+    stats.total += 1;
+    if (procedure.status !== 'fait') stats.remaining += 1;
+    monthStats.set(month, stats);
+  }
+
+  // État vide : prochain mois (après celui choisi) qui a encore des
+  // démarches à faire, sinon le plus proche avant lui.
+  const monthsWithRemaining = PREGNANCY_MONTHS.filter(
+    (month) => (monthStats.get(month)?.remaining ?? 0) > 0,
+  );
+  const nextStepMonth =
+    monthsWithRemaining.find((month) => month > selectedMonth) ??
+    [...monthsWithRemaining].reverse().find((month) => month < selectedMonth) ??
+    null;
+  const nextStepProcedure =
+    nextStepMonth === null
+      ? null
+      : procedures.find(
+          (procedure) =>
+            PROCEDURE_PREGNANCY_MONTH[procedure.slug] === nextStepMonth &&
+            procedure.status !== 'fait',
+        );
+
   const goToMonth = (month: number) => {
+    hasPickedMonthRef.current = true;
     const clamped = Math.min(Math.max(month, firstMonth), lastMonth);
     setSelectedMonth(clamped);
     scrollToMonth(clamped);
@@ -268,6 +320,12 @@ export default function ProceduresScreen() {
               >
                 PAR MOIS DE GROSSESSE
               </Text>
+              <Text
+                className="-mt-1.5 text-[13px]"
+                style={{ color: GLASS_BODY_COLOR }}
+              >
+                Sélectionnez un mois pour voir les démarches à prévoir.
+              </Text>
               <View className="flex-row items-center gap-1.5">
                 <MonthArrow
                   direction="back"
@@ -294,6 +352,9 @@ export default function ProceduresScreen() {
                       key={month}
                       month={month}
                       isActive={month === selectedMonth}
+                      isCurrent={month === currentMonth}
+                      remaining={monthStats.get(month)?.remaining ?? 0}
+                      total={monthStats.get(month)?.total ?? 0}
                       accent={accent}
                       onPress={() => goToMonth(month)}
                       onLayout={(x, width) => {
@@ -314,22 +375,16 @@ export default function ProceduresScreen() {
 
             <View className="gap-3">
               {visibleProcedures.length === 0 ? (
-                <View
-                  className="items-center gap-2 rounded-[28px] px-5 py-6"
-                  style={{ backgroundColor: hexToRgba(accent, 0.07) }}
-                >
-                  <Ionicons
-                    name="checkmark-done-outline"
-                    size={26}
-                    color={accent}
-                  />
-                  <Text
-                    className="text-center text-[14px]"
-                    style={{ color: GLASS_BODY_COLOR }}
-                  >
-                    Aucune démarche à faire ce mois-ci.
-                  </Text>
-                </View>
+                <EmptyMonthCard
+                  accent={accent}
+                  nextStepMonth={nextStepMonth}
+                  nextStepTitle={nextStepProcedure?.title ?? null}
+                  onSeeNextStep={() =>
+                    nextStepMonth === null
+                      ? undefined
+                      : goToMonth(nextStepMonth)
+                  }
+                />
               ) : null}
               {visibleProcedures.map((procedure) => {
                 const deadline = formatDeadlineLabel(
@@ -420,6 +475,86 @@ const tintedShadow = (accent: string) =>
     elevation: 4,
   }) as const;
 
+/** « 1er mois », « 3e mois »… */
+function shortMonthLabel(month: number): string {
+  return month === 1 ? '1er mois' : `${month}e mois`;
+}
+
+/**
+ * État vide d'un mois sans démarche — renvoie vers la suite plutôt que de
+ * s'arrêter là (demande explicite) : la prochaine démarche à faire et un
+ * bouton « Voir » qui sélectionne son mois (et fait défiler la rangée).
+ */
+function EmptyMonthCard({
+  accent,
+  nextStepMonth,
+  nextStepTitle,
+  onSeeNextStep,
+}: {
+  accent: string;
+  nextStepMonth: number | null;
+  nextStepTitle: string | null;
+  onSeeNextStep: () => void;
+}) {
+  return (
+    <View
+      className="gap-3.5 rounded-[28px] px-4 py-4"
+      style={{ backgroundColor: hexToRgba(accent, 0.07) }}
+    >
+      <View className="flex-row items-center gap-3">
+        <View className="h-10 w-10 items-center justify-center rounded-full bg-white">
+          <Ionicons name="leaf-outline" size={19} color={accent} />
+        </View>
+        <Text
+          className="flex-1 text-[15px] font-bold"
+          style={{ color: GLASS_TITLE_COLOR }}
+        >
+          Aucune démarche ce mois-ci.
+        </Text>
+      </View>
+
+      {nextStepMonth !== null && nextStepTitle ? (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={`Voir la prochaine étape : ${nextStepTitle}, ${shortMonthLabel(nextStepMonth)}`}
+          onPress={onSeeNextStep}
+          className="flex-row items-center gap-3 rounded-[22px] bg-white py-3 pl-4 pr-3 active:opacity-80"
+          style={tintedShadow(accent)}
+        >
+          <View className="flex-1 gap-0.5">
+            <Text
+              className="text-[12px] font-semibold"
+              style={{ color: accent }}
+            >
+              Prochaine étape · {shortMonthLabel(nextStepMonth)}
+            </Text>
+            <Text
+              className="text-[14.5px] font-bold"
+              style={{ color: GLASS_TITLE_COLOR }}
+            >
+              {nextStepTitle}
+            </Text>
+          </View>
+          <View
+            className="flex-row items-center gap-1 rounded-full px-3 py-1.5"
+            style={{ backgroundColor: accent }}
+          >
+            <Text className="text-[13px] font-bold text-white">Voir</Text>
+            <Ionicons name="arrow-forward" size={14} color="#ffffff" />
+          </View>
+        </Pressable>
+      ) : (
+        <Text
+          className="px-1 text-[13.5px] leading-5"
+          style={{ color: GLASS_BODY_COLOR }}
+        >
+          Toutes vos démarches sont faites — bravo.
+        </Text>
+      )}
+    </View>
+  );
+}
+
 /** Flèche ronde de part et d'autre des mois : un mois de plus ou de moins. */
 function MonthArrow({
   direction,
@@ -472,12 +607,21 @@ const MONTH_PILL_ACTIVE_HEIGHT = 66;
 function MonthPill({
   month,
   isActive,
+  isCurrent,
+  remaining,
+  total,
   accent,
   onPress,
   onLayout,
 }: {
   month: number;
   isActive: boolean;
+  /** Mois de grossesse en cours : liseré d'accent quand il n'est pas choisi. */
+  isCurrent: boolean;
+  /** Démarches non faites ce mois-là — chiffre de la pastille. */
+  remaining: number;
+  /** Démarches du mois, faites ou non — coche quand tout est fait. */
+  total: number;
   accent: string;
   onPress: () => void;
   onLayout: (x: number, width: number) => void;
@@ -539,7 +683,15 @@ function MonthPill({
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={getPregnancyMonthLabel(month)}
+      accessibilityLabel={`${getPregnancyMonthLabel(month)}${
+        isCurrent ? ', mois en cours' : ''
+      }${
+        remaining > 0
+          ? `, ${remaining} démarche${remaining > 1 ? 's' : ''} à faire`
+          : total > 0
+            ? ', démarches faites'
+            : ''
+      }`}
       accessibilityState={{ selected: isActive }}
       onPress={onPress}
       onLayout={(event) =>
@@ -559,7 +711,12 @@ function MonthPill({
                 shadowRadius: 10,
                 elevation: 6,
               }
-            : { borderWidth: 1, borderColor: hexToRgba(accent, 0.1) },
+            : {
+                // Mois en cours : liseré d'accent plus marqué, pour qu'on
+                // le repère même quand un autre mois est choisi.
+                borderWidth: isCurrent ? 2 : 1,
+                borderColor: hexToRgba(accent, isCurrent ? 0.6 : 0.1),
+              },
           pillStyle,
         ]}
       >
@@ -573,6 +730,33 @@ function MonthPill({
           mois
         </Animated.Text>
       </Animated.View>
+
+      {/* Pastille : nombre de démarches à faire ce mois-là, ou coche quand
+          elles sont toutes faites. Inversée sur le mois choisi (blanc sur
+          accent) pour rester lisible. */}
+      {total > 0 ? (
+        <View
+          pointerEvents="none"
+          className="absolute -right-1 top-0 h-[20px] min-w-[20px] items-center justify-center rounded-full px-1"
+          style={{
+            backgroundColor:
+              remaining === 0 ? '#ffffff' : isActive ? '#ffffff' : accent,
+            borderWidth: 2,
+            borderColor: isActive ? accent : '#ffffff',
+          }}
+        >
+          {remaining > 0 ? (
+            <Text
+              className="text-[11px] font-extrabold"
+              style={{ color: isActive ? accent : '#ffffff' }}
+            >
+              {remaining}
+            </Text>
+          ) : (
+            <Ionicons name="checkmark" size={11} color={accent} />
+          )}
+        </View>
+      ) : null}
       <Animated.View
         pointerEvents="none"
         style={[

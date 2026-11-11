@@ -41,3 +41,11 @@ export const devBypassFirstNameAtom = atom<string>('');
  * pour lire `households.accompaniment_type`).
  */
 export const devBypassAccompanimentTypeAtom = atom<string>('');
+
+/**
+ * Date de terme saisie à l'étape 3 de l'onboarding (ISO), conservée au même
+ * titre que le prénom — sans elle, `demarches.tsx` ne pourrait pas s'ouvrir
+ * sur le mois de grossesse en cours en mode contournement (pas de foyer réel
+ * pour lire `households.due_date`).
+ */
+export const devBypassDueDateAtom = atom<string | null>(null);

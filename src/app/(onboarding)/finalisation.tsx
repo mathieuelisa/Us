@@ -11,6 +11,7 @@ import { useThemeBackground } from '@/features/settings/hooks';
 import {
   devBypassAccompanimentTypeAtom,
   devBypassAtom,
+  devBypassDueDateAtom,
   devBypassFirstNameAtom,
 } from '@/lib/atoms/dev-bypass';
 import {
@@ -37,6 +38,7 @@ export default function FinalisationScreen() {
   const setDevBypassAccompanimentType = useSetAtom(
     devBypassAccompanimentTypeAtom,
   );
+  const setDevBypassDueDate = useSetAtom(devBypassDueDateAtom);
 
   const hasSubmitted = useRef(false);
   const { mutate } = submitOnboarding;
@@ -53,6 +55,7 @@ export default function FinalisationScreen() {
     if (devBypass === 'onboarding') {
       setDevBypassFirstName(draft.firstName.trim());
       setDevBypassAccompanimentType(draft.accompanimentType ?? '');
+      setDevBypassDueDate(draft.dueDate);
       setDraft(EMPTY_ONBOARDING_DRAFT);
       setDevBypass('app');
       return;
@@ -73,6 +76,7 @@ export default function FinalisationScreen() {
     setDevBypass,
     setDevBypassFirstName,
     setDevBypassAccompanimentType,
+    setDevBypassDueDate,
   ]);
 
   const retry = () => {

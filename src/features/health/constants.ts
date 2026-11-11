@@ -73,6 +73,24 @@ export function getWeeksOfAmenorrhea(
 }
 
 /**
+ * Mois de grossesse en cours (1 à 9), déduit de la date de terme.
+ *
+ * Compté depuis la conception (SA − 2) par tranches de 4,345 semaines —
+ * un mois moyen —, comme le font les calendriers de grossesse français :
+ * 14 SA → 3e mois, 29 SA → 7e, 39 SA → 9e. Borné à 1–9 (un terme dépassé
+ * reste au 9e mois). `null` si le terme est inconnu.
+ */
+export function getPregnancyMonth(
+  dueDate: string | null,
+  today: string = todayIso(),
+): number | null {
+  const weeks = getWeeksOfAmenorrhea(dueDate, today);
+  if (weeks === null) return null;
+  const month = Math.floor(Math.max(weeks - 2, 0) / 4.345) + 1;
+  return Math.min(Math.max(month, 1), 9);
+}
+
+/**
  * Découpage français : 1er trimestre jusqu'à 15 SA, 2e jusqu'à 28 SA, 3e
  * au-delà.
  */
