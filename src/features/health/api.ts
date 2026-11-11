@@ -118,6 +118,36 @@ export async function createAppointment(input: {
   return data;
 }
 
+/**
+ * Modifie un rendez-vous. La RLS (`appointments_update_creator`) réserve la
+ * modification à son créateur et interdit de changer de foyer ou d'auteur :
+ * on n'envoie donc que les champs éditables.
+ */
+export async function updateAppointment(input: {
+  id: string;
+  title: string;
+  appointmentDate: string;
+  appointmentTime: string | null;
+  address: string | null;
+  isShared: boolean;
+}): Promise<Appointment> {
+  const { data, error } = await supabase
+    .from('appointments')
+    .update({
+      title: input.title,
+      appointment_date: input.appointmentDate,
+      appointment_time: input.appointmentTime,
+      address: input.address,
+      is_shared: input.isShared,
+    })
+    .eq('id', input.id)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
 export async function deleteAppointment(id: string): Promise<void> {
   const { error } = await supabase.from('appointments').delete().eq('id', id);
   if (error) throw error;

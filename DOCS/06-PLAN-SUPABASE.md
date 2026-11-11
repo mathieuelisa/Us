@@ -227,8 +227,9 @@ co-parent (choix confirmé, D4).
 - [x] App : formulaire et bouton d'ajout pour les deux rôles ; croix de
       suppression et badge « Partagé / Non partagé » sur ses propres
       rendez-vous, badge « De votre co-parent » sur ceux de l'autre.
-- [ ] App : **modification d'un rendez-vous** — la policy de mise à jour
-      existe déjà, il ne manque que l'écran. → dette n°30
+- [x] App : **modification d'un rendez-vous** — toucher un de ses
+      rendez-vous ouvre la feuille pré-remplie (« Enregistrer les
+      modifications », « Supprimer »), sur la policy existante.
 - [ ] Tests RLS du lot 2 mis à jour.
 
 ### Invitation du co-parent après l'onboarding

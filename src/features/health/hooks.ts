@@ -17,6 +17,7 @@ import {
   fetchSymptomsForDate,
   reorderContacts,
   saveSymptoms,
+  updateAppointment,
 } from './api';
 
 function useIds(household: Household | null | undefined) {
@@ -162,6 +163,28 @@ export function useCreateAppointment(household: Household | null | undefined) {
       invalidate([
         queryKeys.health.appointments(householdId as string),
         // Le hub affiche le prochain rendez-vous dans le pilier Suivi santé.
+        queryKeys.hub.summary(householdId as string),
+      ]);
+    },
+  });
+}
+
+export function useUpdateAppointment(household: Household | null | undefined) {
+  const { householdId } = useIds(household);
+  const invalidate = useInvalidate(householdId);
+
+  return useMutation({
+    mutationFn: (input: {
+      id: string;
+      title: string;
+      appointmentDate: string;
+      appointmentTime: string | null;
+      address: string | null;
+      isShared: boolean;
+    }) => updateAppointment(input),
+    onSuccess: () => {
+      invalidate([
+        queryKeys.health.appointments(householdId as string),
         queryKeys.hub.summary(householdId as string),
       ]);
     },

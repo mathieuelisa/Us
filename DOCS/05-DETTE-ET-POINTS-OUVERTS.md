@@ -20,8 +20,9 @@ Dernière revue : 2026-11-11 (analyse complète du code et du projet Supabase
 cloud, puis mise à jour de la base et de la connexion). Points retirés car
 réglés : n°10 (`OutlineButton` n'a plus d'appelant, cf. n°20), n°13 (vraie
 molette de date), n°24 (émoji des gestes en base), n°48 (exemples fictifs
-limités au mode DEV), n°49 (migrations appliquées sur le cloud) et n°50
-(fonctions `SECURITY DEFINER` durcies).
+limités au mode DEV), n°49 (migrations appliquées sur le cloud), n°50
+(fonctions `SECURITY DEFINER` durcies) et n°30 (les rendez-vous se
+modifient d'un tap, par leur créateur).
 
 ## 🔴 Bloquant avant toute mise en production
 
@@ -84,7 +85,6 @@ Décisions prises par défaut, à confirmer ou corriger.
 | 26 | **Vue co-parent du pilier Suivi santé et de « Mon partenaire »** : le co-parent voit déjà les symptômes **du jour** de la personne enceinte, en lecture seule, dans le bloc « Aujourd'hui » du hub (`HealthTodayCard`), et ses rendez-vous partagés dans Suivi santé (filtrage RLS). Restent à faire : l'historique des symptômes en lecture seule et la reprise des rendez-vous partagés dans « Mon partenaire ». L'onglet Journal lui est correctement masqué. | [`src/app/(tabs)/sante.tsx`](../src/app/%28tabs%29/sante.tsx), [`partenaire.tsx`](../src/app/%28tabs%29/partenaire.tsx), [`health-today-card.tsx`](../src/components/hub/health-today-card.tsx) |
 | 28 | **Catalogue de symptômes en constante client**, pas en base : liste fermée qui fait partie de l'interface (pictogrammes `SYMPTOM_VISUALS` compris). À basculer en base si elle doit devenir configurable. | [`src/features/health/constants.ts`](../src/features/health/constants.ts) |
 | 29 | **Astuces du jour en constante client** (« Mon partenaire », bloc « Aujourd'hui » du hub), même raisonnement que le point 28. Distinctes du « geste du jour », qui vit bien en base. **Décision 2026-11-11** : restent côté client pour l'instant ([plan Supabase](./06-PLAN-SUPABASE.md), lot 6). | [`src/features/partner/constants.ts`](../src/features/partner/constants.ts) |
-| 30 | **Modification d'un rendez-vous impossible** : création et suppression seulement. Depuis le 2026-11-11, les deux parents créent des rendez-vous et seul le créateur supprime ; la policy de mise à jour (créateur seul) existe déjà, il ne manque que l'écran de modification. | [`src/components/health/appointments-tab.tsx`](../src/components/health/appointments-tab.tsx) |
 | 31 | **Le bouton « Ajouter le co-parent » du hub ne permet pas d'inviter** : il ouvre « Mon partenaire », où l'on ne peut rien envoyer non plus. L'invitation n'existe que pendant l'onboarding, et depuis le 2026-11-11 elle **n'envoie plus d'email** : elle enregistre l'adresse, et c'est au premier parent de prévenir le co-parent de s'inscrire avec. ⚠️ La pop-up « Comment ça marche ? » décrit un parcours **code à 6 chiffres / QR code** qui n'existe pas. Décision produit à trancher (invitation depuis le hub, email d'invitation via Edge Function, texte de la pop-up). | [`src/app/(tabs)/index.tsx`](../src/app/%28tabs%29/index.tsx), [`src/components/hub/how-it-works-modal.tsx`](../src/components/hub/how-it-works-modal.tsx) |
 | 32 | **Calcul d'échéance de la déclaration de naissance exercé, mais pas contre Supabase** : les deux branches de `formatDeadlineLabel()` (repère informatif / date précise) ont été vérifiées bout en bout en mode contournement DEV, sans écriture réelle (cf. point 43). | [`src/features/procedures/constants.ts`](../src/features/procedures/constants.ts) |
 | 33 | **Rappel de démarche sans effet réel** : le toggle « Me rappeler » persiste bien `reminder_enabled`, mais rien ne le lit encore — les notifications sont câblées en Phase 4. | [`src/app/(tabs)/demarches.tsx`](../src/app/%28tabs%29/demarches.tsx) |

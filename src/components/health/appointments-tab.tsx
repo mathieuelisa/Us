@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import { useAtomValue } from 'jotai';
 import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
@@ -5,11 +6,13 @@ import { Pressable, Text, View } from 'react-native';
 import { AppointmentFormModal } from '@/components/health/appointment-form-modal';
 import { MonthCalendar } from '@/components/health/month-calendar';
 import { PillButton } from '@/components/ui/pill-button';
+import type { Appointment } from '@/features/health/api';
 import { formatAppointmentSummary } from '@/features/health/constants';
 import {
   useAppointments,
   useCreateAppointment,
   useDeleteAppointment,
+  useUpdateAppointment,
 } from '@/features/health/hooks';
 import type { Household } from '@/features/household/api';
 import { sessionAtom } from '@/lib/atoms/session';
@@ -21,9 +24,11 @@ import { todayIso } from '@/lib/date';
  * Les **deux** parents créent des rendez-vous (décision du 2026-11-11). La
  * RLS (`appointments_select_own_or_shared`) ne renvoie que ses propres
  * rendez-vous et ceux que l'autre a partagés : aucun filtrage côté client.
- * Seul le créateur peut supprimer — on n'affiche donc la croix et le badge
- * « Partagé / Non partagé » que sur ses propres rendez-vous ; ceux de
- * l'autre parent sont signalés comme tels.
+ * Seul le créateur peut modifier ou supprimer (`appointments_update_creator`,
+ * `appointments_delete_creator`) : ses propres rendez-vous s'ouvrent d'un
+ * tap dans la feuille de modification (crayon en bout de ligne, badge
+ * « Partagé / Non partagé »), d'où l'on peut aussi les supprimer. Ceux de
+ * l'autre parent restent en lecture seule, signalés comme tels.
  */
 export function AppointmentsTab({
   household,
@@ -33,6 +38,7 @@ export function AppointmentsTab({
   const currentUserId = useAtomValue(sessionAtom)?.user.id ?? null;
   const { data: appointments = [] } = useAppointments(household);
   const createAppointment = useCreateAppointment(household);
+  const updateAppointment = useUpdateAppointment(household);
   const deleteAppointment = useDeleteAppointment(household);
 
   const today = todayIso();
@@ -40,11 +46,22 @@ export function AppointmentsTab({
   const [month, setMonth] = useState(Number(today.slice(5, 7)));
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [pickedDate, setPickedDate] = useState<string | null>(null);
+  const [editingAppointment, setEditingAppointment] =
+    useState<Appointment | null>(null);
 
   const openFormFor = (isoDate: string | null) => {
+    setEditingAppointment(null);
     setPickedDate(isoDate);
     setIsFormOpen(true);
   };
+
+  const openEditor = (appointment: Appointment) => {
+    setEditingAppointment(appointment);
+    setPickedDate(null);
+    setIsFormOpen(true);
+  };
+
+  const closeForm = () => setIsFormOpen(false);
 
   const changeMonth = (delta: -1 | 1) => {
     const next = month + delta;
@@ -87,9 +104,15 @@ export function AppointmentsTab({
           upcoming.map((appointment) => {
             const isMine = appointment.created_by === currentUserId;
             return (
-              <View
+              <Pressable
                 key={appointment.id}
-                className="gap-1.5 rounded-2xl bg-white px-4 py-3.5"
+                accessibilityRole={isMine ? 'button' : undefined}
+                accessibilityLabel={
+                  isMine ? `Modifier ${appointment.title}` : undefined
+                }
+                disabled={!isMine}
+                onPress={() => openEditor(appointment)}
+                className="gap-1.5 rounded-2xl bg-white px-4 py-3.5 active:opacity-70"
               >
                 <View className="flex-row items-center gap-2">
                   <Text className="flex-1 text-[15px] font-medium text-[#1a1a1a]">
@@ -124,14 +147,7 @@ export function AppointmentsTab({
                   )}
 
                   {isMine ? (
-                    <Pressable
-                      accessibilityLabel={`Supprimer ${appointment.title}`}
-                      accessibilityRole="button"
-                      hitSlop={8}
-                      onPress={() => deleteAppointment.mutate(appointment.id)}
-                    >
-                      <Text className="text-[15px] text-[#9a9a9a]">✕</Text>
-                    </Pressable>
+                    <Ionicons name="create-outline" size={18} color="#9a9a9a" />
                   ) : null}
                 </View>
 
@@ -142,7 +158,7 @@ export function AppointmentsTab({
                   )}
                   {appointment.address ? ` — ${appointment.address}` : ''}
                 </Text>
-              </View>
+              </Pressable>
             );
           })
         )}
@@ -158,13 +174,30 @@ export function AppointmentsTab({
 
       <AppointmentFormModal
         visible={isFormOpen}
-        isSaving={createAppointment.isPending}
+        isSaving={
+          editingAppointment
+            ? updateAppointment.isPending
+            : createAppointment.isPending
+        }
         initialDate={pickedDate}
-        onCancel={() => setIsFormOpen(false)}
+        editingAppointment={editingAppointment}
+        onCancel={closeForm}
         onSubmit={(input) =>
-          createAppointment.mutate(input, {
-            onSuccess: () => setIsFormOpen(false),
-          })
+          editingAppointment
+            ? updateAppointment.mutate(
+                { id: editingAppointment.id, ...input },
+                { onSuccess: closeForm },
+              )
+            : createAppointment.mutate(input, { onSuccess: closeForm })
+        }
+        isDeleting={deleteAppointment.isPending}
+        onDelete={
+          editingAppointment
+            ? () =>
+                deleteAppointment.mutate(editingAppointment.id, {
+                  onSuccess: closeForm,
+                })
+            : undefined
         }
       />
     </View>

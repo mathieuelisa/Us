@@ -12,6 +12,7 @@ import {
 import { IconBubble, IconInput } from '@/components/ui/icon-input';
 import { PillButton } from '@/components/ui/pill-button';
 import { WheelDatePicker } from '@/components/wheel-date-picker';
+import type { Appointment } from '@/features/health/api';
 import { parseTimeInput } from '@/features/health/constants';
 import { useThemeAccent } from '@/features/settings/hooks';
 import { hexToRgba, lightenHex } from '@/lib/color';
@@ -37,18 +38,32 @@ import { todayIso } from '@/lib/date';
  * Pas de rendez-vous dans le passé (demande explicite) : la molette part
  * d'aujourd'hui, et un jour passé choisi sur le calendrier avant
  * l'ouverture est ramené à aujourd'hui.
+ *
+ * **Modification** (`editingAppointment` fourni, demande explicite) : même
+ * feuille, pré-remplie, titrée « Modifier le rendez-vous », avec
+ * « Enregistrer les modifications » et un lien de suppression. Un
+ * rendez-vous déjà passé garde sa date : la molette ne descend alors pas
+ * plus bas qu'elle, pour pouvoir corriger son titre sans la déplacer.
  */
 export function AppointmentFormModal({
   visible,
   isSaving,
   initialDate,
+  editingAppointment = null,
   onSubmit,
+  onDelete,
+  isDeleting = false,
   onCancel,
 }: {
   visible: boolean;
   isSaving: boolean;
   /** Date déjà choisie sur le calendrier avant l'ouverture, le cas échéant. */
   initialDate?: string | null;
+  /** Rendez-vous à modifier ; absent pour une création. */
+  editingAppointment?: Appointment | null;
+  /** Suppression depuis la feuille, en modification seulement. */
+  onDelete?: () => void;
+  isDeleting?: boolean;
   onSubmit: (input: {
     title: string;
     appointmentDate: string;
@@ -65,23 +80,39 @@ export function AppointmentFormModal({
   const [address, setAddress] = useState('');
   const [isShared, setIsShared] = useState(true);
 
+  const isEditing = editingAppointment !== null;
+  const today = todayIso();
+  const minDate =
+    editingAppointment && editingAppointment.appointment_date < today
+      ? editingAppointment.appointment_date
+      : today;
+
   useEffect(() => {
-    if (visible) {
-      setTitle('');
-      const today = todayIso();
-      setDate(initialDate && initialDate > today ? initialDate : today);
-      setTime('');
-      setAddress('');
-      setIsShared(true);
+    if (!visible) return;
+    if (editingAppointment) {
+      setTitle(editingAppointment.title);
+      setDate(editingAppointment.appointment_date);
+      // `HH:MM:SS` en base → « 10:30 », format accepté par `parseTimeInput`.
+      setTime(editingAppointment.appointment_time?.slice(0, 5) ?? '');
+      setAddress(editingAppointment.address ?? '');
+      setIsShared(editingAppointment.is_shared);
+      return;
     }
-  }, [visible, initialDate]);
+    setTitle('');
+    const currentDay = todayIso();
+    setDate(initialDate && initialDate > currentDay ? initialDate : currentDay);
+    setTime('');
+    setAddress('');
+    setIsShared(true);
+  }, [visible, initialDate, editingAppointment]);
 
   const isTimeInvalid = time.trim().length > 0 && parseTimeInput(time) === null;
   const canSubmit =
     title.trim().length > 0 &&
-    date >= todayIso() &&
+    date >= minDate &&
     !isTimeInvalid &&
-    !isSaving;
+    !isSaving &&
+    !isDeleting;
 
   return (
     <Modal
@@ -133,7 +164,9 @@ export function AppointmentFormModal({
                   className="text-[22px] font-extrabold leading-7"
                   style={{ color: GLASS_TITLE_COLOR, letterSpacing: -0.4 }}
                 >
-                  Nouveau rendez-vous
+                  {isEditing
+                    ? 'Modifier le rendez-vous'
+                    : 'Nouveau rendez-vous'}
                 </Text>
                 <Svg width={92} height={10} viewBox="0 0 92 10">
                   <Path
@@ -148,7 +181,9 @@ export function AppointmentFormModal({
                   className="text-[13px] leading-[18px]"
                   style={{ color: GLASS_BODY_COLOR }}
                 >
-                  Ajoutez les informations de votre rendez-vous.
+                  {isEditing
+                    ? 'Mettez à jour les informations de votre rendez-vous.'
+                    : 'Ajoutez les informations de votre rendez-vous.'}
                 </Text>
               </View>
               <View>
@@ -199,7 +234,7 @@ export function AppointmentFormModal({
               </View>
               <WheelDatePicker
                 value={date}
-                minDate={todayIso()}
+                minDate={minDate}
                 onChange={setDate}
                 compact
               />
@@ -258,8 +293,16 @@ export function AppointmentFormModal({
             </View>
 
             <PillButton
-              label={isSaving ? 'Ajout en cours…' : 'Ajouter au calendrier'}
-              icon="calendar-outline"
+              label={
+                isEditing
+                  ? isSaving
+                    ? 'Enregistrement…'
+                    : 'Enregistrer les modifications'
+                  : isSaving
+                    ? 'Ajout en cours…'
+                    : 'Ajouter au calendrier'
+              }
+              icon={isEditing ? 'save-outline' : 'calendar-outline'}
               size="compact"
               isDisabled={!canSubmit}
               onPress={() =>
@@ -273,18 +316,34 @@ export function AppointmentFormModal({
               }
             />
 
-            <Pressable
-              accessibilityRole="button"
-              className="items-center"
-              onPress={onCancel}
-            >
-              <Text
-                className="text-[14.5px] font-semibold"
-                style={{ color: GLASS_TITLE_COLOR }}
+            <View className="flex-row items-center justify-center gap-6">
+              <Pressable
+                accessibilityRole="button"
+                className="items-center"
+                onPress={onCancel}
               >
-                Annuler
-              </Text>
-            </Pressable>
+                <Text
+                  className="text-[14.5px] font-semibold"
+                  style={{ color: GLASS_TITLE_COLOR }}
+                >
+                  Annuler
+                </Text>
+              </Pressable>
+              {isEditing && onDelete ? (
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityState={{ disabled: isDeleting || isSaving }}
+                  disabled={isDeleting || isSaving}
+                  onPress={onDelete}
+                  className="flex-row items-center gap-1.5"
+                >
+                  <Ionicons name="trash-outline" size={16} color="#d14b3a" />
+                  <Text className="text-[14.5px] font-semibold text-[#d14b3a]">
+                    {isDeleting ? 'Suppression…' : 'Supprimer'}
+                  </Text>
+                </Pressable>
+              ) : null}
+            </View>
           </ScrollView>
         </Animated.View>
       </View>
