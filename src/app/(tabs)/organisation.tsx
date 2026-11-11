@@ -10,6 +10,7 @@ import { withUniwind } from 'uniwind';
 import { PremiumTeaserCard } from '@/components/hub/premium-teaser-card';
 import { ProgressBar } from '@/components/organisation/progress-bar';
 import { PlainInput } from '@/components/plain-input';
+import { BlobIllustration } from '@/components/ui/blob-illustration';
 import {
   ChevronBubble,
   GLASS_BODY_COLOR,
@@ -19,7 +20,6 @@ import {
 } from '@/components/ui/glass-card';
 import { ScreenCornerShapes } from '@/components/ui/screen-corner-shapes';
 import { useMyHousehold } from '@/features/household/hooks';
-import { CARD_SHADOW } from '@/features/hub/constants';
 import type { ChecklistItem } from '@/features/organisation/api';
 import {
   CHECKLIST_CATEGORY_META,
@@ -47,6 +47,30 @@ import {
 import { hexToRgba } from '@/lib/color';
 
 const SafeAreaView = withUniwind(RNSafeAreaView);
+
+/** Surface « verre dépoli » des cartes du détail d'une checklist. */
+const GLASS_SURFACE = {
+  backgroundColor: 'rgba(255, 255, 255, 0.92)',
+  borderWidth: 1,
+  borderColor: 'rgba(255, 255, 255, 0.95)',
+} as const;
+
+const tintedShadow = (accent: string) =>
+  ({
+    shadowColor: accent,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.08,
+    shadowRadius: 14,
+    elevation: 2,
+  }) as const;
+
+/** Icône de la pastille de chaque sous-section (Maman / Bébé / Co-parent). */
+const CATEGORY_ICONS: Record<string, ComponentProps<typeof Ionicons>['name']> =
+  {
+    maman: 'woman-outline',
+    bebe: 'happy-outline',
+    co_parent: 'man-outline',
+  };
 
 /**
  * Écran « Organisation & Préparation » — nouvelle section, hors maquettes
@@ -459,6 +483,7 @@ function ChecklistDetail({
   }) => void;
   onRemoveItem: (item: ChecklistItem) => void;
 }) {
+  const accent = useThemeAccent();
   const meta = CHECKLIST_META[slug];
   const checkedCount = items.filter((item) => item.checked).length;
   const progress = items.length === 0 ? 0 : checkedCount / items.length;
@@ -466,26 +491,65 @@ function ChecklistDetail({
 
   return (
     <View className="gap-5">
-      <View className="gap-1">
-        <Text className="text-[24px] font-bold text-[#1a1a1a]">
-          {meta.title}
-        </Text>
-        {/* Le total suit les ajouts : un article personnalisé compte comme
-            les autres, au numérateur comme au dénominateur. */}
-        <Text className="text-[13px] font-medium text-accent">
-          {checkedCount} sur {items.length} complétés
-        </Text>
+      <View className="gap-3">
+        {/* Illustration de la valise en haut à droite (image fournie, ou
+            emoji sur une tache d'accent à défaut). */}
+        <View
+          pointerEvents="none"
+          style={{ position: 'absolute', top: -56, right: -10 }}
+        >
+          {meta.image ? (
+            <Image
+              source={meta.image}
+              style={{ width: 132, height: 102 }}
+              resizeMode="contain"
+            />
+          ) : (
+            <BlobIllustration accent={accent} size={96}>
+              <Text style={{ fontSize: 50 }}>{meta.emoji}</Text>
+            </BlobIllustration>
+          )}
+        </View>
+
+        <View className="gap-1" style={{ maxWidth: '68%' }}>
+          <Text
+            className="text-[26px] font-extrabold leading-[31px]"
+            style={{ color: GLASS_TITLE_COLOR, letterSpacing: -0.5 }}
+          >
+            {meta.title}
+          </Text>
+          {/* Le total suit les ajouts : un article personnalisé compte comme
+              les autres, au numérateur comme au dénominateur. */}
+          <Text className="text-[14px] font-bold" style={{ color: accent }}>
+            {checkedCount} sur {items.length} complétés
+          </Text>
+        </View>
+
+        <ProgressBar progress={progress} />
       </View>
 
-      <ProgressBar progress={progress} />
-
       {categoryGroups.length > 0 ? (
-        <View className="gap-4">
+        <View className="gap-5">
           {categoryGroups.map((group) => (
-            <View key={group.category} className="gap-2.5">
-              <Text className="text-[11.5px] font-semibold tracking-wide text-[#8a8a8a]">
-                {CHECKLIST_CATEGORY_META[group.category].title.toUpperCase()}
-              </Text>
+            <View key={group.category} className="gap-3">
+              <View
+                className="flex-row items-center gap-2 self-start rounded-full py-1.5 pl-1.5 pr-4"
+                style={{ backgroundColor: hexToRgba(accent, 0.1) }}
+              >
+                <View className="h-8 w-8 items-center justify-center rounded-full bg-white">
+                  <Ionicons
+                    name={CATEGORY_ICONS[group.category] ?? 'list-outline'}
+                    size={17}
+                    color={accent}
+                  />
+                </View>
+                <Text
+                  className="text-[14.5px] font-bold"
+                  style={{ color: GLASS_TITLE_COLOR }}
+                >
+                  {CHECKLIST_CATEGORY_META[group.category].title}
+                </Text>
+              </View>
               <View className="gap-2.5">
                 {group.items.map((item) => (
                   <ChecklistItemRow
@@ -545,6 +609,7 @@ function AddChecklistItemRow({
   categoryTitle: string;
   onAdd: (label: string) => void;
 }) {
+  const accent = useThemeAccent();
   const [isEditing, setIsEditing] = useState(false);
   const [label, setLabel] = useState('');
   const trimmed = label.trim();
@@ -555,10 +620,15 @@ function AddChecklistItemRow({
         accessibilityRole="button"
         accessibilityLabel={`Ajouter un élément à la sous-section ${categoryTitle}`}
         onPress={() => setIsEditing(true)}
-        className="flex-row items-center gap-3 rounded-2xl border border-dashed border-[#c9c9c9] px-4 py-3.5 active:opacity-60"
+        className="mt-1 h-12 flex-row items-center justify-center gap-2.5 rounded-full active:opacity-70"
+        style={{
+          borderWidth: 1.5,
+          borderColor: accent,
+          backgroundColor: 'rgba(255, 255, 255, 0.6)',
+        }}
       >
-        <Ionicons name="add-circle-outline" size={22} color="#2D5E5A" />
-        <Text className="flex-1 text-[14px] text-[#6b6b6b]">
+        <Ionicons name="add-circle" size={24} color={accent} />
+        <Text className="text-[15px] font-bold" style={{ color: accent }}>
           Ajouter un élément
         </Text>
       </Pressable>
@@ -573,8 +643,8 @@ function AddChecklistItemRow({
 
   return (
     <View
-      style={CARD_SHADOW}
-      className="gap-2.5 rounded-2xl bg-white px-4 py-3.5"
+      className="gap-2.5 rounded-[22px] px-4 py-3.5"
+      style={[tintedShadow(accent), GLASS_SURFACE]}
     >
       <PlainInput
         autoFocus
@@ -603,9 +673,11 @@ function AddChecklistItemRow({
           accessibilityState={{ disabled: trimmed.length === 0 }}
           disabled={trimmed.length === 0}
           onPress={submit}
-          className={`rounded-full px-4 py-2 ${
-            trimmed.length === 0 ? 'bg-[#1f3d3a]/30' : 'bg-[#1f3d3a]'
-          }`}
+          className="rounded-full px-4 py-2"
+          style={{
+            backgroundColor: accent,
+            opacity: trimmed.length === 0 ? 0.35 : 1,
+          }}
         >
           <Text className="text-[13.5px] font-semibold text-white">
             Ajouter
@@ -625,24 +697,41 @@ function ChecklistItemRow({
   onToggle: (item: ChecklistItem) => void;
   onRemove: (item: ChecklistItem) => void;
 }) {
+  const accent = useThemeAccent();
+
   return (
     <Pressable
       accessibilityRole="checkbox"
       accessibilityLabel={item.label}
       accessibilityState={{ checked: item.checked }}
-      style={CARD_SHADOW}
       onPress={() => onToggle(item)}
-      className="flex-row items-center gap-3 rounded-2xl bg-white px-4 py-3.5"
+      className="min-h-[56px] flex-row items-center gap-3.5 rounded-[22px] px-4 py-3"
+      style={[tintedShadow(accent), GLASS_SURFACE]}
     >
-      <Ionicons
-        name={item.checked ? 'checkbox' : 'square-outline'}
-        size={22}
-        color={item.checked ? '#2D5E5A' : '#c0c0c0'}
-      />
+      {/* Cochée : rond d'accent plein avec coche ; à faire : carré arrondi
+          vide — l'état reste lisible même sans distinguer les couleurs. */}
+      {item.checked ? (
+        <View
+          className="h-8 w-8 items-center justify-center rounded-full"
+          style={{ backgroundColor: accent }}
+        >
+          <Ionicons name="checkmark" size={18} color="#ffffff" />
+        </View>
+      ) : (
+        <View className="h-8 w-8 items-center justify-center">
+          <View
+            className="h-6 w-6 rounded-[8px]"
+            style={{ borderWidth: 1.5, borderColor: '#cfcdd8' }}
+          />
+        </View>
+      )}
       <Text
-        className={`flex-1 text-[14px] ${
-          item.checked ? 'text-[#9a9a9a] line-through' : 'text-[#1a1a1a]'
-        }`}
+        className="flex-1 text-[15px]"
+        style={
+          item.checked
+            ? { color: '#a3a1b0', textDecorationLine: 'line-through' }
+            : { color: GLASS_TITLE_COLOR }
+        }
       >
         {item.label}
       </Text>
@@ -655,8 +744,9 @@ function ChecklistItemRow({
           accessibilityLabel={`Supprimer « ${item.label} »`}
           hitSlop={10}
           onPress={() => onRemove(item)}
+          className="h-8 w-8 items-center justify-center rounded-full bg-[#f4f3f7]"
         >
-          <Ionicons name="close" size={18} color="#b0b0b0" />
+          <Ionicons name="close" size={16} color={GLASS_BODY_COLOR} />
         </Pressable>
       ) : null}
     </Pressable>

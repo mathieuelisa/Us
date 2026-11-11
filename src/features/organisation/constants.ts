@@ -1,3 +1,4 @@
+import type { ImageSourcePropType } from 'react-native';
 import type { ChecklistItem } from './api';
 
 /**
@@ -8,17 +9,28 @@ import type { ChecklistItem } from './api';
  */
 export const CHECKLIST_META: Record<
   string,
-  { title: string; emoji: string; bg: string }
+  {
+    title: string;
+    emoji: string;
+    bg: string;
+    /**
+     * Illustration de l'en-tête du détail (fournie par l'utilisateur) ; à
+     * défaut, l'emoji sur une tache d'accent.
+     */
+    image?: ImageSourcePropType;
+  }
 > = {
   'valise-maternite': {
     title: 'La Valise de maternité',
     emoji: '🧳',
     bg: '#DCEAFB',
+    image: require('@/assets/images/Valise_maternite.png'),
   },
   'sac-naissance': {
     title: 'La valise en salle de naissance',
     emoji: '🎒',
     bg: '#FBE4D8',
+    image: require('@/assets/images/Valise_maternite.png'),
   },
 };
 
