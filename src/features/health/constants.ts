@@ -21,6 +21,31 @@ export const SYMPTOM_OPTIONS: { value: string; label: string }[] = [
   { value: 'nausees', label: 'Nausées' },
 ];
 
+/**
+ * Pictogramme et teinte de fond de chaque symptôme : ils rendent la liste
+ * lisible d'un coup d'œil. Purement visuel — la valeur stockée reste celle
+ * de `SYMPTOM_OPTIONS`. Repli neutre pour un symptôme ajouté sans entrée ici.
+ */
+export const SYMPTOM_VISUALS: Record<string, { emoji: string; tint: string }> =
+  {
+    vomissements: { emoji: '🤮', tint: '#e3f3e4' },
+    vertiges: { emoji: '😵‍💫', tint: '#ece6f7' },
+    mal_de_dos: { emoji: '🦴', tint: '#fbe5d6' },
+    fatigue: { emoji: '😴', tint: '#e3ecf8' },
+    reflux_gastrique: { emoji: '🔥', tint: '#fde6d8' },
+    bouffees_de_chaleur: { emoji: '🌡️', tint: '#fbe0e4' },
+    insomnies: { emoji: '🛌', tint: '#e6e7f8' },
+    nausees: { emoji: '🤢', tint: '#e0f2ec' },
+  };
+const FALLBACK_SYMPTOM_VISUAL = { emoji: '•', tint: '#f0f0f3' };
+
+export function getSymptomVisual(value: string): {
+  emoji: string;
+  tint: string;
+} {
+  return SYMPTOM_VISUALS[value] ?? FALLBACK_SYMPTOM_VISUAL;
+}
+
 export function getSymptomLabel(value: string): string {
   return (
     SYMPTOM_OPTIONS.find((option) => option.value === value)?.label ?? value

@@ -57,6 +57,40 @@ export function useSymptomsForDate(
   });
 }
 
+/**
+ * Symptômes du jour **de la personne enceinte**, quel que soit le parent
+ * connecté — pour le bloc « Aujourd'hui » du hub, visible des deux parents
+ * (demande explicite).
+ *
+ * RLS revue (CLAUDE.md) : `symptoms_log_select_members` autorise déjà la
+ * lecture à tout membre du foyer — prévu dès la création de la table pour
+ * l'accès en lecture seule du co-parent. L'écriture reste réservée à la
+ * personne enceinte (`symptoms_log_insert/update_pregnant_only`). Aucune
+ * policy n'est élargie ici.
+ *
+ * Même clé de cache que `useSymptomsForDate` : pour la personne enceinte
+ * c'est la même donnée, et l'enregistrement depuis le Journal invalide donc
+ * aussi ce bloc.
+ */
+export function usePregnantSymptomsForDate(
+  household: Household | null | undefined,
+  logDate: string,
+) {
+  const householdId = household?.id;
+  const pregnantUserId = household?.pregnant_user_id;
+
+  return useQuery({
+    queryKey: queryKeys.health.symptoms(householdId ?? '', logDate),
+    queryFn: () =>
+      fetchSymptomsForDate(
+        householdId as string,
+        pregnantUserId as string,
+        logDate,
+      ),
+    enabled: Boolean(householdId && pregnantUserId),
+  });
+}
+
 export function useSymptomDates(
   household: Household | null | undefined,
   dates: string[],

@@ -5,6 +5,7 @@ import { Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import { withUniwind } from 'uniwind';
 
+import { HealthTodayCard } from '@/components/hub/health-today-card';
 import { HowItWorksModal } from '@/components/hub/how-it-works-modal';
 import { PillarCard } from '@/components/hub/pillar-card';
 import { PremiumTeaserCard } from '@/components/hub/premium-teaser-card';
@@ -226,6 +227,14 @@ export default function HubScreen() {
             onHowItWorks={() => setIsHowItWorksOpen(true)}
           />
         )}
+
+        {/* État de santé du jour + astuce, juste avant les sections
+            (demande explicite) — visible des deux parents. */}
+        <HealthTodayCard
+          household={household}
+          role={role}
+          partnerName={partnerName ?? null}
+        />
 
         <View className="gap-2">
           <Text className="text-[11.5px] font-semibold tracking-wide text-[#8a8a8a]">

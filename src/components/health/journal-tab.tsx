@@ -9,7 +9,7 @@ import {
   SparkLines,
 } from '@/components/ui/glass-card';
 import { PillButton } from '@/components/ui/pill-button';
-import { SYMPTOM_OPTIONS } from '@/features/health/constants';
+import { getSymptomVisual, SYMPTOM_OPTIONS } from '@/features/health/constants';
 import {
   useSaveSymptoms,
   useSymptomDates,
@@ -25,23 +25,6 @@ const DAY_LETTERS = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
 const HEART_PINK = '#e8739a';
 const MUTED = '#8f8f99';
 const FUTURE = '#c9c9cf';
-
-/**
- * Pictogramme et teinte de fond de chaque symptôme : ils rendent la liste
- * lisible d'un coup d'œil. Purement visuel — la valeur stockée reste celle
- * de `SYMPTOM_OPTIONS`. Repli neutre pour un symptôme ajouté sans entrée ici.
- */
-const SYMPTOM_VISUALS: Record<string, { emoji: string; tint: string }> = {
-  vomissements: { emoji: '🤮', tint: '#e3f3e4' },
-  vertiges: { emoji: '😵‍💫', tint: '#ece6f7' },
-  mal_de_dos: { emoji: '🦴', tint: '#fbe5d6' },
-  fatigue: { emoji: '😴', tint: '#e3ecf8' },
-  reflux_gastrique: { emoji: '🔥', tint: '#fde6d8' },
-  bouffees_de_chaleur: { emoji: '🌡️', tint: '#fbe0e4' },
-  insomnies: { emoji: '🛌', tint: '#e6e7f8' },
-  nausees: { emoji: '🤢', tint: '#e0f2ec' },
-};
-const FALLBACK_VISUAL = { emoji: '•', tint: '#f0f0f3' };
 
 const CARD_SHADOW_TINTED = (accent: string) =>
   ({
@@ -142,7 +125,7 @@ export function JournalTab({
             <SymptomChip
               key={option.value}
               label={option.label}
-              visual={SYMPTOM_VISUALS[option.value] ?? FALLBACK_VISUAL}
+              visual={getSymptomVisual(option.value)}
               isSelected={selected.includes(option.value)}
               accent={accent}
               onPress={() => toggle(option.value)}
