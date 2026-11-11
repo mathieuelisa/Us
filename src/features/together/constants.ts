@@ -1,3 +1,6 @@
+import type { Ionicons } from '@expo/vector-icons';
+import type { ComponentProps } from 'react';
+
 /** Tags rapides de l'overlay "besoin de…" (écran 3b), plus texte libre. */
 export const NEED_TAGS: { value: string; label: string }[] = [
   { value: 'sommeil', label: 'Sommeil' },
@@ -21,4 +24,48 @@ const DEFAULT_GESTURE_EMOJI = '✨';
  */
 export function getGestureEmoji(gesture: { emoji: string | null }): string {
   return gesture.emoji ?? DEFAULT_GESTURE_EMOJI;
+}
+
+/** Pictogramme de chaque besoin rapide — purement visuel. */
+export const NEED_ICONS: Record<
+  string,
+  ComponentProps<typeof Ionicons>['name']
+> = {
+  sommeil: 'moon-outline',
+  calin: 'heart-outline',
+  parler: 'chatbubble-ellipses-outline',
+  massage: 'hand-left-outline',
+  coup_de_main: 'construct-outline',
+  calme: 'leaf-outline',
+  rassurée: 'happy-outline',
+  attention: 'notifications-outline',
+  moment_a_deux: 'people-outline',
+};
+
+/**
+ * Relit `mood_checkins.need_note` pour l'afficher à l'autre parent. La
+ * note est stockée en texte : soit les libellés des besoins rapides joints
+ * par « , » (« Sommeil, Câlin »), soit un texte libre. Si chaque morceau est
+ * un besoin connu, on renvoie les besoins (affichés en pastilles à
+ * pictogramme) ; sinon le texte libre, tel quel — mieux vaut le montrer
+ * entier que d'en deviner une partie.
+ */
+export function parseNeedNote(note: string | null | undefined): {
+  needs: { value: string; label: string }[];
+  freeText: string | null;
+} {
+  const trimmed = note?.trim();
+  if (!trimmed) return { needs: [], freeText: null };
+
+  const parts = trimmed.split(',').map((part) => part.trim());
+  const needs = parts.map((part) =>
+    NEED_TAGS.find((tag) => tag.label === part),
+  );
+  if (needs.every((need) => need !== undefined)) {
+    return {
+      needs: needs as { value: string; label: string }[],
+      freeText: null,
+    };
+  }
+  return { needs: [], freeText: trimmed };
 }

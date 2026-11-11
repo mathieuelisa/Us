@@ -11,6 +11,7 @@ import { HowItWorksModal } from '@/components/hub/how-it-works-modal';
 import { PillarCard } from '@/components/hub/pillar-card';
 import { PremiumTeaserCard } from '@/components/hub/premium-teaser-card';
 import { ShareInviteCard } from '@/components/hub/share-invite-card';
+import { NeedChips } from '@/components/together/need-chips';
 import {
   SparkLines,
   WAVE_LILAC,
@@ -131,6 +132,7 @@ export default function HubScreen() {
 
   const partnerName = summary?.partnerFirstName?.trim();
   const hasPartnerJoined = Boolean(household?.partner_user_id);
+  const partnerMood = hasPartnerJoined ? (summary?.partnerMood ?? null) : null;
   const [isHowItWorksOpen, setIsHowItWorksOpen] = useState(false);
 
   // Tant que le résumé n'est pas chargé, on affiche le libellé neutre de la
@@ -226,33 +228,10 @@ export default function HubScreen() {
           ) : null}
         </View>
 
-        {hasPartnerJoined ? (
-          <View className="gap-2">
-            <Text className="text-[11.5px] font-semibold tracking-wide text-[#8a8a8a]">
-              HUMEUR DU JOUR
-            </Text>
-            <View className="flex-row items-center gap-3.5 rounded-2xl bg-white px-4 py-4">
-              <Text className="text-[28px]">
-                {summary?.partnerMood
-                  ? MOOD_PRESENTATION[summary.partnerMood.mood].emoji
-                  : '🌱'}
-              </Text>
-              <View className="flex-1 gap-0.5">
-                <Text className="text-[15px] font-medium text-[#1a1a1a]">
-                  {partnerName
-                    ? `${partnerName} aujourd’hui`
-                    : 'Votre co-parent aujourd’hui'}
-                </Text>
-                <Text className="text-[13px] text-[#6b6b6b]">
-                  {summary?.partnerMood
-                    ? summary.partnerMood.needNote?.trim() ||
-                      `${partnerName ?? 'Votre co-parent'} ${MOOD_PRESENTATION[summary.partnerMood.mood].phrase}`
-                    : 'Pas encore de nouvelles aujourd’hui'}
-                </Text>
-              </View>
-            </View>
-          </View>
-        ) : (
+        {/* L'humeur et les besoins du jour de l'autre parent vivent dans la
+            carte « Mon partenaire » plus bas (demande explicite) ; ici, seule
+            l'invitation tant que le co-parent n'a pas rejoint. */}
+        {hasPartnerJoined ? null : (
           <ShareInviteCard
             onAddPartner={() => router.push('/partenaire')}
             onHowItWorks={() => setIsHowItWorksOpen(true)}
@@ -345,7 +324,7 @@ export default function HubScreen() {
             accessibilityRole="button"
             onPress={() => router.push('/partenaire')}
             style={CARD_SHADOW}
-            className="flex-row items-center gap-3.5 overflow-hidden rounded-2xl bg-[#cf6d8c] px-4 py-4"
+            className="overflow-hidden rounded-2xl bg-[#cf6d8c] px-4 py-4"
           >
             {/* Deux formes plutôt qu'une seule (contrairement à
                 PremiumTeaserCard) : le duo évoque « à deux », cohérent avec
@@ -359,21 +338,50 @@ export default function HubScreen() {
               className="absolute -bottom-10 -left-6 h-20 w-20 rounded-full bg-white/10"
             />
 
-            <View className="h-11 w-11 items-center justify-center rounded-full bg-white/20">
-              <Text className="text-[20px]">💕</Text>
-            </View>
+            <View className="flex-1 gap-3">
+              <View className="flex-row items-center gap-3.5">
+                <View className="h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-white/25">
+                  {partnerMood ? (
+                    <Image
+                      source={MOOD_PRESENTATION[partnerMood.mood].imgUrl}
+                      style={{ width: 44, height: 44 }}
+                      resizeMode="contain"
+                    />
+                  ) : (
+                    <Text className="text-[20px]">💕</Text>
+                  )}
+                </View>
 
-            <View className="flex-1 gap-0.5">
-              <Text className="text-[16px] font-semibold text-white">
-                {partnerName ? `Avec ${partnerName}` : 'Avec votre co-parent'}
-              </Text>
-              <Text className="text-[13px] text-white/75">
-                {hasPartnerJoined
-                  ? 'Voir son état cette semaine'
-                  : 'Taille du bébé et astuces du jour'}
-              </Text>
+                <View className="flex-1 gap-0.5">
+                  <Text className="text-[16px] font-semibold text-white">
+                    {partnerName
+                      ? `Avec ${partnerName}`
+                      : 'Avec votre co-parent'}
+                  </Text>
+                  <Text className="text-[13px] text-white/80">
+                    {!hasPartnerJoined
+                      ? 'Taille du bébé et astuces du jour'
+                      : partnerMood
+                        ? `${MOOD_PRESENTATION[partnerMood.mood].label} aujourd’hui`
+                        : 'Pas encore de nouvelles aujourd’hui'}
+                  </Text>
+                </View>
+                <Text className="text-[20px] text-white/60">›</Text>
+              </View>
+
+              {hasPartnerJoined && partnerMood?.needNote ? (
+                <View className="gap-1.5">
+                  <Text className="text-[11px] font-bold tracking-wide text-white/75">
+                    SES BESOINS DU JOUR
+                  </Text>
+                  <NeedChips
+                    note={partnerMood.needNote}
+                    tone="onColor"
+                    color="#ffffff"
+                  />
+                </View>
+              ) : null}
             </View>
-            <Text className="text-[20px] text-white/60">›</Text>
           </Pressable>
         </View>
 

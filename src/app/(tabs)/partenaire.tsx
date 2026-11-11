@@ -7,7 +7,8 @@ import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import { withUniwind } from 'uniwind';
 
-import { WeekMoodStrip } from '@/components/together/week-mood-strip';
+import { NeedChips } from '@/components/together/need-chips';
+import { WeekMoodDays } from '@/components/together/week-mood-strip';
 import {
   DashedLoopDoodle,
   GLASS_BODY_COLOR,
@@ -16,7 +17,8 @@ import {
 import { getWeeksOfAmenorrhea } from '@/features/health/constants';
 import { useBabySize } from '@/features/health/hooks';
 import { useMyHousehold } from '@/features/household/hooks';
-import { getPartnerUserId } from '@/features/hub/api';
+import { getPartnerUserId, type HubSummary } from '@/features/hub/api';
+import { MOOD_PRESENTATION } from '@/features/hub/constants';
 import { useHubSummary } from '@/features/hub/hooks';
 import { getTipOfTheDay, PARTNER_PINK } from '@/features/partner/constants';
 import { getCurrentWeekIsoDates } from '@/features/together/api';
@@ -162,6 +164,110 @@ function TipCard({
 }
 
 /**
+ * État du jour de l'autre parent : son ourson d'humeur sur une tache rose,
+ * une phrase qualitative (« Camille semble au top »), puis ses besoins du
+ * jour en pastilles — ou un état vide tant qu'il ou elle n'a rien noté.
+ */
+function PartnerStateCard({
+  partnerName,
+  partnerMood,
+}: {
+  partnerName: string | null;
+  partnerMood: HubSummary['partnerMood'];
+}) {
+  const who = partnerName || 'Votre partenaire';
+  const mood = partnerMood ? MOOD_PRESENTATION[partnerMood.mood] : null;
+
+  return (
+    <View
+      style={[
+        PINK_SHADOW,
+        {
+          borderRadius: 28,
+          backgroundColor: 'rgba(255, 255, 255, 0.9)',
+          borderWidth: 1,
+          borderColor: 'rgba(255, 255, 255, 0.95)',
+        },
+      ]}
+      className="gap-4 px-4 py-4"
+    >
+      <View className="flex-row items-center gap-4">
+        <View
+          className="h-[76px] w-[76px] items-center justify-center overflow-hidden"
+          style={{
+            backgroundColor: PINK.soft,
+            borderTopLeftRadius: 34,
+            borderTopRightRadius: 26,
+            borderBottomRightRadius: 36,
+            borderBottomLeftRadius: 24,
+          }}
+        >
+          {mood ? (
+            <Image
+              source={mood.imgUrl}
+              style={{ width: 66, height: 66 }}
+              resizeMode="contain"
+            />
+          ) : (
+            <Text style={{ fontSize: 32 }}>🌱</Text>
+          )}
+        </View>
+
+        <View className="flex-1 items-start gap-1.5">
+          <View
+            className="rounded-full px-2.5 py-1"
+            style={{ backgroundColor: PINK.tag }}
+          >
+            <Text
+              className="text-[12px] font-semibold"
+              style={{ color: PINK.tagText }}
+            >
+              {mood ? mood.label : 'Aujourd’hui'}
+            </Text>
+          </View>
+          <Text
+            className="text-[16px] font-bold leading-[21px]"
+            style={{ color: GLASS_TITLE_COLOR }}
+          >
+            {mood ? `${who} ${mood.phrase}` : 'Pas encore de nouvelles'}
+          </Text>
+          {mood ? null : (
+            <Text
+              className="text-[13px] leading-[18px]"
+              style={{ color: GLASS_BODY_COLOR }}
+            >
+              {`Son humeur apparaîtra ici dès que ${who} l’aura notée dans Ensemble.`}
+            </Text>
+          )}
+        </View>
+      </View>
+
+      {mood ? (
+        <View className="gap-2">
+          <Text
+            className="text-[11.5px] font-bold"
+            style={{ color: PINK.heading, letterSpacing: 1 }}
+          >
+            SES BESOINS DU JOUR
+          </Text>
+          {partnerMood?.needNote?.trim() ? (
+            <NeedChips
+              note={partnerMood.needNote}
+              tone="light"
+              color={PINK.accent}
+            />
+          ) : (
+            <Text className="text-[13px]" style={{ color: GLASS_BODY_COLOR }}>
+              Aucun besoin particulier précisé aujourd’hui.
+            </Text>
+          )}
+        </View>
+      ) : null}
+    </View>
+  );
+}
+
+/**
  * Section « Mon partenaire » — bloc indépendant ouvert depuis le hub, pas un
  * 4e pilier (CONCEPT.md).
  *
@@ -174,6 +280,12 @@ function TipCard({
  * ⚠️ La capture montre des chevrons sur les cartes ; ils ne sont pas repris
  * tant qu'aucune destination n'est définie pour ces cartes (un chevron
  * promettrait une navigation qui n'existe pas).
+ *
+ * Section « Son état aujourd'hui » (demande explicite) : l'humeur du jour
+ * de l'autre parent (son ourson) et les besoins qu'il ou elle a précisés
+ * dans Ensemble — pour que le co-parent sache où en est la mère, et
+ * réciproquement. Lecture permise par la RLS de `mood_checkins` (membres du
+ * foyer).
  *
  * ⚠️ Vue de la personne enceinte pour l'instant (demande explicite). Deux
  * blocs propres au co-parent restent donc à faire : la reprise de ses
@@ -309,6 +421,16 @@ export default function PartnerScreen() {
 
         {partnerUserId ? (
           <View className="gap-3.5">
+            <SectionHeading icon="sunny-outline" label="SON ÉTAT AUJOURD’HUI" />
+            <PartnerStateCard
+              partnerName={partnerName ?? null}
+              partnerMood={summary?.partnerMood ?? null}
+            />
+          </View>
+        ) : null}
+
+        {partnerUserId ? (
+          <View className="gap-3.5">
             <SectionHeading
               icon="happy-outline"
               label="SON HUMEUR CETTE SEMAINE"
@@ -323,10 +445,13 @@ export default function PartnerScreen() {
               ]}
               className="px-4 py-4"
             >
-              <WeekMoodStrip
-                weekDates={weekDates}
-                checkinsByDate={partnerCheckins}
-              />
+              <View className="pt-4">
+                <WeekMoodDays
+                  weekDates={weekDates}
+                  checkinsByDate={partnerCheckins}
+                  accent={PINK.accent}
+                />
+              </View>
             </View>
           </View>
         ) : null}
