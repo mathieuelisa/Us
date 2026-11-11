@@ -112,16 +112,19 @@ export type Database = {
       };
       baby_size_by_week: {
         Row: {
+          emoji: string | null;
           fruit_label: string;
           length_cm: number | null;
           week: number;
         };
         Insert: {
+          emoji: string | null;
           fruit_label: string;
           length_cm?: number | null;
           week: number;
         };
         Update: {
+          emoji?: string | null;
           fruit_label?: string;
           length_cm?: number | null;
           week?: number;

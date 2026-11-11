@@ -462,8 +462,24 @@ export default function PartnerScreen() {
             label="VOTRE BÉBÉ CETTE SEMAINE"
           />
           <PinkCard>
-            <IllustrationTile emoji="🍼" />
+            {/* Fruit ou légume de la semaine (demande explicite) : la taille
+                se lit d'un coup d'œil. Biberon en repli si la semaine n'a
+                pas encore d'émoji en base. */}
+            <IllustrationTile emoji={babySize?.emoji ?? '🍼'} />
             <View className="flex-1 gap-1">
+              {babySize?.length_cm ? (
+                <View
+                  className="self-start rounded-full px-2.5 py-1"
+                  style={{ backgroundColor: PINK.tag }}
+                >
+                  <Text
+                    className="text-[12px] font-semibold"
+                    style={{ color: PINK.tagText }}
+                  >
+                    {`Environ ${String(babySize.length_cm).replace('.', ',')} cm`}
+                  </Text>
+                </View>
+              ) : null}
               <Text
                 className="text-[16px] font-bold"
                 style={{ color: GLASS_TITLE_COLOR }}
@@ -476,9 +492,7 @@ export default function PartnerScreen() {
               >
                 {weeks === null
                   ? 'Renseignez la date de terme pour suivre la croissance.'
-                  : `${weeks} semaines d’aménorrhée${
-                      babySize?.length_cm ? ` · ${babySize.length_cm} cm` : ''
-                    }`}
+                  : `${weeks} semaines d’aménorrhée`}
               </Text>
             </View>
           </PinkCard>
