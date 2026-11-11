@@ -1,6 +1,12 @@
 import { Ionicons } from '@expo/vector-icons';
 import type { ReactNode } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import {
+  Image,
+  type ImageSourcePropType,
+  Pressable,
+  Text,
+  View,
+} from 'react-native';
 import Svg, { Defs, LinearGradient, Path, Stop } from 'react-native-svg';
 
 import { hexToRgba } from '@/lib/color';
@@ -99,13 +105,33 @@ export function ChevronBubble({ accent }: { accent: string }) {
 /** Tuile arrondie teintée qui accueille l'emoji de la carte. */
 export function IconTile({
   emoji,
+  image,
+  imageFillsTile = false,
   tint,
   size = 56,
 }: {
   emoji: string;
+  /** Illustration à la place de l'émoji (ex. presse-papiers de Démarches). */
+  image?: ImageSourcePropType;
+  /**
+   * L'illustration a déjà sa propre tuile (ex. bulles d'Ensemble) : elle
+   * occupe toute la place, sans le fond teinté ni le liseré — sinon on
+   * verrait un carré dans un carré.
+   */
+  imageFillsTile?: boolean;
   tint: string;
   size?: number;
 }) {
+  if (image && imageFillsTile) {
+    return (
+      <Image
+        source={image}
+        style={{ width: size, height: size }}
+        resizeMode="contain"
+      />
+    );
+  }
+
   return (
     <View
       className="items-center justify-center"
@@ -118,7 +144,15 @@ export function IconTile({
         borderColor: 'rgba(255, 255, 255, 0.9)',
       }}
     >
-      <Text style={{ fontSize: size * 0.5 }}>{emoji}</Text>
+      {image ? (
+        <Image
+          source={image}
+          style={{ width: size * 0.72, height: size * 0.72 }}
+          resizeMode="contain"
+        />
+      ) : (
+        <Text style={{ fontSize: size * 0.5 }}>{emoji}</Text>
+      )}
     </View>
   );
 }

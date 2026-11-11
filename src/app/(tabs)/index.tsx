@@ -40,6 +40,15 @@ import { shiftIsoDate, todayIso } from '@/lib/date';
 
 const SafeAreaView = withUniwind(RNSafeAreaView);
 
+/** Presse-papiers coché de la carte Démarches (illustration fournie, avec sa tuile). */
+const DEMARCHES_ICON = require('@/assets/images/Icon_demarches.png');
+/** Bulles de discussion de la carte Ensemble (illustration fournie, avec sa tuile). */
+const ENSEMBLE_ICON = require('@/assets/images/Icon_ensemble.png');
+/** Stéthoscope à cœur de la carte Suivi santé (illustration fournie, avec sa tuile). */
+const SANTE_ICON = require('@/assets/images/Icon_sante.png');
+/** Valise de naissance de la carte Organisation (illustration fournie, avec sa tuile). */
+const ORGANISATION_ICON = require('@/assets/images/Icon_organisation.png');
+
 /**
  * ⚠️ TEMPORAIRE — exemples affichés **en mode contournement DEV
  * uniquement** (pas de foyer, donc jamais de rendez-vous réel), pour
@@ -254,6 +263,8 @@ export default function HubScreen() {
             <PillarCard
               id="demarches"
               emoji="📋"
+              image={DEMARCHES_ICON}
+              imageFillsTile
               title="Démarches"
               state={proceduresState}
               waveColor={WAVE_PEACH}
@@ -262,6 +273,8 @@ export default function HubScreen() {
             <PillarCard
               id="ensemble"
               emoji="💬"
+              image={ENSEMBLE_ICON}
+              imageFillsTile
               title="Ensemble"
               state={togetherState}
               waveColor={WAVE_PINK}
@@ -270,6 +283,8 @@ export default function HubScreen() {
             <PillarCard
               id="sante"
               emoji="🩺"
+              image={SANTE_ICON}
+              imageFillsTile
               title="Suivi santé"
               state={healthState}
               waveColor={WAVE_MINT}
@@ -284,6 +299,8 @@ export default function HubScreen() {
             <PillarCard
               id="organisation"
               emoji="🧳"
+              image={ORGANISATION_ICON}
+              imageFillsTile
               title="Organisation & Préparation"
               state={organisationState}
               waveColor={WAVE_LILAC}

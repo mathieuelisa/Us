@@ -1,4 +1,4 @@
-import { Text, View } from 'react-native';
+import { type ImageSourcePropType, Text, View } from 'react-native';
 
 import {
   CardWave,
@@ -30,6 +30,8 @@ import { hexToRgba } from '@/lib/color';
 export function PillarCard({
   id,
   emoji,
+  image,
+  imageFillsTile,
   title,
   state,
   waveColor,
@@ -37,6 +39,10 @@ export function PillarCard({
 }: {
   id: string;
   emoji: string;
+  /** Illustration à la place de l'émoji, quand la section en a une. */
+  image?: ImageSourcePropType;
+  /** L'illustration a sa propre tuile : voir `IconTile`. */
+  imageFillsTile?: boolean;
   title: string;
   state: string;
   waveColor: string;
@@ -52,7 +58,13 @@ export function PillarCard({
     >
       <CardWave id={`pillar-wave-${id}`} color={waveColor} height={40} />
       <View className="flex-row items-center gap-3.5 p-4">
-        <IconTile emoji={emoji} tint={hexToRgba(accent, 0.12)} size={52} />
+        <IconTile
+          emoji={emoji}
+          image={image}
+          imageFillsTile={imageFillsTile}
+          tint={hexToRgba(accent, 0.12)}
+          size={52}
+        />
         <View className="flex-1 gap-0.5">
           <Text
             className="text-[16.5px] font-bold"
