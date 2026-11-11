@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/glass-card';
 import { getSymptomLabel, getSymptomVisual } from '@/features/health/constants';
 import { usePregnantSymptomsForDate } from '@/features/health/hooks';
+import { getSymptomTipOfTheDay } from '@/features/health/symptom-tips';
 import type { Household } from '@/features/household/api';
 import { getTipOfTheDay } from '@/features/partner/constants';
 import { useThemeAccent } from '@/features/settings/hooks';
@@ -31,6 +32,10 @@ import { todayIso } from '@/lib/date';
  * L'astuce suit le rôle de la personne connectée (`getTipOfTheDay`) :
  * conseil de grossesse pour elle, conseil d'accompagnement pour le
  * co-parent.
+ *
+ * Juste au-dessus, quand des symptômes sont notés, un carré « Conseil »
+ * propre à l'un d'eux (demande explicite), sur la teinte de ce symptôme —
+ * même partage par rôle (`getSymptomTipOfTheDay`).
  */
 export function HealthTodayCard({
   household,
@@ -49,6 +54,7 @@ export function HealthTodayCard({
     todayIso(),
   );
   const tip = getTipOfTheDay(role);
+  const symptomTip = getSymptomTipOfTheDay(symptoms, role);
 
   const title = isPregnant
     ? 'Votre forme aujourd’hui'
@@ -147,6 +153,8 @@ export function HealthTodayCard({
         </View>
       )}
 
+      {symptomTip ? <SymptomTipSquare tip={symptomTip} /> : null}
+
       {tip ? (
         <View
           className="flex-row items-start gap-3 rounded-[20px] px-3.5 py-3"
@@ -175,6 +183,45 @@ export function HealthTodayCard({
           </View>
         </View>
       ) : null}
+    </View>
+  );
+}
+
+/**
+ * Carré « Conseil » lié à un symptôme du jour : pictogramme du symptôme dans
+ * un rond blanc, intitulé « CONSEIL · <SYMPTÔME> », puis l'astuce — le tout
+ * sur la teinte du symptôme (`SYMPTOM_VISUALS`), pour qu'on voie d'un coup
+ * d'œil à quoi il répond.
+ */
+function SymptomTipSquare({ tip }: { tip: { symptom: string; text: string } }) {
+  const visual = getSymptomVisual(tip.symptom);
+
+  return (
+    <View
+      className="gap-2.5 rounded-[20px] px-3.5 py-3.5"
+      style={{ backgroundColor: visual.tint }}
+    >
+      <View className="flex-row items-center gap-2.5">
+        <View className="h-9 w-9 items-center justify-center rounded-full bg-white">
+          <Text style={{ fontSize: 18 }}>{visual.emoji}</Text>
+        </View>
+        <Text
+          className="flex-1 text-[11.5px] font-bold"
+          style={{
+            color: GLASS_TITLE_COLOR,
+            letterSpacing: 0.8,
+            opacity: 0.75,
+          }}
+        >
+          CONSEIL · {getSymptomLabel(tip.symptom).toUpperCase()}
+        </Text>
+      </View>
+      <Text
+        className="text-[13.5px] leading-[19px]"
+        style={{ color: GLASS_TITLE_COLOR }}
+      >
+        {tip.text}
+      </Text>
     </View>
   );
 }
