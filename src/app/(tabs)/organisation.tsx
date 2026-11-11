@@ -1,14 +1,22 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useAtomValue } from 'jotai';
-import { useState } from 'react';
+import { type ComponentProps, useState } from 'react';
 import { Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
+import Svg, { Path } from 'react-native-svg';
 import { withUniwind } from 'uniwind';
 
 import { PremiumTeaserCard } from '@/components/hub/premium-teaser-card';
 import { ProgressBar } from '@/components/organisation/progress-bar';
 import { PlainInput } from '@/components/plain-input';
+import {
+  ChevronBubble,
+  GLASS_BODY_COLOR,
+  GLASS_TITLE_COLOR,
+  GlassCard,
+  SparkLines,
+} from '@/components/ui/glass-card';
 import { ScreenCornerShapes } from '@/components/ui/screen-corner-shapes';
 import { useMyHousehold } from '@/features/household/hooks';
 import { CARD_SHADOW } from '@/features/hub/constants';
@@ -30,12 +38,13 @@ import {
   useDeleteCustomChecklistItem,
   useToggleChecklistItem,
 } from '@/features/organisation/hooks';
-import { useThemeBackground } from '@/features/settings/hooks';
+import { useThemeAccent, useThemeBackground } from '@/features/settings/hooks';
 // ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
 import {
   devBypassAccompanimentTypeAtom,
   devBypassAtom,
 } from '@/lib/atoms/dev-bypass';
+import { hexToRgba } from '@/lib/color';
 
 const SafeAreaView = withUniwind(RNSafeAreaView);
 
@@ -48,6 +57,11 @@ const SafeAreaView = withUniwind(RNSafeAreaView);
  * les mêmes listes, comme pour les démarches administratives. Seule la
  * sous-section « Co-parent » de la valise de maternité est masquée quand le
  * foyer est « Seul·e » (demande explicite).
+ *
+ * Liste modernisée d'après une capture de référence (demande explicite) :
+ * grand bouton retour, ourson en en-tête, titre souligné, intitulés de
+ * section à icône, checklists en cartes « verre dépoli » (grande pastille
+ * d'emoji, avancement coché, barre de progression, chevron en pastille).
  */
 export default function OrganisationScreen() {
   const router = useRouter();
@@ -138,6 +152,7 @@ export default function OrganisationScreen() {
   const [selectedSlug, setSelectedSlug] = useState<string | null>(null);
   const selectedItems = selectedSlug ? (itemsBySlug[selectedSlug] ?? []) : [];
   const backgroundColor = useThemeBackground();
+  const accent = useThemeAccent();
 
   return (
     <SafeAreaView
@@ -150,16 +165,27 @@ export default function OrganisationScreen() {
         contentContainerClassName="gap-5 px-6 pb-10 pt-4"
         showsVerticalScrollIndicator={false}
       >
-        <Pressable
-          accessibilityLabel="Revenir en arrière"
-          accessibilityRole="button"
-          hitSlop={12}
-          style={CARD_SHADOW}
-          onPress={() => (selectedSlug ? setSelectedSlug(null) : router.back())}
-          className="h-9 w-9 items-center justify-center rounded-full bg-white"
-        >
-          <Text className="text-[17px] leading-5 text-[#1a1a1a]">‹</Text>
-        </Pressable>
+        <View>
+          {selectedSlug ? null : <HeaderIllustration accent={accent} />}
+          <Pressable
+            accessibilityLabel="Revenir en arrière"
+            accessibilityRole="button"
+            hitSlop={12}
+            onPress={() =>
+              selectedSlug ? setSelectedSlug(null) : router.back()
+            }
+            className="h-12 w-12 items-center justify-center rounded-full bg-white"
+            style={{
+              shadowColor: accent,
+              shadowOffset: { width: 0, height: 8 },
+              shadowOpacity: 0.12,
+              shadowRadius: 16,
+              elevation: 4,
+            }}
+          >
+            <Ionicons name="chevron-back" size={22} color={GLASS_TITLE_COLOR} />
+          </Pressable>
+        </View>
 
         {selectedSlug ? (
           <ChecklistDetail
@@ -171,21 +197,40 @@ export default function OrganisationScreen() {
           />
         ) : (
           <>
-            <View className="gap-1">
-              <Text className="text-[26px] font-bold text-[#1a1a1a]">
-                Organisation & Préparation
-              </Text>
-              <Text className="text-[13px] text-[#6b6b6b]">
+            <View className="gap-2">
+              <View className="gap-2" style={{ maxWidth: '64%' }}>
+                <Text
+                  className="text-[28px] font-extrabold leading-[34px]"
+                  style={{ color: GLASS_TITLE_COLOR, letterSpacing: -0.6 }}
+                >
+                  Organisation & Préparation
+                </Text>
+                <Svg width={130} height={10} viewBox="0 0 130 10">
+                  <Path
+                    d="M3 7 C 38 2, 88 1.5, 127 4"
+                    stroke={hexToRgba(accent, 0.5)}
+                    strokeWidth={3}
+                    strokeLinecap="round"
+                    fill="none"
+                  />
+                </Svg>
+              </View>
+              <Text
+                className="text-[14px] leading-5"
+                style={{ color: GLASS_BODY_COLOR }}
+              >
                 L'organisation pratique... et les décisions plus légères, comme
                 le prénom.
               </Text>
             </View>
 
-            <View className="gap-2">
-              <Text className="text-[11.5px] font-semibold tracking-wide text-[#8a8a8a]">
-                LES CHECKLISTS DES VALISES
-              </Text>
-              <View className="gap-2.5">
+            <View className="gap-3">
+              <SectionHeading
+                icon="clipboard-outline"
+                label="LES CHECKLISTS DES VALISES"
+                accent={accent}
+              />
+              <View className="gap-3">
                 {CHECKLIST_ORDER.map((slug) => {
                   const meta = CHECKLIST_META[slug];
                   const slugItems = itemsBySlug[slug] ?? [];
@@ -198,32 +243,44 @@ export default function OrganisationScreen() {
                       : checkedCount / slugItems.length;
 
                   return (
-                    <Pressable
+                    <GlassCard
                       key={slug}
-                      accessibilityRole="button"
-                      style={CARD_SHADOW}
+                      accessibilityLabel={`${meta.title}, ${checkedCount} sur ${slugItems.length} complétés`}
+                      accent={accent}
                       onPress={() => setSelectedSlug(slug)}
-                      className="gap-3 rounded-2xl bg-white px-4 py-4"
                     >
-                      <View className="flex-row items-center gap-3">
+                      <View className="flex-row items-center gap-3.5 py-4 pl-4 pr-3">
                         <View
                           style={{ backgroundColor: meta.bg }}
-                          className="h-11 w-11 items-center justify-center rounded-full"
+                          className="h-14 w-14 items-center justify-center rounded-full"
                         >
-                          <Text className="text-[20px]">{meta.emoji}</Text>
+                          <Text className="text-[27px]">{meta.emoji}</Text>
                         </View>
-                        <View className="flex-1 gap-0.5">
-                          <Text className="text-[15px] font-medium text-[#1a1a1a]">
+                        <View className="flex-1 gap-1.5">
+                          <Text
+                            className="text-[16px] font-bold"
+                            style={{ color: GLASS_TITLE_COLOR }}
+                          >
                             {meta.title}
                           </Text>
-                          <Text className="text-[13px] text-[#6b6b6b]">
-                            {checkedCount} sur {slugItems.length} complétés
-                          </Text>
+                          <View className="flex-row items-center gap-1.5">
+                            <Ionicons
+                              name="checkmark-circle"
+                              size={16}
+                              color={hexToRgba(accent, 0.75)}
+                            />
+                            <Text
+                              className="text-[13px]"
+                              style={{ color: GLASS_BODY_COLOR }}
+                            >
+                              {checkedCount} sur {slugItems.length} complétés
+                            </Text>
+                          </View>
+                          <ProgressBar progress={progress} />
                         </View>
-                        <Text className="text-[20px] text-[#c0c0c0]">›</Text>
+                        <ChevronBubble accent={accent} />
                       </View>
-                      <ProgressBar progress={progress} />
-                    </Pressable>
+                    </GlassCard>
                   );
                 })}
               </View>
@@ -233,10 +290,12 @@ export default function OrganisationScreen() {
                 (PremiumTeaserCard) — ouvre son propre écran d'accès
                 verrouillé (`/prenoms`), même concept que `/bebe` (demande
                 explicite). */}
-            <View className="gap-2">
-              <Text className="text-[11.5px] font-semibold tracking-wide text-[#8a8a8a]">
-                JEUX
-              </Text>
+            <View className="gap-3">
+              <SectionHeading
+                icon="game-controller-outline"
+                label="JEUX"
+                accent={accent}
+              />
               <PremiumTeaserCard
                 icon={
                   <Image
@@ -248,12 +307,138 @@ export default function OrganisationScreen() {
                 title="Le match des prénoms"
                 subtitle="Trouvez le prénom parfait à deux"
                 onPress={() => router.push('/prenoms')}
+                illustration={<NameCardsIllustration />}
               />
             </View>
           </>
         )}
       </ScrollView>
     </SafeAreaView>
+  );
+}
+
+/** Intitulé de section : icône d'accent, libellé espacé. */
+function SectionHeading({
+  icon,
+  label,
+  accent,
+}: {
+  icon: ComponentProps<typeof Ionicons>['name'];
+  label: string;
+  accent: string;
+}) {
+  return (
+    <View className="flex-row items-center gap-2.5 px-1">
+      <Ionicons name={icon} size={20} color={accent} />
+      <Text
+        className="text-[12.5px] font-bold"
+        style={{ color: '#5b5470', letterSpacing: 1.1 }}
+      >
+        {label}
+      </Text>
+    </View>
+  );
+}
+
+/**
+ * Ourson en haut à droite de l'en-tête, sur une tache d'accent, avec
+ * feuille et cœurs (capture de référence).
+ */
+function HeaderIllustration({ accent }: { accent: string }) {
+  return (
+    <View
+      pointerEvents="none"
+      style={{ position: 'absolute', top: 0, right: -12 }}
+    >
+      <View
+        style={{
+          position: 'absolute',
+          width: 130,
+          height: 130,
+          borderRadius: 65,
+          backgroundColor: hexToRgba(accent, 0.1),
+          top: 14,
+          left: 14,
+        }}
+      />
+      <Ionicons
+        name="leaf"
+        size={34}
+        color={hexToRgba(accent, 0.3)}
+        style={{
+          position: 'absolute',
+          right: 4,
+          bottom: 8,
+          transform: [{ rotate: '25deg' }],
+        }}
+      />
+      <Image
+        source={require('@/assets/images/Baby_said_hi.png')}
+        style={{ width: 128, height: 148 }}
+        resizeMode="contain"
+      />
+      <Ionicons
+        name="heart"
+        size={18}
+        color="#f08aa8"
+        style={{ position: 'absolute', left: -10, top: 30 }}
+      />
+      <Ionicons
+        name="heart"
+        size={14}
+        color="#f08aa8"
+        style={{ position: 'absolute', right: 2, top: 4 }}
+      />
+    </View>
+  );
+}
+
+/**
+ * Deux cartes à jouer penchées (cœur, étoile) avec petits traits — évoque
+ * le jeu du match des prénoms (capture de référence). Composée de vues et
+ * d'icônes, faute d'illustration dédiée.
+ */
+function NameCardsIllustration() {
+  const card = (
+    rotate: string,
+    left: number,
+    top: number,
+    background: string,
+    icon: 'heart' | 'star',
+    color: string,
+  ) => (
+    <View
+      style={{
+        position: 'absolute',
+        left,
+        top,
+        width: 40,
+        height: 48,
+        borderRadius: 10,
+        backgroundColor: background,
+        alignItems: 'center',
+        justifyContent: 'center',
+        transform: [{ rotate }],
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.2,
+        shadowRadius: 6,
+        elevation: 4,
+      }}
+    >
+      <Ionicons name={icon} size={20} color={color} />
+    </View>
+  );
+
+  return (
+    <View pointerEvents="none" style={{ width: 82, height: 64 }}>
+      {card('-14deg', 4, 10, '#fdf7fb', 'heart', '#f08aa8')}
+      {card('10deg', 36, 6, '#fdf3dc', 'star', '#f2b84b')}
+      <SparkLines
+        color="#8fd3c0"
+        style={{ left: 30, top: -14, transform: [{ scale: 0.8 }] }}
+      />
+    </View>
   );
 }
 

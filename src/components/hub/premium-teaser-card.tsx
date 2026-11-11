@@ -23,37 +23,82 @@ export function PremiumTeaserCard({
   title,
   subtitle,
   onPress,
+  illustration,
 }: {
   icon: ReactNode;
   title: string;
   subtitle: string;
   onPress?: () => void;
+  /**
+   * Variante « vedette » (« Le match des prénoms », capture de référence) :
+   * remplace la pastille d'icône par une illustration plus grande, agrandit
+   * la carte et pose « Premium » dans une gélule. Sans elle, la carte garde
+   * son gabarit sobre (« Votre bébé » sur le hub).
+   */
+  illustration?: ReactNode;
 }) {
   const Container = onPress ? Pressable : View;
+  const isFeatured = Boolean(illustration);
 
   return (
     <Container
       accessibilityRole={onPress ? 'button' : undefined}
       onPress={onPress}
-      style={CARD_SHADOW}
-      className="flex-row items-center gap-3.5 overflow-hidden rounded-2xl bg-[#1f3d3a] px-4 py-4"
+      style={
+        isFeatured
+          ? {
+              shadowColor: '#1f3d3a',
+              shadowOffset: { width: 0, height: 12 },
+              shadowOpacity: 0.25,
+              shadowRadius: 20,
+              elevation: 6,
+            }
+          : CARD_SHADOW
+      }
+      className={`flex-row items-center overflow-hidden bg-[#1f3d3a] ${
+        isFeatured
+          ? 'gap-3 rounded-[28px] py-4 pl-3 pr-3.5'
+          : 'gap-3.5 rounded-2xl px-4 py-4'
+      }`}
     >
       <View
         pointerEvents="none"
-        className="absolute -right-8 -top-12 h-36 w-36 rounded-full bg-[#6fae9c]/25"
+        className={
+          isFeatured
+            ? 'absolute -right-10 -top-10 h-48 w-40 rounded-full bg-[#6fae9c]/25'
+            : 'absolute -right-8 -top-12 h-36 w-36 rounded-full bg-[#6fae9c]/25'
+        }
       />
 
-      <View className="h-11 w-11 items-center justify-center rounded-full bg-[#e8c874]/15">
-        {icon}
-      </View>
+      {isFeatured ? (
+        illustration
+      ) : (
+        <View className="h-11 w-11 items-center justify-center rounded-full bg-[#e8c874]/15">
+          {icon}
+        </View>
+      )}
 
       <View className="flex-1 gap-0.5">
-        <Text className="text-[16px] font-semibold text-white">{title}</Text>
+        <Text
+          className={`font-semibold text-white ${
+            isFeatured ? 'text-[17px] font-bold' : 'text-[16px]'
+          }`}
+        >
+          {title}
+        </Text>
         <Text className="text-[13px] text-[#9fb6b2]">{subtitle}</Text>
       </View>
 
-      <View className="flex-row items-center gap-1">
-        <Ionicons name="lock-closed" size={12} color="#e8c874" />
+      <View
+        className={`flex-row items-center gap-1 ${
+          isFeatured ? 'rounded-full bg-black/20 px-2.5 py-1.5' : ''
+        }`}
+      >
+        <Ionicons
+          name="lock-closed"
+          size={isFeatured ? 13 : 12}
+          color="#e8c874"
+        />
         <Text className="text-[10px] font-semibold uppercase tracking-wide text-[#e8c874]">
           Premium
         </Text>
