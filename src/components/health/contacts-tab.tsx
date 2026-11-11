@@ -56,13 +56,11 @@ export function ContactsTab({
   const reorderContacts = useReorderContacts(household);
 
   const [name, setName] = useState('');
-  const [roleLabel, setRoleLabel] = useState('');
   const [phone, setPhone] = useState('');
   const [isEmergency, setIsEmergency] = useState(false);
 
   const resetForm = () => {
     setName('');
-    setRoleLabel('');
     setPhone('');
     setIsEmergency(false);
     onIsAddingChange(false);
@@ -169,27 +167,16 @@ export function ContactsTab({
             accent={accent}
             autoCapitalize="words"
           />
-          <View className="flex-row gap-2.5">
-            <View className="flex-1">
-              <IconInput
-                icon="medkit-outline"
-                placeholder="Rôle"
-                value={roleLabel}
-                onChangeText={setRoleLabel}
-                accent={accent}
-              />
-            </View>
-            <View style={{ flex: 1.2 }}>
-              <IconInput
-                icon="call-outline"
-                placeholder="Téléphone"
-                value={phone}
-                onChangeText={setPhone}
-                accent={accent}
-                keyboardType="phone-pad"
-              />
-            </View>
-          </View>
+          {/* Plus de champ « Rôle » (demande explicite : il débordait de
+              sa gélule) — nom, téléphone et urgence suffisent. */}
+          <IconInput
+            icon="call-outline"
+            placeholder="Téléphone"
+            value={phone}
+            onChangeText={setPhone}
+            accent={accent}
+            keyboardType="phone-pad"
+          />
 
           <View
             className="flex-row items-center gap-2.5 rounded-full py-1.5 pl-1.5 pr-3"
@@ -227,7 +214,7 @@ export function ContactsTab({
               createContact.mutate(
                 {
                   name: name.trim(),
-                  roleLabel: roleLabel.trim() || null,
+                  roleLabel: null,
                   address: null,
                   phone: phone.trim() || null,
                   isEmergency,
