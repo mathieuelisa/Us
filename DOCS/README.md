@@ -12,6 +12,7 @@ grossesse et les premiers mois du bébé.
 3. [Plan de versionning](./03-VERSIONING.md) — MVP → V1 → V2, et convention pour les versions suivantes
 4. [Architecture technique](./04-ARCHITECTURE.md) — stack, conventions d'état, arborescence, Supabase
 5. [Dette et points ouverts](./05-DETTE-ET-POINTS-OUVERTS.md) — contournements temporaires, vérifications jamais faites, décisions prises par défaut. **À relire avant chaque jalon**
+6. [Plan d'action Supabase](./06-PLAN-SUPABASE.md) — tout ce qui reste à faire côté base, Auth, Edge Functions, Storage et notifications, en lots ordonnés (MVP puis V1), avec les décisions prises
 
 ## Où en est le projet (2026-11-11)
 

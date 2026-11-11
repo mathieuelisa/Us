@@ -40,7 +40,8 @@ Dernière mise à jour de ce tableau : 2026-11-11.
 **Prochaine étape : finir la [Phase 2](#phase-2--déclaration-de-naissance--durcissement-mvp)**,
 en commençant par ce qui fausse les tests réels : pousser les deux
 migrations manquantes sur le cloud (dette n°49) et retirer les données
-fictives affichées hors mode DEV (dette n°48).
+fictives affichées hors mode DEV (dette n°48). Tout le travail côté
+Supabase est ordonné dans le [plan d'action Supabase](./06-PLAN-SUPABASE.md).
 
 ⚠️ **La 1.2 porte une dette de vérification** : aucune écriture Supabase
 authentifiée (création du foyer, invitation, rattachement du co-parent) n'a
