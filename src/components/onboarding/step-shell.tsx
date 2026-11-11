@@ -1,13 +1,20 @@
+import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { Button } from 'heroui-native';
 import type { ReactNode } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
+import Svg, { Path } from 'react-native-svg';
 import { withUniwind } from 'uniwind';
 import { SlideInText } from '@/components/onboarding/slide-in-text';
-import { CARD_SHADOW } from '@/features/hub/constants';
+import {
+  GLASS_BODY_COLOR,
+  GLASS_TITLE_COLOR,
+} from '@/components/ui/glass-card';
+import { PillButton } from '@/components/ui/pill-button';
+import { ScreenCornerShapes } from '@/components/ui/screen-corner-shapes';
 import { ONBOARDING_STEP_COUNT } from '@/features/onboarding/constants';
-import { useThemeBackground } from '@/features/settings/hooks';
+import { useThemeAccent, useThemeBackground } from '@/features/settings/hooks';
+import { hexToRgba } from '@/lib/color';
 
 const SafeAreaView = withUniwind(RNSafeAreaView);
 
@@ -39,6 +46,14 @@ const ONBOARDING_TITLE_FONT = 'Provicali';
  * centre vertical de l'écran plutôt qu'alignés en haut — pour les écrans de
  * transition (réassurance, invitation) qui n'ont pas de longue liste à
  * faire défiler.
+ *
+ * Habillage modernisé d'après une capture de référence de l'étape 1
+ * (demande explicite) et appliqué à tout le parcours, l'ossature étant
+ * commune : grand bouton retour rond, barre de progression plus épaisse,
+ * titre en couleur d'encre souligné d'un trait d'accent, ronds décoratifs
+ * en fond, action principale en `PillButton`. `illustration` (facultatif)
+ * se pose en haut à droite, à côté du titre — qui se resserre alors pour
+ * lui laisser la place.
  */
 export function OnboardingStepShell({
   step,
@@ -51,6 +66,8 @@ export function OnboardingStepShell({
   secondaryLabel,
   onSecondaryPress,
   centered = false,
+  illustration,
+  hero,
 }: {
   step: number | null;
   title: string;
@@ -62,13 +79,46 @@ export function OnboardingStepShell({
   secondaryLabel?: string;
   onSecondaryPress?: () => void;
   centered?: boolean;
+  illustration?: ReactNode;
+  /**
+   * Visuel posé **au-dessus** du titre dans la variante `centered`
+   * (réassurance) : l'image ouvre l'écran, le titre vient ensuite.
+   */
+  hero?: ReactNode;
 }) {
   const router = useRouter();
   const backgroundColor = useThemeBackground();
+  const accent = useThemeAccent();
+
+  const underline = (
+    <Svg width={120} height={10} viewBox="0 0 120 10">
+      <Path
+        d="M3 7 C 34 2, 80 1.5, 117 4"
+        stroke={hexToRgba(accent, 0.5)}
+        strokeWidth={3}
+        strokeLinecap="round"
+        fill="none"
+      />
+    </Svg>
+  );
 
   return (
-    <SafeAreaView className="flex-1" style={{ backgroundColor }}>
-      <View className="flex-1 px-7 pt-4">
+    <SafeAreaView
+      className="flex-1 overflow-hidden"
+      style={{ backgroundColor }}
+    >
+      <ScreenCornerShapes />
+
+      <View className="flex-1 px-6 pt-4">
+        {illustration ? (
+          <View
+            pointerEvents="none"
+            style={{ position: 'absolute', top: 56, right: 8 }}
+          >
+            {illustration}
+          </View>
+        ) : null}
+
         {/* Aligné à gauche : c'est la convention iOS/Android, et surtout le
             côté d'où part le swipe de retour — bouton et geste désignent
             ainsi la même direction. */}
@@ -77,27 +127,38 @@ export function OnboardingStepShell({
             accessibilityLabel="Revenir à l’étape précédente"
             accessibilityRole="button"
             hitSlop={12}
-            style={CARD_SHADOW}
             onPress={() => router.back()}
-            className="mb-2 h-9 w-9 items-center justify-center rounded-full bg-[#ffffff]"
+            className="mb-3 h-11 w-11 items-center justify-center rounded-full bg-white"
+            style={{
+              shadowColor: accent,
+              shadowOffset: { width: 0, height: 6 },
+              shadowOpacity: 0.12,
+              shadowRadius: 12,
+              elevation: 4,
+            }}
           >
-            <Text className="text-[17px] leading-5 text-[#1a1a1a]">‹</Text>
+            <Ionicons name="chevron-back" size={21} color={GLASS_TITLE_COLOR} />
           </Pressable>
         ) : null}
 
         {step === null ? null : (
-          <View className="gap-2 pb-6">
-            <View className="h-1 flex-row gap-1">
+          <View
+            className="gap-2 pb-5"
+            style={illustration ? { maxWidth: '62%' } : undefined}
+          >
+            <View className="h-1.5 flex-row gap-1.5">
               {STEP_NUMBERS.map((stepNumber) => (
                 <View
                   key={stepNumber}
-                  className={`h-1 flex-1 rounded-full ${
-                    stepNumber <= step ? 'bg-accent' : 'bg-[#e8e8e8]'
-                  }`}
+                  className="h-1.5 flex-1 rounded-full"
+                  style={{
+                    backgroundColor:
+                      stepNumber <= step ? accent : hexToRgba(accent, 0.12),
+                  }}
                 />
               ))}
             </View>
-            <Text className="text-[12.5px] text-[#9a9a9a]">
+            <Text className="text-[13px]" style={{ color: GLASS_BODY_COLOR }}>
               Étape {step} sur {ONBOARDING_STEP_COUNT}
             </Text>
           </View>
@@ -105,17 +166,27 @@ export function OnboardingStepShell({
 
         {centered ? (
           <View className="flex-1 justify-center gap-2">
+            {hero}
             <SlideInText direction="left">
-              <Text
-                style={{ fontFamily: ONBOARDING_TITLE_FONT }}
-                className="text-center text-[24px] leading-7 text-[#1a1a1a]"
-              >
-                {title}
-              </Text>
+              <View className="items-center gap-1.5">
+                <Text
+                  style={{
+                    fontFamily: ONBOARDING_TITLE_FONT,
+                    color: GLASS_TITLE_COLOR,
+                  }}
+                  className="text-center text-[25px] leading-[30px]"
+                >
+                  {title}
+                </Text>
+                {underline}
+              </View>
             </SlideInText>
             {subtitle ? (
               <SlideInText direction="right">
-                <Text className="px-2 text-center text-[14px] leading-5 text-[#6b6b6b]">
+                <Text
+                  className="px-2 text-center text-[14px] leading-5"
+                  style={{ color: GLASS_BODY_COLOR }}
+                >
                   {subtitle}
                 </Text>
               </SlideInText>
@@ -125,16 +196,28 @@ export function OnboardingStepShell({
         ) : (
           <>
             <SlideInText direction="left">
-              <Text
-                style={{ fontFamily: ONBOARDING_TITLE_FONT }}
-                className="text-[24px] leading-7 text-[#1a1a1a]"
+              <View
+                className="gap-2"
+                style={illustration ? { maxWidth: '66%' } : undefined}
               >
-                {title}
-              </Text>
+                <Text
+                  style={{
+                    fontFamily: ONBOARDING_TITLE_FONT,
+                    color: GLASS_TITLE_COLOR,
+                  }}
+                  className="text-[26px] leading-[31px]"
+                >
+                  {title}
+                </Text>
+                {underline}
+              </View>
             </SlideInText>
             {subtitle ? (
               <SlideInText direction="right" style={{ paddingTop: 8 }}>
-                <Text className="text-[14px] leading-5 text-[#6b6b6b]">
+                <Text
+                  className="text-[14px] leading-5"
+                  style={{ color: GLASS_BODY_COLOR }}
+                >
                   {subtitle}
                 </Text>
               </SlideInText>
@@ -142,7 +225,7 @@ export function OnboardingStepShell({
 
             <ScrollView
               className="flex-1"
-              contentContainerClassName="gap-3 py-6"
+              contentContainerClassName="gap-3 py-5"
               showsVerticalScrollIndicator={false}
             >
               {children}
@@ -151,9 +234,11 @@ export function OnboardingStepShell({
         )}
 
         <View className="gap-3 pb-2">
-          <Button isDisabled={isPrimaryDisabled} onPress={onPrimaryPress}>
-            <Button.Label>{primaryLabel}</Button.Label>
-          </Button>
+          <PillButton
+            label={primaryLabel}
+            isDisabled={isPrimaryDisabled}
+            onPress={onPrimaryPress}
+          />
 
           {secondaryLabel && onSecondaryPress ? (
             <Pressable
@@ -161,7 +246,10 @@ export function OnboardingStepShell({
               className="items-center py-2"
               onPress={onSecondaryPress}
             >
-              <Text className="text-[14px] text-[#6b6b6b]">
+              <Text
+                className="text-[14.5px] font-semibold"
+                style={{ color: GLASS_TITLE_COLOR }}
+              >
                 {secondaryLabel}
               </Text>
             </Pressable>
