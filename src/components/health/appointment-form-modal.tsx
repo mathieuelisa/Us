@@ -32,6 +32,10 @@ import { todayIso } from '@/lib/date';
  * icône d'accent, partage dans une bande teintée, « Ajouter au calendrier »
  * en `PillButton`. Sans les flèches gauche/droite de la capture autour de
  * la date (demande explicite), et resserrée pour tenir sans défiler.
+ *
+ * Pas de rendez-vous dans le passé (demande explicite) : la molette part
+ * d'aujourd'hui, et un jour passé choisi sur le calendrier avant
+ * l'ouverture est ramené à aujourd'hui.
  */
 export function AppointmentFormModal({
   visible,
@@ -63,7 +67,8 @@ export function AppointmentFormModal({
   useEffect(() => {
     if (visible) {
       setTitle('');
-      setDate(initialDate ?? todayIso());
+      const today = todayIso();
+      setDate(initialDate && initialDate > today ? initialDate : today);
       setTime('');
       setAddress('');
       setIsShared(true);
@@ -71,7 +76,11 @@ export function AppointmentFormModal({
   }, [visible, initialDate]);
 
   const isTimeInvalid = time.trim().length > 0 && parseTimeInput(time) === null;
-  const canSubmit = title.trim().length > 0 && !isTimeInvalid && !isSaving;
+  const canSubmit =
+    title.trim().length > 0 &&
+    date >= todayIso() &&
+    !isTimeInvalid &&
+    !isSaving;
 
   return (
     <Modal
@@ -187,7 +196,12 @@ export function AppointmentFormModal({
                   Date
                 </Text>
               </View>
-              <WheelDatePicker value={date} onChange={setDate} compact />
+              <WheelDatePicker
+                value={date}
+                minDate={todayIso()}
+                onChange={setDate}
+                compact
+              />
             </View>
 
             <View className="gap-1.5">
