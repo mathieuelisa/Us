@@ -222,7 +222,7 @@ de réinitialisation du mot de passe. Ils supposent deux réglages :
 
    | Réglage | Valeur |
    |---|---|
-   | Providers → Email | Activé, avec mot de passe. « Confirm email » activé (sinon n'importe qui peut s'inscrire avec une adresse qui n'est pas la sienne) |
+   | Providers → Email | Activé, avec mot de passe. « Confirm email » **désactivé depuis le 2026-11-11 pour les tests**, à réactiver avant production : sans lui, n'importe qui peut s'inscrire avec une adresse qui n'est pas la sienne et rejoindre un foyer invité (dette n°60) |
    | Providers → Google | À activer : identifiants OAuth créés dans Google Cloud, URL de rappel `https://hsclyntlnoyevstdhgvu.supabase.co/auth/v1/callback` |
    | Site URL | `us://` |
    | Redirect URLs | `us://**`, `exp://**`, `exp+us://**`, `http://localhost:8081/**` |

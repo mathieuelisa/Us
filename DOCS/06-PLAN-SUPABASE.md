@@ -60,7 +60,8 @@ title: Plan d'action Supabase — US
 
 **Reste à faire dans le dashboard** (le MCP Supabase n'a pas accès aux
 réglages Auth) : activer Google (identifiants OAuth Google Cloud),
-vérifier « Confirm email » et la longueur minimale des mots de passe (8),
+réactiver « Confirm email » avant production (désactivé pour les tests,
+dette n°60), vérifier la longueur minimale des mots de passe (8),
 activer si possible la protection contre les mots de passe compromis,
 configurer le SMTP. Détail dans l'[architecture](./04-ARCHITECTURE.md#connexion--email--mot-de-passe-google).
 
@@ -146,7 +147,8 @@ puissent enfin l'être.
 - [ ] **Modèles d'email en français** (confirmation d'inscription,
       réinitialisation du mot de passe), au ton de l'app. → dette n°9
 - [ ] **Réglages Auth du dashboard** : activer Google (dette n°56),
-      vérifier « Confirm email » et la longueur minimale (8), protection
+      réactiver « Confirm email » (dette n°60), vérifier la longueur
+      minimale (8), protection
       contre les mots de passe compromis.
 - [ ] **Jeu de données local** (`supabase/seed.sql`) pour le Supabase local :
       deux comptes de test (personne enceinte, co-parent), un foyer complet

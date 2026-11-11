@@ -102,6 +102,7 @@ Déploiement : MCP Supabase (`deploy_edge_function`) ou
 | [`20261111120100_appointments_both_parents.sql`](../../supabase/migrations/20261111120100_appointments_both_parents.sql) | `appointments` | Les deux parents créent des rendez-vous. Lecture : membre du foyer et (créateur ou partagé) ; modification et suppression : le créateur seul. Policies réécrites par `alter policy` (sans suppression) + index `(household_id, appointment_date)` |
 | [`20261111120200_procedure_templates_pregnancy_month.sql`](../../supabase/migrations/20261111120200_procedure_templates_pregnancy_month.sql) | `procedure_templates` | Ajoute `pregnancy_month` (1-9) et le renseigne pour les 8 démarches — la correspondance vivait dans le code |
 | [`20261111120300_gesture_suggestions_emoji.sql`](../../supabase/migrations/20261111120300_gesture_suggestions_emoji.sql) | `gesture_suggestions` | Ajoute `emoji` et le renseigne pour les 8 gestes — il était retrouvé par correspondance exacte du texte |
+| [`20261111130000_households_direct_membership_policies.sql`](../../supabase/migrations/20261111130000_households_direct_membership_policies.sql) | `households` | Corrige la création du foyer en fin d'onboarding (« new row violates row-level security policy », trouvé au premier essai avec un vrai compte) : la policy SELECT passait par `is_household_member(id)`, qui relit la table sans voir la ligne en cours d'insertion lors du `insert … returning`. Les policies de `households` lisent désormais l'appartenance directement sur les colonnes de la ligne |
 
 ## Décisions de modélisation
 
