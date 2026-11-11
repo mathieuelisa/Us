@@ -43,9 +43,9 @@ import {
   formatDeadlineLabel,
   getPregnancyMonthLabel,
   getProcedureIconStyle,
+  getProcedurePregnancyMonth,
   getStatusLabel,
   PREGNANCY_MONTHS,
-  PROCEDURE_PREGNANCY_MONTH,
 } from '@/features/procedures/constants';
 // ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
 import { DEV_PROCEDURES_FIXTURE } from '@/features/procedures/dev-fixture';
@@ -188,7 +188,7 @@ export default function ProceduresScreen() {
   }, [selectedMonth, monthViewportWidth]);
 
   const visibleProcedures = procedures.filter(
-    (procedure) => PROCEDURE_PREGNANCY_MONTH[procedure.slug] === selectedMonth,
+    (procedure) => getProcedurePregnancyMonth(procedure) === selectedMonth,
   );
 
   const completedCount = procedures.filter((p) => p.status === 'fait').length;
@@ -202,8 +202,8 @@ export default function ProceduresScreen() {
   // pastilles des mois et l'état vide.
   const monthStats = new Map<number, { total: number; remaining: number }>();
   for (const procedure of procedures) {
-    const month = PROCEDURE_PREGNANCY_MONTH[procedure.slug];
-    if (month === undefined) continue;
+    const month = getProcedurePregnancyMonth(procedure);
+    if (month === null) continue;
     const stats = monthStats.get(month) ?? { total: 0, remaining: 0 };
     stats.total += 1;
     if (procedure.status !== 'fait') stats.remaining += 1;
@@ -224,7 +224,7 @@ export default function ProceduresScreen() {
       ? null
       : procedures.find(
           (procedure) =>
-            PROCEDURE_PREGNANCY_MONTH[procedure.slug] === nextStepMonth &&
+            getProcedurePregnancyMonth(procedure) === nextStepMonth &&
             procedure.status !== 'fait',
         );
 

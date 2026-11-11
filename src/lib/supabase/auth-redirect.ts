@@ -5,12 +5,18 @@ import { Platform } from 'react-native';
 import { supabase } from './client';
 
 /**
- * Où Supabase doit renvoyer l'utilisateur après le clic sur le lien magique.
+ * Retours d'Auth par URL. La connexion se fait désormais par email + mot de
+ * passe ou par Google (le lien magique a été abandonné le 2026-11-11), mais
+ * trois parcours ramènent encore l'utilisateur dans l'app par une URL
+ * portant ses jetons :
+ *   - le retour de **Google** (OAuth) ;
+ *   - le lien de **confirmation d'email** après une inscription, si la
+ *     confirmation est activée dans Supabase ;
+ *   - le lien de **réinitialisation du mot de passe**, qui ouvre une session
+ *     depuis laquelle l'utilisateur choisit un nouveau mot de passe dans
+ *     Réglages.
  *
- * Sans cette valeur, Supabase retombe sur le `Site URL` du projet — par
- * défaut `http://localhost:3000`, qui ne correspond à rien ici : le lien
- * aboutit à une erreur de connexion.
- *
+ * Où Supabase doit renvoyer l'utilisateur :
  * - **Web** : l'origine courante, port de dev inclus.
  * - **Natif** : un deep link vers l'app. `Linking.createURL()` produit la
  *   bonne forme selon le contexte d'exécution (`exp://…` sous Expo Go,
@@ -33,11 +39,12 @@ export function getAuthRedirectTo(): string {
 }
 
 /**
- * Ouvre une session à partir d'une URL de retour de lien magique. Supabase
- * place les jetons dans le **fragment** (`#access_token=…`), jamais dans la
- * query string — d'où le découpage sur `#`.
+ * Ouvre une session à partir d'une URL de retour. Supabase (flux
+ * « implicit », celui du client) place les jetons dans le **fragment**
+ * (`#access_token=…`), jamais dans la query string — d'où le découpage sur
+ * `#`. Renvoie `true` si une session a été ouverte.
  */
-async function setSessionFromUrl(url: string): Promise<boolean> {
+export async function createSessionFromUrl(url: string): Promise<boolean> {
   const fragment = url.split('#')[1];
   if (!fragment) return false;
 
@@ -54,7 +61,8 @@ async function setSessionFromUrl(url: string): Promise<boolean> {
 }
 
 /**
- * Récupère la session quand l'app est **ouverte par** le lien magique.
+ * Récupère la session quand l'app est **ouverte par** une URL de retour
+ * (retour de Google sur web, lien de confirmation ou de réinitialisation).
  *
  * Volontairement exécuté au chargement du module, avant le premier rendu :
  * sur web, le routeur normalise l'URL très tôt et efface le fragment. Le
@@ -63,7 +71,7 @@ async function setSessionFromUrl(url: string): Promise<boolean> {
 async function recoverSessionFromInitialUrl(): Promise<void> {
   if (Platform.OS !== 'web') {
     const initialUrl = await Linking.getInitialURL();
-    if (initialUrl) await setSessionFromUrl(initialUrl);
+    if (initialUrl) await createSessionFromUrl(initialUrl);
     return;
   }
 
@@ -79,23 +87,25 @@ async function recoverSessionFromInitialUrl(): Promise<void> {
     window.location.pathname + window.location.search,
   );
 
-  await setSessionFromUrl(`#${hash.replace(/^#/, '')}`);
+  await createSessionFromUrl(`#${hash.replace(/^#/, '')}`);
 }
 
 export const initialSessionRecovery = recoverSessionFromInitialUrl();
 
 /**
- * Traite les liens magiques reçus alors que l'app **tourne déjà** (cas
+ * Traite les URL de retour reçues alors que l'app **tourne déjà** (cas
  * courant sur mobile : l'app est en arrière-plan, l'utilisateur clique le
- * lien depuis sa boîte mail). Sans ce listener, seul le démarrage à froid
- * fonctionnerait. Sans objet sur web, où le clic provoque un chargement.
+ * lien de confirmation depuis sa boîte mail). Sans ce listener, seul le
+ * démarrage à froid fonctionnerait. Sans objet sur web, où le clic provoque
+ * un chargement. Le retour de Google en natif ne passe pas par ici : il est
+ * traité directement par `signInWithGoogle()`.
  */
-export function useMagicLinkListener(): void {
+export function useAuthRedirectListener(): void {
   useEffect(() => {
     if (Platform.OS === 'web') return;
 
     const subscription = Linking.addEventListener('url', ({ url }) => {
-      void setSessionFromUrl(url);
+      void createSessionFromUrl(url);
     });
 
     return () => subscription.remove();

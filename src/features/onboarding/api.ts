@@ -45,16 +45,16 @@ export async function completeOnboarding(
 }
 
 /**
- * Invite le co-parent. Deux effets distincts :
- *  1. une ligne `household_invites` — c'est elle qui fait autorité pour le
- *     rattachement, via `accept_household_invite()` ;
- *  2. un email de lien magique envoyé à cette adresse.
+ * Invite le co-parent : enregistre son adresse dans `household_invites`,
+ * sans envoyer d'email (décision du 2026-11-11, abandon du lien magique).
+ * Le co-parent crée son compte avec cette adresse — mot de passe ou
+ * Google — et `accept_household_invite()` le rattache au foyer à sa
+ * première connexion, **à condition que son email soit confirmé** (sinon
+ * n'importe qui pourrait s'inscrire avec l'adresse invitée).
  *
- * ⚠️ Limite MVP : l'email envoyé est le template « lien de connexion »
- * standard de Supabase, pas un email d'invitation personnalisé au nom du
- * premier parent. Un vrai email d'invitation suppose une Edge Function
- * (clé service_role) — hors périmètre de la Phase 1.2, à traiter quand le
- * SMTP du projet sera configuré.
+ * C'est au premier parent de le prévenir. Un vrai email d'invitation
+ * (« Camille vous invite… ») suppose une Edge Function et un SMTP configuré
+ * — plan Supabase, lot 3.
  */
 export async function invitePartner(
   householdId: string,
@@ -67,12 +67,6 @@ export async function invitePartner(
     .insert({ household_id: householdId, invited_email: invitedEmail });
 
   if (inviteError) throw inviteError;
-
-  const { error: mailError } = await supabase.auth.signInWithOtp({
-    email: invitedEmail,
-  });
-
-  if (mailError) throw mailError;
 }
 
 /**

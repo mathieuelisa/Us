@@ -18,10 +18,11 @@ import { hexToRgba, lightenHex } from '@/lib/color';
 import { todayIso } from '@/lib/date';
 
 /**
- * Écran 4g. Le choix partagé/non partagé est fait **à la création** : c'est
- * lui qui décide si le co-parent verra ce rendez-vous (RLS
- * `appointments_select_scoped`). Non partagé par défaut — sur un pilier
- * santé, le défaut doit être le moins divulgant.
+ * Écran 4g, ouvert par l'un ou l'autre parent. Le choix partagé/non partagé
+ * est fait **à la création** : c'est lui qui décide si l'autre parent verra
+ * ce rendez-vous (RLS `appointments_select_own_or_shared` — un rendez-vous
+ * non partagé n'est visible que de son créateur). Partagé par défaut
+ * (demande explicite), décochable au cas par cas.
  *
  * `animationType="none"` sur `Modal` (même parti pris que `HowItWorksModal`) :
  * le fond opaque apparaît instantanément, seule la carte glisse

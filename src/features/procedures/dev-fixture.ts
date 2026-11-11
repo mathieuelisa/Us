@@ -22,6 +22,7 @@ export const DEV_PROCEDURES_FIXTURE: ProcedureWithStatus[] = [
     id: 'dev-declaration-naissance',
     householdProcedureId: 'dev-declaration-naissance',
     slug: 'declaration-naissance',
+    pregnancy_month: 9,
     title: 'Déclaration de naissance',
     description:
       'La déclaration de naissance se fait à la mairie du lieu de naissance de l’enfant. C’est cette démarche qui donne officiellement son état civil au bébé et permet ensuite toutes les autres inscriptions administratives. Elle doit être réalisée par l’un des parents, en présentant les documents ci-dessous.',
@@ -41,6 +42,7 @@ export const DEV_PROCEDURES_FIXTURE: ProcedureWithStatus[] = [
     id: 'dev-caf',
     householdProcedureId: 'dev-caf',
     slug: 'caf',
+    pregnancy_month: 9,
     title: 'CAF',
     description:
       'L’arrivée d’un nouvel enfant dans la famille vous ouvre de nouveaux droits ainsi que des aides. Afin d’en profiter, il faudra donc contacter l’organisme en charge des prestations sociales et familiales auquel vous êtes affilié : CAF ou MSA',
@@ -56,6 +58,7 @@ export const DEV_PROCEDURES_FIXTURE: ProcedureWithStatus[] = [
     id: 'dev-securite-sociale',
     householdProcedureId: 'dev-securite-sociale',
     slug: 'securite-sociale',
+    pregnancy_month: 6,
     title: 'Sécurité sociale',
     description:
       'Après la naissance, les rendez-vous médicaux et achats de produits en pharmacie pour votre enfant vont se multiplier. Il est donc important d’être bien couvert en matière de protection santé. Il vous faudra donc indiquer le changement de situation à votre organisme',
@@ -71,6 +74,7 @@ export const DEV_PROCEDURES_FIXTURE: ProcedureWithStatus[] = [
     id: 'dev-mutuelle',
     householdProcedureId: 'dev-mutuelle',
     slug: 'mutuelle',
+    pregnancy_month: 9,
     title: 'Mutuelle',
     description:
       'En ce qui concerne la mutuelle pour les enfants, le fonctionnement est le même, avec une double affiliation possible. Avec l’arrivée d’un bébé, vos besoins en matière de santé évoluent cependant drastiquement. Un changement de contrat complémentaire santé pourrait alors se révéler opportun.',
@@ -85,6 +89,7 @@ export const DEV_PROCEDURES_FIXTURE: ProcedureWithStatus[] = [
     id: 'dev-conge-employeur',
     householdProcedureId: 'dev-conge-employeur',
     slug: 'conge-employeur',
+    pregnancy_month: 9,
     title: 'Congé employeur',
     description:
       'Si vous êtes salarié, prévenez immédiatement votre employeur afin de bénéficier de votre congé paternité ou maternité. Vous devrez lui fournir une copie de l’acte de naissance afin d’être dans les règles administrativement. Rappel : il vous incombe d’informer votre employeur par lettre recommandée avec accusé de réception en amont de la naissance pour profiter de vos congés dans leur intégralité. Certaines entreprises prévoient des primes à la naissance ou des cadeaux !',
@@ -100,6 +105,7 @@ export const DEV_PROCEDURES_FIXTURE: ProcedureWithStatus[] = [
     id: 'dev-mode-de-garde',
     householdProcedureId: 'dev-mode-de-garde',
     slug: 'mode-de-garde',
+    pregnancy_month: 3,
     title: 'Mode de garde',
     description:
       'Si vous devez inscrire votre enfant à la crèche, prévenez-la rapidement. En particulier si la date de commission d’attribution est proche.',
@@ -114,6 +120,7 @@ export const DEV_PROCEDURES_FIXTURE: ProcedureWithStatus[] = [
     id: 'dev-assurance-habitation',
     householdProcedureId: 'dev-assurance-habitation',
     slug: 'assurance-habitation',
+    pregnancy_month: 5,
     title: 'Assurance habitation',
     description:
       'Voici un point que l’on a parfois tendance à oublier lors des démarches administratives naissance après l’accouchement. Il est pourtant très important de contacter votre assurance habitation afin de la notifier après la naissance. Ainsi, votre enfant pourra être intégré au contrat et bénéficier du statut d’ayant-droit. Au cas contraire, il ne sera pas couvert et cette omission pourrait avoir des conséquences sérieuses en cas de sinistre.',
@@ -128,6 +135,7 @@ export const DEV_PROCEDURES_FIXTURE: ProcedureWithStatus[] = [
     id: 'dev-administration-fiscale',
     householdProcedureId: 'dev-administration-fiscale',
     slug: 'administration-fiscale',
+    pregnancy_month: 7,
     title: 'Administration fiscale',
     description:
       'Parmi les démarches administratives naissance, il est obligatoire de déclarer votre nouveau-né à l’administration fiscale. Selon votre choix, vous pouvez opter pour différentes formules : rattacher l’enfant à charge de l’un des parents seulement ou répartir la charge entre les deux parents.',

@@ -32,7 +32,7 @@ import { useHubSummary } from '@/features/hub/hooks';
 import { useMyProfile } from '@/features/profile/hooks';
 import { useThemeAccent, useThemeBackground } from '@/features/settings/hooks';
 // ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
-import { devBypassFirstNameAtom } from '@/lib/atoms/dev-bypass';
+import { devBypassAtom, devBypassFirstNameAtom } from '@/lib/atoms/dev-bypass';
 import { currentRoleAtom } from '@/lib/atoms/role';
 import { darkenHex, hexToRgba, lightenHex } from '@/lib/color';
 import { shiftIsoDate, todayIso } from '@/lib/date';
@@ -40,10 +40,11 @@ import { shiftIsoDate, todayIso } from '@/lib/date';
 const SafeAreaView = withUniwind(RNSafeAreaView);
 
 /**
- * ⚠️ TEMPORAIRE — aucun rendez-vous réel tant que l'onboarding ne permet
- * pas encore d'en créer facilement. Sert uniquement à visualiser le rendu
- * de la section « Nos prochains rendez-vous » ; à retirer dès que des rendez-vous
- * réels existent (l'état vide légitime redeviendra alors visible).
+ * ⚠️ TEMPORAIRE — exemples affichés **en mode contournement DEV
+ * uniquement** (pas de foyer, donc jamais de rendez-vous réel), pour
+ * visualiser la section « Nos prochains rendez-vous ». Un vrai foyer sans
+ * rendez-vous voit l'état vide : lui montrer de faux rendez-vous serait
+ * trompeur (dette n°48). À retirer avec le mode contournement.
  */
 const MOCK_APPOINTMENTS = [
   {
@@ -102,8 +103,9 @@ export default function HubScreen() {
     .filter((appointment) => appointment.appointment_date >= today)
     .slice(0, 3);
 
-  // Tant qu'aucun rendez-vous réel n'existe, on affiche des exemples
-  // fictifs plutôt qu'un état vide — voir `MOCK_APPOINTMENTS`.
+  // Exemples fictifs en mode contournement DEV seulement — voir
+  // `MOCK_APPOINTMENTS`.
+  const isDevBypass = useAtomValue(devBypassAtom) !== 'off';
   const displayedAppointments =
     upcomingAppointments.length > 0
       ? upcomingAppointments.map((appointment) => ({
@@ -113,7 +115,9 @@ export default function HubScreen() {
           time: appointment.appointment_time,
           address: appointment.address,
         }))
-      : MOCK_APPOINTMENTS;
+      : isDevBypass
+        ? MOCK_APPOINTMENTS
+        : [];
 
   // ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts. Le sien, jamais le
   // prénom du co-parent : c'est le seul champ que ce contournement propage.
@@ -381,6 +385,11 @@ export default function HubScreen() {
           </Text>
 
           <View className="gap-2">
+            {displayedAppointments.length === 0 ? (
+              <Text className="text-right text-[13px] text-[#9a9a9a]">
+                Aucun rendez-vous à venir.
+              </Text>
+            ) : null}
             {displayedAppointments.map((appointment) => {
               const { weekday, day, month } = formatAppointmentDayMonth(
                 appointment.date,

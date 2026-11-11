@@ -1,3 +1,4 @@
+import { useAtomValue } from 'jotai';
 import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 
@@ -11,16 +12,25 @@ import {
   useDeleteAppointment,
 } from '@/features/health/hooks';
 import type { Household } from '@/features/household/api';
+import { sessionAtom } from '@/lib/atoms/session';
 import { todayIso } from '@/lib/date';
 
-/** Écrans 4b et 4g — calendrier du mois et prochains rendez-vous. */
+/**
+ * Écrans 4b et 4g — calendrier du mois et prochains rendez-vous.
+ *
+ * Les **deux** parents créent des rendez-vous (décision du 2026-11-11). La
+ * RLS (`appointments_select_own_or_shared`) ne renvoie que ses propres
+ * rendez-vous et ceux que l'autre a partagés : aucun filtrage côté client.
+ * Seul le créateur peut supprimer — on n'affiche donc la croix et le badge
+ * « Partagé / Non partagé » que sur ses propres rendez-vous ; ceux de
+ * l'autre parent sont signalés comme tels.
+ */
 export function AppointmentsTab({
   household,
-  isPregnant,
 }: {
   household: Household | null | undefined;
-  isPregnant: boolean;
 }) {
+  const currentUserId = useAtomValue(sessionAtom)?.user.id ?? null;
   const { data: appointments = [] } = useAppointments(household);
   const createAppointment = useCreateAppointment(household);
   const deleteAppointment = useDeleteAppointment(household);
@@ -60,11 +70,8 @@ export function AppointmentsTab({
         month={month}
         markedDates={appointments.map((item) => item.appointment_date)}
         onChangeMonth={changeMonth}
-        // Cliquer une date ouvre directement le formulaire pré-rempli — le
-        // co-parent n'a de toute façon pas le bouton d'ajout, la sélection
-        // reste donc désactivée pour lui (cf. `disabled={!onSelectDate}`
-        // dans MonthCalendar).
-        onSelectDate={isPregnant ? openFormFor : undefined}
+        // Cliquer une date ouvre directement le formulaire pré-rempli.
+        onSelectDate={openFormFor}
       />
 
       <View className="gap-2.5">
@@ -77,66 +84,76 @@ export function AppointmentsTab({
             Aucun rendez-vous à venir.
           </Text>
         ) : (
-          upcoming.map((appointment) => (
-            <View
-              key={appointment.id}
-              className="gap-1.5 rounded-2xl bg-white px-4 py-3.5"
-            >
-              <View className="flex-row items-center gap-2">
-                <Text className="flex-1 text-[15px] font-medium text-[#1a1a1a]">
-                  {appointment.title}
-                </Text>
+          upcoming.map((appointment) => {
+            const isMine = appointment.created_by === currentUserId;
+            return (
+              <View
+                key={appointment.id}
+                className="gap-1.5 rounded-2xl bg-white px-4 py-3.5"
+              >
+                <View className="flex-row items-center gap-2">
+                  <Text className="flex-1 text-[15px] font-medium text-[#1a1a1a]">
+                    {appointment.title}
+                  </Text>
 
-                {/* Le badge n'a de sens que pour la personne enceinte : le
-                    co-parent ne voit de toute façon que les partagés. */}
-                {isPregnant ? (
-                  <View
-                    className={`rounded-full px-2 py-0.5 ${
-                      appointment.is_shared ? 'bg-accent/10' : 'bg-[#f0f0f0]'
-                    }`}
-                  >
-                    <Text
-                      className={`text-[10.5px] font-medium ${
-                        appointment.is_shared ? 'text-accent' : 'text-[#6b6b6b]'
+                  {/* Partagé / non partagé n'a de sens que pour ses propres
+                    rendez-vous : ceux de l'autre parent sont forcément
+                    partagés, sans quoi la RLS ne les renverrait pas. */}
+                  {isMine ? (
+                    <View
+                      className={`rounded-full px-2 py-0.5 ${
+                        appointment.is_shared ? 'bg-accent/10' : 'bg-[#f0f0f0]'
                       }`}
                     >
-                      {appointment.is_shared ? 'Partagé' : 'Non partagé'}
-                    </Text>
-                  </View>
-                ) : null}
+                      <Text
+                        className={`text-[10.5px] font-medium ${
+                          appointment.is_shared
+                            ? 'text-accent'
+                            : 'text-[#6b6b6b]'
+                        }`}
+                      >
+                        {appointment.is_shared ? 'Partagé' : 'Non partagé'}
+                      </Text>
+                    </View>
+                  ) : (
+                    <View className="rounded-full bg-accent/10 px-2 py-0.5">
+                      <Text className="text-[10.5px] font-medium text-accent">
+                        De votre co-parent
+                      </Text>
+                    </View>
+                  )}
 
-                {isPregnant ? (
-                  <Pressable
-                    accessibilityLabel={`Supprimer ${appointment.title}`}
-                    accessibilityRole="button"
-                    hitSlop={8}
-                    onPress={() => deleteAppointment.mutate(appointment.id)}
-                  >
-                    <Text className="text-[15px] text-[#9a9a9a]">✕</Text>
-                  </Pressable>
-                ) : null}
+                  {isMine ? (
+                    <Pressable
+                      accessibilityLabel={`Supprimer ${appointment.title}`}
+                      accessibilityRole="button"
+                      hitSlop={8}
+                      onPress={() => deleteAppointment.mutate(appointment.id)}
+                    >
+                      <Text className="text-[15px] text-[#9a9a9a]">✕</Text>
+                    </Pressable>
+                  ) : null}
+                </View>
+
+                <Text className="text-[13px] text-[#6b6b6b]">
+                  {formatAppointmentSummary(
+                    appointment.appointment_date,
+                    appointment.appointment_time,
+                  )}
+                  {appointment.address ? ` — ${appointment.address}` : ''}
+                </Text>
               </View>
-
-              <Text className="text-[13px] text-[#6b6b6b]">
-                {formatAppointmentSummary(
-                  appointment.appointment_date,
-                  appointment.appointment_time,
-                )}
-                {appointment.address ? ` — ${appointment.address}` : ''}
-              </Text>
-            </View>
-          ))
+            );
+          })
         )}
 
-        {isPregnant ? (
-          <View className="mt-2">
-            <PillButton
-              label="Ajouter un rendez-vous"
-              icon="add-circle-outline"
-              onPress={() => openFormFor(null)}
-            />
-          </View>
-        ) : null}
+        <View className="mt-2">
+          <PillButton
+            label="Ajouter un rendez-vous"
+            icon="add-circle-outline"
+            onPress={() => openFormFor(null)}
+          />
+        </View>
       </View>
 
       <AppointmentFormModal

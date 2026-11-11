@@ -6,7 +6,10 @@ import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import { Uniwind, useUniwind, withUniwind } from 'uniwind';
-
+import {
+  ChangePasswordModal,
+  DeleteAccountModal,
+} from '@/components/settings/account-modals';
 import {
   DashedLoopDoodle,
   GLASS_BODY_COLOR,
@@ -22,6 +25,7 @@ import {
   type ThemeId,
 } from '@/features/settings/constants';
 import { useThemeAccent, useThemeBackground } from '@/features/settings/hooks';
+import { currentRoleAtom } from '@/lib/atoms/role';
 import { sessionAtom } from '@/lib/atoms/session';
 import { hexToRgba, lightenHex } from '@/lib/color';
 import { supabase } from '@/lib/supabase/client';
@@ -59,10 +63,12 @@ const LEGAL_LINKS: { doc: string; label: string; icon: IoniconName }[] = [
  * et non partagés (déjà garanti par la RLS `profiles_update_own`, juste
  * rappelé ici), 3-4 thèmes visuels prédéfinis, pas de sélecteur de langue.
  *
- * ⚠️ Le reste de la maquette 10a (compte, notifications, aide & support,
- * export de données, CGU) n'est pas dans le périmètre de cette phase — le
- * plan d'action §1.7 s'y limite explicitement, contrairement au résumé plus
- * large de DOCS/versions/MVP.md.
+ * Section **Compte** (ajout du 2026-11-11, avec le passage à la connexion
+ * par mot de passe) : email de connexion et moyen utilisé, changement de mot
+ * de passe pour les comptes email, suppression du compte (Edge Function
+ * `delete-account`, obligatoire pour l'App Store). Le reste de la maquette
+ * 10a (notifications, aide & support, export de données) reste hors
+ * périmètre.
  *
  * ⚠️ Distinct du « Thème sombre » + « Couleur d'accent » de la maquette :
  * ce mécanisme-là est explicitement hors MVP. Ici, un choix fermé de 4
@@ -81,6 +87,19 @@ export default function SettingsScreen() {
   const backgroundColor = useThemeBackground();
   const accent = useThemeAccent();
   const [isSigningOut, setIsSigningOut] = useState(false);
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const isPregnant =
+    (useAtomValue(currentRoleAtom) ?? 'pregnant') === 'pregnant';
+
+  // Un compte Google n'a pas de mot de passe chez nous : pas de
+  // changement possible. `providers` liste tous les moyens rattachés.
+  const user = session?.user ?? null;
+  const providers = (user?.app_metadata.providers as string[] | undefined) ?? [
+    user?.app_metadata.provider ?? 'email',
+  ];
+  const hasPassword = providers.includes('email');
+  const isGoogle = providers.includes('google');
 
   const selectedThemeId = resolveThemeId(activeTheme);
 
@@ -138,6 +157,70 @@ export default function SettingsScreen() {
                 fill="none"
               />
             </Svg>
+          </View>
+        </View>
+
+        <View className="gap-3.5">
+          <SectionTitle
+            icon="person-circle-outline"
+            label="Compte"
+            accent={accent}
+          />
+          <View
+            className="overflow-hidden rounded-[24px]"
+            style={[
+              tintedShadow(accent),
+              {
+                backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                borderWidth: 1,
+                borderColor: 'rgba(255, 255, 255, 0.95)',
+              },
+            ]}
+          >
+            <View className="flex-row items-center gap-3.5 px-3.5 py-3">
+              <View
+                className="h-11 w-11 items-center justify-center rounded-2xl"
+                style={{ backgroundColor: hexToRgba(accent, 0.1) }}
+              >
+                <Ionicons
+                  name={
+                    isGoogle && !hasPassword ? 'logo-google' : 'mail-outline'
+                  }
+                  size={20}
+                  color={accent}
+                />
+              </View>
+              <View className="flex-1 gap-0.5">
+                <Text
+                  className="text-[15px] font-semibold"
+                  style={{ color: GLASS_TITLE_COLOR }}
+                  numberOfLines={1}
+                >
+                  {user?.email ?? 'Mode DEV — aucun compte connecté'}
+                </Text>
+                <Text
+                  className="text-[12.5px]"
+                  style={{ color: GLASS_BODY_COLOR }}
+                >
+                  {!user
+                    ? 'Connectez-vous pour gérer votre compte.'
+                    : isGoogle && hasPassword
+                      ? 'Connexion par Google ou mot de passe'
+                      : isGoogle
+                        ? 'Connexion avec Google'
+                        : 'Connexion par email et mot de passe'}
+                </Text>
+              </View>
+            </View>
+
+            {user && hasPassword ? (
+              <AccountRow
+                icon="key-outline"
+                label="Changer le mot de passe"
+                accent={accent}
+                onPress={() => setIsPasswordModalOpen(true)}
+              />
+            ) : null}
           </View>
         </View>
 
@@ -256,9 +339,68 @@ export default function SettingsScreen() {
           </Text>
         </Pressable>
 
+        {user ? (
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => setIsDeleteModalOpen(true)}
+            className="flex-row items-center justify-center gap-2 py-2 active:opacity-60"
+          >
+            <Ionicons name="trash-outline" size={17} color="#d14b3a" />
+            <Text className="text-[14.5px] font-semibold text-[#d14b3a]">
+              Supprimer mon compte
+            </Text>
+          </Pressable>
+        ) : null}
+
         <DashedLoopDoodle color={accent} />
       </ScrollView>
+
+      <ChangePasswordModal
+        visible={isPasswordModalOpen}
+        onClose={() => setIsPasswordModalOpen(false)}
+      />
+      <DeleteAccountModal
+        visible={isDeleteModalOpen}
+        isPregnant={isPregnant}
+        onClose={() => setIsDeleteModalOpen(false)}
+      />
     </SafeAreaView>
+  );
+}
+
+/** Ligne d'action sous l'identité du compte, séparée par un filet. */
+function AccountRow({
+  icon,
+  label,
+  accent,
+  onPress,
+}: {
+  icon: IoniconName;
+  label: string;
+  accent: string;
+  onPress: () => void;
+}) {
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      onPress={onPress}
+      className="flex-row items-center gap-3.5 border-t border-black/5 px-3.5 py-3 active:opacity-70"
+    >
+      <View
+        className="h-11 w-11 items-center justify-center rounded-2xl"
+        style={{ backgroundColor: hexToRgba(accent, 0.1) }}
+      >
+        <Ionicons name={icon} size={20} color={accent} />
+      </View>
+      <Text
+        className="flex-1 text-[15.5px] font-medium"
+        style={{ color: GLASS_TITLE_COLOR }}
+      >
+        {label}
+      </Text>
+      <Ionicons name="chevron-forward" size={18} color="#a8a8b3" />
+    </Pressable>
   );
 }
 

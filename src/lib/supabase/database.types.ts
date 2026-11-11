@@ -229,18 +229,21 @@ export type Database = {
       gesture_suggestions: {
         Row: {
           body: string;
+          emoji: string | null;
           id: string;
           sort_order: number;
           target_role: string;
         };
         Insert: {
           body: string;
+          emoji?: string | null;
           id?: string;
           sort_order?: number;
           target_role: string;
         };
         Update: {
           body?: string;
+          emoji?: string | null;
           id?: string;
           sort_order?: number;
           target_role?: string;
@@ -563,6 +566,7 @@ export type Database = {
           documents: string[];
           id: string;
           official_link: string | null;
+          pregnancy_month: number | null;
           slug: string;
           sort_order: number;
           title: string;
@@ -573,6 +577,7 @@ export type Database = {
           documents?: string[];
           id?: string;
           official_link?: string | null;
+          pregnancy_month?: number | null;
           slug: string;
           sort_order?: number;
           title: string;
@@ -583,6 +588,7 @@ export type Database = {
           documents?: string[];
           id?: string;
           official_link?: string | null;
+          pregnancy_month?: number | null;
           slug?: string;
           sort_order?: number;
           title?: string;

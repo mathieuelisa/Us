@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import { useAtomValue } from 'jotai';
 import { useState } from 'react';
 import { Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
@@ -28,16 +29,19 @@ import {
   useUpdateInfoItem,
 } from '@/features/household/hooks';
 import { useThemeAccent, useThemeBackground } from '@/features/settings/hooks';
+// ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
+import { devBypassAtom } from '@/lib/atoms/dev-bypass';
 import { hexToRgba } from '@/lib/color';
 import { shiftIsoDate, todayIso } from '@/lib/date';
 
 const SafeAreaView = withUniwind(RNSafeAreaView);
 
 /**
- * ⚠️ TEMPORAIRE — visuel avant branchement Supabase (demande explicite) :
- * mêmes IDs/formes qu'un vrai `HouseholdInfoItem`, jamais persisté. À
- * retirer dès que le foyer réel remplace systématiquement cette liste (cf.
- * `MOCK_APPOINTMENTS` dans le hub, même parti pris).
+ * ⚠️ TEMPORAIRE — exemples affichés **en mode contournement DEV
+ * uniquement** (pas de foyer réel) : mêmes formes qu'un vrai
+ * `HouseholdInfoItem`, jamais persistés. Un vrai foyer sans information voit
+ * l'état vide — lui montrer un faux groupe sanguin serait dangereux (dette
+ * n°48). À retirer avec le mode contournement.
  */
 const MOCK_INFO_ITEMS: HouseholdInfoItem[] = [
   {
@@ -233,9 +237,11 @@ export default function InformationsScreen() {
     }
   };
 
-  // Tant que le foyer/les items réels ne sont pas branchés, on affiche des
-  // exemples fictifs plutôt qu'un état vide — voir `MOCK_INFO_ITEMS`.
-  const displayedItems = items.length > 0 ? items : MOCK_INFO_ITEMS;
+  // Exemples fictifs en mode contournement DEV seulement — voir
+  // `MOCK_INFO_ITEMS`.
+  const isDevBypass = useAtomValue(devBypassAtom) !== 'off';
+  const displayedItems =
+    items.length > 0 ? items : isDevBypass ? MOCK_INFO_ITEMS : [];
   const legacyItems = displayedItems.filter(
     (item) => !isInfoCategory(item.category),
   );
@@ -334,6 +340,20 @@ export default function InformationsScreen() {
           <Text className="text-[13px] text-[#9a9a9a]">Chargement…</Text>
         ) : (
           <View className="flex-1 gap-5">
+            {displayedItems.length === 0 ? (
+              <View
+                className="items-center gap-1.5 rounded-[24px] px-5 py-6"
+                style={{ backgroundColor: 'rgba(255, 255, 255, 0.92)' }}
+              >
+                <Text className="text-center text-[15px] font-semibold text-[#1a1a1a]">
+                  Aucune information pour l’instant
+                </Text>
+                <Text className="text-center text-[13px] leading-[18px] text-[#6b6b6b]">
+                  Ajoutez groupe sanguin, allergies, numéros utiles… avec le
+                  bouton +. Elles seront partagées avec votre co-parent.
+                </Text>
+              </View>
+            ) : null}
             {INFO_CATEGORY_ORDER.map((category) => {
               const meta = INFO_CATEGORY_META[category];
               const categoryItems = displayedItems.filter(

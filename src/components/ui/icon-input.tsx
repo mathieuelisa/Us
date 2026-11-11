@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { type ComponentProps, useState } from 'react';
+import { type ComponentProps, type ReactNode, useState } from 'react';
 import { TextInput, type TextInputProps, View } from 'react-native';
 
 import { GLASS_TITLE_COLOR } from '@/components/ui/glass-card';
@@ -40,6 +40,9 @@ export function IconBubble({
  * custom (cf. DOCS/05-DETTE-ET-POINTS-OUVERTS.md, `PlainInput`). Contour
  * d'accent au focus, rouge si la valeur est invalide. Le placeholder sert
  * aussi d'`accessibilityLabel`.
+ *
+ * `trailing` : élément posé en fin de gélule (ex. l'œil qui affiche le mot
+ * de passe sur l'écran de connexion).
  */
 export function IconInput({
   icon,
@@ -50,6 +53,13 @@ export function IconInput({
   isInvalid = false,
   keyboardType,
   autoCapitalize,
+  autoComplete,
+  textContentType,
+  secureTextEntry,
+  editable = true,
+  returnKeyType,
+  onSubmitEditing,
+  trailing,
 }: {
   icon: IoniconName;
   placeholder: string;
@@ -59,6 +69,13 @@ export function IconInput({
   isInvalid?: boolean;
   keyboardType?: TextInputProps['keyboardType'];
   autoCapitalize?: TextInputProps['autoCapitalize'];
+  autoComplete?: TextInputProps['autoComplete'];
+  textContentType?: TextInputProps['textContentType'];
+  secureTextEntry?: boolean;
+  editable?: boolean;
+  returnKeyType?: TextInputProps['returnKeyType'];
+  onSubmitEditing?: () => void;
+  trailing?: ReactNode;
 }) {
   const [isFocused, setIsFocused] = useState(false);
 
@@ -86,9 +103,17 @@ export function IconInput({
         onBlur={() => setIsFocused(false)}
         keyboardType={keyboardType}
         autoCapitalize={autoCapitalize}
+        autoComplete={autoComplete}
+        textContentType={textContentType}
+        secureTextEntry={secureTextEntry}
+        editable={editable}
+        returnKeyType={returnKeyType}
+        onSubmitEditing={onSubmitEditing}
+        autoCorrect={secureTextEntry ? false : undefined}
         className="flex-1 text-[14.5px]"
         style={{ color: GLASS_TITLE_COLOR, paddingVertical: 0 }}
       />
+      {trailing}
     </View>
   );
 }

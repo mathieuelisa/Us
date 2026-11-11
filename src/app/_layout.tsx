@@ -23,11 +23,11 @@ import { useThemeBackground } from '@/features/settings/hooks';
 import { devBypassAtom } from '@/lib/atoms/dev-bypass';
 import { sessionAtom } from '@/lib/atoms/session';
 import { queryClient } from '@/lib/query/query-client';
-import { supabase } from '@/lib/supabase/client';
 import {
   initialSessionRecovery,
-  useMagicLinkListener,
-} from '@/lib/supabase/magic-link';
+  useAuthRedirectListener,
+} from '@/lib/supabase/auth-redirect';
+import { supabase } from '@/lib/supabase/client';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -119,8 +119,9 @@ export default function RootLayout() {
   // noir par défaut du conteneur réservé par React Navigation.
   const backgroundColor = useThemeBackground();
 
-  // Liens magiques reçus pendant que l'app tourne déjà (mobile).
-  useMagicLinkListener();
+  // URL de retour d'Auth (confirmation, réinitialisation) reçues pendant
+  // que l'app tourne déjà (mobile).
+  useAuthRedirectListener();
 
   useEffect(() => {
     initialSessionRecovery.finally(() => {

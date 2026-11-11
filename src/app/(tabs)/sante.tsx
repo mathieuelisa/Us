@@ -235,7 +235,7 @@ export default function HealthScreen() {
             <JournalTab household={household} />
           ) : null}
           {activeTab === 'appointments' ? (
-            <AppointmentsTab household={household} isPregnant={isPregnant} />
+            <AppointmentsTab household={household} />
           ) : null}
           {activeTab === 'contacts' ? (
             <ContactsTab

@@ -120,7 +120,7 @@ export default function TogetherScreen() {
               GESTE DU JOUR
             </Text>
             {/* Emoji en repli, en attendant une vraie illustration. */}
-            <Text className="text-[64px]">{getGestureEmoji(gesture.body)}</Text>
+            <Text className="text-[64px]">{getGestureEmoji(gesture)}</Text>
             <Text className="text-center text-[15px] leading-5 text-[#1a1a1a]">
               {gesture.body}
             </Text>
