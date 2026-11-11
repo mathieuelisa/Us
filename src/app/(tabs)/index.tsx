@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useAtomValue } from 'jotai';
 import { useState } from 'react';
@@ -11,6 +12,7 @@ import { PillarCard } from '@/components/hub/pillar-card';
 import { PremiumTeaserCard } from '@/components/hub/premium-teaser-card';
 import { ShareInviteCard } from '@/components/hub/share-invite-card';
 import {
+  SparkLines,
   WAVE_LILAC,
   WAVE_MINT,
   WAVE_PEACH,
@@ -25,7 +27,6 @@ import {
   formatAppointmentDayMonth,
   formatAppointmentTime,
   MOOD_PRESENTATION,
-  PREMIUM_GOLD_ON_LIGHT,
 } from '@/features/hub/constants';
 import { useHubSummary } from '@/features/hub/hooks';
 import { useMyProfile } from '@/features/profile/hooks';
@@ -33,7 +34,7 @@ import { useThemeAccent, useThemeBackground } from '@/features/settings/hooks';
 // ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
 import { devBypassFirstNameAtom } from '@/lib/atoms/dev-bypass';
 import { currentRoleAtom } from '@/lib/atoms/role';
-import { darkenHex } from '@/lib/color';
+import { darkenHex, hexToRgba, lightenHex } from '@/lib/color';
 import { shiftIsoDate, todayIso } from '@/lib/date';
 
 const SafeAreaView = withUniwind(RNSafeAreaView);
@@ -170,28 +171,54 @@ export default function HubScreen() {
             {greetingName ? `Bonjour ${greetingName}` : 'Bonjour'}
           </Text>
 
-          {/* Or (`PREMIUM_GOLD_ON_LIGHT`) plutôt que l'accent du thème
-              (demande explicite) : posé à côté d'un titre en gras, le vert
-              sauge se confondait avec le reste de l'écran, alors que cette
-              action est la plus importante du hub.
-              ⚠️ Écart assumé avec le code couleur du reste de l'app, où
-              l'or signale le premium — y compris sur cet écran (badge de
-              « Votre bébé », pavés de date des rendez-vous) et dans la
-              barre de navigation. Une action gratuite prend donc ici la
-              couleur du payant. Blanc sur cet or donne par ailleurs ~3,3:1,
-              sous le seuil WCAG AA de 4,5:1 pour 13 px — le `semibold`
-              compense à l'œil, pas à la mesure. */}
+          {/* Gélule d'accent avec cœur, reflet et petits traits, d'après une
+              capture de référence (demande explicite) — remplace l'or
+              (`PREMIUM_GOLD_ON_LIGHT`) choisi auparavant pour détacher ce
+              bouton du titre : la taille, l'ombre teintée et les traits
+              suffisent désormais à en faire l'action phare du hub, sans
+              emprunter la couleur du premium. */}
           {isPregnant ? (
-            <Pressable
-              accessibilityRole="button"
-              style={[CARD_SHADOW, { backgroundColor: PREMIUM_GOLD_ON_LIGHT }]}
-              onPress={() => router.push('/naissance')}
-              className="rounded-full px-3.5 py-2"
-            >
-              <Text className="text-[13px] font-semibold text-white">
-                J’ai accouché
-              </Text>
-            </Pressable>
+            <View>
+              <SparkLines
+                color={hexToRgba(accent, 0.6)}
+                style={{
+                  left: -20,
+                  top: -14,
+                  transform: [{ rotate: '-70deg' }, { scale: 0.85 }],
+                }}
+              />
+              <Pressable
+                accessibilityRole="button"
+                onPress={() => router.push('/naissance')}
+                className="h-11 flex-row items-center gap-2 overflow-hidden rounded-full pl-3.5 pr-4 active:opacity-85"
+                style={{
+                  backgroundColor: accent,
+                  shadowColor: accent,
+                  shadowOffset: { width: 0, height: 8 },
+                  shadowOpacity: 0.3,
+                  shadowRadius: 14,
+                  elevation: 6,
+                }}
+              >
+                <View
+                  pointerEvents="none"
+                  style={{
+                    position: 'absolute',
+                    right: -22,
+                    top: -18,
+                    width: 70,
+                    height: 70,
+                    borderRadius: 35,
+                    backgroundColor: lightenHex(accent, 0.12),
+                    opacity: 0.6,
+                  }}
+                />
+                <Ionicons name="heart" size={17} color="#ffffff" />
+                <Text className="text-[14px] font-bold text-white">
+                  J’ai accouché
+                </Text>
+              </Pressable>
+            </View>
           ) : null}
         </View>
 
