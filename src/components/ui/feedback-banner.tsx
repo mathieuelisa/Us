@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Text, View } from 'react-native';
 import Animated, { FadeInUp, FadeOutUp } from 'react-native-reanimated';
 
@@ -9,14 +10,51 @@ const ERROR_RED = '#d14b3a';
 
 export type FeedbackBannerTone = 'success' | 'error';
 
+export type Feedback = { tone: FeedbackBannerTone; message: string };
+
+/** Durée d'affichage par défaut d'un bandeau. */
+export const FEEDBACK_DURATION_MS = 2500;
+
+/**
+ * État d'un `FeedbackBanner` : `showFeedback()` l'affiche puis le retire
+ * seul après `durationMs`. Un nouvel appel remplace le précédent et relance
+ * le délai. `feedback` sert aussi à l'appelant pour l'état « Enregistré » de
+ * son bouton pendant le même laps de temps.
+ */
+export function useFeedbackBanner(durationMs = FEEDBACK_DURATION_MS) {
+  const [feedback, setFeedback] = useState<Feedback | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(
+    () => () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    },
+    [],
+  );
+
+  const showFeedback = useCallback(
+    (tone: FeedbackBannerTone, message: string) => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      setFeedback({ tone, message });
+      timeoutRef.current = setTimeout(() => {
+        setFeedback(null);
+        timeoutRef.current = null;
+      }, durationMs);
+    },
+    [durationMs],
+  );
+
+  return { feedback, showFeedback };
+}
+
 /**
  * Bandeau de confirmation posé en haut de l'écran : il glisse depuis le
  * haut, puis repart. Sert à dire « c'est pris en compte » après un
  * enregistrement, sans bloquer l'écran ni naviguer ailleurs (première
- * utilisation : prénom de l'écran Profil).
+ * utilisation : prénom de l'écran Profil, puis Journal des symptômes).
  *
- * Purement visuel : c'est l'appelant qui décide quand l'afficher et quand
- * le retirer (`message` à `null`), en général après 2 à 3 secondes. Monté
+ * Purement visuel : l'état vit dans `useFeedbackBanner()`, qui l'affiche et
+ * le retire après 2,5 s. Monté
  * en `absolute` : à placer en dernier enfant du conteneur de l'écran.
  * `accessibilityLiveRegion` / `role="alert"` pour que le message soit lu par
  * les lecteurs d'écran.

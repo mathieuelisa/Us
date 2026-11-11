@@ -14,6 +14,10 @@ import { JournalTab } from '@/components/health/journal-tab';
 import { SegmentedTabs } from '@/components/health/segmented-tabs';
 import { BlobFab } from '@/components/ui/blob-fab';
 import {
+  FeedbackBanner,
+  useFeedbackBanner,
+} from '@/components/ui/feedback-banner';
+import {
   GLASS_BODY_COLOR,
   GLASS_TITLE_COLOR,
 } from '@/components/ui/glass-card';
@@ -114,6 +118,7 @@ export default function HealthScreen() {
   const [isAddingContact, setIsAddingContact] = useState(false);
   const backgroundColor = useThemeBackground();
   const accent = useThemeAccent();
+  const { feedback, showFeedback } = useFeedbackBanner();
 
   return (
     <SafeAreaView
@@ -232,7 +237,11 @@ export default function HealthScreen() {
 
         <View>
           {activeTab === 'journal' && isPregnant ? (
-            <JournalTab household={household} />
+            <JournalTab
+              household={household}
+              feedback={feedback}
+              onFeedback={showFeedback}
+            />
           ) : null}
           {activeTab === 'appointments' ? (
             <AppointmentsTab household={household} />
@@ -259,6 +268,14 @@ export default function HealthScreen() {
           className="absolute bottom-6 right-6"
         />
       ) : null}
+
+      {/* Au niveau de l'écran (et non dans l'onglet, pris dans le
+          défilement) pour rester en haut de l'écran. */}
+      <FeedbackBanner
+        message={feedback?.message ?? null}
+        tone={feedback?.tone}
+        accent={accent}
+      />
     </SafeAreaView>
   );
 }

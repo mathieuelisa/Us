@@ -7,7 +7,7 @@ import { withUniwind } from 'uniwind';
 
 import {
   FeedbackBanner,
-  type FeedbackBannerTone,
+  useFeedbackBanner,
 } from '@/components/ui/feedback-banner';
 import {
   GLASS_BODY_COLOR,
@@ -27,9 +27,6 @@ import { NO_WEB_FOCUS_OUTLINE } from '@/lib/web-styles';
 const SafeAreaView = withUniwind(RNSafeAreaView);
 
 type IoniconName = ComponentProps<typeof Ionicons>['name'];
-
-/** Durée d'affichage du bandeau de confirmation et de « Enregistré ». */
-const FEEDBACK_DURATION_MS = 2500;
 
 /**
  * Onglet « Profil ».
@@ -57,27 +54,7 @@ export default function ProfileScreen() {
   const backgroundColor = useThemeBackground();
   const accent = useThemeAccent();
 
-  const [feedback, setFeedback] = useState<{
-    tone: FeedbackBannerTone;
-    message: string;
-  } | null>(null);
-  const feedbackTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(
-    () => () => {
-      if (feedbackTimeoutRef.current) clearTimeout(feedbackTimeoutRef.current);
-    },
-    [],
-  );
-
-  const showFeedback = (tone: FeedbackBannerTone, message: string) => {
-    if (feedbackTimeoutRef.current) clearTimeout(feedbackTimeoutRef.current);
-    setFeedback({ tone, message });
-    feedbackTimeoutRef.current = setTimeout(() => {
-      setFeedback(null);
-      feedbackTimeoutRef.current = null;
-    }, FEEDBACK_DURATION_MS);
-  };
+  const { feedback, showFeedback } = useFeedbackBanner();
 
   // ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts. Sans utilisateur
   // réel, `useMyProfile()` ne renvoie rien : on reprend le prénom saisi à

@@ -1,7 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
-
+import type {
+  Feedback,
+  FeedbackBannerTone,
+} from '@/components/ui/feedback-banner';
 import {
   DashedLoopDoodle,
   GLASS_TITLE_COLOR,
@@ -44,14 +47,23 @@ const CARD_SHADOW_TINTED = (accent: string) =>
  * en pastilles illustrées (pictogramme sur rond teinté), grand bouton
  * « Enregistrer » en gélule.
  *
+ * Enregistrer confirme visiblement le résultat (demande explicite, comme sur
+ * Profil) : bandeau en haut de l'écran — monté par `sante.tsx`, hors du
+ * défilement — et bouton « Enregistré » pendant 2,5 s, ou bandeau d'erreur.
+ *
  * Donnée de santé : cet onglet n'est monté que pour la personne enceinte
  * (cf. `sante.tsx`), et la RLS refuse de toute façon l'écriture au
  * co-parent. Deux barrières indépendantes, volontairement.
  */
 export function JournalTab({
   household,
+  feedback,
+  onFeedback,
 }: {
   household: Household | null | undefined;
+  /** Bandeau en cours (`useFeedbackBanner` de l'écran). */
+  feedback: Feedback | null;
+  onFeedback: (tone: FeedbackBannerTone, message: string) => void;
 }) {
   const accent = useThemeAccent();
   const weekDates = getCurrentWeekIsoDates();
@@ -81,6 +93,31 @@ export function JournalTab({
     JSON.stringify([...selected].sort()) !==
     JSON.stringify([...(savedSymptoms ?? [])].sort());
   const isSaveDisabled = !isDirty || saveSymptoms.isPending;
+  const justSaved = feedback?.tone === 'success' && !isDirty;
+
+  const save = () => {
+    if (isSaveDisabled) return;
+    const count = selected.length;
+    saveSymptoms.mutate(
+      { logDate: selectedDate, symptoms: selected },
+      {
+        onSuccess: () =>
+          onFeedback(
+            'success',
+            count === 0
+              ? 'Journée enregistrée sans symptôme'
+              : `${count} symptôme${count > 1 ? 's' : ''} enregistré${
+                  count > 1 ? 's' : ''
+                }`,
+          ),
+        onError: () =>
+          onFeedback(
+            'error',
+            'Impossible d’enregistrer vos symptômes. Réessayez.',
+          ),
+      },
+    );
+  };
 
   return (
     <View className="gap-7">
@@ -134,22 +171,20 @@ export function JournalTab({
         </View>
       </View>
 
-      <View className="gap-2">
-        <PillButton
-          label={saveSymptoms.isPending ? 'Enregistrement…' : 'Enregistrer'}
-          icon="save-outline"
-          isDisabled={isSaveDisabled}
-          onPress={() =>
-            saveSymptoms.mutate({ logDate: selectedDate, symptoms: selected })
-          }
-        />
-
-        {saveSymptoms.isError ? (
-          <Text className="text-center text-[12.5px] text-red-600">
-            Impossible d’enregistrer pour le moment.
-          </Text>
-        ) : null}
-      </View>
+      {/* « Enregistré » reste pleinement visible (pas grisé) le temps de la
+          confirmation, puis le bouton reprend son état normal. */}
+      <PillButton
+        label={
+          saveSymptoms.isPending
+            ? 'Enregistrement…'
+            : justSaved
+              ? 'Enregistré'
+              : 'Enregistrer'
+        }
+        icon={justSaved ? 'checkmark-circle' : 'save-outline'}
+        isDisabled={!justSaved && isSaveDisabled}
+        onPress={save}
+      />
 
       <DashedLoopDoodle color={accent} />
     </View>
