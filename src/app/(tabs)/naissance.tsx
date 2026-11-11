@@ -4,10 +4,17 @@ import { useAtomValue } from 'jotai';
 import { useState } from 'react';
 import { Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
+import Svg, { Path } from 'react-native-svg';
 import { withUniwind } from 'uniwind';
 
 import { ConfirmBirthModal } from '@/components/birth/confirm-birth-modal';
 import { DeclareBirthButton } from '@/components/birth/declare-birth-button';
+import {
+  ChevronBubble,
+  GLASS_BODY_COLOR,
+  GLASS_TITLE_COLOR,
+} from '@/components/ui/glass-card';
+import { IconBubble } from '@/components/ui/icon-input';
 import { ScreenCornerShapes } from '@/components/ui/screen-corner-shapes';
 import { WheelDatePicker } from '@/components/wheel-date-picker';
 import {
@@ -18,7 +25,6 @@ import {
 } from '@/features/birth/constants';
 import { useDeclareBirth } from '@/features/birth/hooks';
 import { useMyHousehold } from '@/features/household/hooks';
-import { CARD_SHADOW } from '@/features/hub/constants';
 import {
   formatDeadlineLabel,
   getProcedureIconStyle,
@@ -29,10 +35,27 @@ import { useProcedures } from '@/features/procedures/hooks';
 import { useThemeAccent, useThemeBackground } from '@/features/settings/hooks';
 // ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
 import { devBypassAtom } from '@/lib/atoms/dev-bypass';
+import { hexToRgba } from '@/lib/color';
 
 const SafeAreaView = withUniwind(RNSafeAreaView);
 
 const BIRTH_DECLARATION_SLUG = 'declaration-naissance';
+
+/** Surface « verre dépoli » des cartes de l'écran. */
+const GLASS_SURFACE = {
+  backgroundColor: 'rgba(255, 255, 255, 0.92)',
+  borderWidth: 1,
+  borderColor: 'rgba(255, 255, 255, 0.95)',
+} as const;
+
+const tintedShadow = (accent: string) =>
+  ({
+    shadowColor: accent,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.1,
+    shadowRadius: 16,
+    elevation: 3,
+  }) as const;
 
 /**
  * Écran 7a — « J'ai accouché », ouvert depuis le bouton du hub (visible de
@@ -56,6 +79,11 @@ const BIRTH_DECLARATION_SLUG = 'declaration-naissance';
  * l'état « naissance déclarée » avec un accès direct à la démarche
  * concernée, et la correction reste possible d'un tap.
  *
+ * Habillage modernisé d'après une capture de référence (demande
+ * explicite) : grand bouton retour, illustration agrandie avec feuillage,
+ * titre et sous-titre soulignés, molette dans une carte à icône, « Ce que
+ * ça change » en cartes « verre dépoli », encadré d'information teinté.
+ *
  * ⚠️ Hors périmètre ici : la bascule de navigation grossesse → bébé
  * (déblocage du module premium, changement de contenu du hub) que
  * 01-DESIGN-OVERVIEW rattache à ce même événement — elle appartient à la
@@ -65,6 +93,7 @@ const BIRTH_DECLARATION_SLUG = 'declaration-naissance';
 export default function BirthScreen() {
   const router = useRouter();
   const backgroundColor = useThemeBackground();
+  const accent = useThemeAccent();
 
   const { data: household } = useMyHousehold();
   const declareBirth = useDeclareBirth(household);
@@ -136,23 +165,32 @@ export default function BirthScreen() {
           accessibilityLabel="Revenir en arrière"
           accessibilityRole="button"
           hitSlop={12}
-          style={CARD_SHADOW}
           onPress={() =>
             isCorrecting ? setIsCorrecting(false) : router.back()
           }
-          className="h-9 w-9 items-center justify-center rounded-full bg-white"
+          className="h-12 w-12 items-center justify-center rounded-full bg-white"
+          style={tintedShadow(accent)}
         >
-          <Text className="text-[17px] leading-5 text-[#1a1a1a]">‹</Text>
+          <Ionicons name="chevron-back" size={22} color={GLASS_TITLE_COLOR} />
         </Pressable>
 
         <BirthHeader isDeclared={declaredBirthDate !== null && !isCorrecting} />
 
         {isFormVisible ? (
           <>
-            <View className="gap-2">
-              <Text className="text-[11.5px] font-semibold tracking-wide text-[#8a8a8a]">
-                DATE DE NAISSANCE
-              </Text>
+            <View
+              className="gap-3 rounded-[28px] px-4 pb-4 pt-3.5"
+              style={[tintedShadow(accent), GLASS_SURFACE]}
+            >
+              <View className="flex-row items-center gap-3">
+                <IconBubble icon="calendar-outline" color={accent} size={40} />
+                <Text
+                  className="text-[16px] font-bold"
+                  style={{ color: GLASS_TITLE_COLOR }}
+                >
+                  Date de naissance
+                </Text>
+              </View>
               <WheelDatePicker value={draftDate} onChange={setDraftDate} />
               {dateIssue ? (
                 <View className="flex-row items-start gap-2 px-1">
@@ -164,10 +202,16 @@ export default function BirthScreen() {
               ) : null}
             </View>
 
-            <View className="gap-2">
-              <Text className="text-[11.5px] font-semibold tracking-wide text-[#8a8a8a]">
-                CE QUE ÇA CHANGE
-              </Text>
+            <View className="gap-3">
+              <View className="flex-row items-center gap-2 px-1">
+                <Ionicons name="sparkles-outline" size={19} color={accent} />
+                <Text
+                  className="text-[16px] font-bold"
+                  style={{ color: GLASS_TITLE_COLOR }}
+                >
+                  Ce que ça change
+                </Text>
+              </View>
 
               {birthDeclaration ? (
                 <DeadlinePreviewCard
@@ -180,17 +224,21 @@ export default function BirthScreen() {
               ) : null}
 
               <View
-                style={CARD_SHADOW}
-                className="flex-row items-center gap-3 rounded-2xl bg-white px-4 py-3.5"
+                className="flex-row items-center gap-3.5 rounded-[24px] px-4 py-3.5"
+                style={[tintedShadow(accent), GLASS_SURFACE]}
               >
-                <View className="h-11 w-11 items-center justify-center rounded-full bg-accent/10">
-                  <Ionicons name="sync-outline" size={19} color="#6b6b6b" />
-                </View>
+                <IconBubble icon="sync-outline" color={accent} size={52} />
                 <View className="flex-1 gap-0.5">
-                  <Text className="text-[15px] font-medium text-[#1a1a1a]">
+                  <Text
+                    className="text-[15.5px] font-bold"
+                    style={{ color: GLASS_TITLE_COLOR }}
+                  >
                     Vos autres démarches
                   </Text>
-                  <Text className="text-[13px] leading-[18px] text-[#6b6b6b]">
+                  <Text
+                    className="text-[13px] leading-[18px]"
+                    style={{ color: GLASS_BODY_COLOR }}
+                  >
                     Repères et rappels réalignés sur la date choisie, pour vous
                     deux.
                   </Text>
@@ -201,9 +249,18 @@ export default function BirthScreen() {
             {/* Encadré pointillé de la maquette 7a, repris tel quel : c'est
                 le seul endroit où l'app annonce qu'une saisie modifie des
                 données ailleurs. */}
-            <View className="flex-row items-start gap-2.5 rounded-[14px] border border-dashed border-accent bg-white/70 px-3.5 py-3.5">
-              <Ionicons name="information-circle" size={17} color="#6b6b6b" />
-              <Text className="flex-1 text-[13px] leading-[19px] text-[#3d3d3d]">
+            <View
+              className="flex-row items-start gap-2.5 rounded-[22px] border border-dashed px-4 py-3.5"
+              style={{
+                borderColor: hexToRgba(accent, 0.5),
+                backgroundColor: hexToRgba(accent, 0.05),
+              }}
+            >
+              <Ionicons name="information-circle" size={18} color={accent} />
+              <Text
+                className="flex-1 text-[13px] leading-[19px]"
+                style={{ color: GLASS_BODY_COLOR }}
+              >
                 Toutes les dates et échéances de vos démarches seront
                 automatiquement mises à jour en fonction de cette date.
               </Text>
@@ -224,7 +281,7 @@ export default function BirthScreen() {
       {/* Hors du `ScrollView` : l'action reste atteignable sans faire
           défiler jusqu'en bas, comme dans la maquette 7a. Repeint du fond
           d'écran — sans quoi le contenu défilerait visiblement derrière le
-          bouton, dont le halo n'est pas opaque. */}
+          bouton et son ombre. */}
       {isFormVisible ? (
         <View className="gap-2 px-6 pb-3 pt-3" style={{ backgroundColor }}>
           <DeclareBirthButton
@@ -287,31 +344,63 @@ function BirthHeader({ isDeclared }: { isDeclared: boolean }) {
 
   return (
     <View className="items-center gap-1.5">
-      <Image
-        source={require('@/assets/images/Father_mother_baby_party.png')}
-        className="h-44 w-72"
-        resizeMode="contain"
-      />
+      <View className="w-full items-center" pointerEvents="none">
+        {/* Branche de feuillage à droite, comme sur la capture de
+            référence ; débordante, rognée par le bord de l'écran. */}
+        <Image
+          source={require('@/assets/images/Leaf_branch.png')}
+          style={{
+            position: 'absolute',
+            right: -70,
+            bottom: 10,
+            width: 150,
+            height: 100,
+            opacity: 0.9,
+            transform: [{ rotate: '-140deg' }],
+          }}
+          resizeMode="contain"
+        />
+        <Image
+          source={require('@/assets/images/Father_mother_baby_party.png')}
+          style={{ width: 300, height: 196 }}
+          resizeMode="contain"
+        />
+      </View>
 
-      <View className="flex-row items-center gap-2">
+      <View className="flex-row items-center gap-2.5">
         {/* Cœur rose avant, coche à l'accent après : le premier reprend
             l'icône du bouton du hub, la seconde parle le langage des états
             validés du reste de l'app. */}
         <Ionicons
           name={isDeclared ? 'checkmark-circle' : 'heart'}
-          size={21}
-          color={isDeclared ? accent : '#c9647f'}
+          size={28}
+          color={isDeclared ? accent : '#f08aa8'}
         />
-        <Text className="text-[26px] font-bold text-[#1a1a1a]">
+        <Text
+          className="text-[30px] font-extrabold"
+          style={{ color: GLASS_TITLE_COLOR, letterSpacing: -0.6 }}
+        >
           {isDeclared ? 'Naissance déclarée' : 'J’ai accouché'}
         </Text>
       </View>
 
-      <Text className="text-center text-[14px] text-[#8a8a8a]">
+      <Text
+        className="text-center text-[15px]"
+        style={{ color: GLASS_BODY_COLOR }}
+      >
         {isDeclared
           ? 'Félicitations — tout est à jour de votre côté.'
           : 'Le grand jour est arrivé !'}
       </Text>
+      <Svg width={90} height={10} viewBox="0 0 90 10">
+        <Path
+          d="M3 7 C 26 2, 60 1.5, 87 4"
+          stroke={hexToRgba(accent, 0.5)}
+          strokeWidth={3}
+          strokeLinecap="round"
+          fill="none"
+        />
+      </Svg>
     </View>
   );
 }
@@ -331,23 +420,29 @@ function DeadlinePreviewCard({
   deadlineDaysAfterBirth: number | null;
   birthDate: string | null;
 }) {
+  const accent = useThemeAccent();
   const iconStyle = getProcedureIconStyle(BIRTH_DECLARATION_SLUG);
   const deadline = formatDeadlineLabel(deadlineDaysAfterBirth, birthDate);
 
   return (
     <View
-      style={CARD_SHADOW}
-      className="flex-row items-center gap-3 rounded-2xl bg-white px-4 py-3.5"
+      className="flex-row items-center gap-3.5 rounded-[24px] px-4 py-3.5"
+      style={[tintedShadow(accent), GLASS_SURFACE]}
     >
       <View
         style={{ backgroundColor: iconStyle.bg }}
-        className="h-11 w-11 items-center justify-center rounded-full"
+        className="h-[52px] w-[52px] items-center justify-center rounded-full"
       >
-        <Ionicons name={iconStyle.icon} size={20} color={iconStyle.color} />
+        <Ionicons name={iconStyle.icon} size={24} color={iconStyle.color} />
       </View>
 
       <View className="flex-1 gap-0.5">
-        <Text className="text-[15px] font-medium text-[#1a1a1a]">{title}</Text>
+        <Text
+          className="text-[15.5px] font-bold"
+          style={{ color: GLASS_TITLE_COLOR }}
+        >
+          {title}
+        </Text>
         <Text
           className="text-[13px] font-medium"
           style={{ color: birthDate ? iconStyle.color : '#6b6b6b' }}
@@ -359,10 +454,10 @@ function DeadlinePreviewCard({
       {deadlineDaysAfterBirth === null ? null : (
         <View
           style={{ backgroundColor: iconStyle.bg }}
-          className="rounded-full px-2.5 py-1"
+          className="rounded-full px-3 py-1.5"
         >
           <Text
-            className="text-[11px] font-semibold"
+            className="text-[12px] font-bold"
             style={{ color: iconStyle.color }}
           >
             Délai légal
@@ -385,13 +480,14 @@ function DeclaredBirthSummary({
   deadlineDaysAfterBirth: number | null;
   onOpenProcedures: () => void;
 }) {
+  const accent = useThemeAccent();
   const iconStyle = getProcedureIconStyle(BIRTH_DECLARATION_SLUG);
 
   return (
     <View className="gap-5">
       <View
-        style={CARD_SHADOW}
-        className="items-center gap-1 rounded-2xl bg-white px-4 py-5"
+        className="items-center gap-1 rounded-[28px] px-4 py-5"
+        style={[tintedShadow(accent), GLASS_SURFACE]}
       >
         <Text className="text-[11.5px] font-semibold tracking-wide text-[#8a8a8a]">
           DATE DE NAISSANCE
@@ -413,8 +509,8 @@ function DeclaredBirthSummary({
           <Pressable
             accessibilityRole="button"
             onPress={onOpenProcedures}
-            style={CARD_SHADOW}
-            className="flex-row items-center gap-3 rounded-2xl bg-white px-4 py-3.5"
+            className="flex-row items-center gap-3.5 rounded-[24px] px-4 py-3.5"
+            style={[tintedShadow(accent), GLASS_SURFACE]}
           >
             <View
               style={{ backgroundColor: iconStyle.bg }}
@@ -437,7 +533,7 @@ function DeclaredBirthSummary({
                 {formatDeadlineLabel(deadlineDaysAfterBirth, birthDate)}
               </Text>
             </View>
-            <Text className="text-[20px] text-[#c4c4c4]">›</Text>
+            <ChevronBubble accent={accent} />
           </Pressable>
         </View>
       ) : null}
