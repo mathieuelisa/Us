@@ -1,8 +1,14 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Pressable, Switch, Text, View } from 'react-native';
+import Animated, {
+  FadeInDown,
+  FadeOutLeft,
+  LinearTransition,
+} from 'react-native-reanimated';
 import Svg, { Path } from 'react-native-svg';
 
+import type { FeedbackBannerTone } from '@/components/ui/feedback-banner';
 import {
   GLASS_BODY_COLOR,
   GLASS_TITLE_COLOR,
@@ -25,6 +31,13 @@ import { hexToRgba, lightenHex } from '@/lib/color';
 import { formatPhoneNumber } from '@/lib/phone';
 
 const EMERGENCY_RED = '#d64545';
+const DELETE_RED = '#d14b3a';
+
+/** Durée de la ligne « en rouge » avant qu'elle ne parte. */
+const DELETE_FLASH_MS = 220;
+
+/** Les contacts restants remontent avec un ressort doux. */
+const ROW_LAYOUT = LinearTransition.springify().damping(18).stiffness(170);
 
 /**
  * Écran 4c — carnet de contacts partagé, modifiable par les deux parents.
@@ -40,15 +53,25 @@ const EMERGENCY_RED = '#d64545';
  * interrupteur, « Ajouter le contact » en `PillButton`. Les contacts sont
  * des cartes translucides à pastille d'icône (rouge et badge « Urgence »
  * pour un numéro d'urgence).
+ *
+ * Suppression animée (demande explicite) : la ligne passe un instant en
+ * rouge, corbeille à la place de l'icône, puis glisse vers la gauche en
+ * s'effaçant ; les contacts suivants remontent avec un ressort. Le retrait
+ * est **optimiste** — la ligne part sans attendre le serveur — et la ligne
+ * revient avec un bandeau d'erreur si la suppression échoue. Le même
+ * ressort anime la montée / descente d'un contact.
  */
 export function ContactsTab({
   household,
   isAdding,
   onIsAddingChange,
+  onFeedback,
 }: {
   household: Household | null | undefined;
   isAdding: boolean;
   onIsAddingChange: (isAdding: boolean) => void;
+  /** Bandeau de l'écran (`useFeedbackBanner` de `sante.tsx`). */
+  onFeedback?: (tone: FeedbackBannerTone, message: string) => void;
 }) {
   const accent = useThemeAccent();
   const { data: contacts = [] } = useContacts(household);
@@ -59,6 +82,43 @@ export function ContactsTab({
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [isEmergency, setIsEmergency] = useState(false);
+
+  // Suppression animée : `flashingId` = ligne en rouge pendant
+  // `DELETE_FLASH_MS`, `hiddenIds` = lignes déjà retirées de l'écran en
+  // attendant la réponse du serveur.
+  const [flashingId, setFlashingId] = useState<string | null>(null);
+  const [hiddenIds, setHiddenIds] = useState<string[]>([]);
+  const flashTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(
+    () => () => {
+      if (flashTimeoutRef.current) clearTimeout(flashTimeoutRef.current);
+    },
+    [],
+  );
+
+  const removeContact = (id: string, name: string) => {
+    if (flashingId) return;
+    setFlashingId(id);
+    flashTimeoutRef.current = setTimeout(() => {
+      setFlashingId(null);
+      setHiddenIds((current) => [...current, id]);
+      deleteContact.mutate(id, {
+        onSuccess: () => onFeedback?.('success', `${name} supprimé`),
+        onError: () => {
+          setHiddenIds((current) => current.filter((hidden) => hidden !== id));
+          onFeedback?.(
+            'error',
+            'Impossible de supprimer ce contact. Réessayez.',
+          );
+        },
+      });
+    }, DELETE_FLASH_MS);
+  };
+
+  const visibleContacts = contacts.filter(
+    (contact) => !hiddenIds.includes(contact.id),
+  );
 
   const resetForm = () => {
     setName('');
@@ -242,7 +302,7 @@ export function ContactsTab({
         </View>
       ) : null}
 
-      {contacts.length === 0 && !isAdding ? (
+      {visibleContacts.length === 0 && !isAdding ? (
         <View
           className="items-center gap-2 rounded-[28px] px-5 py-6"
           style={{ backgroundColor: hexToRgba(accent, 0.07) }}
@@ -258,25 +318,45 @@ export function ContactsTab({
         </View>
       ) : null}
 
-      {contacts.map((contact, index) => {
-        const color = contact.is_emergency ? EMERGENCY_RED : accent;
+      {visibleContacts.map((contact) => {
+        const index = contacts.findIndex((item) => item.id === contact.id);
+        const isFlashing = flashingId === contact.id;
+        const color = isFlashing
+          ? DELETE_RED
+          : contact.is_emergency
+            ? EMERGENCY_RED
+            : accent;
         return (
-          <View
+          <Animated.View
             key={contact.id}
+            entering={FadeInDown.duration(260)}
+            exiting={FadeOutLeft.duration(320)}
+            layout={ROW_LAYOUT}
             className="flex-row items-center gap-3 rounded-[24px] py-3 pl-3 pr-2.5"
             style={{
-              backgroundColor: 'rgba(255, 255, 255, 0.9)',
+              backgroundColor: isFlashing
+                ? hexToRgba(DELETE_RED, 0.08)
+                : 'rgba(255, 255, 255, 0.9)',
               borderWidth: 1,
-              borderColor: 'rgba(255, 255, 255, 0.95)',
-              shadowColor: accent,
+              borderColor: isFlashing
+                ? hexToRgba(DELETE_RED, 0.35)
+                : 'rgba(255, 255, 255, 0.95)',
+              shadowColor: isFlashing ? DELETE_RED : accent,
               shadowOffset: { width: 0, height: 8 },
               shadowOpacity: 0.08,
               shadowRadius: 16,
               elevation: 3,
+              transform: [{ scale: isFlashing ? 0.98 : 1 }],
             }}
           >
             <IconBubble
-              icon={contact.is_emergency ? 'alert-circle' : 'person'}
+              icon={
+                isFlashing
+                  ? 'trash'
+                  : contact.is_emergency
+                    ? 'alert-circle'
+                    : 'person'
+              }
               color={color}
               size={42}
             />
@@ -332,9 +412,9 @@ export function ContactsTab({
             <RowAction
               icon="close"
               label={`Supprimer ${contact.name}`}
-              onPress={() => deleteContact.mutate(contact.id)}
+              onPress={() => removeContact(contact.id, contact.name)}
             />
-          </View>
+          </Animated.View>
         );
       })}
     </View>

@@ -133,7 +133,10 @@ export default function HealthScreen() {
         }`}
         showsVerticalScrollIndicator={false}
       >
-        <View>
+        {/* Hauteur minimale au-delà des 160 px de l'illustration : sans elle,
+            un sous-titre court laissait remonter les onglets sous l'ourson
+            (demande explicite de les descendre). */}
+        <View style={{ minHeight: 184 }}>
           {/* Illustration en haut à droite, du niveau du bouton retour
               jusqu'au sous-titre, derrière le titre. */}
           <View
@@ -251,6 +254,7 @@ export default function HealthScreen() {
               household={household}
               isAdding={isAddingContact}
               onIsAddingChange={setIsAddingContact}
+              onFeedback={showFeedback}
             />
           ) : null}
           {activeTab === 'exercises' ? (
