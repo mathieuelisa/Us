@@ -24,7 +24,10 @@ import {
 } from '@/features/names/catalog';
 import { hexToRgba } from '@/lib/color';
 
-const CARD_HEIGHT = 360;
+/** Hauteur par défaut d'une carte ; l'écran la réduit si la place manque. */
+export const DEFAULT_CARD_HEIGHT = 360;
+/** En dessous, la carte deviendrait illisible : l'écran défile plutôt. */
+export const MIN_CARD_HEIGHT = 240;
 /** Au-delà de cette distance (ou de cette vitesse), la carte part. */
 const SWIPE_DISTANCE = 110;
 const SWIPE_VELOCITY = 800;
@@ -44,6 +47,7 @@ export type SwipeCommand = { direction: 'left' | 'right'; id: number } | null;
  */
 export function NameSwipeDeck({
   cards,
+  cardHeight = DEFAULT_CARD_HEIGHT,
   gender,
   favorites,
   command,
@@ -57,6 +61,8 @@ export function NameSwipeDeck({
   command: SwipeCommand;
   onSwipe: (card: NameCard, liked: boolean) => void;
   onToggleFavorite: (card: NameCard) => void;
+  /** Hauteur des cartes, adaptée à la place disponible à l'écran. */
+  cardHeight?: number;
 }) {
   const [top, next] = cards;
   // Progression du départ de la carte du dessus (0 → 1), partagée avec la
@@ -72,7 +78,7 @@ export function NameSwipeDeck({
   }));
 
   return (
-    <View style={{ height: CARD_HEIGHT + 20 }}>
+    <View style={{ height: cardHeight + 20 }}>
       {next ? (
         <Animated.View
           pointerEvents="none"
@@ -80,6 +86,7 @@ export function NameSwipeDeck({
         >
           <CardFace
             card={next}
+            height={cardHeight}
             gender={gender}
             isFavorite={favorites.has(next.name)}
           />
@@ -91,6 +98,7 @@ export function NameSwipeDeck({
           // repartent de zéro.
           key={top.name}
           card={top}
+          cardHeight={cardHeight}
           gender={gender}
           isFavorite={favorites.has(top.name)}
           command={command}
@@ -105,6 +113,7 @@ export function NameSwipeDeck({
 
 function TopCard({
   card,
+  cardHeight,
   gender,
   isFavorite,
   command,
@@ -113,6 +122,7 @@ function TopCard({
   onToggleFavorite,
 }: {
   card: NameCard;
+  cardHeight: number;
   gender: NameGender;
   isFavorite: boolean;
   command: SwipeCommand;
@@ -154,8 +164,10 @@ function TopCard({
     flyOff(command.direction === 'right' ? 1 : -1);
   }, [command?.id]);
 
+  // Horizontal seulement : un glissement vertical laisse défiler l'écran.
   const pan = Gesture.Pan()
-    .minDistance(6)
+    .activeOffsetX([-10, 10])
+    .failOffsetY([-14, 14])
     .onUpdate((event) => {
       translateX.value = event.translationX;
       translateY.value = event.translationY * 0.25;
@@ -215,7 +227,12 @@ function TopCard({
         } favoris.`}
         style={[{ position: 'absolute', left: 0, right: 0 }, cardStyle]}
       >
-        <CardFace card={card} gender={gender} isFavorite={isFavorite} />
+        <CardFace
+          card={card}
+          height={cardHeight}
+          gender={gender}
+          isFavorite={isFavorite}
+        />
 
         {/* Tampons « Gardé » / « Écarté », qui apparaissent avec le geste. */}
         <Animated.View
@@ -274,10 +291,12 @@ function Stamp({ label, color }: { label: string; color: string }) {
 /** Face d'une carte : prénom, pays, cœur de favori. */
 function CardFace({
   card,
+  height,
   gender,
   isFavorite,
 }: {
   card: NameCard;
+  height: number;
   gender: NameGender;
   isFavorite: boolean;
 }) {
@@ -288,7 +307,7 @@ function CardFace({
     <View
       className="items-center justify-center overflow-hidden rounded-[34px] px-6"
       style={{
-        height: CARD_HEIGHT,
+        height,
         backgroundColor: '#ffffff',
         borderWidth: 1,
         borderColor: hexToRgba(meta.color, 0.15),

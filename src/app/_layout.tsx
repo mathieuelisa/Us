@@ -2,12 +2,18 @@ import '@/global.css';
 
 import { QueryClientProvider } from '@tanstack/react-query';
 import { useFonts } from 'expo-font';
+import { NavigationBar } from 'expo-navigation-bar';
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { HeroUINativeProvider } from 'heroui-native';
 import { useAtomValue } from 'jotai';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, useColorScheme, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Platform,
+  useColorScheme,
+  View,
+} from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Uniwind } from 'uniwind';
 
@@ -62,6 +68,15 @@ function AuthGate() {
   // ne soit connu.
   useEffect(() => {
     Uniwind.setTheme(DEFAULT_THEME_ID);
+  }, []);
+
+  // Android : barre de navigation du système (boutons ou trait de geste)
+  // masquée par défaut (demande explicite), pour que la barre de l'app ne
+  // soit pas surmontée d'une seconde barre. Un glissement depuis le bas la
+  // fait réapparaître un instant. Aussi déclaré dans `app.json` (plugin
+  // `expo-navigation-bar`) pour qu'elle soit masquée dès le lancement.
+  useEffect(() => {
+    if (Platform.OS === 'android') NavigationBar.setHidden(true);
   }, []);
 
   const hasSession = !!session;

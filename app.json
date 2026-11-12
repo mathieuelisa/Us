@@ -17,7 +17,8 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.anonymous.us"
     },
     "web": {
       "output": "single",
@@ -31,6 +32,12 @@
           "backgroundColor": "#2D5E5A",
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 76
+        }
+      ],
+      [
+        "expo-navigation-bar",
+        {
+          "hidden": true
         }
       ]
     ],

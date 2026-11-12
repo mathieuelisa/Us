@@ -8,6 +8,8 @@ import Svg, { Path } from 'react-native-svg';
 import { withUniwind } from 'uniwind';
 
 import {
+  DEFAULT_CARD_HEIGHT,
+  MIN_CARD_HEIGHT,
   NameSwipeDeck,
   SwipeButtons,
   type SwipeCommand,
@@ -151,9 +153,9 @@ export default function NameGameScreen() {
         contentContainerClassName="grow gap-5 px-5 pt-4"
         contentContainerStyle={{ paddingBottom: tabBarInset }}
         showsVerticalScrollIndicator={false}
-        // Le paquet capte les glissements horizontaux ; le défilement
-        // vertical reste possible autour.
-        scrollEnabled={!deck}
+        // Le paquet ne capte que les glissements horizontaux (voir
+        // `NameSwipeDeck`) : un glissement vertical fait défiler l'écran,
+        // utile sur un petit téléphone où tout ne tient pas.
       >
         <Pressable
           accessibilityLabel={deck ? 'Revenir au choix des pays' : 'Revenir'}
@@ -350,6 +352,8 @@ function DeckStep({
   onChangeCountries: () => void;
   onSeeMatches: () => void;
 }) {
+  // Hauteur disponible pour le paquet, mesurée (voir le rendu).
+  const [deckSpace, setDeckSpace] = useState(DEFAULT_CARD_HEIGHT + 20);
   const meta = GENDER_META[gender];
   const flags = NAME_COUNTRIES.filter((country) =>
     selectedCountries.includes(country.id),
@@ -403,7 +407,11 @@ function DeckStep({
   }
 
   return (
-    <Animated.View entering={FadeIn.duration(220)} className="gap-5">
+    // Remplit la hauteur restante de l'écran : la carte prend la place
+    // disponible entre l'en-tête et les boutons, pour que ✕ / ✓ restent
+    // au-dessus de la barre du bas sur tous les téléphones (demande
+    // explicite, Galaxy S26 Ultra : ils passaient dessous).
+    <Animated.View entering={FadeIn.duration(220)} className="flex-1 gap-4">
       <View className="flex-row items-center justify-between px-1">
         <Text style={{ fontSize: 18 }}>{flags}</Text>
         <Text
@@ -414,20 +422,53 @@ function DeckStep({
         </Text>
       </View>
 
-      <NameSwipeDeck
-        cards={deck}
-        gender={gender}
-        favorites={favorites}
-        command={command}
-        onSwipe={onSwipe}
-        onToggleFavorite={onToggleFavorite}
-      />
+      <View
+        className="flex-1"
+        style={{ minHeight: MIN_CARD_HEIGHT + 20 }}
+        onLayout={(event) => {
+          const available = Math.floor(event.nativeEvent.layout.height);
+          setDeckSpace((current) =>
+            current === available ? current : available,
+          );
+        }}
+      >
+        {/* En position absolue : le paquet ne doit pas imposer sa hauteur
+            au conteneur, sinon la mesure ne pourrait jamais rétrécir. */}
+        <View
+          style={{
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            top: 0,
+            bottom: 0,
+            justifyContent: 'center',
+          }}
+        >
+          <NameSwipeDeck
+            cards={deck}
+            // 20 pt réservés à la carte suivante, qui dépasse en dessous.
+            cardHeight={Math.max(
+              MIN_CARD_HEIGHT,
+              Math.min(DEFAULT_CARD_HEIGHT, deckSpace - 20),
+            )}
+            gender={gender}
+            favorites={favorites}
+            command={command}
+            onSwipe={onSwipe}
+            onToggleFavorite={onToggleFavorite}
+          />
+        </View>
+      </View>
 
-      <SwipeButtons
-        onPass={() => onCommand('left')}
-        onKeep={() => onCommand('right')}
-        disabled={deck.length === 0}
-      />
+      {/* Un peu plus haut que le reste du contenu : la barre du bas
+          estompe ce qui passe dans son fondu. */}
+      <View style={{ marginBottom: 28 }}>
+        <SwipeButtons
+          onPass={() => onCommand('left')}
+          onKeep={() => onCommand('right')}
+          disabled={deck.length === 0}
+        />
+      </View>
     </Animated.View>
   );
 }
