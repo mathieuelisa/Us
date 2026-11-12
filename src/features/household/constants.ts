@@ -48,9 +48,10 @@ export const INFO_CATEGORY_META: Record<
     /**
      * Libellés qui ne peuvent exister qu'une fois dans la catégorie (casse
      * ignorée) : une fois saisis, la suggestion disparaît et l'ajout est
-     * bloqué — on modifie l'élément existant.
+     * bloqué — on modifie l'élément existant. `'all'` : tout libellé, même
+     * saisi à la main, est unique.
      */
-    uniqueLabels?: string[];
+    uniqueLabels?: string[] | 'all';
     defaultLabel: string;
     valuePlaceholder: string;
     valueKeyboardType?: 'default' | 'phone-pad' | 'number-pad';
@@ -75,6 +76,8 @@ export const INFO_CATEGORY_META: Record<
     needsLabel: true,
     labelPlaceholder: 'Qui — ex. Maman',
     labelSuggestions: ['Maman', 'Partenaire'],
+    // Un seul groupe sanguin par personne (demande explicite).
+    uniqueLabels: 'all',
     defaultLabel: '',
     valuePlaceholder: 'Groupe sanguin',
     valueOptions: ['O+', 'O-', 'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-'],
@@ -185,6 +188,8 @@ export const INFO_CATEGORY_META: Record<
     needsLabel: true,
     labelPlaceholder: 'Qui — ex. Maman',
     labelSuggestions: ['Maman', 'Partenaire'],
+    // Un seul numéro par personne, comme le groupe sanguin.
+    uniqueLabels: 'all',
     defaultLabel: '',
     valuePlaceholder: 'Numéro à 15 chiffres',
     valueKeyboardType: 'number-pad',

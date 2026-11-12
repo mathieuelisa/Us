@@ -120,18 +120,20 @@ export function InfoItemFormModal({
   const meta = category ? INFO_CATEGORY_META[category] : null;
   const isEditing = Boolean(editingItem);
 
-  // Libellés uniques (ex. « Terme ») déjà présents dans la catégorie — hors
-  // l'élément en cours de modification, qui garde le sien.
+  // Libellés uniques (ex. « Terme », « Maman » pour le groupe sanguin) déjà
+  // présents dans la catégorie — hors l'élément en cours de modification,
+  // qui garde le sien.
+  const uniqueLabels = meta?.uniqueLabels;
   const takenUniqueLabels = new Set(
-    (meta?.uniqueLabels ?? [])
-      .map((unique) => unique.toLowerCase())
-      .filter((unique) =>
-        existingItems.some(
-          (item) =>
-            item.category === category &&
-            item.id !== editingItem?.id &&
-            item.label.trim().toLowerCase() === unique,
-        ),
+    existingItems
+      .filter(
+        (item) => item.category === category && item.id !== editingItem?.id,
+      )
+      .map((item) => item.label.trim().toLowerCase())
+      .filter(
+        (taken) =>
+          uniqueLabels === 'all' ||
+          (uniqueLabels ?? []).some((unique) => unique.toLowerCase() === taken),
       ),
   );
   const isLabelTaken = takenUniqueLabels.has(label.trim().toLowerCase());
@@ -372,8 +374,8 @@ export function InfoItemFormModal({
                     />
                     {isLabelTaken ? (
                       <Text className="text-[12.5px] text-[#B91C1C]">
-                        « {label.trim()} » est déjà renseigné : modifiez la date
-                        existante plutôt que d'en ajouter une autre.
+                        « {label.trim()} » est déjà renseigné : modifiez
+                        l'élément existant plutôt que d'en ajouter un autre.
                       </Text>
                     ) : null}
                     {availableLabelSuggestions.length > 0 ? (
