@@ -44,6 +44,8 @@ import {
 import { useThemeAccent, useThemeBackground } from '@/features/settings/hooks';
 import { hexToRgba } from '@/lib/color';
 
+const GOOGLE_LOGO = require('@/assets/images/Google_logo.png');
+
 const SafeAreaView = withUniwind(RNSafeAreaView);
 
 type Mode = 'signIn' | 'signUp';
@@ -417,7 +419,14 @@ export default function LoginScreen() {
                 elevation: 3,
               }}
             >
-              <Ionicons name="logo-google" size={20} color="#4285F4" />
+              {/* Logo Google en couleurs (fourni par l'utilisateur), à la
+                  place de l'icône monochrome. */}
+              <Image
+                source={GOOGLE_LOGO}
+                style={{ width: 20, height: 20 }}
+                resizeMode="contain"
+                accessibilityIgnoresInvertColors
+              />
               <Text
                 className="text-[15.5px] font-semibold"
                 style={{ color: GLASS_TITLE_COLOR }}
