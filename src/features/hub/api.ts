@@ -16,6 +16,13 @@ export type HubSummary = {
   hasCheckedInToday: boolean;
   partnerFirstName: string | null;
   partnerMood: { mood: MoodValue; needNote: string | null } | null;
+  /**
+   * Humeur du jour de la personne enceinte, quel que soit le parent
+   * connecté : son ourson remplace le cœur du bloc « Votre forme
+   * aujourd'hui » du hub (demande explicite), pour elle comme pour le
+   * co-parent. `null` tant qu'elle n'a rien noté aujourd'hui.
+   */
+  pregnantMood: MoodValue | null;
   nextAppointment: { title: string; date: string } | null;
   checklistProgress: { checked: number; total: number } | null;
 };
@@ -95,6 +102,10 @@ export async function fetchHubSummary(
     partnerMood: partnerCheckin
       ? { mood: partnerCheckin.mood, needNote: partnerCheckin.need_note }
       : null,
+    pregnantMood:
+      moods.data?.find(
+        (checkin) => checkin.user_id === household.pregnant_user_id,
+      )?.mood ?? null,
     nextAppointment: nextAppointment
       ? {
           title: nextAppointment.title,

@@ -22,6 +22,21 @@ export const SYMPTOM_OPTIONS: { value: string; label: string }[] = [
 ];
 
 /**
+ * « Pas de symptômes » (demande explicite) : valeur spéciale stockée dans
+ * `symptoms_log.symptoms` pour dire qu'une journée a bien été renseignée
+ * sans symptôme — sinon une journée vide et une journée oubliée seraient
+ * indiscernables. Exclusive : la choisir retire les symptômes, cocher un
+ * symptôme la retire. Jamais comptée comme un symptôme (`withoutNoSymptom`).
+ */
+export const NO_SYMPTOM = 'aucun';
+export const NO_SYMPTOM_LABEL = 'Pas de symptômes';
+
+/** Les symptômes réels d'une liste, sans la valeur « Pas de symptômes ». */
+export function withoutNoSymptom(symptoms: string[]): string[] {
+  return symptoms.filter((symptom) => symptom !== NO_SYMPTOM);
+}
+
+/**
  * Pictogramme et teinte de fond de chaque symptôme : ils rendent la liste
  * lisible d'un coup d'œil. Purement visuel — la valeur stockée reste celle
  * de `SYMPTOM_OPTIONS`. Repli neutre pour un symptôme ajouté sans entrée ici.
@@ -36,6 +51,7 @@ export const SYMPTOM_VISUALS: Record<string, { emoji: string; tint: string }> =
     bouffees_de_chaleur: { emoji: '🌡️', tint: '#fbe0e4' },
     insomnies: { emoji: '🛌', tint: '#e6e7f8' },
     nausees: { emoji: '🤢', tint: '#e0f2ec' },
+    [NO_SYMPTOM]: { emoji: '😊', tint: '#e5f4e7' },
   };
 const FALLBACK_SYMPTOM_VISUAL = { emoji: '•', tint: '#f0f0f3' };
 
@@ -47,6 +63,7 @@ export function getSymptomVisual(value: string): {
 }
 
 export function getSymptomLabel(value: string): string {
+  if (value === NO_SYMPTOM) return NO_SYMPTOM_LABEL;
   return (
     SYMPTOM_OPTIONS.find((option) => option.value === value)?.label ?? value
   );

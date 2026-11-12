@@ -253,6 +253,7 @@ export default function HubScreen() {
           household={household}
           role={role}
           partnerName={partnerName ?? null}
+          pregnantMood={summary?.pregnantMood ?? null}
         />
 
         <View className="gap-2">

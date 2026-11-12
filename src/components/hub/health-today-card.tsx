@@ -1,16 +1,23 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { Pressable, Text, View } from 'react-native';
+import { Image, Pressable, Text, View } from 'react-native';
 
 import {
   GLASS_BODY_COLOR,
   GLASS_TITLE_COLOR,
   SparkLines,
 } from '@/components/ui/glass-card';
-import { getSymptomLabel, getSymptomVisual } from '@/features/health/constants';
+import {
+  getSymptomLabel,
+  getSymptomVisual,
+  NO_SYMPTOM,
+  withoutNoSymptom,
+} from '@/features/health/constants';
 import { usePregnantSymptomsForDate } from '@/features/health/hooks';
 import { getSymptomTipOfTheDay } from '@/features/health/symptom-tips';
 import type { Household } from '@/features/household/api';
+import type { MoodValue } from '@/features/hub/api';
+import { MOOD_PRESENTATION } from '@/features/hub/constants';
 import { getTipOfTheDay } from '@/features/partner/constants';
 import { useThemeAccent } from '@/features/settings/hooks';
 import type { HouseholdRole } from '@/lib/atoms/role';
@@ -33,6 +40,11 @@ import { todayIso } from '@/lib/date';
  * conseil de grossesse pour elle, conseil d'accompagnement pour le
  * co-parent.
  *
+ * Pastille d'en-tête : l'ourson de l'humeur du jour de la personne enceinte
+ * (check-in d'Ensemble) dès qu'elle l'a notée, à la place du cœur — pour
+ * elle comme pour le co-parent (demande explicite). Le cœur reste tant
+ * qu'elle n'a rien noté.
+ *
  * Juste au-dessus, quand des symptômes sont notés, un carré « Conseil »
  * propre à l'un d'eux (demande explicite), sur la teinte de ce symptôme —
  * même partage par rôle (`getSymptomTipOfTheDay`).
@@ -41,9 +53,12 @@ export function HealthTodayCard({
   household,
   role,
   partnerName,
+  pregnantMood = null,
 }: {
   household: Household | null | undefined;
   role: HouseholdRole;
+  /** Humeur du jour de la personne enceinte (résumé du hub), ou `null`. */
+  pregnantMood?: MoodValue | null;
   /** Prénom de l'autre parent, pour le titre côté co-parent. */
   partnerName: string | null;
 }) {
@@ -55,6 +70,10 @@ export function HealthTodayCard({
   );
   const tip = getTipOfTheDay(role);
   const symptomTip = getSymptomTipOfTheDay(symptoms, role);
+  // « Pas de symptômes » (valeur `NO_SYMPTOM`) n'est pas un symptôme : on
+  // ne le compte ni ne l'affiche en pastille, il change seulement le texte.
+  const realSymptoms = withoutNoSymptom(symptoms);
+  const hasDeclaredNoSymptom = symptoms.includes(NO_SYMPTOM);
 
   const title = isPregnant
     ? 'Votre forme aujourd’hui'
@@ -76,10 +95,28 @@ export function HealthTodayCard({
     >
       <View className="flex-row items-center gap-3">
         <View
-          className="h-11 w-11 items-center justify-center rounded-full"
+          accessibilityRole={pregnantMood ? 'image' : undefined}
+          accessibilityLabel={
+            pregnantMood
+              ? `Humeur du jour : ${MOOD_PRESENTATION[pregnantMood].label}`
+              : undefined
+          }
+          // Plus grand quand c'est l'ourson (demande explicite) : à 44 px
+          // son expression ne se lisait pas.
+          className={`${
+            pregnantMood ? 'h-[60px] w-[60px]' : 'h-11 w-11'
+          } items-center justify-center overflow-hidden rounded-full`}
           style={{ backgroundColor: hexToRgba('#e8739a', 0.14) }}
         >
-          <Ionicons name="heart" size={21} color="#e8739a" />
+          {pregnantMood ? (
+            <Image
+              source={MOOD_PRESENTATION[pregnantMood].imgUrl}
+              style={{ width: 56, height: 56 }}
+              resizeMode="contain"
+            />
+          ) : (
+            <Ionicons name="heart" size={21} color="#e8739a" />
+          )}
         </View>
         <View className="flex-1 gap-0.5">
           <Text
@@ -89,11 +126,13 @@ export function HealthTodayCard({
             {title}
           </Text>
           <Text className="text-[12.5px]" style={{ color: GLASS_BODY_COLOR }}>
-            {symptoms.length === 0
-              ? 'Aucun symptôme noté aujourd’hui'
-              : `${symptoms.length} symptôme${symptoms.length > 1 ? 's' : ''} noté${
-                  symptoms.length > 1 ? 's' : ''
-                } aujourd’hui`}
+            {hasDeclaredNoSymptom
+              ? 'Pas de symptôme aujourd’hui'
+              : realSymptoms.length === 0
+                ? 'Aucun symptôme noté aujourd’hui'
+                : `${realSymptoms.length} symptôme${
+                    realSymptoms.length > 1 ? 's' : ''
+                  } noté${realSymptoms.length > 1 ? 's' : ''} aujourd’hui`}
           </Text>
         </View>
         {isPregnant ? (
@@ -113,9 +152,9 @@ export function HealthTodayCard({
         ) : null}
       </View>
 
-      {symptoms.length > 0 ? (
+      {realSymptoms.length > 0 ? (
         <View className="flex-row flex-wrap gap-2">
-          {symptoms.map((symptom) => {
+          {realSymptoms.map((symptom) => {
             const visual = getSymptomVisual(symptom);
             return (
               <View
@@ -146,9 +185,13 @@ export function HealthTodayCard({
             className="flex-1 text-[13px] leading-[18px]"
             style={{ color: GLASS_BODY_COLOR }}
           >
-            {isPregnant
-              ? 'Une journée sans symptôme pour l’instant. Notez-les si quelque chose change.'
-              : 'Rien de signalé pour l’instant aujourd’hui.'}
+            {hasDeclaredNoSymptom
+              ? isPregnant
+                ? 'Journée sans symptôme, notée dans votre Journal. 🌿'
+                : 'Pas de symptôme signalé aujourd’hui. 🌿'
+              : isPregnant
+                ? 'Une journée sans symptôme pour l’instant. Notez-les si quelque chose change.'
+                : 'Rien de signalé pour l’instant aujourd’hui.'}
           </Text>
         </View>
       )}

@@ -12,7 +12,13 @@ import {
   SparkLines,
 } from '@/components/ui/glass-card';
 import { PillButton } from '@/components/ui/pill-button';
-import { getSymptomVisual, SYMPTOM_OPTIONS } from '@/features/health/constants';
+import {
+  getSymptomVisual,
+  NO_SYMPTOM,
+  NO_SYMPTOM_LABEL,
+  SYMPTOM_OPTIONS,
+  withoutNoSymptom,
+} from '@/features/health/constants';
 import {
   useSaveSymptoms,
   useSymptomDates,
@@ -82,11 +88,17 @@ export function JournalTab({
     setSelected(savedSymptoms ?? []);
   }, [savedSymptoms]);
 
+  // « Pas de symptômes » est exclusif : le choisir efface les symptômes,
+  // cocher un symptôme le retire.
   const toggle = (value: string) =>
     setSelected((current) =>
-      current.includes(value)
-        ? current.filter((item) => item !== value)
-        : [...current, value],
+      value === NO_SYMPTOM
+        ? current.includes(NO_SYMPTOM)
+          ? []
+          : [NO_SYMPTOM]
+        : current.includes(value)
+          ? current.filter((item) => item !== value)
+          : [...withoutNoSymptom(current), value],
     );
 
   const isDirty =
@@ -97,7 +109,7 @@ export function JournalTab({
 
   const save = () => {
     if (isSaveDisabled) return;
-    const count = selected.length;
+    const count = withoutNoSymptom(selected).length;
     saveSymptoms.mutate(
       { logDate: selectedDate, symptoms: selected },
       {
@@ -158,6 +170,13 @@ export function JournalTab({
         </View>
 
         <View className="flex-row flex-wrap gap-2.5">
+          <SymptomChip
+            label={NO_SYMPTOM_LABEL}
+            visual={getSymptomVisual(NO_SYMPTOM)}
+            isSelected={selected.includes(NO_SYMPTOM)}
+            accent={accent}
+            onPress={() => toggle(NO_SYMPTOM)}
+          />
           {SYMPTOM_OPTIONS.map((option) => (
             <SymptomChip
               key={option.value}
