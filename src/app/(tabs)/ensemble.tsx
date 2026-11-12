@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useAtomValue } from 'jotai';
 import { useState } from 'react';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import { withUniwind } from 'uniwind';
@@ -22,7 +22,6 @@ import type { MoodValue } from '@/features/hub/api';
 import { MOOD_PRESENTATION } from '@/features/hub/constants';
 import { useThemeAccent, useThemeBackground } from '@/features/settings/hooks';
 import { getCurrentWeekIsoDates } from '@/features/together/api';
-import { getGestureEmoji } from '@/features/together/constants';
 import {
   useGestureOfTheDay,
   useMyWeekCheckins,
@@ -159,11 +158,7 @@ export default function TogetherScreen() {
         />
 
         {gesture ? (
-          <GestureOfTheDayCard
-            emoji={getGestureEmoji(gesture)}
-            body={gesture.body}
-            accent={accent}
-          />
+          <GestureOfTheDayCard body={gesture.body} accent={accent} />
         ) : null}
 
         <DashedLoopDoodle color={accent} />
@@ -181,18 +176,20 @@ export default function TogetherScreen() {
   );
 }
 
+/** Lotus du geste du jour (illustration fournie, avec sa propre tuile). */
+const GESTURE_ICON = require('@/assets/images/Icon_geste.png');
+
 /**
- * Geste du jour en carte illustrée : émoji du geste sur une tache d'accent
- * entourée d'un cœur et de petits traits, pastille « Geste du jour », texte
+ * Geste du jour en carte illustrée : lotus sur sa tuile (illustration
+ * fournie, demande explicite — remplace l'émoji propre à chaque geste),
+ * entouré d'un cœur et de petits traits, pastille « Geste du jour », texte
  * en grand, puis un rappel qu'il change chaque jour. Le même geste reste
  * affiché toute la journée (`pickGestureOfTheDay`).
  */
 function GestureOfTheDayCard({
-  emoji,
   body,
   accent,
 }: {
-  emoji: string;
   body: string;
   accent: string;
 }) {
@@ -227,21 +224,11 @@ function GestureOfTheDayCard({
 
       <View className="flex-row items-center gap-4">
         <View className="h-[84px] w-[84px] items-center justify-center">
-          <View
-            style={{
-              position: 'absolute',
-              top: 0,
-              right: 0,
-              bottom: 0,
-              left: 0,
-              borderTopLeftRadius: 44,
-              borderTopRightRadius: 36,
-              borderBottomRightRadius: 44,
-              borderBottomLeftRadius: 32,
-              backgroundColor: hexToRgba(accent, 0.12),
-            }}
+          <Image
+            source={GESTURE_ICON}
+            style={{ width: 84, height: 84 }}
+            resizeMode="contain"
           />
-          <Text style={{ fontSize: 44 }}>{emoji}</Text>
           <Ionicons
             name="heart"
             size={16}
