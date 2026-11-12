@@ -212,6 +212,48 @@ export type Database = {
         };
         Relationships: [];
       };
+      contraction_sessions: {
+        Row: {
+          created_at: string;
+          created_by: string | null;
+          ended_at: string | null;
+          household_id: string;
+          id: string;
+          started_at: string;
+        };
+        Insert: {
+          created_at?: string;
+          created_by?: string | null;
+          ended_at?: string | null;
+          household_id: string;
+          id?: string;
+          started_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          created_by?: string | null;
+          ended_at?: string | null;
+          household_id?: string;
+          id?: string;
+          started_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'contraction_sessions_created_by_fkey';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'contraction_sessions_household_id_fkey';
+            columns: ['household_id'];
+            isOneToOne: false;
+            referencedRelation: 'households';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       contacts: {
         Row: {
           address: string | null;
@@ -253,6 +295,51 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: 'households';
             referencedColumns: ['id'];
+          },
+        ];
+      };
+      contractions: {
+        Row: {
+          created_at: string;
+          created_by: string | null;
+          ended_at: string | null;
+          household_id: string;
+          id: string;
+          session_id: string;
+          started_at: string;
+        };
+        Insert: {
+          created_at?: string;
+          created_by?: string | null;
+          ended_at?: string | null;
+          household_id: string;
+          id?: string;
+          session_id: string;
+          started_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          created_by?: string | null;
+          ended_at?: string | null;
+          household_id?: string;
+          id?: string;
+          session_id?: string;
+          started_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'contractions_created_by_fkey';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'contractions_session_fkey';
+            columns: ['session_id', 'household_id'];
+            isOneToOne: false;
+            referencedRelation: 'contraction_sessions';
+            referencedColumns: ['id', 'household_id'];
           },
         ];
       };

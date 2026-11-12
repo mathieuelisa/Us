@@ -42,6 +42,8 @@ const SafeAreaView = withUniwind(RNSafeAreaView);
  *
  * `modules` couvre la grille 2×2 uniforme par défaut (`/prenoms`) ;
  * `gridContent` la remplace entièrement pour une disposition sur mesure
+ * (fonction : reçoit `isPaywallVisible`, pour qu'un contenu interactif —
+ * l'assistant contractions — n'ouvre pas sa propre modale sous le paywall)
  * (bento de `/bebe`, demande explicite « inspire-toi de ça pour la
  * formation et le placement des blocs » — mêmes couleurs, agencement
  * différent).
@@ -72,7 +74,9 @@ export function PremiumLockedScreen({
   description: string;
   paywallTitle: string;
   modules?: { emoji: string; label: string }[];
-  gridContent?: ReactNode;
+  gridContent?:
+    | ReactNode
+    | ((state: { isPaywallVisible: boolean }) => ReactNode);
   backgroundImage?: ImageSourcePropType;
   header?: ReactNode;
   /** Illustration du paywall à la place de `image` (voir `PremiumOffer`). */
@@ -133,7 +137,9 @@ export function PremiumLockedScreen({
           </>
         )}
 
-        {gridContent ?? (
+        {(typeof gridContent === 'function'
+          ? gridContent({ isPaywallVisible })
+          : gridContent) ?? (
           <View className="flex-row flex-wrap gap-3">
             {modules?.map((module) => (
               <View

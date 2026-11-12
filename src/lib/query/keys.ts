@@ -49,6 +49,11 @@ export const queryKeys = {
     entries: (householdId: string, module: string) =>
       ['baby', householdId, 'entries', module] as const,
   },
+  contractions: {
+    all: ['contractions'] as const,
+    latest: (householdId: string) =>
+      ['contractions', householdId, 'latest'] as const,
+  },
   names: {
     all: ['names'] as const,
     swipes: (householdId: string) => ['names', householdId, 'swipes'] as const,

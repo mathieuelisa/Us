@@ -86,14 +86,22 @@ configurer le SMTP. Détail dans l'[architecture](./04-ARCHITECTURE.md#connexion
 - Vérifié à chaque étape : étanchéité par simulation SQL annulée (un
   utilisateur hors foyer ne voit aucune ligne), advisors de sécurité sans
   nouvel avertissement, dépôt et cloud alignés (34 migrations).
+- **Assistant contractions & départ maternité** (premium, demande
+  explicite) : tables `contraction_sessions` (un suivi ouvert au plus par
+  foyer) et `contractions` (une contraction ouverte au plus par suivi),
+  RLS foyer, les deux parents écrivent ; seule la fin (`ended_at`) se
+  modifie. Vérifié par simulation SQL annulée : un utilisateur hors foyer
+  ne voit et n'écrit rien, le début d'un suivi ne se réécrit pas. Advisors
+  sans nouvel avertissement. Comme `baby_entries`, `has_premium()` reste à
+  ajouter aux policies (lot 4).
 
 ## État des lieux (2026-11-12)
 
 | Élément | État |
 |---|---|
 | Projet | `hsclyntlnoyevstdhgvu`, Paris. Ancien projet de Londres encore présent (dette n°4) |
-| Migrations | 34, **identiques** entre le dépôt et le cloud (dernière : `20261112130000`) |
-| Tables | 20, toutes avec RLS |
+| Migrations | 35, **identiques** entre le dépôt et le cloud (dernière : `20261112220936`) |
+| Tables | 22, toutes avec RLS |
 | Données réelles | 2 comptes, **1 foyer sans co-parent rattaché** : le parcours à deux n'a jamais été joué pour de vrai (dette n°5) |
 | Auth | Email + mot de passe actif ; Google désactivé (dette n°56) ; confirmation d'email désactivée pour les tests (dette n°60) ; SMTP mutualisé de Supabase |
 | Edge Functions | `delete-account` |

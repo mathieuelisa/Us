@@ -11,6 +11,7 @@ const HUB_DESTINATIONS = [
   'naissance',
   'bebe',
   'prenoms',
+  'contractions',
 ] as const;
 
 // Sous-destinations de « Votre bébé » : les 4 suivis de la grille bento de
