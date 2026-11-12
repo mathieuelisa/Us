@@ -150,8 +150,9 @@ export const INFO_CATEGORY_META: Record<
     labelPlaceholder: 'Quoi — ex. Maternité',
     labelSuggestions: ['Maternité', 'Cabinet médecin', 'Domicile'],
     defaultLabel: '',
-    valuePlaceholder: 'Adresse complète',
-    multilineValue: true,
+    // Saisie en trois champs (rue, ville, code postal) dans
+    // `InfoItemFormModal` — voir `formatAddress`.
+    valuePlaceholder: '',
   },
   date: {
     icon: 'calendar-outline',
@@ -202,4 +203,42 @@ export function formatInfoDate(isoDate: string): string {
     month: 'long',
     year: 'numeric',
   });
+}
+
+export type AddressParts = { street: string; postalCode: string; city: string };
+
+/**
+ * Adresse saisie en trois champs (rue, ville, code postal — demande
+ * explicite) mais rangée dans l'unique colonne `value`, sur deux lignes :
+ * « 12 rue des Lilas » puis « 75011 Paris ». Pas de migration, et une
+ * adresse s'affiche telle quelle dans la liste.
+ */
+export function formatAddress({
+  street,
+  postalCode,
+  city,
+}: AddressParts): string {
+  const locality = [postalCode.trim(), city.trim()].filter(Boolean).join(' ');
+  return [street.trim(), locality].filter(Boolean).join('\n');
+}
+
+/**
+ * Inverse de `formatAddress`, pour rouvrir une adresse en modification.
+ * Une adresse saisie avant les trois champs (texte libre, sans retour à la
+ * ligne) revient entière dans la rue, rien n'est perdu.
+ */
+export function parseAddress(value: string): AddressParts {
+  const [first = '', ...rest] = value.split('\n');
+  // Une seule ligne qui commence par un code postal : c'est une adresse
+  // saisie sans rue (« 13001 Marseille »), pas une rue.
+  const isLocalityOnly =
+    rest.length === 0 && /^\d{4,5}(\s|$)/.test(first.trim());
+  const street = isLocalityOnly ? '' : first;
+  const locality = (isLocalityOnly ? first : rest.join(' ')).trim();
+  const match = locality.match(/^(\d{4,5})\s*(.*)$/);
+  return {
+    street: street.trim(),
+    postalCode: match ? match[1] : '',
+    city: match ? match[2].trim() : locality,
+  };
 }

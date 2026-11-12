@@ -10,15 +10,19 @@ import {
   GLASS_BODY_COLOR,
   GLASS_TITLE_COLOR,
 } from '@/components/ui/glass-card';
+import { IconInput } from '@/components/ui/icon-input';
 import { PillButton } from '@/components/ui/pill-button';
 import { WheelDatePicker } from '@/components/wheel-date-picker';
 import type { HouseholdInfoItem } from '@/features/household/api';
 import {
+  type AddressParts,
+  formatAddress,
   formatSocialSecurityNumber,
   INFO_CATEGORY_META,
   INFO_CATEGORY_ORDER,
   type InfoCategory,
   isInfoCategory,
+  parseAddress,
 } from '@/features/household/constants';
 import { useThemeAccent } from '@/features/settings/hooks';
 import { hexToRgba, lightenHex } from '@/lib/color';
@@ -79,10 +83,17 @@ export function InfoItemFormModal({
   const [value, setValue] = useState('');
   // Exemples cochés (création seulement) : plusieurs à la fois.
   const [pickedSuggestions, setPickedSuggestions] = useState<string[]>([]);
+  // Adresse en trois champs (demande explicite), recomposée à l'envoi.
+  const [address, setAddress] = useState<AddressParts>(EMPTY_ADDRESS);
 
   useEffect(() => {
     if (!visible) return;
     setPickedSuggestions([]);
+    setAddress(
+      editingItem?.category === 'address'
+        ? parseAddress(editingItem.value ?? '')
+        : EMPTY_ADDRESS,
+    );
 
     if (editingItem && isInfoCategory(editingItem.category)) {
       setCategory(editingItem.category);
@@ -111,6 +122,7 @@ export function InfoItemFormModal({
     setLabel('');
     setValue(INFO_CATEGORY_META[next].isDate ? todayIso() : '');
     setPickedSuggestions([]);
+    setAddress(EMPTY_ADDRESS);
   };
 
   const togglePickedSuggestion = (suggestion: string) =>
@@ -124,6 +136,10 @@ export function InfoItemFormModal({
   // doublons retirés (même texte, casse ignorée).
   const submittedValues = (() => {
     if (meta?.isDate) return value ? [value] : [];
+    if (category === 'address') {
+      const composed = formatAddress(address);
+      return composed ? [composed] : [];
+    }
     const all = isEditing
       ? [value.trim()]
       : [...pickedSuggestions, value.trim()];
@@ -361,7 +377,53 @@ export function InfoItemFormModal({
                   </View>
                 ) : null}
 
-                {meta?.isDate ? (
+                {category === 'address' ? (
+                  <View className="gap-2.5">
+                    <IconInput
+                      icon="home-outline"
+                      placeholder="Rue et numéro"
+                      value={address.street}
+                      onChangeText={(street) =>
+                        setAddress((current) => ({ ...current, street }))
+                      }
+                      accent={accent}
+                      autoComplete="street-address"
+                      textContentType="fullStreetAddress"
+                    />
+                    <View className="flex-row gap-2.5">
+                      <View style={{ flex: 1.6 }}>
+                        <IconInput
+                          icon="business-outline"
+                          placeholder="Ville"
+                          value={address.city}
+                          onChangeText={(city) =>
+                            setAddress((current) => ({ ...current, city }))
+                          }
+                          accent={accent}
+                          textContentType="addressCity"
+                        />
+                      </View>
+                      <View style={{ flex: 1 }}>
+                        <IconInput
+                          icon="mail-outline"
+                          placeholder="Code postal"
+                          value={address.postalCode}
+                          // Chiffres seulement, 5 au plus.
+                          onChangeText={(text) =>
+                            setAddress((current) => ({
+                              ...current,
+                              postalCode: text.replace(/\D/g, '').slice(0, 5),
+                            }))
+                          }
+                          accent={accent}
+                          keyboardType="number-pad"
+                          autoComplete="postal-code"
+                          textContentType="postalCode"
+                        />
+                      </View>
+                    </View>
+                  </View>
+                ) : meta?.isDate ? (
                   <WheelDatePicker value={value} onChange={setValue} />
                 ) : meta?.valueOptions ? (
                   <View className="flex-row flex-wrap gap-2">
@@ -527,3 +589,5 @@ function CloseButton({
     </Pressable>
   );
 }
+
+const EMPTY_ADDRESS: AddressParts = { street: '', postalCode: '', city: '' };
