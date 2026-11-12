@@ -5,6 +5,7 @@ import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import { withUniwind } from 'uniwind';
 
 import { PremiumOffer } from '@/components/hub/premium-offer';
+import { useTabBarContentInset } from '@/components/navigation/use-tab-bar-height';
 import { GLASS_TITLE_COLOR } from '@/components/ui/glass-card';
 import { ScreenCornerShapes } from '@/components/ui/screen-corner-shapes';
 import { useThemeAccent, useThemeBackground } from '@/features/settings/hooks';
@@ -25,6 +26,8 @@ const SafeAreaView = withUniwind(RNSafeAreaView);
  * la barre de navigation (demande explicite).
  */
 export default function PremiumScreen() {
+  // Place de la barre du bas, qui flotte au-dessus du contenu.
+  const tabBarInset = useTabBarContentInset();
   const router = useRouter();
   const backgroundColor = useThemeBackground();
   const accent = useThemeAccent();
@@ -37,7 +40,8 @@ export default function PremiumScreen() {
       <ScreenCornerShapes />
 
       <ScrollView
-        contentContainerClassName="gap-3 px-5 pb-4 pt-2"
+        contentContainerClassName="gap-3 px-5 pt-2"
+        contentContainerStyle={{ paddingBottom: tabBarInset }}
         showsVerticalScrollIndicator={false}
       >
         <Pressable

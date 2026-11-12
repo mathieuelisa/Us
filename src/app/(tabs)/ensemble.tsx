@@ -6,7 +6,7 @@ import { Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import { withUniwind } from 'uniwind';
-
+import { useTabBarContentInset } from '@/components/navigation/use-tab-bar-height';
 import { MoodPicker } from '@/components/together/mood-picker';
 import { NeedNoteOverlay } from '@/components/together/need-note-overlay';
 import { WeekMoodStrip } from '@/components/together/week-mood-strip';
@@ -50,6 +50,8 @@ const SafeAreaView = withUniwind(RNSafeAreaView);
  * jour en carte illustrée (`GestureOfTheDayCard`).
  */
 export default function TogetherScreen() {
+  // Place de la barre du bas, qui flotte au-dessus du contenu.
+  const tabBarInset = useTabBarContentInset();
   const router = useRouter();
 
   const { data: household } = useMyHousehold();
@@ -101,7 +103,8 @@ export default function TogetherScreen() {
       <ScreenCornerShapes />
 
       <ScrollView
-        contentContainerClassName="gap-6 px-6 pb-10 pt-4"
+        contentContainerClassName="gap-6 px-6 pt-4"
+        contentContainerStyle={{ paddingBottom: tabBarInset }}
         showsVerticalScrollIndicator={false}
       >
         <Pressable

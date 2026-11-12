@@ -6,6 +6,10 @@ import Svg, { Path } from 'react-native-svg';
 import { withUniwind } from 'uniwind';
 import { EmptyInfoState } from '@/components/household/empty-info-state';
 import { InfoItemFormModal } from '@/components/household/info-item-form-modal';
+import {
+  useTabBarContentInset,
+  useTabBarHeight,
+} from '@/components/navigation/use-tab-bar-height';
 import { BlobFab } from '@/components/ui/blob-fab';
 import {
   GLASS_BODY_COLOR,
@@ -56,6 +60,9 @@ function displayValue(item: HouseholdInfoItem, category: InfoCategory) {
  * ligne : la création choisit d'abord une catégorie parmi 6.
  */
 export default function InformationsScreen() {
+  // Place de la barre du bas, qui flotte au-dessus du contenu.
+  const tabBarInset = useTabBarContentInset();
+  const tabBarHeight = useTabBarHeight();
   const { data: household, isLoading: isHouseholdLoading } = useMyHousehold();
   const householdId = household?.id;
   const backgroundColor = useThemeBackground();
@@ -150,7 +157,9 @@ export default function InformationsScreen() {
       <ScreenCornerShapes />
 
       <ScrollView
-        contentContainerClassName="gap-4 px-6 pb-24 pt-4"
+        contentContainerClassName="gap-4 px-6 pt-4"
+        // Place en plus pour le bouton + flottant.
+        contentContainerStyle={{ paddingBottom: tabBarInset + 72 }}
         showsVerticalScrollIndicator={false}
       >
         {/* En-tête d'après une capture de référence (demande explicite) :
@@ -382,7 +391,9 @@ export default function InformationsScreen() {
       <BlobFab
         accessibilityLabel="Ajouter une information"
         onPress={() => openCreate()}
-        className="absolute bottom-6 right-6"
+        className="absolute right-6"
+        // Juste au-dessus de la barre du bas, qui flotte sur le contenu.
+        style={{ bottom: tabBarHeight + 12 }}
         invite={!isHouseholdLoading && !areItemsLoading && items.length === 0}
       />
 

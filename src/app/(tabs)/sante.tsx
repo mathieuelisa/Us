@@ -12,6 +12,10 @@ import { ContactsTab } from '@/components/health/contacts-tab';
 import { ExercisesTab } from '@/components/health/exercises-tab';
 import { JournalTab } from '@/components/health/journal-tab';
 import { SegmentedTabs } from '@/components/health/segmented-tabs';
+import {
+  useTabBarContentInset,
+  useTabBarHeight,
+} from '@/components/navigation/use-tab-bar-height';
 import { BlobFab } from '@/components/ui/blob-fab';
 import {
   FeedbackBanner,
@@ -70,6 +74,9 @@ function isHealthTab(value: string | undefined): value is HealthTab {
  * premier onglet par défaut.
  */
 export default function HealthScreen() {
+  // Place de la barre du bas, qui flotte au-dessus du contenu.
+  const tabBarInset = useTabBarContentInset();
+  const tabBarHeight = useTabBarHeight();
   const router = useRouter();
   const { tab: tabParam } = useLocalSearchParams<{ tab?: string }>();
   const { data: household } = useMyHousehold();
@@ -128,9 +135,11 @@ export default function HealthScreen() {
       <ScreenCornerShapes />
 
       <ScrollView
-        contentContainerClassName={`gap-5 px-6 pt-4 ${
-          activeTab === 'contacts' ? 'pb-28' : 'pb-10'
-        }`}
+        contentContainerClassName="gap-5 px-6 pt-4"
+        // Sur Contacts, place en plus pour le bouton + flottant.
+        contentContainerStyle={{
+          paddingBottom: tabBarInset + (activeTab === 'contacts' ? 72 : 0),
+        }}
         showsVerticalScrollIndicator={false}
       >
         {/* Hauteur minimale au-delà des 160 px de l'illustration : sans elle,
@@ -269,7 +278,9 @@ export default function HealthScreen() {
           iconSize={26}
           accessibilityLabel="Ajouter un contact"
           onPress={() => setIsAddingContact(true)}
-          className="absolute bottom-6 right-6"
+          className="absolute right-6"
+          // Juste au-dessus de la barre du bas, qui flotte sur le contenu.
+          style={{ bottom: tabBarHeight + 12 }}
         />
       ) : null}
 

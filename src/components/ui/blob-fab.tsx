@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import type { ComponentProps } from 'react';
 import { useEffect } from 'react';
-import { Pressable } from 'react-native';
+import { Pressable, type StyleProp, type ViewStyle } from 'react-native';
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -60,6 +60,7 @@ export function BlobFab({
   accessibilityLabel,
   onPress,
   className,
+  style,
   invite = false,
 }: {
   icon?: IoniconName;
@@ -68,6 +69,8 @@ export function BlobFab({
   accessibilityLabel: string;
   onPress: () => void;
   className?: string;
+  /** Position fine (ex. `bottom` au-dessus de la barre du bas). */
+  style?: StyleProp<ViewStyle>;
   invite?: boolean;
 }) {
   const accent = useThemeAccent();
@@ -130,6 +133,7 @@ export function BlobFab({
       onPress={handlePress}
       hitSlop={6}
       className={className}
+      style={style}
     >
       <Animated.View
         style={[

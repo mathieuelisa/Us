@@ -5,7 +5,7 @@ import { Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import { withUniwind } from 'uniwind';
-
+import { useTabBarContentInset } from '@/components/navigation/use-tab-bar-height';
 import {
   FeedbackBanner,
   useFeedbackBanner,
@@ -47,6 +47,8 @@ type IoniconName = ComponentProps<typeof Ionicons>['name'];
  * Pas de redirection vers l'accueil (choix explicite).
  */
 export default function ProfileScreen() {
+  // Place de la barre du bas, qui flotte au-dessus du contenu.
+  const tabBarInset = useTabBarContentInset();
   const session = useAtomValue(sessionAtom);
   const { data: profile, isLoading } = useMyProfile();
   const updateProfile = useUpdateMyProfile();
@@ -100,7 +102,8 @@ export default function ProfileScreen() {
       <ScreenCornerShapes />
 
       <ScrollView
-        contentContainerClassName="gap-7 px-6 pb-8 pt-4"
+        contentContainerClassName="gap-7 px-6 pt-4"
+        contentContainerStyle={{ paddingBottom: tabBarInset }}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >

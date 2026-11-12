@@ -8,6 +8,7 @@ import { withUniwind } from 'uniwind';
 
 import { NameCardsIllustration } from '@/components/hub/name-cards-illustration';
 import { PremiumTeaserCard } from '@/components/hub/premium-teaser-card';
+import { useTabBarContentInset } from '@/components/navigation/use-tab-bar-height';
 import { ProgressBar } from '@/components/organisation/progress-bar';
 import { PlainInput } from '@/components/plain-input';
 import { BlobIllustration } from '@/components/ui/blob-illustration';
@@ -89,6 +90,8 @@ const CATEGORY_IMAGES: Record<string, number> = {
  * d'emoji, avancement coché, barre de progression, chevron en pastille).
  */
 export default function OrganisationScreen() {
+  // Place de la barre du bas, qui flotte au-dessus du contenu.
+  const tabBarInset = useTabBarContentInset();
   const router = useRouter();
   const { data: household } = useMyHousehold();
 
@@ -140,7 +143,8 @@ export default function OrganisationScreen() {
       <ScreenCornerShapes />
 
       <ScrollView
-        contentContainerClassName="gap-5 px-6 pb-10 pt-4"
+        contentContainerClassName="gap-5 px-6 pt-4"
+        contentContainerStyle={{ paddingBottom: tabBarInset }}
         showsVerticalScrollIndicator={false}
       >
         <View>

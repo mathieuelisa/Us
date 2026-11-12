@@ -10,7 +10,7 @@ import Animated, {
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import { withUniwind } from 'uniwind';
-
+import { useTabBarContentInset } from '@/components/navigation/use-tab-bar-height';
 import {
   GLASS_BODY_COLOR,
   GLASS_TITLE_COLOR,
@@ -58,6 +58,8 @@ export function NameListScreen({
   emptyText: string;
   onRemove?: (item: NameListItem) => void;
 }) {
+  // Place de la barre du bas, qui flotte au-dessus du contenu.
+  const tabBarInset = useTabBarContentInset();
   const router = useRouter();
   const accent = useThemeAccent();
   const backgroundColor = useThemeBackground();
@@ -70,7 +72,8 @@ export function NameListScreen({
     >
       <ScreenCornerShapes />
       <ScrollView
-        contentContainerClassName="gap-5 px-5 pb-12 pt-4"
+        contentContainerClassName="gap-5 px-5 pt-4"
+        contentContainerStyle={{ paddingBottom: tabBarInset }}
         showsVerticalScrollIndicator={false}
       >
         <Pressable

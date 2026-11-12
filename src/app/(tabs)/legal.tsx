@@ -4,7 +4,7 @@ import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import { withUniwind } from 'uniwind';
-
+import { useTabBarContentInset } from '@/components/navigation/use-tab-bar-height';
 import {
   DashedLoopDoodle,
   GLASS_BODY_COLOR,
@@ -43,6 +43,8 @@ const GLASS_SURFACE = {
  * et à faire valider (voir l'avertissement de ce fichier).
  */
 export default function LegalScreen() {
+  // Place de la barre du bas, qui flotte au-dessus du contenu.
+  const tabBarInset = useTabBarContentInset();
   const router = useRouter();
   const { doc } = useLocalSearchParams<{ doc: string }>();
   const backgroundColor = useThemeBackground();
@@ -65,7 +67,8 @@ export default function LegalScreen() {
       <ScreenCornerShapes />
 
       <ScrollView
-        contentContainerClassName="gap-5 px-5 pb-12 pt-4"
+        contentContainerClassName="gap-5 px-5 pt-4"
+        contentContainerStyle={{ paddingBottom: tabBarInset }}
         showsVerticalScrollIndicator={false}
       >
         {router.canGoBack() ? (

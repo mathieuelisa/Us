@@ -16,6 +16,7 @@ import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import { withUniwind } from 'uniwind';
 
 import { PremiumPaywallModal } from '@/components/hub/premium-paywall-modal';
+import { useTabBarContentInset } from '@/components/navigation/use-tab-bar-height';
 import { GLASS_TITLE_COLOR } from '@/components/ui/glass-card';
 import { CARD_SHADOW } from '@/features/hub/constants';
 import { useThemeAccent, useThemeBackground } from '@/features/settings/hooks';
@@ -77,6 +78,8 @@ export function PremiumLockedScreen({
   /** Illustration du paywall à la place de `image` (voir `PremiumOffer`). */
   paywallIllustration?: ReactNode;
 }) {
+  // Place de la barre du bas, qui flotte au-dessus du contenu.
+  const tabBarInset = useTabBarContentInset();
   const backgroundColor = useThemeBackground();
   const accent = useThemeAccent();
   const [isPaywallVisible, setIsPaywallVisible] = useState(true);
@@ -90,7 +93,8 @@ export function PremiumLockedScreen({
   const content = (
     <>
       <ScrollView
-        contentContainerClassName="gap-5 px-6 pb-10 pt-4"
+        contentContainerClassName="gap-5 px-6 pt-4"
+        contentContainerStyle={{ paddingBottom: tabBarInset }}
         showsVerticalScrollIndicator={false}
       >
         <Pressable

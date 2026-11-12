@@ -19,6 +19,7 @@ import { withUniwind } from 'uniwind';
 
 import { BabyEntryFormModal } from '@/components/baby/baby-entry-form-modal';
 import { GrowthChart } from '@/components/baby/growth-chart';
+import { useTabBarContentInset } from '@/components/navigation/use-tab-bar-height';
 import { BlobIllustration } from '@/components/ui/blob-illustration';
 import {
   FeedbackBanner,
@@ -92,6 +93,8 @@ const tintedShadow = (accent: string) =>
  * revue explicitement dans la migration `20261112110000_baby_entries`.
  */
 export function BabyModuleScreen({ module }: { module: BabyModule }) {
+  // Place de la barre du bas, qui flotte au-dessus du contenu.
+  const tabBarInset = useTabBarContentInset();
   const router = useRouter();
   const wallpaper = useThemeBabyWallpaper();
   const accent = useThemeAccent();
@@ -157,7 +160,8 @@ export function BabyModuleScreen({ module }: { module: BabyModule }) {
     <SafeAreaView className="flex-1">
       <ImageBackground source={wallpaper} resizeMode="cover" className="flex-1">
         <ScrollView
-          contentContainerClassName="gap-5 px-5 pb-10 pt-4"
+          contentContainerClassName="gap-5 px-5 pt-4"
+          contentContainerStyle={{ paddingBottom: tabBarInset }}
           showsVerticalScrollIndicator={false}
         >
           <Pressable

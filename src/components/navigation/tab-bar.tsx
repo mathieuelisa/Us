@@ -1,6 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
+import { LinearGradient as FadeGradient } from 'expo-linear-gradient';
 import { type ComponentProps, useEffect } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -84,7 +86,12 @@ const BAR_MARGIN = 16;
 const BAR_RADIUS = 34;
 const BAR_PADDING_X = 8;
 const BAR_PADDING_Y = 6;
+const BAR_BORDER = 1.5;
 const ICON_SIZE = 22;
+/** Espace sous la pilule, au-dessus de la zone sûre du bas. */
+export const BAR_BOTTOM_GAP = 12;
+/** Hauteur du fondu au-dessus de la pilule, où le contenu s'efface. */
+const FADE_HEIGHT = 64;
 
 /**
  * Colonnes à largeur fixe : 5 × 60 + 4 × 4 + marges tient dans un écran de
@@ -104,6 +111,9 @@ const ITEM_HEIGHT =
   LABEL_LINE_HEIGHT +
   ITEM_PADDING_Y;
 
+/** Hauteur de la pilule elle-même (bordure comprise). */
+export const BAR_PILL_HEIGHT = ITEM_HEIGHT + BAR_PADDING_Y * 2 + BAR_BORDER * 2;
+
 /**
  * Bulle de l'onglet actif : plus large et plus haute qu'une colonne, elle
  * **dépasse** du haut de la barre. Le contenu de l'onglet actif remonte de
@@ -119,12 +129,8 @@ const ACTIVE_LIFT = ITEM_HEIGHT / 2 - (BUBBLE_TOP + BUBBLE_HEIGHT / 2);
 const BUBBLE_PATH =
   'M33 1.5C51 0.5 63 11 63 31C63 52 52 65 31 65C12 65 1 54 1 34C1 13 13 2.5 33 1.5Z';
 
-/**
- * Hauteur réservée au-dessus de la carte pour la bulle qui dépasse **et**
- * ses traits (jusqu'à 12 pt au-dessus d'elle) : hors de cette zone, ils
- * seraient rognés par le conteneur de `BottomTabView`.
- */
-const BUBBLE_OVERFLOW = -BUBBLE_TOP - BAR_PADDING_Y + 14;
+/** Dépassement de la bulle active au-dessus de la pilule. */
+export const BUBBLE_OVERFLOW = -BUBBLE_TOP - BAR_PADDING_Y;
 
 const DOT_SIZE = 6;
 
@@ -141,18 +147,14 @@ const ROUTE_BACKGROUND_OVERRIDES: Record<string, string> = {
 const SPRING = { damping: 15, stiffness: 190, mass: 0.9 };
 
 /**
- * Trois petits traits qui « jaillissent » du coin haut-gauche de la bulle à
- * chaque changement d'onglet. Coordonnées relatives à la bulle : chaque
- * trait est posé le long d'un rayon partant de ce coin, orienté selon ce
- * même rayon.
+ * Flou sous la pilule : iOS et web. Sur Android, le flou d'`expo-blur`
+ * coûte cher et rend mal derrière un contenu qui défile — on garde un fond
+ * presque opaque à la place (demande explicite).
  */
-const SPARKS = [
-  { left: 3, top: -12, rotate: '-15deg' },
-  { left: -3.5, top: -8.5, rotate: '-45deg' },
-  { left: -7, top: -2, rotate: '-75deg' },
-];
-const SPARK_WIDTH = 3;
-const SPARK_HEIGHT = 9;
+const USE_BLUR = Platform.OS !== 'android';
+const PILL_BACKGROUND = USE_BLUR
+  ? 'rgba(255, 255, 255, 0.75)'
+  : 'rgba(255, 255, 255, 0.95)';
 
 /**
  * Barre de navigation basse personnalisée (remplace le rendu par défaut de
@@ -162,20 +164,16 @@ const SPARK_HEIGHT = 9;
  * filet de la couleur d'accent. L'onglet actif est porté par une **bulle**
  * au dégradé d'accent qui déborde au-dessus de la carte, avec icône et
  * libellé en blanc ; elle glisse d'un onglet à l'autre avec un ressort,
- * rebondit à l'arrivée et fait jaillir trois petits traits, tandis qu'un
- * point d'accent la suit sur le bord bas de la carte (demande explicite,
- * capture de référence à l'appui). Premium garde son or, bulle comprise.
+ * rebondit à l'arrivée, tandis qu'un point d'accent la suit sur le bord bas
+ * de la carte (demande explicite, capture de référence à l'appui). Premium
+ * garde son or, bulle comprise.
  *
- * ⚠️ Le conteneur réservé par `BottomTabView` autour de la carte est
- * repeint du même pastel que le fond de page plutôt que laissé en vrai
- * `transparent` : en web, une vraie transparence ici laisse voir le fond
- * noir d'un backdrop de `Modal` React Native resté mal masqué quand fermé
- * (`AppointmentFormModal`, `HowItWorksModal`, `NeedNoteOverlay`), un bug du
- * polyfill web de `Modal`, pas de ce composant.
- *
- * Rendu en flux normal (pas de `position: absolute`) : c'est ce qui permet
- * à `BottomTabView` de réserver automatiquement la place occupée par la
- * barre — bulle débordante comprise, via `BUBBLE_OVERFLOW`.
+ * Transition avec le contenu (demande explicite) : plus de bande de fond
+ * opaque pleine largeur, qui tranchait net les cartes. La barre flotte en
+ * `position: absolute` au-dessus des écrans, sur un **dégradé** de la
+ * couleur de fond (transparent → opaque) où le contenu s'efface ; la
+ * pilule, translucide, floute ce qui passe dessous. Les écrans réservent
+ * eux-mêmes la place en bas de leur défilement (`useTabBarContentInset`).
  *
  * L'entrée Premium (dernière colonne) navigue vers la route `premium`
  * (`(tabs)/premium.tsx`, enregistrée avec `href: null` dans `_layout.tsx`)
@@ -213,23 +211,16 @@ export function AppTabBar({
 
   const bubbleX = useSharedValue(Math.max(bubbleIndex, 0) * COLUMN_STRIDE);
   const bubbleScale = useSharedValue(1);
-  const sparkProgress = useSharedValue(1);
 
   useEffect(() => {
     if (bubbleIndex === -1) return;
     bubbleX.value = withSpring(bubbleIndex * COLUMN_STRIDE, SPRING);
-    // Petit écrasement puis rebond à l'arrivée, et les traits ne jaillissent
-    // qu'une fois la bulle presque posée.
+    // Petit écrasement puis rebond à l'arrivée.
     bubbleScale.value = withSequence(
       withTiming(0.86, { duration: 110 }),
       withSpring(1, { damping: 8, stiffness: 230 }),
     );
-    sparkProgress.value = 0;
-    sparkProgress.value = withDelay(
-      160,
-      withSpring(1, { damping: 10, stiffness: 200 }),
-    );
-  }, [bubbleIndex, bubbleX, bubbleScale, sparkProgress]);
+  }, [bubbleIndex, bubbleX, bubbleScale]);
 
   const isBubbleVisible = bubbleIndex !== -1;
 
@@ -240,32 +231,52 @@ export function AppTabBar({
     ],
   }));
 
-  const sparksStyle = useAnimatedStyle(() => ({
-    opacity: sparkProgress.value,
-    transform: [{ scale: 0.4 + 0.6 * sparkProgress.value }],
-  }));
-
   const dotStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: bubbleX.value + (COLUMN_WIDTH - DOT_SIZE) / 2 }],
   }));
 
+  const pageBackground =
+    ROUTE_BACKGROUND_OVERRIDES[focusedRouteName ?? ''] ?? pastelBackground;
+
   return (
+    // Conteneur sans fond, posé au-dessus des écrans : seuls la pilule et
+    // ses boutons captent les touchers (`box-none`), le reste laisse
+    // défiler le contenu dessous.
     <View
+      pointerEvents="box-none"
       style={{
-        backgroundColor:
-          ROUTE_BACKGROUND_OVERRIDES[focusedRouteName ?? ''] ??
-          pastelBackground,
-        paddingTop: BUBBLE_OVERFLOW,
+        position: 'absolute',
+        left: 0,
+        right: 0,
+        bottom: 0,
+        paddingTop: FADE_HEIGHT,
+        backgroundColor: 'transparent',
+        borderTopWidth: 0,
+        elevation: 0,
+        shadowOpacity: 0,
       }}
     >
+      {/* Fondu du contenu vers la couleur de fond de l'écran, de
+          transparent (haut) à opaque (bas, sous la pilule). */}
+      <FadeGradient
+        pointerEvents="none"
+        colors={[
+          hexToRgba(pageBackground, 0),
+          hexToRgba(pageBackground, 0.9),
+          pageBackground,
+        ]}
+        locations={[0, 0.55, 1]}
+        style={StyleSheet.absoluteFill}
+      />
+
       <View
         style={{
           alignSelf: 'center',
           marginHorizontal: BAR_MARGIN,
-          marginBottom: Math.max(insets.bottom, 12) + 8,
+          marginBottom: insets.bottom + BAR_BOTTOM_GAP,
           borderRadius: BAR_RADIUS,
-          backgroundColor: 'rgba(255, 255, 255, 0.78)',
-          borderWidth: 1.5,
+          backgroundColor: PILL_BACKGROUND,
+          borderWidth: BAR_BORDER,
           borderColor: hexToRgba(accent, 0.35),
           paddingHorizontal: BAR_PADDING_X,
           paddingVertical: BAR_PADDING_Y,
@@ -276,6 +287,25 @@ export function AppTabBar({
           elevation: 8,
         }}
       >
+        {/* Flou de ce qui défile sous la pilule. Dans son propre cadre
+            rogné (même rayon) : la pilule, elle, ne rogne pas, sinon la
+            bulle active qui la dépasse serait coupée. */}
+        {USE_BLUR ? (
+          <View
+            pointerEvents="none"
+            style={[
+              StyleSheet.absoluteFill,
+              { borderRadius: BAR_RADIUS - BAR_BORDER, overflow: 'hidden' },
+            ]}
+          >
+            <BlurView
+              intensity={30}
+              tint="light"
+              style={StyleSheet.absoluteFill}
+            />
+          </View>
+        ) : null}
+
         <View style={{ flexDirection: 'row', gap: COLUMN_GAP }}>
           {isBubbleVisible ? (
             <Animated.View
@@ -330,26 +360,6 @@ export function AppTabBar({
                   opacity={0.16}
                 />
               </Svg>
-
-              <Animated.View
-                style={[{ position: 'absolute', top: 0, left: 0 }, sparksStyle]}
-              >
-                {SPARKS.map((spark) => (
-                  <View
-                    key={spark.rotate}
-                    style={{
-                      position: 'absolute',
-                      left: spark.left,
-                      top: spark.top,
-                      width: SPARK_WIDTH,
-                      height: SPARK_HEIGHT,
-                      borderRadius: SPARK_WIDTH / 2,
-                      backgroundColor: bubbleColor,
-                      transform: [{ rotate: spark.rotate }],
-                    }}
-                  />
-                ))}
-              </Animated.View>
             </Animated.View>
           ) : null}
 

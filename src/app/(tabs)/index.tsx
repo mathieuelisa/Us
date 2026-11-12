@@ -11,6 +11,7 @@ import { HowItWorksModal } from '@/components/hub/how-it-works-modal';
 import { PillarCard } from '@/components/hub/pillar-card';
 import { PremiumTeaserCard } from '@/components/hub/premium-teaser-card';
 import { ShareInviteCard } from '@/components/hub/share-invite-card';
+import { useTabBarContentInset } from '@/components/navigation/use-tab-bar-height';
 import { NeedChips } from '@/components/together/need-chips';
 import {
   SparkLines,
@@ -67,6 +68,8 @@ const COPARENT_ICON = require('@/assets/images/Icon_coparent.png');
  * écrans (`sante.tsx`, `demarches.tsx`, `ensemble.tsx`, `partenaire.tsx`).
  */
 export default function HubScreen() {
+  // Place de la barre du bas, qui flotte au-dessus du contenu.
+  const tabBarInset = useTabBarContentInset();
   const { data: profile } = useMyProfile();
   const { data: household } = useMyHousehold();
   const { data: summary } = useHubSummary(household);
@@ -136,7 +139,8 @@ export default function HubScreen() {
       <ScreenCornerShapes />
 
       <ScrollView
-        contentContainerClassName="gap-6 px-6 pb-10 pt-4"
+        contentContainerClassName="gap-6 px-6 pt-4"
+        contentContainerStyle={{ paddingBottom: tabBarInset }}
         showsVerticalScrollIndicator={false}
       >
         <View className="flex-row items-center justify-between gap-3">

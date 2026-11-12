@@ -13,7 +13,7 @@ import {
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import { withUniwind } from 'uniwind';
-
+import { useTabBarContentInset } from '@/components/navigation/use-tab-bar-height';
 import { NeedChips } from '@/components/together/need-chips';
 import { WeekMoodDays } from '@/components/together/week-mood-strip';
 import {
@@ -332,6 +332,8 @@ function PartnerStateCard({
  * Journal — sa seule porte d'entrée vers cette donnée de santé.
  */
 export default function PartnerScreen() {
+  // Place de la barre du bas, qui flotte au-dessus du contenu.
+  const tabBarInset = useTabBarContentInset();
   const router = useRouter();
   const session = useAtomValue(sessionAtom);
   const { data: household } = useMyHousehold();
@@ -368,7 +370,8 @@ export default function PartnerScreen() {
       <PinkBackdrop />
 
       <ScrollView
-        contentContainerClassName="gap-7 px-6 pb-6 pt-4"
+        contentContainerClassName="gap-7 px-6 pt-4"
+        contentContainerStyle={{ paddingBottom: tabBarInset }}
         showsVerticalScrollIndicator={false}
       >
         <View>

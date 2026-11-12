@@ -8,6 +8,7 @@ import { withUniwind } from 'uniwind';
 
 import { ConfirmBirthModal } from '@/components/birth/confirm-birth-modal';
 import { DeclareBirthButton } from '@/components/birth/declare-birth-button';
+import { useTabBarContentInset } from '@/components/navigation/use-tab-bar-height';
 import {
   ChevronBubble,
   GLASS_BODY_COLOR,
@@ -86,6 +87,8 @@ const tintedShadow = (accent: string) =>
  * qu'écrire la date et recalculer les échéances.
  */
 export default function BirthScreen() {
+  // Place de la barre du bas, qui flotte au-dessus du contenu.
+  const tabBarInset = useTabBarContentInset();
   const router = useRouter();
   const backgroundColor = useThemeBackground();
   const accent = useThemeAccent();
@@ -136,7 +139,8 @@ export default function BirthScreen() {
 
       <ScrollView
         className="flex-1"
-        contentContainerClassName="gap-5 px-6 pb-6 pt-4"
+        contentContainerClassName="gap-5 px-6 pt-4"
+        contentContainerStyle={{ paddingBottom: tabBarInset }}
         showsVerticalScrollIndicator={false}
       >
         <Pressable

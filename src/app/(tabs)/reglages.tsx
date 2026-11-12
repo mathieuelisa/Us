@@ -6,6 +6,7 @@ import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import { Uniwind, useUniwind, withUniwind } from 'uniwind';
+import { useTabBarContentInset } from '@/components/navigation/use-tab-bar-height';
 import {
   ChangePasswordModal,
   DeleteAccountModal,
@@ -81,6 +82,8 @@ const LEGAL_LINKS: { doc: string; label: string; icon: IoniconName }[] = [
  * Pas de bouton retour malgré la capture : c'est un onglet racine.
  */
 export default function SettingsScreen() {
+  // Place de la barre du bas, qui flotte au-dessus du contenu.
+  const tabBarInset = useTabBarContentInset();
   const session = useAtomValue(sessionAtom);
   const { theme: activeTheme } = useUniwind();
   const updateTheme = useUpdateMyTheme();
@@ -133,7 +136,8 @@ export default function SettingsScreen() {
       <ScreenCornerShapes />
 
       <ScrollView
-        contentContainerClassName="gap-6 px-6 pb-6 pt-4"
+        contentContainerClassName="gap-6 px-6 pt-4"
+        contentContainerStyle={{ paddingBottom: tabBarInset }}
         showsVerticalScrollIndicator={false}
       >
         <View>

@@ -12,6 +12,7 @@ import {
   SwipeButtons,
   type SwipeCommand,
 } from '@/components/names/name-swipe-deck';
+import { useTabBarContentInset } from '@/components/navigation/use-tab-bar-height';
 import {
   FeedbackBanner,
   useFeedbackBanner,
@@ -53,6 +54,8 @@ const SafeAreaView = withUniwind(RNSafeAreaView);
  *    (`name_swipes`), le paquet avance sans attendre la requête.
  */
 export default function NameGameScreen() {
+  // Place de la barre du bas, qui flotte au-dessus du contenu.
+  const tabBarInset = useTabBarContentInset();
   const router = useRouter();
   const { gender: genderParam } = useLocalSearchParams<{ gender: string }>();
   const gender: NameGender = genderParam === 'boy' ? 'boy' : 'girl';
@@ -145,7 +148,8 @@ export default function NameGameScreen() {
       <ScreenCornerShapes />
 
       <ScrollView
-        contentContainerClassName="grow gap-5 px-5 pb-10 pt-4"
+        contentContainerClassName="grow gap-5 px-5 pt-4"
+        contentContainerStyle={{ paddingBottom: tabBarInset }}
         showsVerticalScrollIndicator={false}
         // Le paquet capte les glissements horizontaux ; le défilement
         // vertical reste possible autour.

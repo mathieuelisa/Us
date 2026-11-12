@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import { withUniwind } from 'uniwind';
-
+import { useTabBarContentInset } from '@/components/navigation/use-tab-bar-height';
 import {
   type CatalogExercise,
   EXERCISE_DISCLAIMER,
@@ -47,6 +47,8 @@ const HERO_IMAGE_TOP_INSET = 44;
  * bon onglet, sans quoi on retomberait sur le Journal.
  */
 export default function ExerciseScreen() {
+  // Place de la barre du bas, qui flotte au-dessus du contenu.
+  const tabBarInset = useTabBarContentInset();
   const router = useRouter();
   const { slug } = useLocalSearchParams<{ slug?: string }>();
   const backgroundColor = useThemeBackground();
@@ -78,7 +80,7 @@ export default function ExerciseScreen() {
   return (
     <View className="flex-1" style={{ backgroundColor }}>
       <ScrollView
-        contentContainerClassName="pb-10"
+        contentContainerStyle={{ paddingBottom: tabBarInset }}
         showsVerticalScrollIndicator={false}
       >
         <ExerciseHero exercise={exercise} onBack={goBack} />
