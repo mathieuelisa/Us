@@ -71,13 +71,21 @@ export async function upsertMoodCheckin(input: {
   if (error) throw error;
 }
 
+/**
+ * Période du geste du jour : « pendant la grossesse » tant que la naissance
+ * n'est pas déclarée, « après la naissance » ensuite (`households.birth_date`).
+ */
+export type GesturePhase = 'pregnancy' | 'after_birth';
+
 export async function fetchGestureSuggestions(
   role: HouseholdRole,
+  phase: GesturePhase,
 ): Promise<GestureSuggestion[]> {
   const { data, error } = await supabase
     .from('gesture_suggestions')
     .select('*')
     .eq('target_role', role)
+    .eq('phase', phase)
     .order('sort_order', { ascending: true });
 
   if (error) throw error;

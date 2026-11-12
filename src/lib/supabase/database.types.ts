@@ -291,6 +291,7 @@ export type Database = {
           body: string;
           emoji: string | null;
           id: string;
+          phase: string;
           sort_order: number;
           target_role: string;
         };
@@ -298,6 +299,7 @@ export type Database = {
           body: string;
           emoji?: string | null;
           id?: string;
+          phase?: string;
           sort_order?: number;
           target_role: string;
         };
@@ -305,6 +307,7 @@ export type Database = {
           body?: string;
           emoji?: string | null;
           id?: string;
+          phase?: string;
           sort_order?: number;
           target_role?: string;
         };

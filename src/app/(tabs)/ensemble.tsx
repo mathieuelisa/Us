@@ -57,7 +57,11 @@ export default function TogetherScreen() {
   const weekDates = getCurrentWeekIsoDates();
 
   const { data: checkinsByDate = {} } = useMyWeekCheckins(household);
-  const { data: gesture } = useGestureOfTheDay(role);
+  // Gestes « après la naissance » dès qu'elle est déclarée.
+  const { data: gesture } = useGestureOfTheDay(
+    role,
+    household?.birth_date ? 'after_birth' : 'pregnancy',
+  );
   const upsertCheckin = useUpsertMoodCheckin(household);
   const backgroundColor = useThemeBackground();
   const accent = useThemeAccent();

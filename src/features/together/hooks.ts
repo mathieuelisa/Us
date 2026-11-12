@@ -10,6 +10,7 @@ import { queryKeys } from '@/lib/query/keys';
 import {
   fetchGestureSuggestions,
   fetchMyWeekCheckins,
+  type GesturePhase,
   getCurrentWeekIsoDates,
   pickGestureOfTheDay,
   upsertMoodCheckin,
@@ -60,11 +61,11 @@ export function useWeekCheckinsFor(
   });
 }
 
-export function useGestureOfTheDay(role: HouseholdRole) {
+export function useGestureOfTheDay(role: HouseholdRole, phase: GesturePhase) {
   return useQuery({
-    queryKey: queryKeys.together.gesture(role),
+    queryKey: queryKeys.together.gesture(role, phase),
     queryFn: async () =>
-      pickGestureOfTheDay(await fetchGestureSuggestions(role)),
+      pickGestureOfTheDay(await fetchGestureSuggestions(role, phase)),
   });
 }
 
