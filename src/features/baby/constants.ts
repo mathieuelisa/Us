@@ -42,10 +42,13 @@ export type BabyNumberField = {
  * partie décimale (« 690 » pour des grammes), `fractionStep` le pas de sa
  * colonne, exprimé dans cette même unité (10 → 000, 010, … 990).
  * `defaultValue` est la position de départ quand aucune mesure n'existe.
+ * `fractionDigits: 0` : pas de colonne décimale (quantité en ml).
  */
 export type BabyMeasureWheel = {
   min: number;
   max: number;
+  /** Pas de la colonne entière (5 → 5, 10, 15 ml…) ; 1 par défaut. */
+  integerStep?: number;
   fractionDigits: number;
   fractionStep: number;
   defaultValue: number;
@@ -169,7 +172,22 @@ export const BABY_MODULES: Record<BabyModuleSlug, BabyModule> = {
     hasTime: true,
     hasComment: true,
     fields: [
-      { key: 'quantity', label: 'Quantité', unit: 'ml', kind: 'number' },
+      {
+        key: 'quantity',
+        label: 'Quantité',
+        unit: 'ml',
+        kind: 'number',
+        // Molette par pas de 5 ml (demande explicite) : les graduations
+        // d'un biberon ne sont pas plus fines.
+        wheel: {
+          min: 5,
+          max: 360,
+          integerStep: 5,
+          fractionDigits: 0,
+          fractionStep: 1,
+          defaultValue: 90,
+        },
+      },
     ],
     requiredFieldCount: 1,
   },

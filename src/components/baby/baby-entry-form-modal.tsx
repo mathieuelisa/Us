@@ -11,8 +11,11 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-
-import { MeasureWheelField } from '@/components/baby/measure-wheel-field';
+import { DeleteEntryAlert } from '@/components/baby/delete-entry-alert';
+import {
+  MeasureWheelField,
+  TimeWheelField,
+} from '@/components/baby/measure-wheel-field';
 import { BlobIllustration } from '@/components/ui/blob-illustration';
 import {
   GLASS_BODY_COLOR,
@@ -31,7 +34,6 @@ import {
   formatBabyEntrySummary,
   formatDurationSeconds,
 } from '@/features/baby/constants';
-import { parseTimeInput } from '@/features/health/constants';
 import { useThemeAccent } from '@/features/settings/hooks';
 import { hexToRgba, lightenHex } from '@/lib/color';
 import { todayIso } from '@/lib/date';
@@ -91,7 +93,7 @@ export function BabyEntryFormModal({
   isSaving?: boolean;
   /**
    * Suppression de `initialEntry` (demande explicite), après confirmation
-   * dans `ConfirmDeleteAlert`. Absent : pas de bouton « Supprimer ».
+   * dans `DeleteEntryAlert`. Absent : pas de bouton « Supprimer ».
    */
   onDelete?: () => void;
   isDeleting?: boolean;
@@ -123,8 +125,9 @@ export function BabyEntryFormModal({
   useEffect(() => {
     if (!visible) return;
     setDate(initialEntry?.date ?? todayIso());
-    // Heure stockée en `HH:MM`, réaffichée comme on la tape (« 14h20 »).
-    setTime(initialEntry?.time?.replace(':', 'h') ?? '');
+    // `HH:MM`, choisie à la molette ; vide tant qu'elle n'est pas
+    // renseignée (l'heure est facultative).
+    setTime(initialEntry?.time ?? '');
     setSegment(initialEntry?.segment ?? module.segments?.options[0] ?? null);
     setValues(initialEntry ? { ...initialEntry.values } : {});
     setComment(initialEntry?.comment ?? '');
@@ -173,7 +176,6 @@ export function BabyEntryFormModal({
     }
   }
 
-  const isTimeInvalid = time.trim().length > 0 && parseTimeInput(time) === null;
   const filledFieldCount = module.fields.filter((field) =>
     isNumberFilled(values[field.key]),
   ).length;
@@ -183,34 +185,17 @@ export function BabyEntryFormModal({
       !isNumberFilled(values[field.key]),
   );
   const canSubmit =
-    filledFieldCount >= module.requiredFieldCount &&
-    !hasInvalidNumber &&
-    !isTimeInvalid;
+    filledFieldCount >= module.requiredFieldCount && !hasInvalidNumber;
 
-  // Poids et taille : molettes côte à côte (demande explicite).
+  // Heure, poids, taille, quantité : molettes côte à côte (demandes
+  // explicites).
   const wheelFields = module.fields.filter(
     (field) => field.kind === 'number' && field.wheel,
   );
 
-  // Heure et champs chiffrés : petits champs posés deux par ligne.
+  // Champs chiffrés restés au clavier (périmètre crânien) : petits champs
+  // posés deux par ligne.
   const smallInputs: { key: string; node: ReactNode }[] = [
-    ...(module.hasTime
-      ? [
-          {
-            key: 'time',
-            node: (
-              <IconInput
-                icon="time-outline"
-                placeholder="Heure, ex. 14h20"
-                value={time}
-                onChangeText={setTime}
-                accent={accent}
-                isInvalid={isTimeInvalid}
-              />
-            ),
-          },
-        ]
-      : []),
     ...module.fields
       .filter((field) => field.kind === 'number' && !field.wheel)
       .map((field) => ({
@@ -346,8 +331,19 @@ export function BabyEntryFormModal({
                 />
               ))}
 
-            {wheelFields.length > 0 ? (
+            {module.hasTime || wheelFields.length > 0 ? (
               <View className="flex-row gap-2.5">
+                {module.hasTime ? (
+                  <TimeWheelField
+                    // Remontée à chaque ouverture, comme les mesures : elle
+                    // repart de l'heure de l'entrée ou de l'heure actuelle.
+                    key={`time-${timerResetToken}`}
+                    value={time || null}
+                    startTime={initialEntry?.time ?? currentTime()}
+                    onChange={(next) => setTime(next ?? '')}
+                    accent={accent}
+                  />
+                ) : null}
                 {wheelFields.map((field) =>
                   field.wheel ? (
                     <MeasureWheelField
@@ -385,18 +381,6 @@ export function BabyEntryFormModal({
                     ))}
                   </View>
                 ))}
-                {isTimeInvalid ? (
-                  <Text className="px-2 text-[12px] text-red-600">
-                    Heure non reconnue. Formats acceptés : 14h20, 14:20.
-                  </Text>
-                ) : module.hasTime ? (
-                  <Text
-                    className="px-2 text-[12px]"
-                    style={{ color: '#a3a1b0' }}
-                  >
-                    L’heure est facultative.
-                  </Text>
-                ) : null}
               </View>
             ) : null}
 
@@ -418,7 +402,7 @@ export function BabyEntryFormModal({
               onPress={() =>
                 onSubmit({
                   date,
-                  time: module.hasTime ? parseTimeInput(time) : null,
+                  time: module.hasTime && time ? time : null,
                   segment,
                   values: normalizeValues(module, values),
                   comment: module.hasComment ? comment.trim() || null : null,
@@ -463,9 +447,11 @@ export function BabyEntryFormModal({
         </Animated.View>
 
         {isConfirmingDelete && initialEntry && onDelete ? (
-          <ConfirmDeleteAlert
+          <DeleteEntryAlert
+            emoji={module.emoji}
             summary={formatBabyEntrySummary(module, initialEntry)}
             date={formatBabyEntryDate(initialEntry)}
+            accent={accent}
             onConfirm={() => {
               setIsConfirmingDelete(false);
               onDelete();
@@ -564,66 +550,6 @@ function DiscardTimerAlert({
 }
 
 const DELETE_RED = '#d14b3a';
-
-/**
- * Confirmation avant de supprimer une entrée : la suppression est
- * définitive et vaut pour les deux parents (journal partagé). Même
- * surcouche que `DiscardTimerAlert`, et même parti pris : le choix par
- * défaut est de garder l'entrée.
- */
-function ConfirmDeleteAlert({
-  summary,
-  date,
-  onConfirm,
-  onCancel,
-}: {
-  summary: string;
-  date: string;
-  onConfirm: () => void;
-  onCancel: () => void;
-}) {
-  return (
-    <View className="absolute inset-0 items-center justify-center bg-black/50 px-8">
-      <View className="w-full gap-4 rounded-3xl bg-white px-6 py-6">
-        <View className="items-center gap-2">
-          <View className="h-11 w-11 items-center justify-center rounded-full bg-[#e07a7a]/15">
-            <Ionicons name="trash-outline" size={21} color="#c25b5b" />
-          </View>
-          <Text className="text-center text-[17px] font-bold text-[#1a1a1a]">
-            Supprimer cette entrée ?
-          </Text>
-        </View>
-
-        <Text className="text-center text-[13.5px] leading-5 text-[#6b6b6b]">
-          {summary ? `${summary} — ${date}.` : `${date}.`} Elle sera supprimée
-          pour tout le foyer. Cette action est définitive.
-        </Text>
-
-        <View className="gap-2">
-          <Pressable
-            accessibilityRole="button"
-            onPress={onCancel}
-            className="items-center rounded-2xl bg-[#1f3d3a] py-3.5 active:opacity-80"
-          >
-            <Text className="text-[15px] font-semibold text-white">
-              Garder l’entrée
-            </Text>
-          </Pressable>
-
-          <Pressable
-            accessibilityRole="button"
-            onPress={onConfirm}
-            className="items-center py-2 active:opacity-60"
-          >
-            <Text className="text-[14px] font-medium text-[#c25b5b]">
-              Supprimer définitivement
-            </Text>
-          </Pressable>
-        </View>
-      </View>
-    </View>
-  );
-}
 
 /** Marge interne du rail (`p-1`) et écart entre segments (`gap-1`), en points. */
 const SEGMENT_TRACK_PADDING = 4;
@@ -1001,4 +927,12 @@ function chunkPairs<T>(items: T[]): T[][] {
     pairs.push(items.slice(index, index + 2));
   }
   return pairs;
+}
+
+/** Heure actuelle en `HH:MM` : départ de la molette d'heure en ajout. */
+function currentTime(): string {
+  const now = new Date();
+  return `${String(now.getHours()).padStart(2, '0')}:${String(
+    now.getMinutes(),
+  ).padStart(2, '0')}`;
 }
