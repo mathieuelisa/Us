@@ -20,8 +20,6 @@ import {
   resolveThemeId,
 } from '@/features/settings/constants';
 import { useThemeBackground } from '@/features/settings/hooks';
-// ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
-import { devBypassAtom } from '@/lib/atoms/dev-bypass';
 import { sessionAtom } from '@/lib/atoms/session';
 import { queryClient } from '@/lib/query/query-client';
 import {
@@ -66,9 +64,6 @@ function AuthGate() {
     Uniwind.setTheme(DEFAULT_THEME_ID);
   }, []);
 
-  // ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
-  const devBypass = useAtomValue(devBypassAtom);
-
   const hasSession = !!session;
   const isResolvingHousehold = hasSession && isPending;
 
@@ -82,23 +77,13 @@ function AuthGate() {
 
   return (
     <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Protected guard={devBypass === 'off' && !hasSession}>
+      <Stack.Protected guard={!hasSession}>
         <Stack.Screen name="(auth)" />
       </Stack.Protected>
-      <Stack.Protected
-        guard={
-          devBypass === 'onboarding' ||
-          (devBypass === 'off' && hasSession && !household)
-        }
-      >
+      <Stack.Protected guard={hasSession && !household}>
         <Stack.Screen name="(onboarding)" />
       </Stack.Protected>
-      <Stack.Protected
-        guard={
-          devBypass === 'app' ||
-          (devBypass === 'off' && hasSession && !!household)
-        }
-      >
+      <Stack.Protected guard={hasSession && !!household}>
         <Stack.Screen name="(tabs)" />
       </Stack.Protected>
     </Stack>

@@ -19,8 +19,6 @@ import { PillButton } from '@/components/ui/pill-button';
 import { ScreenCornerShapes } from '@/components/ui/screen-corner-shapes';
 import { useMyProfile, useUpdateMyProfile } from '@/features/profile/hooks';
 import { useThemeAccent, useThemeBackground } from '@/features/settings/hooks';
-// ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
-import { devBypassFirstNameAtom } from '@/lib/atoms/dev-bypass';
 import { sessionAtom } from '@/lib/atoms/session';
 import { hexToRgba, lightenHex } from '@/lib/color';
 import { NO_WEB_FOCUS_OUTLINE } from '@/lib/web-styles';
@@ -57,11 +55,7 @@ export default function ProfileScreen() {
 
   const { feedback, showFeedback } = useFeedbackBanner();
 
-  // ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts. Sans utilisateur
-  // réel, `useMyProfile()` ne renvoie rien : on reprend le prénom saisi à
-  // l'onboarding, comme la salutation du hub.
-  const devBypassFirstName = useAtomValue(devBypassFirstNameAtom);
-  const savedFirstName = profile?.first_name || devBypassFirstName;
+  const savedFirstName = profile?.first_name ?? '';
 
   const [firstName, setFirstName] = useState(savedFirstName);
   const [isEditingName, setIsEditingName] = useState(false);

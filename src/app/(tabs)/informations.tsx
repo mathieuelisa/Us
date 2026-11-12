@@ -1,5 +1,4 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useAtomValue } from 'jotai';
 import { useState } from 'react';
 import { Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
@@ -29,131 +28,10 @@ import {
   useUpdateInfoItem,
 } from '@/features/household/hooks';
 import { useThemeAccent, useThemeBackground } from '@/features/settings/hooks';
-// ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
-import { devBypassAtom } from '@/lib/atoms/dev-bypass';
 import { hexToRgba } from '@/lib/color';
-import { shiftIsoDate, todayIso } from '@/lib/date';
 import { formatPhoneNumber } from '@/lib/phone';
 
 const SafeAreaView = withUniwind(RNSafeAreaView);
-
-/**
- * ⚠️ TEMPORAIRE — exemples affichés **en mode contournement DEV
- * uniquement** (pas de foyer réel) : mêmes formes qu'un vrai
- * `HouseholdInfoItem`, jamais persistés. Un vrai foyer sans information voit
- * l'état vide — lui montrer un faux groupe sanguin serait dangereux (dette
- * n°48). À retirer avec le mode contournement.
- */
-const MOCK_INFO_ITEMS: HouseholdInfoItem[] = [
-  {
-    id: 'mock-info-0a',
-    household_id: 'mock',
-    category: 'blood_type',
-    label: 'Maman',
-    value: 'A+',
-    sort_order: -2,
-    created_at: todayIso(),
-  },
-  {
-    id: 'mock-info-0b',
-    household_id: 'mock',
-    category: 'blood_type',
-    label: 'Papa',
-    value: 'O-',
-    sort_order: -1,
-    created_at: todayIso(),
-  },
-  {
-    id: 'mock-info-1',
-    household_id: 'mock',
-    category: 'vigilance',
-    label: 'Point de vigilance',
-    value: 'Diabète gestationnel',
-    sort_order: 0,
-    created_at: todayIso(),
-  },
-  {
-    id: 'mock-info-2',
-    household_id: 'mock',
-    category: 'vigilance',
-    label: 'Point de vigilance',
-    value: 'Hypertension légère',
-    sort_order: 1,
-    created_at: todayIso(),
-  },
-  {
-    id: 'mock-info-3',
-    household_id: 'mock',
-    category: 'allergy',
-    label: 'Allergie',
-    value: 'Pénicilline',
-    sort_order: 2,
-    created_at: todayIso(),
-  },
-  {
-    id: 'mock-info-4',
-    household_id: 'mock',
-    category: 'allergy',
-    label: 'Allergie',
-    value: 'Arachides',
-    sort_order: 3,
-    created_at: todayIso(),
-  },
-  {
-    id: 'mock-info-5',
-    household_id: 'mock',
-    category: 'phone',
-    label: 'Sage-femme',
-    value: '06 12 34 56 78',
-    sort_order: 4,
-    created_at: todayIso(),
-  },
-  {
-    id: 'mock-info-6',
-    household_id: 'mock',
-    category: 'phone',
-    label: 'Maternité',
-    value: '01 23 45 67 89',
-    sort_order: 5,
-    created_at: todayIso(),
-  },
-  {
-    id: 'mock-info-7',
-    household_id: 'mock',
-    category: 'address',
-    label: 'Maternité des Lilas',
-    value: '12 rue des Lilas, 75020 Paris',
-    sort_order: 6,
-    created_at: todayIso(),
-  },
-  {
-    id: 'mock-info-8',
-    household_id: 'mock',
-    category: 'date',
-    label: 'Terme',
-    value: shiftIsoDate(todayIso(), 60),
-    sort_order: 7,
-    created_at: todayIso(),
-  },
-  {
-    id: 'mock-info-9',
-    household_id: 'mock',
-    category: 'date',
-    label: 'Début de grossesse',
-    value: shiftIsoDate(todayIso(), -180),
-    sort_order: 8,
-    created_at: todayIso(),
-  },
-  {
-    id: 'mock-info-10',
-    household_id: 'mock',
-    category: 'social_security',
-    label: 'Maman',
-    value: '2 99 08 75 123 456 78',
-    sort_order: 9,
-    created_at: todayIso(),
-  },
-];
 
 const HEADER_IMAGE = require('@/assets/images/Baby_said_hi.png');
 
@@ -256,14 +134,7 @@ export default function InformationsScreen() {
     );
   };
 
-  // Exemples fictifs en mode contournement DEV seulement — voir
-  // `MOCK_INFO_ITEMS`.
-  const isDevBypass = useAtomValue(devBypassAtom) !== 'off';
-  const displayedItems =
-    items.length > 0 ? items : isDevBypass ? MOCK_INFO_ITEMS : [];
-  const legacyItems = displayedItems.filter(
-    (item) => !isInfoCategory(item.category),
-  );
+  const legacyItems = items.filter((item) => !isInfoCategory(item.category));
 
   return (
     <SafeAreaView
@@ -359,7 +230,7 @@ export default function InformationsScreen() {
           <Text className="text-[13px] text-[#9a9a9a]">Chargement…</Text>
         ) : (
           <View className="flex-1 gap-5">
-            {displayedItems.length === 0 ? (
+            {items.length === 0 ? (
               <View
                 className="items-center gap-1.5 rounded-[24px] px-5 py-6"
                 style={{ backgroundColor: 'rgba(255, 255, 255, 0.92)' }}
@@ -375,7 +246,7 @@ export default function InformationsScreen() {
             ) : null}
             {INFO_CATEGORY_ORDER.map((category) => {
               const meta = INFO_CATEGORY_META[category];
-              const categoryItems = displayedItems.filter(
+              const categoryItems = items.filter(
                 (item) => item.category === category,
               );
               if (categoryItems.length === 0) return null;

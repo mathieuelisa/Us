@@ -32,11 +32,9 @@ import {
 import { useHubSummary } from '@/features/hub/hooks';
 import { useMyProfile } from '@/features/profile/hooks';
 import { useThemeAccent, useThemeBackground } from '@/features/settings/hooks';
-// ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
-import { devBypassAtom, devBypassFirstNameAtom } from '@/lib/atoms/dev-bypass';
 import { currentRoleAtom } from '@/lib/atoms/role';
 import { darkenHex, hexToRgba, lightenHex } from '@/lib/color';
-import { shiftIsoDate, todayIso } from '@/lib/date';
+import { todayIso } from '@/lib/date';
 
 const SafeAreaView = withUniwind(RNSafeAreaView);
 
@@ -50,37 +48,6 @@ const SANTE_ICON = require('@/assets/images/Icon_sante.png');
 const ORGANISATION_ICON = require('@/assets/images/Icon_organisation.png');
 /** Deux cœurs de la carte « Avec votre co-parent » (illustration fournie, préparée ronde). */
 const COPARENT_ICON = require('@/assets/images/Icon_coparent.png');
-
-/**
- * ⚠️ TEMPORAIRE — exemples affichés **en mode contournement DEV
- * uniquement** (pas de foyer, donc jamais de rendez-vous réel), pour
- * visualiser la section « Nos prochains rendez-vous ». Un vrai foyer sans
- * rendez-vous voit l'état vide : lui montrer de faux rendez-vous serait
- * trompeur (dette n°48). À retirer avec le mode contournement.
- */
-const MOCK_APPOINTMENTS = [
-  {
-    id: 'mock-1',
-    title: 'Échographie T3',
-    date: shiftIsoDate(todayIso(), 6),
-    time: '10:30',
-    address: 'Maternité des Lilas',
-  },
-  {
-    id: 'mock-2',
-    title: 'Rendez-vous sage-femme',
-    date: shiftIsoDate(todayIso(), 13),
-    time: '14:00',
-    address: null,
-  },
-  {
-    id: 'mock-3',
-    title: 'Cours de préparation à la naissance',
-    date: shiftIsoDate(todayIso(), 20),
-    time: '18:30',
-    address: 'Cabinet Dr Martin',
-  },
-];
 
 /**
  * Écran 2b / 3c / 3d — le hub.
@@ -115,26 +82,15 @@ export default function HubScreen() {
     .filter((appointment) => appointment.appointment_date >= today)
     .slice(0, 3);
 
-  // Exemples fictifs en mode contournement DEV seulement — voir
-  // `MOCK_APPOINTMENTS`.
-  const isDevBypass = useAtomValue(devBypassAtom) !== 'off';
-  const displayedAppointments =
-    upcomingAppointments.length > 0
-      ? upcomingAppointments.map((appointment) => ({
-          id: appointment.id,
-          title: appointment.title,
-          date: appointment.appointment_date,
-          time: appointment.appointment_time,
-          address: appointment.address,
-        }))
-      : isDevBypass
-        ? MOCK_APPOINTMENTS
-        : [];
+  const displayedAppointments = upcomingAppointments.map((appointment) => ({
+    id: appointment.id,
+    title: appointment.title,
+    date: appointment.appointment_date,
+    time: appointment.appointment_time,
+    address: appointment.address,
+  }));
 
-  // ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts. Le sien, jamais le
-  // prénom du co-parent : c'est le seul champ que ce contournement propage.
-  const devBypassFirstName = useAtomValue(devBypassFirstNameAtom);
-  const greetingName = profile?.first_name || devBypassFirstName || null;
+  const greetingName = profile?.first_name || null;
 
   // Le rôle n'est pas encore résolu au tout premier rendu ; la vue « femme
   // enceinte » est le défaut, c'est elle qui crée le foyer.

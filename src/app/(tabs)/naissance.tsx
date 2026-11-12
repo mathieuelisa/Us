@@ -1,6 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { useAtomValue } from 'jotai';
 import { useState } from 'react';
 import { Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
@@ -29,12 +28,8 @@ import {
   formatDeadlineLabel,
   getProcedureIconStyle,
 } from '@/features/procedures/constants';
-// ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
-import { DEV_PROCEDURES_FIXTURE } from '@/features/procedures/dev-fixture';
 import { useProcedures } from '@/features/procedures/hooks';
 import { useThemeAccent, useThemeBackground } from '@/features/settings/hooks';
-// ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
-import { devBypassAtom } from '@/lib/atoms/dev-bypass';
 import { hexToRgba } from '@/lib/color';
 
 const SafeAreaView = withUniwind(RNSafeAreaView);
@@ -98,15 +93,7 @@ export default function BirthScreen() {
   const { data: household } = useMyHousehold();
   const declareBirth = useDeclareBirth(household);
 
-  // ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts. Sans foyer réel,
-  // l'écriture Supabase échouerait et l'écran resterait bloqué sur son
-  // formulaire : la date déclarée est alors gardée en mémoire, comme les
-  // statuts de démarches le sont déjà dans `demarches.tsx`.
-  const isDevBypass = useAtomValue(devBypassAtom) !== 'off';
-  const [devBirthDate, setDevBirthDate] = useState<string | null>(null);
-
-  const { data: remoteProcedures = [] } = useProcedures(household);
-  const procedures = isDevBypass ? DEV_PROCEDURES_FIXTURE : remoteProcedures;
+  const { data: procedures = [] } = useProcedures(household);
   // Le délai légal n'est pas codé en dur ici : il vient du référentiel
   // (`procedure_templates.deadline_days_after_birth`), seule source de
   // vérité de cette valeur — la même que celle lue par l'écran Démarches.
@@ -114,9 +101,7 @@ export default function BirthScreen() {
     (procedure) => procedure.slug === BIRTH_DECLARATION_SLUG,
   );
 
-  const declaredBirthDate = isDevBypass
-    ? devBirthDate
-    : (household?.birth_date ?? null);
+  const declaredBirthDate = household?.birth_date ?? null;
 
   const [draftDate, setDraftDate] = useState<string | null>(null);
   const [isCorrecting, setIsCorrecting] = useState(false);
@@ -133,13 +118,6 @@ export default function BirthScreen() {
 
   const confirm = () => {
     if (!draftDate) return;
-
-    if (isDevBypass) {
-      setDevBirthDate(draftDate);
-      setIsConfirmOpen(false);
-      setIsCorrecting(false);
-      return;
-    }
 
     declareBirth.mutate(draftDate, {
       onSuccess: () => {

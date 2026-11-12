@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { useAtomValue, useSetAtom } from 'jotai';
+import { useAtomValue } from 'jotai';
 import { type ComponentProps, useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
@@ -26,8 +26,6 @@ import {
   type ThemeId,
 } from '@/features/settings/constants';
 import { useThemeAccent, useThemeBackground } from '@/features/settings/hooks';
-// ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
-import { devBypassAtom, resetDevBypassAtom } from '@/lib/atoms/dev-bypass';
 import { currentRoleAtom } from '@/lib/atoms/role';
 import { sessionAtom } from '@/lib/atoms/session';
 import { hexToRgba, lightenHex } from '@/lib/color';
@@ -89,9 +87,6 @@ export default function SettingsScreen() {
   const backgroundColor = useThemeBackground();
   const accent = useThemeAccent();
   const [isSigningOut, setIsSigningOut] = useState(false);
-  // ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
-  const isDevBypass = useAtomValue(devBypassAtom) !== 'off';
-  const resetDevBypass = useSetAtom(resetDevBypassAtom);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const isPregnant =
@@ -110,9 +105,7 @@ export default function SettingsScreen() {
 
   // Le changement est instantané côté client (Uniwind re-thème toute l'app,
   // pas seulement cet écran) ; l'écriture Supabase ne sert qu'à faire
-  // survivre le choix à une reconnexion, sans bloquer l'affichage dessus —
-  // et n'a d'ailleurs aucun effet sans session réelle (mode contournement
-  // DEV compris, où le thème reste malgré tout modifiable).
+  // survivre le choix à une reconnexion, sans bloquer l'affichage dessus.
   const selectTheme = (id: ThemeId) => {
     Uniwind.setTheme(id);
     if (session?.user.id) {
@@ -120,17 +113,12 @@ export default function SettingsScreen() {
     }
   };
 
-  // Hors ligne, `signOut()` se rabat sur une déconnexion locale ; en mode
-  // contournement DEV, il n'y a pas de session : on sort du mode à la place.
-  // Le nettoyage du cache suit le changement de compte
-  // (`useApplySession`, layout racine).
+  // Hors ligne, `signOut()` se rabat sur une déconnexion locale. Le
+  // nettoyage du cache suit le changement de compte (`useApplySession`,
+  // layout racine).
   const handleSignOut = async () => {
     setIsSigningOut(true);
     try {
-      if (isDevBypass) {
-        resetDevBypass();
-        return;
-      }
       await signOut();
     } finally {
       setIsSigningOut(false);

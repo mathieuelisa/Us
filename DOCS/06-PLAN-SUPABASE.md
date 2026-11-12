@@ -169,8 +169,8 @@ puissent enfin l'être.
 - [ ] **Retours d'Auth par URL** (Google, confirmation d'email,
       réinitialisation) testés depuis un simulateur et un appareil réel.
       → dette n°6
-- [ ] **Retirer le mode contournement DEV** une fois ce parcours validé.
-      → dette n°1
+- [x] **Retirer le mode contournement DEV** — fait le 2026-11-12
+      (demande explicite, l'authentification fonctionnant). → dette n°1
 
 **Terminé quand** : un couple réel termine l'onboarding et se rattache, et
 chaque écran a lu et écrit au moins une fois dans Supabase.

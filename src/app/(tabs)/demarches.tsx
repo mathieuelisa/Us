@@ -1,6 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { useAtomValue } from 'jotai';
 import { useEffect, useRef, useState } from 'react';
 import {
   Linking,
@@ -47,16 +46,12 @@ import {
   getStatusLabel,
   PREGNANCY_MONTHS,
 } from '@/features/procedures/constants';
-// ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
-import { DEV_PROCEDURES_FIXTURE } from '@/features/procedures/dev-fixture';
 import {
   useProcedures,
   useUpdateProcedureReminder,
   useUpdateProcedureStatus,
 } from '@/features/procedures/hooks';
 import { useThemeAccent, useThemeBackground } from '@/features/settings/hooks';
-// ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
-import { devBypassAtom, devBypassDueDateAtom } from '@/lib/atoms/dev-bypass';
 import { hexToRgba } from '@/lib/color';
 
 const SafeAreaView = withUniwind(RNSafeAreaView);
@@ -83,32 +78,14 @@ export default function ProceduresScreen() {
   const router = useRouter();
   const { data: household } = useMyHousehold();
 
-  const { data: remoteProcedures = [] } = useProcedures(household);
+  const { data: procedures = [] } = useProcedures(household);
   const updateStatus = useUpdateProcedureStatus(household);
   const updateReminder = useUpdateProcedureReminder(household);
-
-  // ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts. Sans foyer réel,
-  // remoteProcedures reste toujours vide (la requête est désactivée) : cet
-  // écran ne montrerait jamais rien à explorer. Les modifications de statut
-  // et de rappel restent locales, elles n'écrivent jamais dans Supabase.
-  const isDevBypass = useAtomValue(devBypassAtom) !== 'off';
-  const [devProcedures, setDevProcedures] = useState(DEV_PROCEDURES_FIXTURE);
-  const procedures = isDevBypass ? devProcedures : remoteProcedures;
 
   const changeStatus = (
     householdProcedureId: string,
     status: 'a_faire' | 'en_cours' | 'fait',
   ) => {
-    if (isDevBypass) {
-      setDevProcedures((current) =>
-        current.map((procedure) =>
-          procedure.householdProcedureId === householdProcedureId
-            ? { ...procedure, status }
-            : procedure,
-        ),
-      );
-      return;
-    }
     updateStatus.mutate({ householdProcedureId, status });
   };
 
@@ -116,16 +93,6 @@ export default function ProceduresScreen() {
     householdProcedureId: string,
     reminderEnabled: boolean,
   ) => {
-    if (isDevBypass) {
-      setDevProcedures((current) =>
-        current.map((procedure) =>
-          procedure.householdProcedureId === householdProcedureId
-            ? { ...procedure, reminderEnabled }
-            : procedure,
-        ),
-      );
-      return;
-    }
     updateReminder.mutate({ householdProcedureId, reminderEnabled });
   };
 
@@ -136,12 +103,7 @@ export default function ProceduresScreen() {
 
   // Mois de grossesse en cours, déduit de la date de terme saisie à
   // l'onboarding (demande explicite) — `null` si elle est inconnue.
-  // ⚠️ TEMPORAIRE — en mode contournement, pas de foyer réel : la date de
-  // terme vient de l'onboarding, conservée à part (cf. dev-bypass.ts).
-  const devBypassDueDate = useAtomValue(devBypassDueDateAtom);
-  const dueDate = isDevBypass
-    ? devBypassDueDate
-    : (household?.due_date ?? null);
+  const dueDate = household?.due_date ?? null;
   const currentMonth = getPregnancyMonth(dueDate);
 
   // Il y a toujours exactement un mois actif (plus de « tous les mois »

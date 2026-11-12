@@ -145,7 +145,7 @@ src/
   lib/
     supabase/                # client, auth-redirect (retours d'Auth par URL), database.types.ts
     query/                   # queryClient, keys.ts (une clé par domaine)
-    atoms/                   # session, role, onboarding (brouillon), dev-bypass
+    atoms/                   # session, role, onboarding (brouillon)
     date.ts color.ts         # dates ISO locales, helpers de couleur
 ```
 
@@ -172,19 +172,13 @@ filer bord à bord (`exercice.tsx`, une route).
 | `/bebe`, `/prenoms`, `/premium` | Vitrine premium (paywall inerte) | aucune | Dette n°53 |
 | `/bebe-*` | Suivis bébé : historique, courbe de croissance, ajout et modification d'une entrée | `baby_entries` | Les deux parents lisent et modifient toutes les entrées ; pas encore de contrôle premium (dette n°53) |
 
-## Mode contournement DEV et données fictives
+## Plus de mode contournement DEV
 
-Faute de SMTP configuré (dette n°8) et de comptes de test, un **mode contournement** (`devBypassAtom`, `__DEV__` uniquement) permet
-de parcourir l'onboarding puis l'app sans session. Sans foyer réel, plusieurs
-écrans s'appuient sur des fixtures ou des atomes dédiés : démarches et
-checklists (`dev-fixture.ts`), prénom, type d'accompagnement et date de terme
-saisis à l'onboarding (`devBypass*Atom`). Tout ce qui est modifié dans ce mode
-reste en mémoire et disparaît au rechargement de la page.
-
-Les **données fictives de rendu** (`MOCK_APPOINTMENTS` du hub,
-`MOCK_INFO_ITEMS` des Informations) ne s'affichent plus qu'en mode
-contournement : un vrai foyer sans données voit un état vide (corrigé le
-2026-11-11). Elles disparaîtront avec le mode contournement.
+Le mode contournement (`devBypassAtom`) qui permettait de parcourir l'app
+sans session a été retiré le 2026-11-12, l'authentification par email +
+mot de passe fonctionnant : il n'y a plus ni fixtures ni données fictives de
+rendu. Toute vérification passe par un vrai compte, et un foyer sans données
+voit l'état vide.
 
 ## Supabase — points de vigilance
 
@@ -280,9 +274,8 @@ Phase 0/1.
   types Expo/Uniwind et sert de test de build), `bun run lint`,
   `bun run typecheck`.
 - **Aucun test automatisé** à ce jour (ni unitaire, ni intégration RLS) — la
-  vérification se fait à la main dans le navigateur, en mode contournement
-  DEV. Les tests d'intégration des policies RLS sont demandés en Phase 2.
+  vérification se fait à la main dans le navigateur, avec un vrai compte.
+  Les tests d'intégration des policies RLS sont demandés en Phase 2.
 - Vérifications visuelles en web (`bun run web`, port 8081) : comportements
   propres au web à connaître — la molette de souris peut laisser une molette
-  de date entre deux lignes, et un rechargement de page perd le mode
-  contournement DEV (il faut rejouer l'onboarding).
+  de date entre deux lignes.

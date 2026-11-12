@@ -1,6 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useSetAtom } from 'jotai';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Image,
   KeyboardAvoidingView,
@@ -10,6 +9,21 @@ import {
   Text,
   View,
 } from 'react-native';
+import Animated, {
+  Easing,
+  FadeIn,
+  FadeInDown,
+  FadeInLeft,
+  FadeInRight,
+  FadeOut,
+  FadeOutUp,
+  interpolateColor,
+  LinearTransition,
+  type SharedValue,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import { withUniwind } from 'uniwind';
 
@@ -28,8 +42,6 @@ import {
   signUpWithPassword,
 } from '@/features/auth/api';
 import { useThemeAccent, useThemeBackground } from '@/features/settings/hooks';
-// ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
-import { devBypassAtom } from '@/lib/atoms/dev-bypass';
 import { hexToRgba } from '@/lib/color';
 
 const SafeAreaView = withUniwind(RNSafeAreaView);
@@ -37,6 +49,28 @@ const SafeAreaView = withUniwind(RNSafeAreaView);
 type Mode = 'signIn' | 'signUp';
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/**
+ * Bascule Connexion ↔ Inscription animée (demande explicite : plus fluide) :
+ * la pastille de la gélule glisse, le titre arrive du côté du mode choisi,
+ * le champ de confirmation se déplie ou se replie, et les blocs suivants
+ * glissent à leur nouvelle place au lieu de sauter.
+ */
+const SWITCH_DURATION = 260;
+const BLOCK_LAYOUT = LinearTransition.duration(SWITCH_DURATION).easing(
+  Easing.out(Easing.cubic),
+);
+
+const MODE_COPY: Record<Mode, { title: string; subtitle: string }> = {
+  signIn: {
+    title: 'Bon retour parmi nous',
+    subtitle: 'Connectez-vous pour retrouver votre espace à deux.',
+  },
+  signUp: {
+    title: 'Bienvenue sur US',
+    subtitle: 'Créez votre compte en quelques secondes.',
+  },
+};
 
 /**
  * Écran 1a — connexion et inscription (décision du 2026-11-11) : email +
@@ -59,8 +93,6 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export default function LoginScreen() {
   const accent = useThemeAccent();
   const backgroundColor = useThemeBackground();
-  // ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
-  const setDevBypass = useSetAtom(devBypassAtom);
 
   const [mode, setMode] = useState<Mode>('signIn');
   const [email, setEmail] = useState('');
@@ -205,9 +237,32 @@ export default function LoginScreen() {
             </Text>
           </View>
 
-          <ModeToggle mode={mode} accent={accent} onChange={switchMode} />
+          <Animated.View layout={BLOCK_LAYOUT}>
+            <ModeToggle mode={mode} accent={accent} onChange={switchMode} />
+          </Animated.View>
 
-          <View className="gap-3">
+          {/* Remonté à chaque bascule (`key`) : le titre arrive du côté où
+              la pastille vient de glisser. */}
+          <Animated.View
+            key={`copy-${mode}`}
+            entering={(isSignUp ? FadeInRight : FadeInLeft).duration(
+              SWITCH_DURATION,
+            )}
+            layout={BLOCK_LAYOUT}
+            className="gap-1 px-1"
+          >
+            <Text
+              className="text-[21px] font-extrabold"
+              style={{ color: GLASS_TITLE_COLOR, letterSpacing: -0.4 }}
+            >
+              {MODE_COPY[mode].title}
+            </Text>
+            <Text className="text-[14px]" style={{ color: GLASS_BODY_COLOR }}>
+              {MODE_COPY[mode].subtitle}
+            </Text>
+          </Animated.View>
+
+          <Animated.View layout={BLOCK_LAYOUT} className="gap-3">
             <IconInput
               icon="mail-outline"
               placeholder="votre@email.com"
@@ -237,21 +292,28 @@ export default function LoginScreen() {
               trailing={eyeToggle}
             />
             {isSignUp ? (
-              <IconInput
-                icon="shield-checkmark-outline"
-                placeholder="Confirmer le mot de passe"
-                value={passwordConfirmation}
-                onChangeText={setPasswordConfirmation}
-                accent={accent}
-                isInvalid={passwordConfirmation.length > 0 && !doPasswordsMatch}
-                secureTextEntry={!isPasswordVisible}
-                autoCapitalize="none"
-                autoComplete="new-password"
-                textContentType="newPassword"
-                editable={!isBusy}
-                returnKeyType="go"
-                onSubmitEditing={handleSubmit}
-              />
+              <Animated.View
+                entering={FadeInDown.duration(SWITCH_DURATION)}
+                exiting={FadeOutUp.duration(180)}
+              >
+                <IconInput
+                  icon="shield-checkmark-outline"
+                  placeholder="Confirmer le mot de passe"
+                  value={passwordConfirmation}
+                  onChangeText={setPasswordConfirmation}
+                  accent={accent}
+                  isInvalid={
+                    passwordConfirmation.length > 0 && !doPasswordsMatch
+                  }
+                  secureTextEntry={!isPasswordVisible}
+                  autoCapitalize="none"
+                  autoComplete="new-password"
+                  textContentType="newPassword"
+                  editable={!isBusy}
+                  returnKeyType="go"
+                  onSubmitEditing={handleSubmit}
+                />
+              </Animated.View>
             ) : null}
 
             {passwordHint ? (
@@ -261,37 +323,49 @@ export default function LoginScreen() {
             ) : null}
 
             {!isSignUp ? (
-              <Pressable
-                accessibilityRole="button"
-                hitSlop={8}
-                onPress={handleForgotPassword}
-                className="self-end px-2"
+              <Animated.View
+                entering={FadeIn.duration(SWITCH_DURATION)}
+                exiting={FadeOut.duration(150)}
+                layout={BLOCK_LAYOUT}
+                className="self-end"
               >
-                <Text
-                  className="text-[13px] font-semibold"
-                  style={{ color: accent }}
+                <Pressable
+                  accessibilityRole="button"
+                  hitSlop={8}
+                  onPress={handleForgotPassword}
+                  className="px-2"
                 >
-                  Mot de passe oublié ?
-                </Text>
-              </Pressable>
+                  <Text
+                    className="text-[13px] font-semibold"
+                    style={{ color: accent }}
+                  >
+                    Mot de passe oublié ?
+                  </Text>
+                </Pressable>
+              </Animated.View>
             ) : null}
-          </View>
+          </Animated.View>
 
-          <View className="gap-3">
-            <PillButton
-              label={
-                isSubmitting
-                  ? isSignUp
-                    ? 'Création…'
-                    : 'Connexion…'
-                  : isSignUp
-                    ? 'Créer mon compte'
-                    : 'Se connecter'
-              }
-              icon={isSignUp ? 'person-add-outline' : 'log-in-outline'}
-              isDisabled={!canSubmit}
-              onPress={handleSubmit}
-            />
+          <Animated.View layout={BLOCK_LAYOUT} className="gap-3">
+            <Animated.View
+              key={`submit-${mode}`}
+              entering={FadeIn.duration(SWITCH_DURATION)}
+            >
+              <PillButton
+                label={
+                  isSubmitting
+                    ? isSignUp
+                      ? 'Création…'
+                      : 'Connexion…'
+                    : isSignUp
+                      ? 'Créer mon compte'
+                      : 'Se connecter'
+                }
+                icon={isSignUp ? 'person-add-outline' : 'log-in-outline'}
+                isDisabled={!canSubmit}
+                onPress={handleSubmit}
+              />
+            </Animated.View>
 
             {errorMessage ? (
               <Text className="text-center text-[13px] leading-[18px] text-[#c9553d]">
@@ -312,64 +386,65 @@ export default function LoginScreen() {
                 </Text>
               </View>
             ) : null}
-          </View>
+          </Animated.View>
 
-          <View className="flex-row items-center gap-3">
+          <Animated.View
+            layout={BLOCK_LAYOUT}
+            className="flex-row items-center gap-3"
+          >
             <View className="h-px flex-1 bg-black/10" />
             <Text className="text-[12.5px]" style={{ color: GLASS_BODY_COLOR }}>
               ou
             </Text>
             <View className="h-px flex-1 bg-black/10" />
-          </View>
+          </Animated.View>
 
-          <Pressable
-            accessibilityRole="button"
-            accessibilityState={{ disabled: isBusy }}
-            disabled={isBusy}
-            onPress={handleGoogle}
-            className="h-14 flex-row items-center justify-center gap-3 rounded-full bg-white active:opacity-70"
-            style={{
-              opacity: isBusy ? 0.5 : 1,
-              borderWidth: 1,
-              borderColor: 'rgba(0, 0, 0, 0.06)',
-              shadowColor: accent,
-              shadowOffset: { width: 0, height: 8 },
-              shadowOpacity: 0.08,
-              shadowRadius: 16,
-              elevation: 3,
-            }}
-          >
-            <Ionicons name="logo-google" size={20} color="#4285F4" />
-            <Text
-              className="text-[15.5px] font-semibold"
-              style={{ color: GLASS_TITLE_COLOR }}
-            >
-              {isGooglePending
-                ? 'Ouverture de Google…'
-                : 'Continuer avec Google'}
-            </Text>
-          </Pressable>
-
-          {/* ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts. Absent des
-              builds de production. */}
-          {__DEV__ ? (
+          <Animated.View layout={BLOCK_LAYOUT}>
             <Pressable
               accessibilityRole="button"
-              onPress={() => setDevBypass('onboarding')}
-              className="mt-2 items-center rounded-xl border border-dashed border-[#d0d0d0] py-3"
+              accessibilityState={{ disabled: isBusy }}
+              disabled={isBusy}
+              onPress={handleGoogle}
+              className="h-14 flex-row items-center justify-center gap-3 rounded-full bg-white active:opacity-70"
+              style={{
+                opacity: isBusy ? 0.5 : 1,
+                borderWidth: 1,
+                borderColor: 'rgba(0, 0, 0, 0.06)',
+                shadowColor: accent,
+                shadowOffset: { width: 0, height: 8 },
+                shadowOpacity: 0.08,
+                shadowRadius: 16,
+                elevation: 3,
+              }}
             >
-              <Text className="text-[13px] font-medium text-[#9a9a9a]">
-                DEV — passer à l’onboarding sans connexion
+              <Ionicons name="logo-google" size={20} color="#4285F4" />
+              <Text
+                className="text-[15.5px] font-semibold"
+                style={{ color: GLASS_TITLE_COLOR }}
+              >
+                {isGooglePending
+                  ? 'Ouverture de Google…'
+                  : 'Continuer avec Google'}
               </Text>
             </Pressable>
-          ) : null}
+          </Animated.View>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
 
-/** Gélule « Connexion / Inscription » : le mode actif se remplit d'accent. */
+const TOGGLE_PADDING = 4;
+const LABEL_IDLE = GLASS_BODY_COLOR;
+const LABEL_ACTIVE = '#ffffff';
+
+/**
+ * Gélule « Connexion / Inscription » : une seule pastille d'accent qui
+ * glisse d'un mode à l'autre (même principe que le segment des suivis
+ * bébé), et des libellés dont la couleur suit la pastille au lieu de
+ * basculer d'un coup. La largeur du rail est mesurée pour placer la
+ * pastille ; tant qu'elle vaut 0, la pastille n'est pas rendue.
+ */
 function ModeToggle({
   mode,
   accent,
@@ -383,33 +458,95 @@ function ModeToggle({
     { value: 'signIn', label: 'Connexion' },
     { value: 'signUp', label: 'Inscription' },
   ];
+  const [trackWidth, setTrackWidth] = useState(0);
+  const selectedIndex = mode === 'signIn' ? 0 : 1;
+  const position = useSharedValue(selectedIndex);
+
+  useEffect(() => {
+    position.value = withTiming(selectedIndex, {
+      duration: SWITCH_DURATION,
+      easing: Easing.out(Easing.cubic),
+    });
+  }, [selectedIndex, position]);
+
+  const segmentWidth = Math.max(trackWidth - TOGGLE_PADDING * 2, 0) / 2;
+  const pillStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: position.value * segmentWidth }],
+  }));
 
   return (
     <View
       accessibilityRole="tablist"
-      className="flex-row rounded-full p-1"
-      style={{ backgroundColor: 'rgba(255, 255, 255, 0.75)' }}
+      className="flex-row rounded-full"
+      style={{
+        padding: TOGGLE_PADDING,
+        backgroundColor: 'rgba(255, 255, 255, 0.75)',
+      }}
+      onLayout={(event) => {
+        const { width } = event.nativeEvent.layout;
+        setTrackWidth((current) => (current === width ? current : width));
+      }}
     >
-      {options.map((option) => {
-        const isActive = option.value === mode;
-        return (
-          <Pressable
-            key={option.value}
-            accessibilityRole="tab"
-            accessibilityState={{ selected: isActive }}
-            onPress={() => onChange(option.value)}
-            className="h-11 flex-1 items-center justify-center rounded-full"
-            style={{ backgroundColor: isActive ? accent : 'transparent' }}
-          >
-            <Text
-              className="text-[15px] font-semibold"
-              style={{ color: isActive ? '#ffffff' : GLASS_BODY_COLOR }}
-            >
-              {option.label}
-            </Text>
-          </Pressable>
-        );
-      })}
+      {segmentWidth > 0 ? (
+        <Animated.View
+          pointerEvents="none"
+          style={[
+            {
+              position: 'absolute',
+              top: TOGGLE_PADDING,
+              bottom: TOGGLE_PADDING,
+              left: TOGGLE_PADDING,
+              width: segmentWidth,
+              borderRadius: 999,
+              backgroundColor: accent,
+              shadowColor: accent,
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.25,
+              shadowRadius: 8,
+              elevation: 4,
+            },
+            pillStyle,
+          ]}
+        />
+      ) : null}
+      {options.map((option, index) => (
+        <Pressable
+          key={option.value}
+          accessibilityRole="tab"
+          accessibilityState={{ selected: option.value === mode }}
+          onPress={() => onChange(option.value)}
+          className="h-11 flex-1 items-center justify-center rounded-full"
+        >
+          <ToggleLabel label={option.label} index={index} position={position} />
+        </Pressable>
+      ))}
     </View>
+  );
+}
+
+/**
+ * Libellé de la gélule. `Animated.Text` porte ses styles en `style` :
+ * Uniwind et les composants animés ne se combinent pas de façon fiable.
+ */
+function ToggleLabel({
+  label,
+  index,
+  position,
+}: {
+  label: string;
+  index: number;
+  position: SharedValue<number>;
+}) {
+  const textStyle = useAnimatedStyle(() => {
+    const closeness = 1 - Math.min(Math.abs(position.value - index), 1);
+    return {
+      color: interpolateColor(closeness, [0, 1], [LABEL_IDLE, LABEL_ACTIVE]),
+    };
+  });
+
+  return (
+    <Animated.Text style={[{ fontSize: 15, fontWeight: '600' }, textStyle]}>
+      {label}
+    </Animated.Text>
   );
 }

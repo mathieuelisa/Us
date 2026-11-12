@@ -1,6 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { useAtomValue } from 'jotai';
 import { type ComponentProps, useState } from 'react';
 import { Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
@@ -30,8 +29,6 @@ import {
   groupChecklistItemsByCategory,
   groupChecklistItemsBySlug,
 } from '@/features/organisation/constants';
-// ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
-import { DEV_CHECKLIST_ITEMS_FIXTURE } from '@/features/organisation/dev-fixture';
 import {
   useAddCustomChecklistItem,
   useChecklistItems,
@@ -39,11 +36,6 @@ import {
   useToggleChecklistItem,
 } from '@/features/organisation/hooks';
 import { useThemeAccent, useThemeBackground } from '@/features/settings/hooks';
-// ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts
-import {
-  devBypassAccompanimentTypeAtom,
-  devBypassAtom,
-} from '@/lib/atoms/dev-bypass';
 import { hexToRgba } from '@/lib/color';
 
 const SafeAreaView = withUniwind(RNSafeAreaView);
@@ -100,41 +92,15 @@ export default function OrganisationScreen() {
   const router = useRouter();
   const { data: household } = useMyHousehold();
 
-  const { data: remoteItems = [] } = useChecklistItems(household);
+  const { data: items = [] } = useChecklistItems(household);
   const toggleItem = useToggleChecklistItem(household);
   const addCustomItem = useAddCustomChecklistItem(household);
   const deleteCustomItem = useDeleteCustomChecklistItem(household);
 
-  // ⚠️ TEMPORAIRE — voir src/lib/atoms/dev-bypass.ts. Sans foyer réel,
-  // remoteItems reste toujours vide (la requête est désactivée) : cet écran
-  // ne montrerait jamais rien à explorer. Les cases cochées en mode DEV
-  // restent locales, elles n'écrivent jamais dans Supabase.
-  const isDevBypass = useAtomValue(devBypassAtom) !== 'off';
-  const devBypassAccompanimentType = useAtomValue(
-    devBypassAccompanimentTypeAtom,
-  );
-  const [devItems, setDevItems] = useState(DEV_CHECKLIST_ITEMS_FIXTURE);
-  const items = isDevBypass ? devItems : remoteItems;
-
-  // Sans foyer réel en mode contournement, on retombe sur la réponse donnée
-  // à l'étape 1 de l'onboarding (conservée à part, cf. dev-bypass.ts) —
-  // jamais un foyer inconnu n'est traité comme « Seul·e » par défaut.
-  const accompanimentType = isDevBypass
-    ? devBypassAccompanimentType
-    : (household?.accompaniment_type ?? null);
-  const hideCoParent = accompanimentType === 'seul';
+  // Un foyer inconnu n'est jamais traité comme « Seul·e » par défaut.
+  const hideCoParent = household?.accompaniment_type === 'seul';
 
   const toggleChecked = (item: ChecklistItem) => {
-    if (isDevBypass) {
-      setDevItems((current) =>
-        current.map((current_item) =>
-          current_item.id === item.id
-            ? { ...current_item, checked: !current_item.checked }
-            : current_item,
-        ),
-      );
-      return;
-    }
     toggleItem.mutate({
       itemId: item.id,
       checked: !item.checked,
@@ -152,31 +118,10 @@ export default function OrganisationScreen() {
     const sortOrder =
       items.reduce((max, item) => Math.max(max, item.sortOrder), 0) + 1;
 
-    if (isDevBypass) {
-      setDevItems((current) => [
-        ...current,
-        {
-          id: `dev-custom-${Date.now()}`,
-          checklistSlug: input.checklistSlug,
-          label: input.label,
-          sortOrder,
-          checked: false,
-          category: input.category,
-          isCustom: true,
-        },
-      ]);
-      return;
-    }
     addCustomItem.mutate({ ...input, sortOrder });
   };
 
   const removeItem = (item: ChecklistItem) => {
-    if (isDevBypass) {
-      setDevItems((current) =>
-        current.filter((current_item) => current_item.id !== item.id),
-      );
-      return;
-    }
     deleteCustomItem.mutate(item.id);
   };
 
