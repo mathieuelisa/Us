@@ -622,6 +622,93 @@ export type Database = {
           },
         ];
       };
+      name_favorites: {
+        Row: {
+          created_at: string;
+          gender: string;
+          household_id: string;
+          id: string;
+          name: string;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          gender: string;
+          household_id: string;
+          id?: string;
+          name: string;
+          user_id?: string;
+        };
+        Update: {
+          created_at?: string;
+          gender?: string;
+          household_id?: string;
+          id?: string;
+          name?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'name_favorites_household_id_fkey';
+            columns: ['household_id'];
+            isOneToOne: false;
+            referencedRelation: 'households';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'name_favorites_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      name_swipes: {
+        Row: {
+          created_at: string;
+          gender: string;
+          household_id: string;
+          id: string;
+          liked: boolean;
+          name: string;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          gender: string;
+          household_id: string;
+          id?: string;
+          liked: boolean;
+          name: string;
+          user_id?: string;
+        };
+        Update: {
+          created_at?: string;
+          gender?: string;
+          household_id?: string;
+          id?: string;
+          liked?: boolean;
+          name?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'name_swipes_household_id_fkey';
+            columns: ['household_id'];
+            isOneToOne: false;
+            referencedRelation: 'households';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'name_swipes_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       procedure_templates: {
         Row: {
           deadline_days_after_birth: number | null;

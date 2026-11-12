@@ -1,5 +1,5 @@
-import { Ionicons } from '@expo/vector-icons';
-import { Image, Text, View } from 'react-native';
+import { router } from 'expo-router';
+import { Image, Pressable, Text, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
 import { NameCardsIllustration } from '@/components/hub/name-cards-illustration';
@@ -20,30 +20,34 @@ const DESCRIPTION =
   "Swipez chacun de votre côté et découvrez les prénoms sur lesquels vous êtes tombés d'accord.";
 
 /**
- * Aperçu des 4 catégories du jeu — contenu réel hors périmètre MVP, ces
- * blocs ne sont que la vitrine derrière le paywall (même traitement que
- * `/bebe`, demande explicite « exactement le même concept »). Chaque
- * catégorie a son illustration (fournie par l'utilisateur, tache de couleur
- * comprise dans l'image).
+ * Les 4 entrées du jeu, chacune avec son illustration (fournie par
+ * l'utilisateur, tache de couleur comprise dans l'image). Accessibles en
+ * fermant le paywall, comme les suivis de `/bebe` (le paiement est hors
+ * MVP) : filles et garçons ouvrent le jeu (`/prenoms-jeu`), les deux autres
+ * leurs listes.
  */
 const PRENOMS_MODULES = [
   {
     label: 'Prénoms filles',
     image: require('@/assets/images/Prenoms_filles.png'),
+    href: '/prenoms-jeu?gender=girl',
   },
   {
     label: 'Prénoms garçons',
     image: require('@/assets/images/Prenoms_garcons.png'),
+    href: '/prenoms-jeu?gender=boy',
   },
   {
     label: 'Vos matchs',
     image: require('@/assets/images/Prenoms_matchs.png'),
+    href: '/prenoms-matchs',
   },
   {
     label: 'Favoris',
     image: require('@/assets/images/Prenoms_favoris.png'),
+    href: '/prenoms-favoris',
   },
-];
+] as const;
 
 /**
  * En-tête sur mesure (capture de référence) : grand titre souligné, cœur
@@ -110,9 +114,12 @@ function PrenomsGrid({ accent }: { accent: string }) {
     <View className="gap-4">
       <View className="flex-row flex-wrap justify-between gap-y-3.5">
         {PRENOMS_MODULES.map((module) => (
-          <View
+          <Pressable
             key={module.label}
-            className="w-[48%] gap-3 rounded-[28px] p-4"
+            accessibilityRole="button"
+            accessibilityLabel={module.label}
+            onPress={() => router.push(module.href)}
+            className="w-[48%] gap-3 rounded-[28px] p-4 active:opacity-80"
             style={{
               backgroundColor: 'rgba(255, 255, 255, 0.92)',
               borderWidth: 1,
@@ -124,12 +131,6 @@ function PrenomsGrid({ accent }: { accent: string }) {
               elevation: 3,
             }}
           >
-            <Ionicons
-              name="lock-closed"
-              size={15}
-              color={accent}
-              style={{ position: 'absolute', right: 14, top: 14 }}
-            />
             <Image
               source={module.image}
               style={{ width: 104, height: 104, marginLeft: -8, marginTop: -6 }}
@@ -144,7 +145,7 @@ function PrenomsGrid({ accent }: { accent: string }) {
               </Text>
               <ChevronBubble accent={accent} />
             </View>
-          </View>
+          </Pressable>
         ))}
       </View>
 

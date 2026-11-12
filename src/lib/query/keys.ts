@@ -49,6 +49,12 @@ export const queryKeys = {
     entries: (householdId: string, module: string) =>
       ['baby', householdId, 'entries', module] as const,
   },
+  names: {
+    all: ['names'] as const,
+    swipes: (householdId: string) => ['names', householdId, 'swipes'] as const,
+    favorites: (householdId: string) =>
+      ['names', householdId, 'favorites'] as const,
+  },
   organisation: {
     all: ['organisation'] as const,
     checklistItems: (householdId: string) =>

@@ -24,6 +24,14 @@ const BABY_DESTINATIONS = [
   'bebe-bain',
 ] as const;
 
+// Le jeu du match des prénoms et ses listes, ouverts depuis la grille de
+// `/prenoms` — même traitement `href: null`.
+const NAMES_DESTINATIONS = [
+  'prenoms-jeu',
+  'prenoms-matchs',
+  'prenoms-favoris',
+] as const;
+
 // Destination ouverte depuis Réglages (sous-section Confidentialité), pas
 // depuis le hub — gardée à part de HUB_DESTINATIONS pour ne pas brouiller
 // son nom, même traitement `href: null`.
@@ -74,6 +82,9 @@ export default function TabsLayout() {
         <Tabs.Screen key={name} name={name} options={{ href: null }} />
       ))}
       {BABY_DESTINATIONS.map((name) => (
+        <Tabs.Screen key={name} name={name} options={{ href: null }} />
+      ))}
+      {NAMES_DESTINATIONS.map((name) => (
         <Tabs.Screen key={name} name={name} options={{ href: null }} />
       ))}
       {SETTINGS_DESTINATIONS.map((name) => (
