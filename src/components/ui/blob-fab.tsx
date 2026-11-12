@@ -3,6 +3,7 @@ import type { ComponentProps } from 'react';
 import { useEffect } from 'react';
 import { Pressable } from 'react-native';
 import Animated, {
+  cancelAnimation,
   Easing,
   useAnimatedStyle,
   useSharedValue,
@@ -45,6 +46,11 @@ const BLOB_PATH =
  * à l'appui elle s'écrase puis rebondit, et les traits rejaillissent — le
  * même vocabulaire que la sélection d'un onglet.
  *
+ * `pulse` : un halo d'accent s'élargit et s'efface derrière la bulle, puis
+ * marque une pause — invitation discrète à appuyer, par exemple quand la
+ * liste qu'elle remplit est encore vide (demande explicite sur les
+ * Informations importantes).
+ *
  * Le positionnement (`absolute`, coin de l'écran) reste à l'appelant, via
  * `className`.
  */
@@ -54,6 +60,7 @@ export function BlobFab({
   accessibilityLabel,
   onPress,
   className,
+  pulse = false,
 }: {
   icon?: IoniconName;
   /** 32 pour le « + » ; plus petit pour une icône plus chargée. */
@@ -61,11 +68,13 @@ export function BlobFab({
   accessibilityLabel: string;
   onPress: () => void;
   className?: string;
+  pulse?: boolean;
 }) {
   const accent = useThemeAccent();
   const float = useSharedValue(0);
   const scale = useSharedValue(1);
   const sparks = useSharedValue(1);
+  const halo = useSharedValue(0);
 
   useEffect(() => {
     float.value = withRepeat(
@@ -74,6 +83,25 @@ export function BlobFab({
       true,
     );
   }, [float]);
+
+  useEffect(() => {
+    if (!pulse) {
+      cancelAnimation(halo);
+      halo.value = withTiming(0, { duration: 200 });
+      return;
+    }
+    // Un élargissement de 1,6 s, puis 1,4 s de pause : assez lent pour
+    // rester discret, assez régulier pour attirer l'œil.
+    halo.value = 0;
+    halo.value = withRepeat(
+      withSequence(
+        withTiming(1, { duration: 1600, easing: Easing.out(Easing.quad) }),
+        withDelay(1400, withTiming(0, { duration: 0 })),
+      ),
+      -1,
+      false,
+    );
+  }, [pulse, halo]);
 
   const handlePress = () => {
     scale.value = withSequence(
@@ -91,6 +119,13 @@ export function BlobFab({
   const bubbleStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: -3 * float.value }, { scale: scale.value }],
   }));
+  const haloStyle = useAnimatedStyle(() => ({
+    opacity: halo.value === 0 ? 0 : 0.32 * (1 - halo.value),
+    transform: [
+      { translateY: -3 * float.value },
+      { scale: 1 + 0.5 * halo.value },
+    ],
+  }));
   const sparksStyle = useAnimatedStyle(() => ({
     opacity: sparks.value,
     transform: [{ scale: 0.5 + 0.5 * sparks.value }],
@@ -104,6 +139,22 @@ export function BlobFab({
       hitSlop={6}
       className={className}
     >
+      {/* Halo de `pulse`, derrière la bulle et transparent aux gestes. */}
+      <Animated.View
+        pointerEvents="none"
+        style={[
+          {
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: SIZE,
+            height: HEIGHT,
+            borderRadius: SIZE / 2,
+            backgroundColor: accent,
+          },
+          haloStyle,
+        ]}
+      />
       <Animated.View
         style={[
           {

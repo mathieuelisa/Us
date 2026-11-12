@@ -381,10 +381,14 @@ export default function InformationsScreen() {
         )}
       </ScrollView>
 
+      {/* Pulsation discrète tant qu'aucune information n'est saisie
+          (demande explicite) — pas pendant le chargement, où la liste est
+          vide sans l'être vraiment. */}
       <BlobFab
         accessibilityLabel="Ajouter une information"
         onPress={openCreate}
         className="absolute bottom-6 right-6"
+        pulse={!isHouseholdLoading && !areItemsLoading && items.length === 0}
       />
 
       <InfoItemFormModal
