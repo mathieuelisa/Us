@@ -6,6 +6,7 @@ import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import { withUniwind } from 'uniwind';
 
+import { NameCardsIllustration } from '@/components/hub/name-cards-illustration';
 import { PremiumTeaserCard } from '@/components/hub/premium-teaser-card';
 import { ProgressBar } from '@/components/organisation/progress-bar';
 import { PlainInput } from '@/components/plain-input';
@@ -15,7 +16,6 @@ import {
   GLASS_BODY_COLOR,
   GLASS_TITLE_COLOR,
   GlassCard,
-  SparkLines,
 } from '@/components/ui/glass-card';
 import { ScreenCornerShapes } from '@/components/ui/screen-corner-shapes';
 import { useMyHousehold } from '@/features/household/hooks';
@@ -367,55 +367,6 @@ function HeaderIllustration({ accent }: { accent: string }) {
         size={14}
         color="#f08aa8"
         style={{ position: 'absolute', right: 2, top: 4 }}
-      />
-    </View>
-  );
-}
-
-/**
- * Deux cartes à jouer penchées (cœur, étoile) avec petits traits — évoque
- * le jeu du match des prénoms (capture de référence). Composée de vues et
- * d'icônes, faute d'illustration dédiée.
- */
-function NameCardsIllustration() {
-  const card = (
-    rotate: string,
-    left: number,
-    top: number,
-    background: string,
-    icon: 'heart' | 'star',
-    color: string,
-  ) => (
-    <View
-      style={{
-        position: 'absolute',
-        left,
-        top,
-        width: 40,
-        height: 48,
-        borderRadius: 10,
-        backgroundColor: background,
-        alignItems: 'center',
-        justifyContent: 'center',
-        transform: [{ rotate }],
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.2,
-        shadowRadius: 6,
-        elevation: 4,
-      }}
-    >
-      <Ionicons name={icon} size={20} color={color} />
-    </View>
-  );
-
-  return (
-    <View pointerEvents="none" style={{ width: 82, height: 64 }}>
-      {card('-14deg', 4, 10, '#fdf7fb', 'heart', '#f08aa8')}
-      {card('10deg', 36, 6, '#fdf3dc', 'star', '#f2b84b')}
-      <SparkLines
-        color="#8fd3c0"
-        style={{ left: 30, top: -14, transform: [{ scale: 0.8 }] }}
       />
     </View>
   );

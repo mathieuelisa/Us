@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Image, Text, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
+import { NameCardsIllustration } from '@/components/hub/name-cards-illustration';
 import { PremiumLockedScreen } from '@/components/hub/premium-locked-screen';
 import {
   ChevronBubble,
@@ -185,6 +186,10 @@ export default function PrenomsScreen() {
       image={HEART_IMAGE}
       description={DESCRIPTION}
       paywallTitle="Débloquez le match des prénoms"
+      // Les deux cartes de l'entrée « Le match des prénoms »
+      // d'Organisation, pour que le paywall soit raccord (demande
+      // explicite).
+      paywallIllustration={<NameCardsIllustration scale={1.45} />}
       header={<PrenomsHeader accent={accent} />}
       gridContent={<PrenomsGrid accent={accent} />}
     />

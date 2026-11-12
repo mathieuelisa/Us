@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import type { ReactNode } from 'react';
 import type { ImageSourcePropType } from 'react-native';
 import { Modal, Pressable, ScrollView, View } from 'react-native';
 
@@ -29,11 +30,14 @@ export function PremiumPaywallModal({
   onClose,
   title,
   image,
+  illustration,
 }: {
   visible: boolean;
   onClose: () => void;
   title: string;
   image: ImageSourcePropType;
+  /** Voir `PremiumOffer` : remplace `image` dans l'offre. */
+  illustration?: ReactNode;
 }) {
   const accent = useThemeAccent();
 
@@ -107,7 +111,11 @@ export function PremiumPaywallModal({
             showsVerticalScrollIndicator={false}
             contentContainerClassName="gap-4 px-5 pb-6 pt-5"
           >
-            <PremiumOffer title={title} image={image} />
+            <PremiumOffer
+              title={title}
+              image={image}
+              illustration={illustration}
+            />
           </ScrollView>
         </View>
       </View>

@@ -64,6 +64,7 @@ export function PremiumLockedScreen({
   gridContent,
   backgroundImage,
   header,
+  paywallIllustration,
 }: {
   title: string;
   image: ImageSourcePropType;
@@ -73,6 +74,8 @@ export function PremiumLockedScreen({
   gridContent?: ReactNode;
   backgroundImage?: ImageSourcePropType;
   header?: ReactNode;
+  /** Illustration du paywall à la place de `image` (voir `PremiumOffer`). */
+  paywallIllustration?: ReactNode;
 }) {
   const backgroundColor = useThemeBackground();
   const accent = useThemeAccent();
@@ -186,6 +189,7 @@ export function PremiumLockedScreen({
         onClose={() => setIsPaywallVisible(false)}
         title={paywallTitle}
         image={image}
+        illustration={paywallIllustration}
       />
     </SafeAreaView>
   );

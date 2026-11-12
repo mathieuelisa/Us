@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import type { ReactNode } from 'react';
 import type { ImageSourcePropType } from 'react-native';
 import { Image, Text, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
@@ -26,10 +27,16 @@ import { hexToRgba, lightenHex } from '@/lib/color';
 export function PremiumOffer({
   title,
   image,
+  illustration,
   compact = false,
 }: {
   title: string;
   image: ImageSourcePropType;
+  /**
+   * Illustration composée à la place de `image` (ex. les deux cartes du
+   * match des prénoms, pour rester raccord avec sa carte d'Organisation).
+   */
+  illustration?: ReactNode;
   /**
    * Gabarit resserré pour la page `/premium`, qui doit tenir sans défiler
    * au-dessus de la barre de navigation (demande explicite).
@@ -68,14 +75,16 @@ export function PremiumOffer({
               transform: [{ rotate: '30deg' }],
             }}
           />
-          <Image
-            source={image}
-            style={{
-              width: size.imageHeight * 0.85,
-              height: size.imageHeight,
-            }}
-            resizeMode="contain"
-          />
+          {illustration ?? (
+            <Image
+              source={image}
+              style={{
+                width: size.imageHeight * 0.85,
+                height: size.imageHeight,
+              }}
+              resizeMode="contain"
+            />
+          )}
           <Ionicons
             name="heart"
             size={20}
