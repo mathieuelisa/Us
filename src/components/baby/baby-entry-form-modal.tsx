@@ -260,9 +260,7 @@ export function BabyEntryFormModal({
             <View className="h-1.5 w-11 self-center rounded-full bg-[#e6e6ea]" />
 
             <View className="flex-row items-center gap-3.5">
-              <BlobIllustration accent={accent}>
-                <Text style={{ fontSize: 40 }}>{module.emoji}</Text>
-              </BlobIllustration>
+              <BlobIllustration accent={accent} image={module.image} />
               <View className="flex-1 gap-1">
                 <Text
                   className="text-[21px] font-extrabold leading-[26px]"
@@ -448,7 +446,7 @@ export function BabyEntryFormModal({
 
         {isConfirmingDelete && initialEntry && onDelete ? (
           <DeleteEntryAlert
-            emoji={module.emoji}
+            image={module.image}
             summary={formatBabyEntrySummary(module, initialEntry)}
             date={formatBabyEntryDate(initialEntry)}
             accent={accent}

@@ -1,5 +1,11 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Pressable, Text, View } from 'react-native';
+import {
+  Image,
+  type ImageSourcePropType,
+  Pressable,
+  Text,
+  View,
+} from 'react-native';
 import Svg, { Defs, LinearGradient, Path, Rect, Stop } from 'react-native-svg';
 
 import {
@@ -26,15 +32,15 @@ const PINK_PALE = '#fde6ea';
  * « Garder l'entrée » annulent tous deux.
  */
 export function DeleteEntryAlert({
-  emoji,
+  image,
   summary,
   date,
   accent,
   onConfirm,
   onCancel,
 }: {
-  /** Émoji du module, posé sur la fiche qui part à la corbeille. */
-  emoji: string;
+  /** Icône du module, posée sur la fiche qui part à la corbeille. */
+  image: ImageSourcePropType;
   summary: string;
   /** « jeudi 12 novembre · 14h30 ». */
   date: string;
@@ -86,7 +92,7 @@ export function DeleteEntryAlert({
           <Ionicons name="close" size={20} color={GLASS_TITLE_COLOR} />
         </Pressable>
 
-        <TrashIllustration emoji={emoji} accent={accent} />
+        <TrashIllustration image={image} accent={accent} />
 
         <Text
           className="mt-3 text-center text-[22px] font-extrabold"
@@ -145,15 +151,15 @@ export function DeleteEntryAlert({
 }
 
 /**
- * Corbeille rose au couvercle ouvert, une fiche (émoji du module) en train
+ * Corbeille rose au couvercle ouvert, une fiche (icône du module) en train
  * d'y tomber, sur une tache pâle — composée en vues et SVG faute
  * d'illustration dédiée dans `assets/images/`.
  */
 function TrashIllustration({
-  emoji,
+  image,
   accent,
 }: {
-  emoji: string;
+  image: ImageSourcePropType;
   accent: string;
 }) {
   return (
@@ -211,7 +217,11 @@ function TrashIllustration({
           shadowRadius: 5,
         }}
       >
-        <Text style={{ fontSize: 17 }}>{emoji}</Text>
+        <Image
+          source={image}
+          style={{ width: 22, height: 22 }}
+          resizeMode="contain"
+        />
         <View
           style={{
             width: 24,

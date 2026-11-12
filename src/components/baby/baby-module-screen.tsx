@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
+  Image,
   ImageBackground,
   Pressable,
   ScrollView,
@@ -174,9 +175,7 @@ export function BabyModuleScreen({ module }: { module: BabyModule }) {
             className="flex-row items-center gap-4 rounded-[28px] p-4"
             style={[tintedShadow(accent), GLASS_SURFACE]}
           >
-            <BlobIllustration accent={accent} size={80}>
-              <Text style={{ fontSize: 40 }}>{module.emoji}</Text>
-            </BlobIllustration>
+            <BlobIllustration accent={accent} size={80} image={module.image} />
             <View className="flex-1 gap-1">
               <Text
                 className="text-[25px] font-extrabold leading-[30px]"
@@ -220,9 +219,11 @@ export function BabyModuleScreen({ module }: { module: BabyModule }) {
                 className="items-center gap-3 rounded-[28px] px-5 py-7"
                 style={[tintedShadow(accent), GLASS_SURFACE]}
               >
-                <BlobIllustration accent={accent} size={96}>
-                  <Text style={{ fontSize: 48 }}>{module.emoji}</Text>
-                </BlobIllustration>
+                <BlobIllustration
+                  accent={accent}
+                  size={96}
+                  image={module.image}
+                />
                 <Text
                   className="text-center text-[14.5px] leading-5"
                   style={{ color: GLASS_TITLE_COLOR }}
@@ -251,12 +252,13 @@ export function BabyModuleScreen({ module }: { module: BabyModule }) {
                       className="flex-row items-center gap-3 rounded-[22px] py-3 pl-3 pr-3 active:opacity-70"
                       style={[tintedShadow(accent), GLASS_SURFACE]}
                     >
-                      <View
-                        className="h-11 w-11 items-center justify-center rounded-full"
-                        style={{ backgroundColor: hexToRgba(accent, 0.1) }}
-                      >
-                        <Text style={{ fontSize: 22 }}>{module.emoji}</Text>
-                      </View>
+                      {/* Icône du module sur sa propre tuile (demande
+                          explicite), à la place de l'émoji sur rond teinté. */}
+                      <Image
+                        source={module.image}
+                        style={{ width: 46, height: 46 }}
+                        resizeMode="contain"
+                      />
                       <View className="flex-1 gap-0.5">
                         <Text
                           className="text-[15px] font-bold"

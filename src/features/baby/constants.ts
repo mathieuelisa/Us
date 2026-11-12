@@ -1,3 +1,5 @@
+import type { ImageSourcePropType } from 'react-native';
+
 /**
  * Les 4 suivis bébé accessibles depuis la grille bento de `/bebe`
  * (design US Hi-Fi, écran 8b « Votre bébé — écran principal ») et le
@@ -10,10 +12,8 @@
  *
  * ⚠️ Ces écrans sont derrière le paywall (module premium — voir
  * DOCS/versions/MVP.md) : y arriver suppose l'accès débloqué, donc les
- * formulaires sont pleinement actifs. En revanche la **persistance**
- * n'existe pas encore — pas de table Supabase ni de policy RLS pour ces
- * suivis. Les entrées saisies vivent dans l'état de l'écran et sont
- * perdues à la fermeture ; le branchement serveur reste à faire.
+ * formulaires sont pleinement actifs. Les entrées sont enregistrées dans
+ * `baby_entries` (Supabase) — voir `features/baby/api.ts`.
  */
 export type BabyModuleSlug = 'croissance' | 'biberon' | 'allaitement' | 'bain';
 
@@ -64,6 +64,13 @@ export type BabyModule = {
   /** Segment de route sous `(tabs)` : `bebe-<slug>`. */
   slug: BabyModuleSlug;
   emoji: string;
+  /**
+   * Icône 3D du module (fournie par l'utilisateur), sur sa propre tuile :
+   * grille de `/bebe`, en-tête et historique du suivi, modale d'ajout,
+   * pop-up de suppression (demande explicite). `emoji` reste le texte de
+   * repli (libellés d'accessibilité, contextes sans image).
+   */
+  image: ImageSourcePropType;
   title: string;
   /** Rappel de ce que couvre le module — repris de la carte de `/bebe`. */
   subtitle: string;
@@ -103,6 +110,7 @@ export const BABY_MODULES: Record<BabyModuleSlug, BabyModule> = {
   croissance: {
     slug: 'croissance',
     emoji: '📏',
+    image: require('@/assets/images/Icon_croissance.png'),
     title: 'Croissance',
     subtitle: 'Poids, taille, périmètre crânien',
     // La courbe a sa propre carte au-dessus (GrowthChart) : cette section
@@ -158,6 +166,7 @@ export const BABY_MODULES: Record<BabyModuleSlug, BabyModule> = {
   biberon: {
     slug: 'biberon',
     emoji: '🍼',
+    image: require('@/assets/images/Icon_biberon.png'),
     title: 'Biberon',
     subtitle: 'Quantité, horaire, type de lait',
     sectionTitle: 'Derniers biberons',
@@ -194,6 +203,7 @@ export const BABY_MODULES: Record<BabyModuleSlug, BabyModule> = {
   allaitement: {
     slug: 'allaitement',
     emoji: '🤱',
+    image: require('@/assets/images/Icon_allaitement.png'),
     title: 'Allaitement',
     subtitle: 'Durée, sein, horaire',
     sectionTitle: 'Dernières tétées',
@@ -212,6 +222,7 @@ export const BABY_MODULES: Record<BabyModuleSlug, BabyModule> = {
   bain: {
     slug: 'bain',
     emoji: '🛁',
+    image: require('@/assets/images/Icon_bain.png'),
     title: 'Bain & Soins',
     subtitle: 'Rituel du soir, température, produits',
     sectionTitle: 'Derniers soins',

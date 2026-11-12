@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { Image, Text, View } from 'react-native';
+import { Image, type ImageSourcePropType, Text, View } from 'react-native';
 import Svg, { Defs, LinearGradient, Path, Stop } from 'react-native-svg';
 
 import { PremiumLockedScreen } from '@/components/hub/premium-locked-screen';
@@ -17,7 +17,7 @@ import {
   WAVE_PINK,
   WAVE_SKY,
 } from '@/components/ui/glass-card';
-import type { BabyModuleSlug } from '@/features/baby/constants';
+import { BABY_MODULES, type BabyModuleSlug } from '@/features/baby/constants';
 import {
   useThemeAccent,
   useThemeBabyWallpaper,
@@ -29,6 +29,13 @@ const BODY_COLOR = GLASS_BODY_COLOR;
 const PREMIUM_GOLD = '#b8860b';
 
 const BABY_IMAGE = require('@/assets/images/Baby_said_hi.png');
+// Icônes 3D des suivis (fournies par l'utilisateur) : elles ont déjà leur
+// tuile, elles remplacent donc tuile et émoji. Définies une seule fois
+// dans `BABY_MODULES`, reprises dans les écrans de suivi.
+const BIBERON_ICON = BABY_MODULES.biberon.image;
+const CROISSANCE_ICON = BABY_MODULES.croissance.image;
+const BAIN_ICON = BABY_MODULES.bain.image;
+const ALLAITEMENT_ICON = BABY_MODULES.allaitement.image;
 const DESCRIPTION =
   'Centralisez la croissance, les repas et le sommeil de bébé, et gardez votre co-parent connecté à chaque étape.';
 
@@ -228,12 +235,15 @@ function GrowthSparkline({ accent }: { accent: string }) {
 
 function SmallModuleCard({
   emoji,
+  image,
   label,
   slug,
   waveColor,
   accent,
 }: {
   emoji: string;
+  /** Illustration à sa propre tuile, à la place de l'émoji. */
+  image?: ImageSourcePropType;
   label: string;
   slug: BabyModuleSlug;
   waveColor: string;
@@ -248,7 +258,13 @@ function SmallModuleCard({
     >
       <CardWave id={`wave-${slug}`} color={waveColor} />
       <View className="flex-1 justify-between p-4">
-        <IconTile emoji={emoji} tint={hexToRgba(accent, 0.12)} size={52} />
+        <IconTile
+          emoji={emoji}
+          image={image}
+          imageFillsTile={Boolean(image)}
+          tint={hexToRgba(accent, 0.12)}
+          size={52}
+        />
         <View className="flex-row items-center justify-between gap-2">
           <Text
             numberOfLines={1}
@@ -287,7 +303,12 @@ function BabyModulesGrid({ accent }: { accent: string }) {
           />
           <View className="flex-1 gap-3 p-4">
             <View className="flex-row items-start justify-between">
-              <IconTile emoji="📏" tint={hexToRgba(accent, 0.14)} />
+              <IconTile
+                emoji="📏"
+                image={CROISSANCE_ICON}
+                imageFillsTile
+                tint={hexToRgba(accent, 0.14)}
+              />
               <View
                 className="flex-row items-center gap-1 rounded-full px-2.5 py-1"
                 style={{ backgroundColor: 'rgba(232, 200, 116, 0.3)' }}
@@ -329,6 +350,7 @@ function BabyModulesGrid({ accent }: { accent: string }) {
         <View className="flex-1 gap-3.5">
           <SmallModuleCard
             emoji="🍼"
+            image={BIBERON_ICON}
             label="Biberon"
             slug="biberon"
             waveColor={WAVE_PEACH}
@@ -336,6 +358,7 @@ function BabyModulesGrid({ accent }: { accent: string }) {
           />
           <SmallModuleCard
             emoji="🤱"
+            image={ALLAITEMENT_ICON}
             label="Allaitement"
             slug="allaitement"
             waveColor={WAVE_PINK}
@@ -356,7 +379,12 @@ function BabyModulesGrid({ accent }: { accent: string }) {
           height={40}
         />
         <View className="flex-row items-center gap-3.5 p-4">
-          <IconTile emoji="🛁" tint="rgba(207, 224, 247, 0.7)" />
+          <IconTile
+            emoji="🛁"
+            image={BAIN_ICON}
+            imageFillsTile
+            tint="rgba(207, 224, 247, 0.7)"
+          />
           <View className="flex-1 gap-0.5">
             <Text
               className="text-[17px] font-bold"

@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import type { ReactNode } from 'react';
-import { View } from 'react-native';
+import { Image, type ImageSourcePropType, View } from 'react-native';
 
 import { SparkLines } from '@/components/ui/glass-card';
 import { hexToRgba } from '@/lib/color';
@@ -10,16 +10,44 @@ import { hexToRgba } from '@/lib/color';
  * passé en `children`) sur une tache d'accent aux coins irréguliers, avec
  * feuille, cœur et petits traits. Composée faute d'illustrations dédiées —
  * modales d'ajout des suivis bébé et des informations importantes.
+ *
+ * Avec `image` (icône 3D qui a déjà sa tuile, ex. suivis bébé) : l'icône
+ * remplace tache et feuille — sinon on verrait une tuile dans une tache —
+ * et garde le cœur et les petits traits.
  */
 export function BlobIllustration({
   accent,
   size = 76,
+  image,
   children,
 }: {
   accent: string;
   size?: number;
-  children: ReactNode;
+  image?: ImageSourcePropType;
+  children?: ReactNode;
 }) {
+  if (image) {
+    return (
+      <View pointerEvents="none" style={{ width: size, height: size }}>
+        <Image
+          source={image}
+          style={{ width: size, height: size }}
+          resizeMode="contain"
+        />
+        <Ionicons
+          name="heart"
+          size={size * 0.18}
+          color="#f08aa8"
+          style={{ position: 'absolute', right: -2, top: 0 }}
+        />
+        <SparkLines
+          color={hexToRgba(accent, 0.55)}
+          style={{ left: -12, top: -12, transform: [{ rotate: '-70deg' }] }}
+        />
+      </View>
+    );
+  }
+
   return (
     <View pointerEvents="none" style={{ width: size, height: size }}>
       <View
