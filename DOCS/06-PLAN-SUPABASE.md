@@ -9,7 +9,9 @@ title: Plan d'action Supabase — US
 > mode contournement DEV à une app qui tourne sur de vraies données — puis
 > pour porter le premium et les notifications de la V1.
 >
-> Établi le 2026-11-11 après analyse complète du code et du projet cloud.
+> Établi le 2026-11-11 après analyse complète du code et du projet cloud,
+> **mis à jour le 2026-11-12** (suivis bébé, gestes, match des prénoms,
+> fin du mode contournement DEV).
 > Complète le [plan d'action général](./02-ACTION-PLAN.md) (phases produit)
 > et renvoie à la [dette](./05-DETTE-ET-POINTS-OUVERTS.md) par numéro. Le
 > schéma existant est catalogué dans [`migrations/README.md`](./migrations/README.md).
@@ -25,6 +27,8 @@ title: Plan d'action Supabase — US
 | D5 | Comment se connecte-t-on ? | **Email + mot de passe, ou Google.** Le lien magique est abandonné (écart avec CONCEPT.md, dette n°58). |
 | D6 | Que fait l'invitation du co-parent sans lien magique ? | **Elle enregistre l'adresse, sans email.** Le co-parent s'inscrit avec cette adresse et rejoint le foyer une fois son email confirmé. |
 | D7 | Que contient le compte dans Réglages ? | Email et moyen de connexion, **changement de mot de passe**, **suppression du compte**. |
+| D8 | Qui modifie une entrée de suivi bébé ? | **Les deux parents**, y compris celles saisies par l'autre (journal partagé). *(2026-11-12)* |
+| D9 | Match des prénoms : où et comment ? | **Supabase, par parent.** Swipe à droite = prénom gardé, qui alimente « Vos matchs » (gardé par les deux) ; **favoris personnels**, invisibles du partenaire. Catalogue de prénoms dans l'app. *(2026-11-12)* |
 
 ## Principes
 
@@ -64,6 +68,38 @@ réactiver « Confirm email » avant production (désactivé pour les tests,
 dette n°60), vérifier la longueur minimale des mots de passe (8),
 activer si possible la protection contre les mots de passe compromis,
 configurer le SMTP. Détail dans l'[architecture](./04-ARCHITECTURE.md#connexion--email--mot-de-passe-google).
+
+## Fait le 2026-11-12
+
+- **Suivis « Votre bébé » enregistrés en base** : table unique
+  `baby_entries` (croissance, biberon, allaitement, bain), RLS foyer, les
+  deux parents modifient tout (D8). Ajout, modification, suppression dans
+  l'app ; courbe de croissance lue depuis cette table.
+- **Gestes du jour** : colonne `phase` (grossesse / après la naissance) et
+  35 gestes fournis par l'utilisateur (43 au total).
+- **Match des prénoms** : tables `name_swipes` et `name_favorites` (D9),
+  jeu complet dans l'app (choix de 10 pays, cartes à swiper, Vos matchs,
+  Favoris). Écarts au plan initial : voir le [lot 4](#match-des-prénoms).
+- **Émoji de la taille du bébé** (`baby_size_by_week.emoji`).
+- **Mode contournement DEV retiré** (dette n°1), fixtures et exemples
+  fictifs compris : l'app ne lit plus que de vraies données.
+- Vérifié à chaque étape : étanchéité par simulation SQL annulée (un
+  utilisateur hors foyer ne voit aucune ligne), advisors de sécurité sans
+  nouvel avertissement, dépôt et cloud alignés (34 migrations).
+
+## État des lieux (2026-11-12)
+
+| Élément | État |
+|---|---|
+| Projet | `hsclyntlnoyevstdhgvu`, Paris. Ancien projet de Londres encore présent (dette n°4) |
+| Migrations | 34, **identiques** entre le dépôt et le cloud (dernière : `20261112130000`) |
+| Tables | 20, toutes avec RLS |
+| Données réelles | 2 comptes, **1 foyer sans co-parent rattaché** : le parcours à deux n'a jamais été joué pour de vrai (dette n°5) |
+| Auth | Email + mot de passe actif ; Google désactivé (dette n°56) ; confirmation d'email désactivée pour les tests (dette n°60) ; SMTP mutualisé de Supabase |
+| Edge Functions | `delete-account` |
+| Storage, Cron, Realtime | Rien |
+| Sécurité | Advisors : seuls les avertissements voulus (`accept_household_invite`, `is_household_member`, `household_role`) et la protection des mots de passe compromis (réglage du dashboard) |
+| Tests | Aucun test automatisé des règles d'accès |
 
 ## État des lieux (avant la mise à jour du 2026-11-11)
 
@@ -156,10 +192,8 @@ puissent enfin l'être.
       et non partagés), contacts et informations. Permet de tester chaque
       rôle sans email ni contournement.
 - [x] **Retirer les données fictives de l'app** (`MOCK_APPOINTMENTS`,
-      `MOCK_INFO_ITEMS`) au profit de vrais états vides — sans quoi un
-      foyer réel verrait de faux rendez-vous et un faux groupe sanguin.
-      Changement côté app, mais préalable à tout test réel. Fait : elles ne
-      s'affichent plus qu'en mode contournement DEV.
+      `MOCK_INFO_ITEMS`) au profit de vrais états vides. Supprimées
+      entièrement le 2026-11-12 avec le mode contournement.
 - [ ] **Parcours de bout en bout sur le cloud**, avec deux vrais comptes :
       inscription, onboarding, création du foyer (vérifier que les triggers
       ont bien créé 8 démarches et les articles de valise), invitation,
@@ -195,6 +229,10 @@ la Phase 2 du plan d'action.
 | `household_invites` / `accept_household_invite()` | Seule la personne invitée (email vérifié) rejoint ; impossible de rejoindre un foyer qui a déjà un co-parent |
 | `household_procedures`, `household_checklist_items` | Mise à jour par les deux membres, aucune insertion côté client |
 | `app_feedback` | Chacun ne lit que ses propres retours |
+| `baby_entries` | Les deux membres lisent, créent, modifient et suppriment toutes les entrées ; ni l'auteur ni le foyer ne se réécrivent |
+| `name_swipes` | Chacun n'écrit que ses choix ; les deux membres les lisent (calcul des matchs) |
+| `name_favorites` | Chacun ne voit et ne modifie que ses favoris, même au sein du foyer |
+| `gesture_suggestions` et autres catalogues | Lecture seule, aucune écriture côté client |
 
 - [ ] **Exécution en CI** : démarrer le Supabase local dans GitHub Actions
       (Docker est disponible sur les runners), appliquer les migrations,
@@ -276,6 +314,9 @@ co-parent (choix confirmé, D4).
       correspondance démarche → mois (`PROCEDURE_PREGNANCY_MONTH`).
 - [x] `gesture_suggestions.emoji` : remplacer l'association par texte
       exact.
+- [x] `gesture_suggestions.phase` : gestes « après la naissance » une fois
+      celle-ci déclarée (2026-11-12).
+- [x] `baby_size_by_week.emoji` (2026-11-12).
 - [ ] `baby_size_by_week` : compléter les semaines manquantes (aujourd'hui
       9 lignes, une toutes les 4 semaines).
 - [ ] Décider du sort de `contacts.role_label` (plus rempli depuis le retrait
@@ -338,20 +379,33 @@ comme en écriture — les deux parents saisissent indifféremment (CONCEPT.md).
 - [ ] Table `household_baby_favorites` : modules choisis et leur ordre
       (écrans 8y/8a). Les favoris « sommeil », « couche », « visite
       médecin » restent à confirmer avant d'avoir leurs tables.
-- [ ] Courbe de croissance : lecture simple de `baby_growth_measurements`,
-      pas de calcul serveur nécessaire.
+- [x] Courbe de croissance : lecture des mesures de `baby_entries`
+      (module `croissance`), sans calcul serveur.
+- [ ] Ajouter `has_premium(household_id)` aux 4 policies de
+      `baby_entries` (`alter policy`) une fois le droit premium en place.
+      → dette n°53
 
 ### Match des prénoms
 
-- [ ] `baby_name_catalog` : référentiel (prénom, genre), lisible par tous,
-      rempli par migration.
-- [ ] `baby_name_votes` : `household_id`, `user_id`, prénom, aimé ou non.
-      Chacun ne lit que **ses** votes, pour ne pas influencer l'autre.
-- [ ] Fonction `get_name_matches(household_id)` (`security definer`) :
-      renvoie uniquement les prénoms aimés par **les deux** parents — la
-      seule façon de révéler un match sans exposer les votes de l'autre.
-- [ ] Favoris : colonne sur `baby_name_votes` ou table dédiée, à trancher
-      avec le design.
+> ✅ **Fait en avance (2026-11-12, D9)**, avec des écarts au plan
+> ci-dessous : catalogue dans l'app (`features/names/catalog.ts`, 10 pays)
+> plutôt qu'en base ; `name_swipes` **lisible par les deux parents**, les
+> matchs étant calculés dans l'app ; favoris dans une table dédiée
+> `name_favorites`, personnels. Migration
+> `20261112130000_name_swipes_and_favorites.sql`.
+
+- [x] Choix des parents en base (`name_swipes`), favoris personnels
+      (`name_favorites`), RLS foyer.
+- [ ] **À trancher** : aujourd'hui le partenaire *peut* lire vos choix en
+      base (l'app ne les affiche pas). Pour qu'il ne les voie jamais, il
+      faut restreindre la lecture de `name_swipes` à ses propres lignes et
+      passer par une fonction `get_name_matches(household_id)`
+      (`security definer`) qui ne renvoie que les prénoms gardés par les
+      deux.
+- [ ] Catalogue en base (`baby_name_catalog`) le jour où il doit grossir
+      ou être modifié sans mise à jour de l'app.
+- [ ] Ajouter `has_premium(household_id)` aux policies des deux tables une
+      fois le droit premium en place.
 
 **Terminé quand** : un achat sur un téléphone débloque les deux parents,
 les suivis persistent et sont refusés sans premium (prouvé par des tests
@@ -393,7 +447,9 @@ appareil réel, et aucune n'est envoyée en double.
   faire relire par un professionnel de santé avant (dette n°47). → dette
   n°37, n°46
 - **Astuces du jour en base** (D2) : table `daily_tips` (rôle, semaine ou
-  mois de grossesse, texte). → dette n°29
+  mois de grossesse, texte). Depuis le 2026-11-12, cinq listes fournies
+  par l'utilisateur vivent dans `features/partner/constants.ts`. → dette
+  n°29
 - **Realtime** : abonnements ciblés (humeur du partenaire sur le hub,
   statuts de démarches, cases des valises) qui invalident le cache TanStack
   Query — seulement si l'actualisation à l'ouverture d'écran ne suffit pas
