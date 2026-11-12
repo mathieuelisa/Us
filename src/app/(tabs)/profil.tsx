@@ -73,10 +73,16 @@ export default function ProfileScreen() {
     if (!hasChanges || updateProfile.isPending || firstName.trim() === '') {
       return;
     }
-    updateProfile.mutate(firstName.trim(), {
+    const newFirstName = firstName.trim();
+    updateProfile.mutate(newFirstName, {
       onSuccess: () => {
         nameInputRef.current?.blur();
-        showFeedback('success', 'Prénom mis à jour');
+        // Message plus chaleureux, avec le nouveau prénom (demande
+        // explicite).
+        showFeedback(
+          'success',
+          `${newFirstName}, c’est joli ! Votre prénom est à jour.`,
+        );
       },
       onError: () =>
         showFeedback(
