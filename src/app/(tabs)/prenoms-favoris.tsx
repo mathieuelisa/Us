@@ -25,6 +25,7 @@ export default function NameFavoritesScreen() {
       isLoading={isLoading}
       emptyTitle="Aucun favori pour l’instant"
       emptyText="Pendant le jeu, touchez une carte pour garder un prénom ici."
+      emptyImage={require('@/assets/images/Prenoms_favoris.png')}
       onRemove={(item) =>
         toggleFavorite.mutate({
           gender: item.gender,

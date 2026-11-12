@@ -1,11 +1,23 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import type { ComponentProps } from 'react';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { type ComponentProps, useEffect } from 'react';
+import {
+  Image,
+  type ImageSourcePropType,
+  Pressable,
+  ScrollView,
+  Text,
+  View,
+} from 'react-native';
 import Animated, {
+  Easing,
   FadeInDown,
   FadeOutLeft,
   LinearTransition,
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withTiming,
 } from 'react-native-reanimated';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
@@ -14,6 +26,7 @@ import { useTabBarContentInset } from '@/components/navigation/use-tab-bar-heigh
 import {
   GLASS_BODY_COLOR,
   GLASS_TITLE_COLOR,
+  SparkLines,
 } from '@/components/ui/glass-card';
 import { ScreenCornerShapes } from '@/components/ui/screen-corner-shapes';
 import {
@@ -32,6 +45,8 @@ export type NameListItem = { gender: NameGender; name: string };
 
 const ROW_LAYOUT = LinearTransition.springify().damping(18).stiffness(170);
 
+const LEAF_IMAGE = require('@/assets/images/Leaf_branch.png');
+
 /**
  * Liste de prénoms du match des prénoms — « Vos matchs » et « Favoris »
  * partagent la même mise en page : retour, titre souligné, prénoms rangés
@@ -47,6 +62,7 @@ export function NameListScreen({
   isLoading,
   emptyTitle,
   emptyText,
+  emptyImage,
   onRemove,
 }: {
   title: string;
@@ -56,6 +72,8 @@ export function NameListScreen({
   isLoading: boolean;
   emptyTitle: string;
   emptyText: string;
+  /** Illustration 3D de l'état vide (celle de l'entrée du jeu). */
+  emptyImage: ImageSourcePropType;
   onRemove?: (item: NameListItem) => void;
 }) {
   // Place de la barre du bas, qui flotte au-dessus du contenu.
@@ -123,29 +141,34 @@ export function NameListScreen({
         {isLoading ? (
           <Text className="text-[13px] text-[#9a9a9a]">Chargement…</Text>
         ) : items.length === 0 ? (
-          <View
-            className="items-center gap-2 rounded-[28px] px-6 py-8"
-            style={{ backgroundColor: 'rgba(255, 255, 255, 0.92)' }}
+          <Animated.View
+            entering={FadeInDown.duration(320)}
+            className="items-center rounded-[28px] px-6 pb-8 pt-6"
+            style={{
+              backgroundColor: 'rgba(255, 255, 255, 0.92)',
+              borderWidth: 1,
+              borderColor: 'rgba(255, 255, 255, 0.95)',
+              shadowColor: accent,
+              shadowOffset: { width: 0, height: 12 },
+              shadowOpacity: 0.1,
+              shadowRadius: 22,
+              elevation: 4,
+            }}
           >
-            <View
-              className="h-16 w-16 items-center justify-center rounded-full"
-              style={{ backgroundColor: hexToRgba(accent, 0.1) }}
-            >
-              <Ionicons name={icon} size={30} color={accent} />
-            </View>
+            <EmptyIllustration image={emptyImage} accent={accent} />
             <Text
-              className="mt-1 text-center text-[17px] font-extrabold"
-              style={{ color: GLASS_TITLE_COLOR }}
+              className="mt-4 text-center text-[19px] font-extrabold"
+              style={{ color: GLASS_TITLE_COLOR, letterSpacing: -0.3 }}
             >
               {emptyTitle}
             </Text>
             <Text
-              className="text-center text-[14px] leading-5"
+              className="mt-2 max-w-[280px] text-center text-[14.5px] leading-[21px]"
               style={{ color: GLASS_BODY_COLOR }}
             >
               {emptyText}
             </Text>
-          </View>
+          </Animated.View>
         ) : (
           groups.map((gender) => {
             const groupItems = items.filter((item) => item.gender === gender);
@@ -220,5 +243,166 @@ export function NameListScreen({
         )}
       </ScrollView>
     </SafeAreaView>
+  );
+}
+
+/**
+ * Illustration de l'état vide (capture de référence) : l'icône 3D de la
+ * liste qui flotte doucement au centre, sur une tache d'accent, devant deux
+ * cartes de prénom fille et garçon inclinées — rappel du jeu — avec la
+ * branche de feuillage de l'app de part et d'autre et de petits traits.
+ * Composée avec les illustrations existantes, sans image dédiée.
+ */
+function EmptyIllustration({
+  image,
+  accent,
+}: {
+  image: ImageSourcePropType;
+  accent: string;
+}) {
+  const float = useSharedValue(0);
+
+  useEffect(() => {
+    // Mouvement réduit : Reanimated suit le réglage du système.
+    float.value = withRepeat(
+      withTiming(1, { duration: 2200, easing: Easing.inOut(Easing.sin) }),
+      -1,
+      true,
+    );
+  }, [float]);
+
+  const floatStyle = useAnimatedStyle(() => ({
+    transform: [
+      { translateY: -6 * float.value },
+      { rotate: `${-4 + 4 * float.value}deg` },
+    ],
+  }));
+
+  return (
+    <View
+      pointerEvents="none"
+      accessibilityElementsHidden
+      importantForAccessibility="no-hide-descendants"
+      style={{ width: 250, height: 168 }}
+    >
+      {/* Tache rose pêche aux coins irréguliers (capture de référence),
+          comme `BlobIllustration`. */}
+      <View
+        style={{
+          position: 'absolute',
+          left: 22,
+          top: 18,
+          width: 206,
+          height: 140,
+          borderTopLeftRadius: 96,
+          borderTopRightRadius: 80,
+          borderBottomRightRadius: 104,
+          borderBottomLeftRadius: 72,
+          backgroundColor: 'rgba(242, 163, 142, 0.16)',
+        }}
+      />
+
+      <GhostNameCard gender="girl" letter="L" style={{ left: 42, top: 38 }} />
+      <GhostNameCard gender="boy" letter="N" style={{ right: 40, top: 30 }} />
+
+      <Image
+        source={LEAF_IMAGE}
+        style={{
+          position: 'absolute',
+          left: 4,
+          bottom: 0,
+          width: 84,
+          height: 56,
+          transform: [{ rotate: '-18deg' }],
+        }}
+        resizeMode="contain"
+      />
+      <Image
+        source={LEAF_IMAGE}
+        style={{
+          position: 'absolute',
+          right: 2,
+          bottom: 8,
+          width: 64,
+          height: 43,
+          opacity: 0.85,
+          transform: [{ scaleX: -1 }, { rotate: '-24deg' }],
+        }}
+        resizeMode="contain"
+      />
+
+      <Animated.View
+        style={[
+          { position: 'absolute', left: 59, top: 8, width: 132, height: 132 },
+          floatStyle,
+        ]}
+      >
+        <Image
+          source={image}
+          style={{ width: 132, height: 132 }}
+          resizeMode="contain"
+        />
+      </Animated.View>
+
+      <SparkLines
+        color={hexToRgba(accent, 0.6)}
+        style={{ left: 46, top: 0, transform: [{ rotate: '-70deg' }] }}
+      />
+    </View>
+  );
+}
+
+/** Carte de prénom estompée, inclinée derrière l'icône. */
+function GhostNameCard({
+  gender,
+  letter,
+  style,
+}: {
+  gender: NameGender;
+  letter: string;
+  style: object;
+}) {
+  const meta = GENDER_META[gender];
+  return (
+    <View
+      className="items-center gap-1.5 rounded-[16px] bg-white pt-2.5"
+      style={[
+        {
+          position: 'absolute',
+          width: 62,
+          height: 82,
+          borderWidth: 1,
+          borderColor: 'rgba(0, 0, 0, 0.05)',
+          opacity: 0.92,
+          transform: [{ rotate: gender === 'girl' ? '-14deg' : '12deg' }],
+          shadowColor: meta.color,
+          shadowOffset: { width: 0, height: 6 },
+          shadowOpacity: 0.12,
+          shadowRadius: 10,
+          elevation: 2,
+        },
+        style,
+      ]}
+    >
+      <View
+        className="h-7 w-7 items-center justify-center rounded-full"
+        style={{ backgroundColor: meta.tint }}
+      >
+        <Text
+          className="text-[13px] font-extrabold"
+          style={{ color: meta.color }}
+        >
+          {letter}
+        </Text>
+      </View>
+      <View
+        className="h-1.5 w-9 rounded-full"
+        style={{ backgroundColor: hexToRgba(meta.color, 0.22) }}
+      />
+      <View
+        className="h-1.5 w-6 rounded-full"
+        style={{ backgroundColor: hexToRgba(meta.color, 0.12) }}
+      />
+    </View>
   );
 }

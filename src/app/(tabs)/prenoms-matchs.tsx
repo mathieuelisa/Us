@@ -17,6 +17,7 @@ export default function NameMatchesScreen() {
       isLoading={isLoading}
       emptyTitle="Pas encore de match"
       emptyText="Swipez chacun de votre côté : un prénom gardé par vous deux apparaîtra ici."
+      emptyImage={require('@/assets/images/Prenoms_matchs.png')}
     />
   );
 }
