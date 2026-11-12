@@ -21,109 +21,130 @@ export const PARTNER_PINK = {
 } as const;
 
 /**
- * Astuces du jour, une par rôle. Volontairement en constante côté client et
- * non en base, contrairement à `gesture_suggestions` : il s'agit d'un
- * contenu court et figé, et une table de plus n'apporterait rien tant que
- * personne ne l'édite. À basculer en base le jour où ce contenu s'enrichit
- * ou doit être modifiable sans redéploiement.
+ * Astuces du jour. Volontairement en constantes côté client et non en
+ * base, contrairement à `gesture_suggestions` : contenu court et figé,
+ * une table de plus n'apporterait rien tant que personne ne l'édite. À
+ * basculer en base le jour où il doit être modifiable sans redéploiement.
  *
- * Distinct du « geste du jour » du pilier Ensemble : celui-ci suggère une
- * action envers l'autre, celles-ci parlent de la grossesse elle-même.
+ * Textes fournis par l'utilisateur (demande explicite, 2026-11-12), en
+ * cinq listes : pour soi et au sujet de l'autre, pour chaque parent, plus
+ * une liste commune au couple. Le co-parent est un homme par défaut (choix
+ * produit), d'où « compagnon » côté mère et les accords au masculin.
+ *
+ * Distinct du « geste du jour » du pilier Ensemble.
  */
-const TIPS_BY_ROLE: Record<HouseholdRole, string[]> = {
+
+/** Pour soi : carte « Pour vous ». */
+const SELF_TIPS_BY_ROLE: Record<HouseholdRole, string[]> = {
   pregnant: [
-    'Buvez régulièrement dans la journée, même sans soif.',
-    'Une sieste de 20 minutes vaut mieux qu’un long réveil difficile.',
-    'Notez vos questions au fil de l’eau pour le prochain rendez-vous.',
-    'Bougez un peu chaque jour, à votre rythme — rien d’intense.',
+    'Bougez un peu chaque jour, à votre rythme.',
+    'Écoutez votre fatigue : une sieste n’est pas du temps perdu.',
+    'Notez vos questions au fil de la semaine pour ne rien oublier au prochain rendez-vous.',
+    'Buvez régulièrement, gardez une bouteille d’eau à portée de main.',
+    'Acceptez l’aide qu’on vous propose, sans vous justifier.',
+    'Accordez-vous un petit plaisir rien que pour vous cette semaine.',
+    'Vos émotions peuvent varier d’un jour à l’autre, et c’est normal.',
+    'Parlez à un professionnel de santé si quelque chose vous inquiète, même si ça vous semble minime.',
+    'Limitez les comparaisons : chaque grossesse et chaque bébé suivent leur propre chemin.',
+    'Après la naissance, reposez-vous dès que bébé dort, les tâches peuvent attendre.',
+    'Gardez le contact avec vos proches, même par un simple message.',
   ],
   partner: [
-    'Proposez de préparer le sac de maternité ensemble.',
-    'Accompagnez-la au prochain rendez-vous si vous le pouvez.',
-    'Prenez en charge une tâche du quotidien sans qu’elle ait à demander.',
-    'Demandez-lui comment elle se sent, vraiment — puis écoutez.',
+    'Prenez aussi du temps pour vous reposer : vous comptez aussi.',
+    'Vous avez le droit d’avoir des doutes ou des peurs : parlez-en à quelqu’un de confiance.',
+    'Renseignez-vous sur les étapes de la grossesse pour mieux comprendre ce qui se passe.',
+    'Gardez une activité qui vous fait du bien, même courte.',
+    'Échangez avec d’autres jeunes pères, l’expérience des autres rassure.',
+    'Préparez-vous au congé de paternité : organisez votre travail à l’avance.',
+    'Ne cherchez pas à tout savoir ni à tout réussir du premier coup.',
+    'Le lien avec bébé se construit avec le temps, ne vous inquiétez pas s’il n’est pas immédiat.',
+    'Faites du peau à peau avec bébé, c’est bon pour lui comme pour vous.',
+    'Si vous vous sentez dépassé ou triste durablement, parlez-en à un professionnel : ça arrive aussi aux pères.',
   ],
 };
 
+/** Au sujet de l'autre : « Pour votre compagnon » / « Pour votre compagne ». */
+const ABOUT_PARTNER_TIPS_BY_ROLE: Record<HouseholdRole, string[]> = {
+  pregnant: [
+    'N’hésitez pas à demander à votre compagnon s’il se sent bien considéré.',
+    'Partagez-lui ce que vous ressentez physiquement : il ne peut pas le deviner.',
+    'Proposez-lui de sentir bébé bouger quand l’occasion se présente.',
+    'Dites-lui concrètement de quoi vous avez besoin, il sera souvent soulagé de savoir comment aider.',
+    'Laissez-lui de la place pour s’occuper de bébé à sa façon, même si elle diffère de la vôtre.',
+    'Remerciez-le pour un petit geste qu’il a fait cette semaine.',
+    'Demandez-lui comment il imagine son rôle de père.',
+    'Invitez-le à préparer avec vous la chambre ou la valise de maternité.',
+    'Lui aussi peut avoir des inquiétudes : proposez-lui d’en parler.',
+    'Après la naissance, confiez-lui un moment rien qu’à lui avec bébé (bain, peau à peau, promenade).',
+    'Encouragez-le à prendre son congé de paternité s’il le peut.',
+  ],
+  partner: [
+    'Accompagnez-la au prochain rendez-vous si vous le pouvez.',
+    'Demandez-lui comment elle se sent aujourd’hui, et prenez le temps d’écouter la réponse.',
+    'Prenez en charge une tâche du quotidien sans qu’elle ait à vous le demander.',
+    'Proposez-lui un massage des pieds ou du dos en fin de journée.',
+    'Rassurez-la sur les changements de son corps.',
+    'Faites le relais auprès de la famille et des visiteurs pour la préserver si elle a besoin de calme.',
+    'Pendant l’accouchement, soyez sa voix : faites respecter ses souhaits.',
+    'La nuit, prenez le relais pour un change ou pour rendormir bébé.',
+    'Apportez-lui à boire ou une collation pendant qu’elle allaite ou donne le biberon.',
+    'Félicitez-la : elle accomplit quelque chose d’immense.',
+    'Soyez attentif à son moral après la naissance : si elle semble triste plus de deux semaines, encouragez-la à consulter.',
+  ],
+};
+
+/** Commun aux deux parents : « Pour votre couple ». */
+const COUPLE_TIPS: string[] = [
+  'Gardez un moment à deux cette semaine, sans parler de bébé.',
+  'Choisissez ensemble le prénom en prenant le temps d’en discuter, sans pression.',
+  'Répartissez les tâches à l’avance pour éviter les tensions plus tard.',
+  'Préparez ensemble votre projet de naissance.',
+  'Prenez une photo de vous deux chaque mois pour garder un souvenir de cette période.',
+  'Discutez de vos valeurs éducatives : comment chacun a été élevé, ce que vous voulez garder ou changer.',
+  'Fixez un petit rituel quotidien à deux : un café, une promenade, un message.',
+  'Après une dispute, prenez le temps de vous reparler à tête reposée : la fatigue amplifie tout.',
+  'Dites-vous merci, souvent, même pour les petites choses.',
+  'Assistez ensemble à une séance de préparation à la naissance.',
+  'Organisez-vous pour que chacun puisse dormir une vraie nuit de temps en temps.',
+];
+
 /**
- * Astuce du jour du hub (« ASTUCE DU JOUR » de la carte santé) : inchangée
- * — la personne enceinte y lit un conseil pour elle, le co-parent un
- * conseil tourné vers elle.
+ * Astuce du jour du hub (« ASTUCE DU JOUR » de la carte santé) : la
+ * personne enceinte y lit un conseil pour elle, le co-parent un conseil
+ * tourné vers elle — comme avant la refonte de « Mon partenaire ».
  */
 export function getTipOfTheDay(role: HouseholdRole): string | null {
-  return pickForToday(TIPS_BY_ROLE[role]);
+  return pickForToday(
+    role === 'pregnant'
+      ? SELF_TIPS_BY_ROLE.pregnant
+      : ABOUT_PARTNER_TIPS_BY_ROLE.partner,
+  );
 }
 
 /**
  * Écran « Mon partenaire », section Astuces du jour (demande explicite) :
- * deux cartes qui s'adressent toutes deux à la personne connectée.
- *
- * - « Pour vous » : un conseil pour soi. Personne enceinte : ses astuces
- *   habituelles ; co-parent : prendre soin de lui-même (ses astuces
- *   habituelles étant déjà tournées vers elle).
- * - Seconde carte : un conseil **pour soi, au sujet de l'autre** — ou du
- *   couple. Le libellé suit le conseil du jour et alterne donc d'un jour à
- *   l'autre entre « Pour votre compagnon / compagne » et « Pour votre
- *   couple » (demande explicite).
+ * deux cartes qui s'adressent toutes deux à la personne connectée —
+ * « Pour vous », puis un conseil au sujet de l'autre ou du couple, dont le
+ * libellé suit le conseil du jour et alterne donc d'un jour à l'autre.
  *
  * Avant, la seconde carte montrait l'astuce destinée à l'autre parent :
  * lue par la mère, « Accompagnez-la au prochain rendez-vous » n'avait pas
- * de sens. Le co-parent est un homme par défaut (choix produit), d'où
- * « compagnon » côté mère.
+ * de sens.
  */
-const SELF_TIPS_BY_ROLE: Record<HouseholdRole, string[]> = {
-  pregnant: TIPS_BY_ROLE.pregnant,
-  partner: [
-    'Prenez aussi du temps pour vous reposer : vous comptez aussi.',
-    'Parlez de ce que vous ressentez à un proche de confiance.',
-    'Renseignez-vous sur votre congé paternité pour l’anticiper sereinement.',
-    'Informez-vous sur le déroulé de l’accouchement pour vous sentir prêt.',
-  ],
-};
-
 export type RelationTip = { kind: 'partner' | 'couple'; text: string };
-
-/** Conseils pour le couple, communs aux deux parents. */
-const COUPLE_TIPS: RelationTip[] = [
-  {
-    kind: 'couple',
-    text: 'Gardez un moment à deux cette semaine, sans parler de bébé.',
-  },
-  {
-    kind: 'couple',
-    text: 'Partagez chacun une inquiétude et une envie pour l’arrivée de bébé.',
-  },
-  {
-    kind: 'couple',
-    text: 'Faites une petite balade ensemble, téléphones rangés.',
-  },
-];
 
 const RELATION_TIPS_BY_ROLE: Record<HouseholdRole, RelationTip[]> = {
   pregnant: [
-    {
-      kind: 'partner',
-      text: 'N’hésitez pas à demander à votre compagnon s’il se sent bien considéré.',
-    },
-    {
-      kind: 'partner',
-      text: 'Dites-lui ce qu’il fait qui vous aide vraiment au quotidien.',
-    },
-    {
-      kind: 'partner',
-      text: 'Proposez-lui de vous accompagner au prochain rendez-vous.',
-    },
-    {
-      kind: 'partner',
-      text: 'Laissez-lui une place dans les choix pour bébé, même les petits.',
-    },
-    ...COUPLE_TIPS,
-  ],
-  partner: [
-    ...TIPS_BY_ROLE.partner.map(
+    ...ABOUT_PARTNER_TIPS_BY_ROLE.pregnant.map(
       (text): RelationTip => ({ kind: 'partner', text }),
     ),
-    ...COUPLE_TIPS,
+    ...COUPLE_TIPS.map((text): RelationTip => ({ kind: 'couple', text })),
+  ],
+  partner: [
+    ...ABOUT_PARTNER_TIPS_BY_ROLE.partner.map(
+      (text): RelationTip => ({ kind: 'partner', text }),
+    ),
+    ...COUPLE_TIPS.map((text): RelationTip => ({ kind: 'couple', text })),
   ],
 };
 
