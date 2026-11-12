@@ -189,8 +189,10 @@ function TipCard({
             {recipient}
           </Text>
         </View>
+        {/* Graisse normale (demande explicite) : le libellé au-dessus
+            porte déjà l'accent, le conseil se lit comme une phrase. */}
         <Text
-          className="text-[15px] font-semibold leading-5"
+          className="text-[15px] leading-5"
           style={{ color: GLASS_TITLE_COLOR }}
         >
           {tip}
