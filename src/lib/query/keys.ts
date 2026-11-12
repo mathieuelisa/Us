@@ -43,6 +43,11 @@ export const queryKeys = {
     all: ['procedures'] as const,
     list: (householdId: string) => ['procedures', householdId] as const,
   },
+  baby: {
+    all: ['baby'] as const,
+    entries: (householdId: string, module: string) =>
+      ['baby', householdId, 'entries', module] as const,
+  },
   organisation: {
     all: ['organisation'] as const,
     checklistItems: (householdId: string) =>

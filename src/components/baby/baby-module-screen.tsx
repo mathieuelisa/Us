@@ -8,6 +8,11 @@ import {
   Text,
   View,
 } from 'react-native';
+import Animated, {
+  FadeInDown,
+  FadeOutLeft,
+  LinearTransition,
+} from 'react-native-reanimated';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import { withUniwind } from 'uniwind';
 
@@ -15,16 +20,26 @@ import { BabyEntryFormModal } from '@/components/baby/baby-entry-form-modal';
 import { GrowthChart } from '@/components/baby/growth-chart';
 import { BlobIllustration } from '@/components/ui/blob-illustration';
 import {
+  FeedbackBanner,
+  useFeedbackBanner,
+} from '@/components/ui/feedback-banner';
+import {
   DashedLoopDoodle,
   GLASS_BODY_COLOR,
   GLASS_TITLE_COLOR,
 } from '@/components/ui/glass-card';
 import { PillButton } from '@/components/ui/pill-button';
+import type { BabyEntryInput } from '@/features/baby/api';
 import type { BabyEntry, BabyModule } from '@/features/baby/constants';
 import {
   formatBabyEntryDate,
   formatBabyEntrySummary,
 } from '@/features/baby/constants';
+import {
+  useBabyEntries,
+  useDeleteBabyEntry,
+  useSaveBabyEntry,
+} from '@/features/baby/hooks';
 import {
   useThemeAccent,
   useThemeBabyWallpaper,
@@ -32,6 +47,8 @@ import {
 import { hexToRgba } from '@/lib/color';
 
 const SafeAreaView = withUniwind(RNSafeAreaView);
+
+const ROW_LAYOUT = LinearTransition.springify().damping(18).stiffness(170);
 
 /** Surface « verre dépoli » des cartes de l'écran. */
 const GLASS_SURFACE = {
@@ -69,18 +86,19 @@ const tintedShadow = (accent: string) =>
  * `/bebe` — `back()` remonterait au hub et non à la grille d'où l'on
  * vient.
  *
- * ⚠️ Les entrées sont gardées dans l'état de l'écran : il n'existe ni
- * table Supabase ni policy RLS pour ces suivis (module premium, hors
- * périmètre MVP — DOCS/versions/MVP.md). La saisie fonctionne de bout en
- * bout mais ne survit pas à la fermeture de l'app ; le branchement
- * serveur reste à faire, et ces données touchant la santé de l'enfant,
- * leur policy devra être revue explicitement (cf. CLAUDE.md).
+ * Les entrées sont enregistrées dans `baby_entries` (Supabase), partagées
+ * par les deux parents du foyer, qui peuvent toutes les corriger — RLS
+ * revue explicitement dans la migration `20261112110000_baby_entries`.
  */
 export function BabyModuleScreen({ module }: { module: BabyModule }) {
   const router = useRouter();
   const wallpaper = useThemeBabyWallpaper();
   const accent = useThemeAccent();
-  const [entries, setEntries] = useState<BabyEntry[]>([]);
+  const entriesQuery = useBabyEntries(module.slug);
+  const entries = entriesQuery.data ?? [];
+  const saveMutation = useSaveBabyEntry(module.slug);
+  const deleteMutation = useDeleteBabyEntry(module.slug);
+  const { feedback, showFeedback } = useFeedbackBanner();
   const [isFormVisible, setIsFormVisible] = useState(false);
   /** Entrée rouverte pour correction ; `null` quand la modale ajoute. */
   const [editingEntry, setEditingEntry] = useState<BabyEntry | null>(null);
@@ -94,22 +112,34 @@ export function BabyModuleScreen({ module }: { module: BabyModule }) {
   }
 
   /**
-   * L'historique reste trié par date (puis heure) décroissante, même quand
-   * on saisit après coup une mesure plus ancienne (demande explicite) : elle
-   * se range à sa place au lieu de passer en tête. Le tri étant stable et la
-   * nouvelle entrée placée devant, elle passe avant celles du même moment.
+   * Ajout ou correction, puis rechargement de la liste — triée par la base
+   * du plus récent au plus ancien, même pour une mesure saisie après coup
+   * (demande explicite). La modale reste ouverte en cas d'échec, pour ne
+   * pas perdre la saisie.
    */
-  function saveEntry(entry: Omit<BabyEntry, 'id'>) {
-    const editedId = editingEntry?.id;
-    setEntries((current) =>
-      (editedId
-        ? current.map((item) =>
-            item.id === editedId ? { ...entry, id: editedId } : item,
-          )
-        : [{ ...entry, id: `${Date.now()}` }, ...current]
-      ).sort(compareNewestFirst),
-    );
-    closeForm();
+  async function saveEntry(input: BabyEntryInput) {
+    try {
+      await saveMutation.mutateAsync({ id: editingEntry?.id ?? null, input });
+      closeForm();
+      showFeedback(
+        'success',
+        editingEntry ? 'Modification enregistrée.' : 'Entrée enregistrée.',
+      );
+    } catch {
+      showFeedback('error', 'Enregistrement impossible. Réessayez.');
+    }
+  }
+
+  /** Suppression confirmée dans la modale (demande explicite). */
+  async function deleteEntry() {
+    if (!editingEntry) return;
+    try {
+      await deleteMutation.mutateAsync(editingEntry.id);
+      closeForm();
+      showFeedback('success', 'Entrée supprimée.');
+    } catch {
+      showFeedback('error', 'Suppression impossible. Réessayez.');
+    }
   }
 
   function openForm(entry: BabyEntry | null) {
@@ -185,7 +215,7 @@ export function BabyModuleScreen({ module }: { module: BabyModule }) {
               </Text>
             </View>
 
-            {entries.length === 0 ? (
+            {entriesQuery.isPending ? null : entries.length === 0 ? (
               <View
                 className="items-center gap-3 rounded-[28px] px-5 py-7"
                 style={[tintedShadow(accent), GLASS_SURFACE]}
@@ -205,53 +235,63 @@ export function BabyModuleScreen({ module }: { module: BabyModule }) {
                 {/* Un appui rouvre la modale préremplie pour corriger une
                     saisie (demande explicite). */}
                 {entries.map((entry) => (
-                  <Pressable
+                  // Même animation que la suppression d'un contact : la
+                  // ligne supprimée glisse vers la gauche, les suivantes
+                  // remontent en douceur.
+                  <Animated.View
                     key={entry.id}
-                    accessibilityRole="button"
-                    accessibilityLabel={`${module.editLabel} du ${formatBabyEntryDate(entry)}`}
-                    onPress={() => openForm(entry)}
-                    className="flex-row items-center gap-3 rounded-[22px] py-3 pl-3 pr-3 active:opacity-70"
-                    style={[tintedShadow(accent), GLASS_SURFACE]}
+                    entering={FadeInDown.duration(260)}
+                    exiting={FadeOutLeft.duration(320)}
+                    layout={ROW_LAYOUT}
                   >
-                    <View
-                      className="h-11 w-11 items-center justify-center rounded-full"
-                      style={{ backgroundColor: hexToRgba(accent, 0.1) }}
+                    <Pressable
+                      accessibilityRole="button"
+                      accessibilityLabel={`${module.editLabel} du ${formatBabyEntryDate(entry)}`}
+                      onPress={() => openForm(entry)}
+                      className="flex-row items-center gap-3 rounded-[22px] py-3 pl-3 pr-3 active:opacity-70"
+                      style={[tintedShadow(accent), GLASS_SURFACE]}
                     >
-                      <Text style={{ fontSize: 22 }}>{module.emoji}</Text>
-                    </View>
-                    <View className="flex-1 gap-0.5">
-                      <Text
-                        className="text-[15px] font-bold"
-                        style={{ color: GLASS_TITLE_COLOR }}
+                      <View
+                        className="h-11 w-11 items-center justify-center rounded-full"
+                        style={{ backgroundColor: hexToRgba(accent, 0.1) }}
                       >
-                        {formatBabyEntrySummary(module, entry) || module.title}
-                      </Text>
-                      {entry.comment ? (
+                        <Text style={{ fontSize: 22 }}>{module.emoji}</Text>
+                      </View>
+                      <View className="flex-1 gap-0.5">
                         <Text
-                          className="text-[12.5px] leading-4"
-                          style={{ color: GLASS_BODY_COLOR }}
+                          className="text-[15px] font-bold"
+                          style={{ color: GLASS_TITLE_COLOR }}
                         >
-                          {entry.comment}
+                          {formatBabyEntrySummary(module, entry) ||
+                            module.title}
                         </Text>
-                      ) : null}
-                    </View>
-                    <View
-                      className="rounded-full px-2.5 py-1"
-                      style={{ backgroundColor: hexToRgba(accent, 0.1) }}
-                    >
-                      <Text
-                        className="text-[11.5px] font-semibold"
-                        style={{ color: accent }}
+                        {entry.comment ? (
+                          <Text
+                            className="text-[12.5px] leading-4"
+                            style={{ color: GLASS_BODY_COLOR }}
+                          >
+                            {entry.comment}
+                          </Text>
+                        ) : null}
+                      </View>
+                      <View
+                        className="rounded-full px-2.5 py-1"
+                        style={{ backgroundColor: hexToRgba(accent, 0.1) }}
                       >
-                        {formatBabyEntryDate(entry)}
-                      </Text>
-                    </View>
-                    <Ionicons
-                      name="create-outline"
-                      size={17}
-                      color={GLASS_BODY_COLOR}
-                    />
-                  </Pressable>
+                        <Text
+                          className="text-[11.5px] font-semibold"
+                          style={{ color: accent }}
+                        >
+                          {formatBabyEntryDate(entry)}
+                        </Text>
+                      </View>
+                      <Ionicons
+                        name="create-outline"
+                        size={17}
+                        color={GLASS_BODY_COLOR}
+                      />
+                    </Pressable>
+                  </Animated.View>
                 ))}
               </View>
             )}
@@ -271,16 +311,19 @@ export function BabyModuleScreen({ module }: { module: BabyModule }) {
           visible={isFormVisible}
           initialEntry={editingEntry}
           lastValues={lastValues}
+          isSaving={saveMutation.isPending}
+          onDelete={deleteEntry}
+          isDeleting={deleteMutation.isPending}
           onSubmit={saveEntry}
           onCancel={closeForm}
         />
+
+        <FeedbackBanner
+          message={feedback?.message ?? null}
+          tone={feedback?.tone}
+          accent={accent}
+        />
       </ImageBackground>
     </SafeAreaView>
-  );
-}
-
-function compareNewestFirst(a: BabyEntry, b: BabyEntry): number {
-  return (
-    b.date.localeCompare(a.date) || (b.time ?? '').localeCompare(a.time ?? '')
   );
 }

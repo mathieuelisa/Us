@@ -169,7 +169,8 @@ filer bord à bord (`exercice.tsx`, une route).
 | `/naissance` | 7a — déclaration de naissance | `households.birth_date` | Personne enceinte |
 | `/informations` | Informations importantes par catégorie | `household_info_items` | Aucune (les deux lisent et écrivent) |
 | `/profil`, `/reglages`, `/legal` | Prénom, thème, compte (email, mot de passe, suppression), liens légaux | `profiles`, Auth, Edge Function `delete-account` | Personnel |
-| `/bebe`, `/bebe-*`, `/prenoms`, `/premium` | Vitrine premium (paywall inerte) ; suivis bébé en état local | aucune | Dette n°53 |
+| `/bebe`, `/prenoms`, `/premium` | Vitrine premium (paywall inerte) | aucune | Dette n°53 |
+| `/bebe-*` | Suivis bébé : historique, courbe de croissance, ajout et modification d'une entrée | `baby_entries` | Les deux parents lisent et modifient toutes les entrées ; pas encore de contrôle premium (dette n°53) |
 
 ## Mode contournement DEV et données fictives
 

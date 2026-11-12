@@ -105,6 +105,7 @@ Déploiement : MCP Supabase (`deploy_edge_function`) ou
 | [`20261111130000_households_direct_membership_policies.sql`](../../supabase/migrations/20261111130000_households_direct_membership_policies.sql) | `households` | Corrige la création du foyer en fin d'onboarding (« new row violates row-level security policy », trouvé au premier essai avec un vrai compte) : la policy SELECT passait par `is_household_member(id)`, qui relit la table sans voir la ligne en cours d'insertion lors du `insert … returning`. Les policies de `households` lisent désormais l'appartenance directement sur les colonnes de la ligne |
 | [`20261111140000_households_solo_without_partner.sql`](../../supabase/migrations/20261111140000_households_solo_without_partner.sql) | `households` | « Seul·e » exclut un co-parent : remet `partner_uses_app` à `false` sur les foyers concernés et ajoute la contrainte `households_solo_without_partner`. L'onboarding enregistrait la réponse par défaut (Oui) d'une question affichée même pour « Seul·e » |
 | [`20261112100000_baby_size_by_week_emoji.sql`](../../supabase/migrations/20261112100000_baby_size_by_week_emoji.sql) | `baby_size_by_week` | Ajoute `emoji` (fruit ou légume de la semaine, affiché dans « Votre bébé cette semaine ») et le renseigne pour les 9 semaines — 🍓 et 🍒 en approchant pour framboise et prune |
+| [`20261112110000_baby_entries.sql`](../../supabase/migrations/20261112110000_baby_entries.sql) | `baby_entries` | Crée la table des suivis « Votre bébé » (croissance, biberon, allaitement, bain) : une ligne par entrée, mesures en `jsonb` (`measures`). RLS : membres du foyer en lecture, création, modification et suppression — les deux parents corrigent toutes les entrées (choix explicite) ; auteur et foyer non modifiables (droits `UPDATE` par colonne) ; aucun accès `anon` |
 
 ## Décisions de modélisation
 
@@ -129,9 +130,12 @@ Déploiement : MCP Supabase (`deploy_edge_function`) ou
   (`checklist_item_templates` / `household_checklist_items`) : le client ne
   fait que lire et mettre à jour. Seuls les articles personnalisés
   (`household_custom_checklist_items`) sont insérés par le client.
-- **Rien pour le module « Votre bébé »** : les écrans de suivi existent
-  (vitrine, cf. dette n°53) mais aucune table `baby_*` ni `subscriptions`
-  n'a été créée — elles arrivent avec la Phase 3.
+- **Module « Votre bébé » : une seule table `baby_entries`** pour les 4
+  suivis (demande explicite du 2026-11-12, avant la Phase 3), plutôt
+  qu'une table par suivi : le formulaire est commun (`BABY_MODULES`) et les
+  mesures varient d'un module à l'autre, d'où `measures` en `jsonb`. Pas
+  encore de contrôle premium en base (aucune table de droits) — cf. dette
+  n°53.
 - **`household_procedures` auto-peuplée par trigger** : les clients n'ont
   jamais besoin d'un droit `INSERT` dessus, seulement `UPDATE` du statut.
 - **Pas d'échéance stockée** sur `household_procedures` : elle se calcule à

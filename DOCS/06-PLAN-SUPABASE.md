@@ -312,7 +312,15 @@ le module bébé. Correspond à la Phase 3 du plan d'action (→ [V1](./versions
 
 ### Suivis bébé
 
-Une table par suivi, calquée sur les champs déjà définis dans
+> ✅ **Fait en avance (2026-11-12, demande explicite)**, avec un écart au
+> plan ci-dessous : **une seule table `baby_entries`** (colonne `module`,
+> mesures en `jsonb`) au lieu de quatre, le formulaire étant commun aux 4
+> suivis. Policies : membres du foyer, les deux parents modifient toutes
+> les entrées — **sans `has_premium()`** pour l'instant, à ajouter par
+> `alter policy` quand `household_entitlements` existera.
+> Migration : `20261112110000_baby_entries.sql`.
+
+Plan initial — une table par suivi, calquée sur les champs déjà définis dans
 `BABY_MODULES` (`features/baby/constants.ts`) :
 
 | Table | Colonnes métier |
@@ -326,7 +334,7 @@ Colonnes communes : `id`, `household_id`, `created_by`, `created_at`.
 Policies : membre du foyer **et** `has_premium(household_id)`, en lecture
 comme en écriture — les deux parents saisissent indifféremment (CONCEPT.md).
 
-- [ ] Migration des 4 tables + policies + index (`household_id`, date).
+- [x] Migration + policies + index — en une table `baby_entries` (voir encadré).
 - [ ] Table `household_baby_favorites` : modules choisis et leur ordre
       (écrans 8y/8a). Les favoris « sommeil », « couche », « visite
       médecin » restent à confirmer avant d'avoir leurs tables.

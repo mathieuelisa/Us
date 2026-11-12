@@ -110,6 +110,63 @@ export type Database = {
           },
         ];
       };
+      baby_entries: {
+        Row: {
+          comment: string | null;
+          created_at: string;
+          created_by: string | null;
+          entry_date: string;
+          entry_time: string | null;
+          household_id: string;
+          id: string;
+          measures: Json;
+          module: string;
+          segment: string | null;
+          updated_at: string;
+        };
+        Insert: {
+          comment?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          entry_date: string;
+          entry_time?: string | null;
+          household_id: string;
+          id?: string;
+          measures?: Json;
+          module: string;
+          segment?: string | null;
+          updated_at?: string;
+        };
+        Update: {
+          comment?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          entry_date?: string;
+          entry_time?: string | null;
+          household_id?: string;
+          id?: string;
+          measures?: Json;
+          module?: string;
+          segment?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'baby_entries_created_by_fkey';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'baby_entries_household_id_fkey';
+            columns: ['household_id'];
+            isOneToOne: false;
+            referencedRelation: 'households';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       baby_size_by_week: {
         Row: {
           emoji: string | null;

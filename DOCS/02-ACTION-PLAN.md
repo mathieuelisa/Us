@@ -478,8 +478,10 @@ le plan.
   - ⚠️ **Les 4 suivis de « Votre bébé » existent** (`/bebe-croissance`,
     `-biberon`, `-allaitement`, `-bain`) avec historique et formulaire
     d'ajout complet (écrans 8d/8f/8g/8h), accessibles en fermant le paywall
-    — mais **sans persistance** (état local) ni contrôle d'achat. C'est un
-    écart avec MVP.md à trancher (dette n°53), pas un début de Phase 3.
+    — enregistrés dans Supabase (`baby_entries`, demande explicite du
+    2026-11-12) avec courbe de croissance et modification d'une entrée,
+    mais **sans contrôle d'achat**. C'est un écart avec MVP.md à trancher
+    (dette n°53).
 - [x] **Refonte visuelle complète** (2026-11-10 → 11), écran par écran
       d'après des captures de référence : barre d'onglets à bulle, cartes
       « verre dépoli », boutons en gélule, champs à icône, illustrations

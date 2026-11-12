@@ -26,7 +26,11 @@ import {
 import { PillButton } from '@/components/ui/pill-button';
 import { WheelDatePicker } from '@/components/wheel-date-picker';
 import type { BabyEntry, BabyModule } from '@/features/baby/constants';
-import { formatDurationSeconds } from '@/features/baby/constants';
+import {
+  formatBabyEntryDate,
+  formatBabyEntrySummary,
+  formatDurationSeconds,
+} from '@/features/baby/constants';
 import { parseTimeInput } from '@/features/health/constants';
 import { useThemeAccent } from '@/features/settings/hooks';
 import { hexToRgba, lightenHex } from '@/lib/color';
@@ -64,6 +68,9 @@ export function BabyEntryFormModal({
   visible,
   initialEntry = null,
   lastValues = {},
+  isSaving = false,
+  onDelete,
+  isDeleting = false,
   onSubmit,
   onCancel,
 }: {
@@ -80,6 +87,14 @@ export function BabyEntryFormModal({
    * de mesure, la nouvelle mesure en est rarement loin.
    */
   lastValues?: Record<string, string>;
+  /** Enregistrement en cours : bouton désactivé, contre le double envoi. */
+  isSaving?: boolean;
+  /**
+   * Suppression de `initialEntry` (demande explicite), après confirmation
+   * dans `ConfirmDeleteAlert`. Absent : pas de bouton « Supprimer ».
+   */
+  onDelete?: () => void;
+  isDeleting?: boolean;
   onSubmit: (entry: Omit<BabyEntry, 'id'>) => void;
   onCancel: () => void;
 }) {
@@ -95,6 +110,8 @@ export function BabyEntryFormModal({
    * confirmation. `null` quand aucune alerte n'est ouverte.
    */
   const [pendingSegment, setPendingSegment] = useState<string | null>(null);
+  /** Alerte « Supprimer cette entrée ? » ouverte. */
+  const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
   /**
    * Incrémenté à chaque remise à zéro demandée au chronomètre (ouverture
    * de la modale, changement de segment confirmé). Un compteur plutôt
@@ -112,6 +129,7 @@ export function BabyEntryFormModal({
     setValues(initialEntry ? { ...initialEntry.values } : {});
     setComment(initialEntry?.comment ?? '');
     setPendingSegment(null);
+    setIsConfirmingDelete(false);
     setTimerResetToken((token) => token + 1);
   }, [visible, module, initialEntry]);
 
@@ -393,10 +411,10 @@ export function BabyEntryFormModal({
             ) : null}
 
             <PillButton
-              label="Enregistrer"
+              label={isSaving ? 'Enregistrement…' : 'Enregistrer'}
               icon="save-outline"
               size="compact"
-              isDisabled={!canSubmit}
+              isDisabled={!canSubmit || isSaving || isDeleting}
               onPress={() =>
                 onSubmit({
                   date,
@@ -408,20 +426,53 @@ export function BabyEntryFormModal({
               }
             />
 
-            <Pressable
-              accessibilityRole="button"
-              className="items-center"
-              onPress={onCancel}
-            >
-              <Text
-                className="text-[14.5px] font-semibold"
-                style={{ color: GLASS_TITLE_COLOR }}
+            {/* Même rangée que la modale de rendez-vous : « Annuler » et,
+                en modification seulement, « Supprimer » en rouge. */}
+            <View className="flex-row items-center justify-center gap-6">
+              <Pressable
+                accessibilityRole="button"
+                className="items-center"
+                onPress={onCancel}
               >
-                Annuler
-              </Text>
-            </Pressable>
+                <Text
+                  className="text-[14.5px] font-semibold"
+                  style={{ color: GLASS_TITLE_COLOR }}
+                >
+                  Annuler
+                </Text>
+              </Pressable>
+              {initialEntry && onDelete ? (
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityState={{ disabled: isDeleting || isSaving }}
+                  disabled={isDeleting || isSaving}
+                  onPress={() => setIsConfirmingDelete(true)}
+                  className="flex-row items-center gap-1.5"
+                >
+                  <Ionicons name="trash-outline" size={16} color={DELETE_RED} />
+                  <Text
+                    className="text-[14.5px] font-semibold"
+                    style={{ color: DELETE_RED }}
+                  >
+                    {isDeleting ? 'Suppression…' : 'Supprimer'}
+                  </Text>
+                </Pressable>
+              ) : null}
+            </View>
           </ScrollView>
         </Animated.View>
+
+        {isConfirmingDelete && initialEntry && onDelete ? (
+          <ConfirmDeleteAlert
+            summary={formatBabyEntrySummary(module, initialEntry)}
+            date={formatBabyEntryDate(initialEntry)}
+            onConfirm={() => {
+              setIsConfirmingDelete(false);
+              onDelete();
+            }}
+            onCancel={() => setIsConfirmingDelete(false)}
+          />
+        ) : null}
 
         {pendingSegment !== null && segment !== null ? (
           <DiscardTimerAlert
@@ -504,6 +555,68 @@ function DiscardTimerAlert({
           >
             <Text className="text-[14px] font-medium text-[#c25b5b]">
               Changer sans enregistrer
+            </Text>
+          </Pressable>
+        </View>
+      </View>
+    </View>
+  );
+}
+
+const DELETE_RED = '#d14b3a';
+
+/**
+ * Confirmation avant de supprimer une entrée : la suppression est
+ * définitive et vaut pour les deux parents (journal partagé). Même
+ * surcouche que `DiscardTimerAlert`, et même parti pris : le choix par
+ * défaut est de garder l'entrée.
+ */
+function ConfirmDeleteAlert({
+  summary,
+  date,
+  onConfirm,
+  onCancel,
+}: {
+  summary: string;
+  date: string;
+  onConfirm: () => void;
+  onCancel: () => void;
+}) {
+  return (
+    <View className="absolute inset-0 items-center justify-center bg-black/50 px-8">
+      <View className="w-full gap-4 rounded-3xl bg-white px-6 py-6">
+        <View className="items-center gap-2">
+          <View className="h-11 w-11 items-center justify-center rounded-full bg-[#e07a7a]/15">
+            <Ionicons name="trash-outline" size={21} color="#c25b5b" />
+          </View>
+          <Text className="text-center text-[17px] font-bold text-[#1a1a1a]">
+            Supprimer cette entrée ?
+          </Text>
+        </View>
+
+        <Text className="text-center text-[13.5px] leading-5 text-[#6b6b6b]">
+          {summary ? `${summary} — ${date}.` : `${date}.`} Elle sera supprimée
+          pour tout le foyer. Cette action est définitive.
+        </Text>
+
+        <View className="gap-2">
+          <Pressable
+            accessibilityRole="button"
+            onPress={onCancel}
+            className="items-center rounded-2xl bg-[#1f3d3a] py-3.5 active:opacity-80"
+          >
+            <Text className="text-[15px] font-semibold text-white">
+              Garder l’entrée
+            </Text>
+          </Pressable>
+
+          <Pressable
+            accessibilityRole="button"
+            onPress={onConfirm}
+            className="items-center py-2 active:opacity-60"
+          >
+            <Text className="text-[14px] font-medium text-[#c25b5b]">
+              Supprimer définitivement
             </Text>
           </Pressable>
         </View>
