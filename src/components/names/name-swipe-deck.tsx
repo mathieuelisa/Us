@@ -11,7 +11,7 @@ import Animated, {
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
-
+import { FavoriteHeart } from '@/components/names/favorite-heart';
 import {
   GLASS_BODY_COLOR,
   GLASS_TITLE_COLOR,
@@ -325,15 +325,9 @@ function CardFace({
         }}
       />
 
-      <View
-        className="absolute right-4 top-4 h-11 w-11 items-center justify-center rounded-full"
-        style={{ backgroundColor: 'rgba(255, 255, 255, 0.9)' }}
-      >
-        <Ionicons
-          name={isFavorite ? 'heart' : 'heart-outline'}
-          size={24}
-          color={isFavorite ? '#e8739a' : '#b8b4c4'}
-        />
+      {/* Cœur de favori, animé à l'ajout (éclat rouge, petits cœurs). */}
+      <View className="absolute right-4 top-4">
+        <FavoriteHeart isFavorite={isFavorite} />
       </View>
 
       <View
