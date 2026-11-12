@@ -49,7 +49,7 @@ const SafeAreaView = withUniwind(RNSafeAreaView);
  * Jeu du match des prénoms (demande explicite), ouvert depuis « Prénoms
  * filles » ou « Prénoms garçons » de `/prenoms` (`?gender=girl|boy`).
  *
- * 1. Choix des pays : une dizaine, 3 au plus.
+ * 1. Choix des pays : 16, 3 au plus.
  * 2. Cartes : un prénom par carte, des pays choisis, sans ceux déjà
  *    swipés. Droite = gardé (alimente « Vos matchs »), gauche = écarté,
  *    toucher = favori. Chaque choix est enregistré tout de suite
