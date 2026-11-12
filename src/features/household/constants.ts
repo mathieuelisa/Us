@@ -45,6 +45,12 @@ export const INFO_CATEGORY_META: Record<
     needsLabel: boolean;
     labelPlaceholder: string;
     labelSuggestions: string[];
+    /**
+     * Libellés qui ne peuvent exister qu'une fois dans la catégorie (casse
+     * ignorée) : une fois saisis, la suggestion disparaît et l'ajout est
+     * bloqué — on modifie l'élément existant.
+     */
+    uniqueLabels?: string[];
     defaultLabel: string;
     valuePlaceholder: string;
     valueKeyboardType?: 'default' | 'phone-pad' | 'number-pad';
@@ -68,7 +74,7 @@ export const INFO_CATEGORY_META: Record<
     tint: '#FFE4E6',
     needsLabel: true,
     labelPlaceholder: 'Qui — ex. Maman',
-    labelSuggestions: ['Maman', 'Papa', 'Partenaire'],
+    labelSuggestions: ['Maman', 'Partenaire'],
     defaultLabel: '',
     valuePlaceholder: 'Groupe sanguin',
     valueOptions: ['O+', 'O-', 'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-'],
@@ -163,6 +169,9 @@ export const INFO_CATEGORY_META: Record<
     needsLabel: true,
     labelPlaceholder: 'Quoi — ex. Terme',
     labelSuggestions: ['Terme', 'Début de grossesse'],
+    // Une seule date de terme et de début par grossesse (demande explicite) :
+    // si elle change, on modifie l'existante.
+    uniqueLabels: ['Terme', 'Début de grossesse'],
     defaultLabel: '',
     valuePlaceholder: '',
     isDate: true,
@@ -175,7 +184,7 @@ export const INFO_CATEGORY_META: Record<
     tint: '#E0E7FF',
     needsLabel: true,
     labelPlaceholder: 'Qui — ex. Maman',
-    labelSuggestions: ['Maman', 'Papa', 'Partenaire'],
+    labelSuggestions: ['Maman', 'Partenaire'],
     defaultLabel: '',
     valuePlaceholder: 'Numéro à 15 chiffres',
     valueKeyboardType: 'number-pad',

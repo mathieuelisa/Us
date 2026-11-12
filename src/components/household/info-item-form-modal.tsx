@@ -54,12 +54,15 @@ export function InfoItemFormModal({
   isSaving,
   editingItem,
   initialCategory = null,
+  existingItems = [],
   onCancel,
   onSubmit,
 }: {
   visible: boolean;
   isSaving: boolean;
   editingItem?: HouseholdInfoItem | null;
+  /** Éléments déjà enregistrés, pour écarter les libellés uniques déjà pris. */
+  existingItems?: HouseholdInfoItem[];
   /**
    * Création ouverte depuis une suggestion de l'état vide : la modale
    * démarre directement sur le formulaire de cette catégorie (la grille
@@ -117,6 +120,25 @@ export function InfoItemFormModal({
   const meta = category ? INFO_CATEGORY_META[category] : null;
   const isEditing = Boolean(editingItem);
 
+  // Libellés uniques (ex. « Terme ») déjà présents dans la catégorie — hors
+  // l'élément en cours de modification, qui garde le sien.
+  const takenUniqueLabels = new Set(
+    (meta?.uniqueLabels ?? [])
+      .map((unique) => unique.toLowerCase())
+      .filter((unique) =>
+        existingItems.some(
+          (item) =>
+            item.category === category &&
+            item.id !== editingItem?.id &&
+            item.label.trim().toLowerCase() === unique,
+        ),
+      ),
+  );
+  const isLabelTaken = takenUniqueLabels.has(label.trim().toLowerCase());
+  const availableLabelSuggestions = (meta?.labelSuggestions ?? []).filter(
+    (suggestion) => !takenUniqueLabels.has(suggestion.toLowerCase()),
+  );
+
   const selectCategory = (next: InfoCategory) => {
     setCategory(next);
     setLabel('');
@@ -155,7 +177,7 @@ export function InfoItemFormModal({
   const canSubmit =
     category !== null &&
     !isSaving &&
-    (meta?.needsLabel ? label.trim() !== '' : true) &&
+    (meta?.needsLabel ? label.trim() !== '' && !isLabelTaken : true) &&
     submittedValues.length > 0;
 
   const submit = () => {
@@ -348,9 +370,15 @@ export function InfoItemFormModal({
                       value={label}
                       onChangeText={setLabel}
                     />
-                    {meta.labelSuggestions.length > 0 ? (
+                    {isLabelTaken ? (
+                      <Text className="text-[12.5px] text-[#B91C1C]">
+                        « {label.trim()} » est déjà renseigné : modifiez la date
+                        existante plutôt que d'en ajouter une autre.
+                      </Text>
+                    ) : null}
+                    {availableLabelSuggestions.length > 0 ? (
                       <View className="flex-row flex-wrap gap-1.5">
-                        {meta.labelSuggestions.map((suggestion) => (
+                        {availableLabelSuggestions.map((suggestion) => (
                           <Pressable
                             key={suggestion}
                             accessibilityRole="button"

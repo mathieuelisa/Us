@@ -402,6 +402,7 @@ export default function InformationsScreen() {
         isSaving={createItems.isPending || updateItem.isPending}
         editingItem={editingItem}
         initialCategory={initialCategory}
+        existingItems={items}
         onCancel={closeModal}
         onSubmit={submit}
       />
