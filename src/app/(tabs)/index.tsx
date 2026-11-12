@@ -44,10 +44,12 @@ const SafeAreaView = withUniwind(RNSafeAreaView);
 const DEMARCHES_ICON = require('@/assets/images/Icon_demarches.png');
 /** Bulles de discussion de la carte Ensemble (illustration fournie, avec sa tuile). */
 const ENSEMBLE_ICON = require('@/assets/images/Icon_ensemble.png');
-/** Stéthoscope à cœur de la carte Suivi santé (illustration fournie, avec sa tuile). */
+/** Stéthoscope de la carte Suivi santé (illustration fournie, avec sa tuile). */
 const SANTE_ICON = require('@/assets/images/Icon_sante.png');
 /** Valise de naissance de la carte Organisation (illustration fournie, avec sa tuile). */
 const ORGANISATION_ICON = require('@/assets/images/Icon_organisation.png');
+/** Deux cœurs de la carte « Avec votre co-parent » (illustration fournie, préparée ronde). */
+const COPARENT_ICON = require('@/assets/images/Icon_coparent.png');
 
 /**
  * ⚠️ TEMPORAIRE — exemples affichés **en mode contournement DEV
@@ -358,17 +360,25 @@ export default function HubScreen() {
 
             <View className="flex-1 gap-3">
               <View className="flex-row items-center gap-3.5">
-                <View className="h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-white/25">
-                  {partnerMood ? (
+                {partnerMood ? (
+                  <View className="h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-white/25">
                     <Image
                       source={MOOD_PRESENTATION[partnerMood.mood].imgUrl}
                       style={{ width: 44, height: 44 }}
                       resizeMode="contain"
                     />
-                  ) : (
-                    <Text className="text-[20px]">💕</Text>
-                  )}
-                </View>
+                  </View>
+                ) : (
+                  // Icône 3D des deux cœurs (fournie par l'utilisateur,
+                  // demande explicite) à la place de l'émoji 💕. Image
+                  // préparée ronde, cœurs réduits au centre (demandes
+                  // explicites) : affichée telle quelle.
+                  <Image
+                    source={COPARENT_ICON}
+                    style={{ width: 48, height: 48 }}
+                    resizeMode="contain"
+                  />
+                )}
 
                 <View className="flex-1 gap-0.5">
                   <Text className="text-[16px] font-semibold text-white">

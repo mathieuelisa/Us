@@ -2,7 +2,14 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useAtomValue } from 'jotai';
 import type { ComponentProps, ReactNode } from 'react';
-import { Image, Pressable, ScrollView, Text, View } from 'react-native';
+import {
+  Image,
+  type ImageSourcePropType,
+  Pressable,
+  ScrollView,
+  Text,
+  View,
+} from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import { withUniwind } from 'uniwind';
@@ -20,7 +27,12 @@ import { useMyHousehold } from '@/features/household/hooks';
 import { getPartnerUserId, type HubSummary } from '@/features/hub/api';
 import { MOOD_PRESENTATION } from '@/features/hub/constants';
 import { useHubSummary } from '@/features/hub/hooks';
-import { getTipOfTheDay, PARTNER_PINK } from '@/features/partner/constants';
+import {
+  getRelationTipOfTheDay,
+  getSelfTipOfTheDay,
+  PARTNER_PINK,
+  relationTipLabel,
+} from '@/features/partner/constants';
 import { getCurrentWeekIsoDates } from '@/features/together/api';
 import { useWeekCheckinsFor } from '@/features/together/hooks';
 import { currentRoleAtom } from '@/lib/atoms/role';
@@ -33,6 +45,12 @@ type IoniconName = ComponentProps<typeof Ionicons>['name'];
 
 const PINK = PARTNER_PINK;
 const HEADER_IMAGE = require('@/assets/images/Father_feelings_mother.png');
+/**
+ * Deux cœurs entrelacés de la seconde astuce (compagnon, compagne ou
+ * couple — illustration fournie, avec sa tuile, demande explicite), à la
+ * place de l'émoji 💞.
+ */
+const COPARENT_TIP_ICON = require('@/assets/images/Icon_astuce_coparent.png');
 
 const PINK_SHADOW = {
   shadowColor: PINK.accent,
@@ -95,7 +113,24 @@ function PinkCard({ children }: { children: ReactNode }) {
  * Tuile d'illustration : tache rose aux coins inégaux plutôt qu'un carré,
  * pour l'effet « dessiné » de la capture de référence.
  */
-function IllustrationTile({ emoji }: { emoji: string }) {
+function IllustrationTile({
+  emoji,
+  image,
+}: {
+  emoji: string;
+  /** Illustration qui a déjà sa tuile : affichée seule, sans la tache. */
+  image?: ImageSourcePropType;
+}) {
+  if (image) {
+    return (
+      <Image
+        source={image}
+        style={{ width: 68, height: 68 }}
+        resizeMode="contain"
+      />
+    );
+  }
+
   return (
     <View
       className="h-[68px] w-[68px] items-center justify-center"
@@ -130,16 +165,18 @@ function SectionHeading({ icon, label }: { icon: IoniconName; label: string }) {
 
 function TipCard({
   emoji,
+  image,
   recipient,
   tip,
 }: {
   emoji: string;
+  image?: ImageSourcePropType;
   recipient: string;
   tip: string;
 }) {
   return (
     <PinkCard>
-      <IllustrationTile emoji={emoji} />
+      <IllustrationTile emoji={emoji} image={image} />
       <View className="flex-1 items-start gap-2">
         <View
           className="rounded-full px-2.5 py-1"
@@ -314,9 +351,8 @@ export default function PartnerScreen() {
   const { data: babySize } = useBabySize(weeks);
 
   const partnerName = summary?.partnerFirstName?.trim();
-  const otherRole = role === 'pregnant' ? 'partner' : 'pregnant';
-  const myTip = getTipOfTheDay(role);
-  const partnerTip = getTipOfTheDay(otherRole);
+  const myTip = getSelfTipOfTheDay(role);
+  const relationTip = getRelationTipOfTheDay(role);
 
   const notJoinedText = partnerName
     ? `${partnerName} n’a pas encore rejoint votre espace. Sa tendance d’humeur apparaîtra ici dès qu’il ou elle aura créé son compte.`
@@ -498,22 +534,21 @@ export default function PartnerScreen() {
           </PinkCard>
         </View>
 
-        {/* Les deux astuces sont visibles par les deux parents (CONCEPT.md :
-            « une carte pour la femme, une carte pour le co-parent — partagé
-            entre les deux »), d'où l'étiquetage explicite du destinataire. */}
-        {myTip || partnerTip ? (
+        {/* Deux conseils pour la personne connectée (demande explicite) :
+            l'un pour elle-même, l'autre au sujet de son compagnon ou de sa
+            compagne, ou du couple — voir `getRelationTipOfTheDay`. */}
+        {myTip || relationTip ? (
           <View className="gap-3.5">
             <SectionHeading icon="calendar-outline" label="ASTUCES DU JOUR" />
             {myTip ? (
               <TipCard emoji="💡" recipient="Pour vous" tip={myTip} />
             ) : null}
-            {partnerTip ? (
+            {relationTip ? (
               <TipCard
                 emoji="💞"
-                recipient={
-                  partnerName ? `Pour ${partnerName}` : 'Pour le co-parent'
-                }
-                tip={partnerTip}
+                image={COPARENT_TIP_ICON}
+                recipient={relationTipLabel(relationTip, role)}
+                tip={relationTip.text}
               />
             ) : null}
           </View>
