@@ -12,6 +12,7 @@ import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import { withUniwind } from 'uniwind';
 
 import { BabyEntryFormModal } from '@/components/baby/baby-entry-form-modal';
+import { GrowthChart } from '@/components/baby/growth-chart';
 import { BlobIllustration } from '@/components/ui/blob-illustration';
 import {
   DashedLoopDoodle,
@@ -81,10 +82,44 @@ export function BabyModuleScreen({ module }: { module: BabyModule }) {
   const accent = useThemeAccent();
   const [entries, setEntries] = useState<BabyEntry[]>([]);
   const [isFormVisible, setIsFormVisible] = useState(false);
+  /** Entrée rouverte pour correction ; `null` quand la modale ajoute. */
+  const [editingEntry, setEditingEntry] = useState<BabyEntry | null>(null);
 
-  function addEntry(entry: Omit<BabyEntry, 'id'>) {
-    setEntries((current) => [{ ...entry, id: `${Date.now()}` }, ...current]);
+  // Dernière valeur de chaque champ, par date de mesure : point de départ
+  // des molettes du formulaire. `entries` étant trié du plus récent au plus
+  // ancien, on le parcourt à rebours pour que le plus récent l'emporte.
+  const lastValues: Record<string, string> = {};
+  for (const entry of [...entries].reverse()) {
+    Object.assign(lastValues, entry.values);
+  }
+
+  /**
+   * L'historique reste trié par date (puis heure) décroissante, même quand
+   * on saisit après coup une mesure plus ancienne (demande explicite) : elle
+   * se range à sa place au lieu de passer en tête. Le tri étant stable et la
+   * nouvelle entrée placée devant, elle passe avant celles du même moment.
+   */
+  function saveEntry(entry: Omit<BabyEntry, 'id'>) {
+    const editedId = editingEntry?.id;
+    setEntries((current) =>
+      (editedId
+        ? current.map((item) =>
+            item.id === editedId ? { ...entry, id: editedId } : item,
+          )
+        : [{ ...entry, id: `${Date.now()}` }, ...current]
+      ).sort(compareNewestFirst),
+    );
+    closeForm();
+  }
+
+  function openForm(entry: BabyEntry | null) {
+    setEditingEntry(entry);
+    setIsFormVisible(true);
+  }
+
+  function closeForm() {
     setIsFormVisible(false);
+    setEditingEntry(null);
   }
 
   return (
@@ -128,6 +163,17 @@ export function BabyModuleScreen({ module }: { module: BabyModule }) {
             </View>
           </View>
 
+          {/* Courbe de croissance (demande explicite), au-dessus de
+              l'historique, sur le seul suivi « Croissance ». */}
+          {module.slug === 'croissance' ? (
+            <View
+              className="rounded-[28px] px-4 pb-3 pt-4"
+              style={[tintedShadow(accent), GLASS_SURFACE]}
+            >
+              <GrowthChart entries={entries} accent={accent} />
+            </View>
+          ) : null}
+
           <View className="gap-3">
             <View className="flex-row items-center gap-2.5 px-1">
               <Ionicons name="calendar-outline" size={20} color={accent} />
@@ -156,10 +202,15 @@ export function BabyModuleScreen({ module }: { module: BabyModule }) {
               </View>
             ) : (
               <View className="gap-2.5">
+                {/* Un appui rouvre la modale préremplie pour corriger une
+                    saisie (demande explicite). */}
                 {entries.map((entry) => (
-                  <View
+                  <Pressable
                     key={entry.id}
-                    className="flex-row items-center gap-3 rounded-[22px] py-3 pl-3 pr-4"
+                    accessibilityRole="button"
+                    accessibilityLabel={`${module.editLabel} du ${formatBabyEntryDate(entry)}`}
+                    onPress={() => openForm(entry)}
+                    className="flex-row items-center gap-3 rounded-[22px] py-3 pl-3 pr-3 active:opacity-70"
                     style={[tintedShadow(accent), GLASS_SURFACE]}
                   >
                     <View
@@ -195,7 +246,12 @@ export function BabyModuleScreen({ module }: { module: BabyModule }) {
                         {formatBabyEntryDate(entry)}
                       </Text>
                     </View>
-                  </View>
+                    <Ionicons
+                      name="create-outline"
+                      size={17}
+                      color={GLASS_BODY_COLOR}
+                    />
+                  </Pressable>
                 ))}
               </View>
             )}
@@ -204,7 +260,7 @@ export function BabyModuleScreen({ module }: { module: BabyModule }) {
           <PillButton
             label={module.actionLabel}
             icon="add"
-            onPress={() => setIsFormVisible(true)}
+            onPress={() => openForm(null)}
           />
 
           <DashedLoopDoodle color={accent} />
@@ -213,10 +269,18 @@ export function BabyModuleScreen({ module }: { module: BabyModule }) {
         <BabyEntryFormModal
           module={module}
           visible={isFormVisible}
-          onSubmit={addEntry}
-          onCancel={() => setIsFormVisible(false)}
+          initialEntry={editingEntry}
+          lastValues={lastValues}
+          onSubmit={saveEntry}
+          onCancel={closeForm}
         />
       </ImageBackground>
     </SafeAreaView>
+  );
+}
+
+function compareNewestFirst(a: BabyEntry, b: BabyEntry): number {
+  return (
+    b.date.localeCompare(a.date) || (b.time ?? '').localeCompare(a.time ?? '')
   );
 }

@@ -45,11 +45,11 @@ const WEEKDAY_LABELS = [
  * centre du bandeau de sélection. `compact` sert là où la hauteur manque
  * (modale « Nouveau rendez-vous », qui doit tenir sans défiler).
  */
-const WHEEL_SIZES = {
+export const WHEEL_SIZES = {
   regular: { itemHeight: 40, visibleItems: 5, fontSize: 19 },
   compact: { itemHeight: 34, visibleItems: 3, fontSize: 16 },
 } as const;
-type WheelSize = (typeof WHEEL_SIZES)[keyof typeof WHEEL_SIZES];
+export type WheelSize = (typeof WHEEL_SIZES)[keyof typeof WHEEL_SIZES];
 
 function daysInMonth(year: number, month: number): number {
   // `month` est 1-indexé ; le jour 0 du mois suivant = dernier jour du mois.
@@ -78,7 +78,7 @@ function parseIsoDate(value: string | null): {
   };
 }
 
-type WheelItem = { value: number; label: string };
+export type WheelItem = { value: number; label: string };
 
 function WheelRow({
   item,
@@ -148,7 +148,7 @@ function WheelRow({
   );
 }
 
-function WheelColumn({
+export function WheelColumn({
   items,
   selected,
   onSelect,

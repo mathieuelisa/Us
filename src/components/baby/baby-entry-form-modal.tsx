@@ -12,6 +12,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
+import { MeasureWheelField } from '@/components/baby/measure-wheel-field';
 import { BlobIllustration } from '@/components/ui/blob-illustration';
 import {
   GLASS_BODY_COLOR,
@@ -61,11 +62,24 @@ import { todayIso } from '@/lib/date';
 export function BabyEntryFormModal({
   module,
   visible,
+  initialEntry = null,
+  lastValues = {},
   onSubmit,
   onCancel,
 }: {
   module: BabyModule;
   visible: boolean;
+  /**
+   * Entrée à modifier (appui sur une ligne de l'historique, demande
+   * explicite) : la modale s'ouvre préremplie et titrée `editLabel`.
+   * `null` : ajout d'une nouvelle entrée.
+   */
+  initialEntry?: BabyEntry | null;
+  /**
+   * Dernière valeur connue de chaque champ : point de départ des molettes
+   * de mesure, la nouvelle mesure en est rarement loin.
+   */
+  lastValues?: Record<string, string>;
   onSubmit: (entry: Omit<BabyEntry, 'id'>) => void;
   onCancel: () => void;
 }) {
@@ -91,14 +105,15 @@ export function BabyEntryFormModal({
 
   useEffect(() => {
     if (!visible) return;
-    setDate(todayIso());
-    setTime('');
-    setSegment(module.segments?.options[0] ?? null);
-    setValues({});
-    setComment('');
+    setDate(initialEntry?.date ?? todayIso());
+    // Heure stockée en `HH:MM`, réaffichée comme on la tape (« 14h20 »).
+    setTime(initialEntry?.time?.replace(':', 'h') ?? '');
+    setSegment(initialEntry?.segment ?? module.segments?.options[0] ?? null);
+    setValues(initialEntry ? { ...initialEntry.values } : {});
+    setComment(initialEntry?.comment ?? '');
     setPendingSegment(null);
     setTimerResetToken((token) => token + 1);
-  }, [visible, module]);
+  }, [visible, module, initialEntry]);
 
   function setValue(key: string, value: string) {
     setValues((current) => ({ ...current, [key]: value }));
@@ -154,6 +169,11 @@ export function BabyEntryFormModal({
     !hasInvalidNumber &&
     !isTimeInvalid;
 
+  // Poids et taille : molettes côte à côte (demande explicite).
+  const wheelFields = module.fields.filter(
+    (field) => field.kind === 'number' && field.wheel,
+  );
+
   // Heure et champs chiffrés : petits champs posés deux par ligne.
   const smallInputs: { key: string; node: ReactNode }[] = [
     ...(module.hasTime
@@ -174,7 +194,7 @@ export function BabyEntryFormModal({
         ]
       : []),
     ...module.fields
-      .filter((field) => field.kind === 'number')
+      .filter((field) => field.kind === 'number' && !field.wheel)
       .map((field) => ({
         key: field.key,
         node: (
@@ -245,7 +265,7 @@ export function BabyEntryFormModal({
                   className="text-[21px] font-extrabold leading-[26px]"
                   style={{ color: GLASS_TITLE_COLOR, letterSpacing: -0.4 }}
                 >
-                  {module.actionLabel}
+                  {initialEntry ? module.editLabel : module.actionLabel}
                 </Text>
                 <Text
                   className="text-[13px] leading-[18px]"
@@ -301,11 +321,40 @@ export function BabyEntryFormModal({
                   key={`${field.key}-${timerResetToken}`}
                   label={field.label}
                   accent={accent}
+                  initialSeconds={Number(initialEntry?.values[field.key]) || 0}
                   onRunningChange={setIsTimerRunning}
                   onStop={(seconds) => setValue(field.key, String(seconds))}
                   onStart={() => setValue(field.key, '')}
                 />
               ))}
+
+            {wheelFields.length > 0 ? (
+              <View className="flex-row gap-2.5">
+                {wheelFields.map((field) =>
+                  field.wheel ? (
+                    <MeasureWheelField
+                      // Remonté à chaque ouverture : la molette repart de
+                      // la dernière mesure, pas de la saisie précédente.
+                      key={`${field.key}-${timerResetToken}`}
+                      label={field.label}
+                      unit={field.unit}
+                      wheel={field.wheel}
+                      value={values[field.key] || null}
+                      // En modification, la molette part de la valeur de
+                      // l'entrée (déjà dans `values`) ; en ajout, de la
+                      // dernière mesure connue.
+                      startValue={
+                        Number(values[field.key]) ||
+                        Number(lastValues[field.key]) ||
+                        field.wheel.defaultValue
+                      }
+                      onChange={(next) => setValue(field.key, next ?? '')}
+                      accent={accent}
+                    />
+                  ) : null,
+                )}
+              </View>
+            ) : null}
 
             {smallInputs.length > 0 ? (
               <View className="gap-1.5">
@@ -682,12 +731,15 @@ function normalizeValues(
 function TimerField({
   label,
   accent,
+  initialSeconds,
   onRunningChange,
   onStart,
   onStop,
 }: {
   label: string;
   accent: string;
+  /** Durée déjà enregistrée, affichée à l'ouverture d'une entrée modifiée. */
+  initialSeconds: number;
   /** Remonte l'état de marche — le parent en a besoin pour ses garde-fous. */
   onRunningChange: (isRunning: boolean) => void;
   /** Appelé au démarrage et à la remise à zéro — la durée n'est plus valide. */
@@ -695,7 +747,7 @@ function TimerField({
   onStop: (seconds: number) => void;
 }) {
   const [startedAt, setStartedAt] = useState<number | null>(null);
-  const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const [elapsedSeconds, setElapsedSeconds] = useState(initialSeconds);
   const isRunning = startedAt !== null;
 
   useEffect(() => {

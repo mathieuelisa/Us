@@ -29,6 +29,26 @@ export type BabyNumberField = {
   label: string;
   unit: string;
   kind: 'number' | 'timer';
+  /**
+   * Saisie à la molette plutôt qu'au clavier (demande explicite sur le
+   * poids et la taille) : une colonne pour la partie entière, une pour la
+   * partie décimale. Absent : champ texte classique.
+   */
+  wheel?: BabyMeasureWheel;
+};
+
+/**
+ * Bornes d'une molette de mesure. `fractionDigits` fixe l'affichage de la
+ * partie décimale (« 690 » pour des grammes), `fractionStep` le pas de sa
+ * colonne, exprimé dans cette même unité (10 → 000, 010, … 990).
+ * `defaultValue` est la position de départ quand aucune mesure n'existe.
+ */
+export type BabyMeasureWheel = {
+  min: number;
+  max: number;
+  fractionDigits: number;
+  fractionStep: number;
+  defaultValue: number;
 };
 
 /** Choix exclusif en tête de formulaire (segments des écrans 8g/8h). */
@@ -50,6 +70,8 @@ export type BabyModule = {
   emptyState: string;
   /** Libellé du bouton d'ajout et titre de la modale (écrans 8d/8f/8g/8h). */
   actionLabel: string;
+  /** Titre de la même modale rouverte sur une entrée existante. */
+  editLabel: string;
   /** Sous-titre de la modale d'ajout, sous `actionLabel`. */
   formSubtitle: string;
   segments: BabySegmentGroup | null;
@@ -80,17 +102,47 @@ export const BABY_MODULES: Record<BabyModuleSlug, BabyModule> = {
     emoji: '📏',
     title: 'Croissance',
     subtitle: 'Poids, taille, périmètre crânien',
-    sectionTitle: 'Courbe de croissance',
-    emptyState:
-      'Aucune mesure enregistrée. La courbe se dessinera dès la première.',
+    // La courbe a sa propre carte au-dessus (GrowthChart) : cette section
+    // n'est plus que l'historique.
+    sectionTitle: 'Historique des mesures',
+    emptyState: 'Aucune mesure enregistrée pour l’instant.',
     actionLabel: 'Ajouter une mesure',
+    editLabel: 'Modifier la mesure',
     formSubtitle: 'Notez les mesures de votre bébé.',
     segments: null,
     hasTime: false,
     hasComment: true,
     fields: [
-      { key: 'height', label: 'Taille', unit: 'cm', kind: 'number' },
-      { key: 'weight', label: 'Poids', unit: 'kg', kind: 'number' },
+      // Plages couvrant un grand prématuré comme un enfant de 2 ans.
+      {
+        key: 'height',
+        label: 'Taille',
+        unit: 'cm',
+        kind: 'number',
+        wheel: {
+          min: 20,
+          max: 110,
+          fractionDigits: 1,
+          fractionStep: 1,
+          defaultValue: 50,
+        },
+      },
+      {
+        key: 'weight',
+        label: 'Poids',
+        unit: 'kg',
+        kind: 'number',
+        // Au gramme près sur l'affichage (« 5,690 kg », demande explicite),
+        // par pas de 10 g : une colonne de 1 000 lignes serait interminable
+        // à faire défiler, et un pèse-bébé n'est pas plus précis.
+        wheel: {
+          min: 0,
+          max: 20,
+          fractionDigits: 3,
+          fractionStep: 10,
+          defaultValue: 3.5,
+        },
+      },
       {
         key: 'headCircumference',
         label: 'Périmètre crânien',
@@ -108,6 +160,7 @@ export const BABY_MODULES: Record<BabyModuleSlug, BabyModule> = {
     sectionTitle: 'Derniers biberons',
     emptyState: 'Aucun biberon enregistré pour le moment.',
     actionLabel: 'Ajouter un biberon',
+    editLabel: 'Modifier le biberon',
     formSubtitle: 'Renseignez les informations de votre biberon.',
     segments: {
       label: 'Type de lait',
@@ -128,6 +181,7 @@ export const BABY_MODULES: Record<BabyModuleSlug, BabyModule> = {
     sectionTitle: 'Dernières tétées',
     emptyState: 'Aucune tétée enregistrée pour le moment.',
     actionLabel: 'Ajouter un allaitement',
+    editLabel: 'Modifier l’allaitement',
     formSubtitle: 'Lancez le chronomètre pendant la tétée.',
     // Le design 8g proposait aussi « Les deux » ; retiré sur demande
     // explicite — une tétée se note sein par sein.
@@ -145,6 +199,7 @@ export const BABY_MODULES: Record<BabyModuleSlug, BabyModule> = {
     sectionTitle: 'Derniers soins',
     emptyState: 'Aucun bain ni soin enregistré pour le moment.',
     actionLabel: 'Ajouter un bain',
+    editLabel: 'Modifier le bain',
     formSubtitle: 'Notez le bain ou les soins du jour.',
     segments: { label: 'Type', options: ['Bain', 'Soins'] },
     hasTime: true,
