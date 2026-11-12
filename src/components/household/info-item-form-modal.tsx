@@ -49,12 +49,19 @@ export function InfoItemFormModal({
   visible,
   isSaving,
   editingItem,
+  initialCategory = null,
   onCancel,
   onSubmit,
 }: {
   visible: boolean;
   isSaving: boolean;
   editingItem?: HouseholdInfoItem | null;
+  /**
+   * Création ouverte depuis une suggestion de l'état vide : la modale
+   * démarre directement sur le formulaire de cette catégorie (la grille
+   * reste accessible par le retour).
+   */
+  initialCategory?: InfoCategory | null;
   onCancel: () => void;
   /**
    * `values` : une valeur en modification ; en création, une par exemple
@@ -85,12 +92,16 @@ export function InfoItemFormModal({
           ? formatPhoneNumber(editingItem.value ?? '')
           : (editingItem.value ?? ''),
       );
+    } else if (!editingItem && initialCategory) {
+      setCategory(initialCategory);
+      setLabel('');
+      setValue(INFO_CATEGORY_META[initialCategory].isDate ? todayIso() : '');
     } else {
       setCategory(null);
       setLabel('');
       setValue(editingItem ? '' : todayIso());
     }
-  }, [visible, editingItem]);
+  }, [visible, editingItem, initialCategory]);
 
   const meta = category ? INFO_CATEGORY_META[category] : null;
   const isEditing = Boolean(editingItem);

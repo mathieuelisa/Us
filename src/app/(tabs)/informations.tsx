@@ -4,7 +4,7 @@ import { Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import { withUniwind } from 'uniwind';
-
+import { EmptyInfoState } from '@/components/household/empty-info-state';
 import { InfoItemFormModal } from '@/components/household/info-item-form-modal';
 import { BlobFab } from '@/components/ui/blob-fab';
 import {
@@ -71,9 +71,14 @@ export default function InformationsScreen() {
   const [editingItem, setEditingItem] = useState<HouseholdInfoItem | null>(
     null,
   );
+  /** Catégorie choisie depuis une suggestion de l'état vide, le cas échéant. */
+  const [initialCategory, setInitialCategory] = useState<InfoCategory | null>(
+    null,
+  );
 
-  const openCreate = () => {
+  const openCreate = (category: InfoCategory | null = null) => {
     setEditingItem(null);
+    setInitialCategory(category);
     setIsModalOpen(true);
   };
 
@@ -85,6 +90,7 @@ export default function InformationsScreen() {
   const closeModal = () => {
     setIsModalOpen(false);
     setEditingItem(null);
+    setInitialCategory(null);
   };
 
   const submit = (input: {
@@ -231,18 +237,7 @@ export default function InformationsScreen() {
         ) : (
           <View className="flex-1 gap-5">
             {items.length === 0 ? (
-              <View
-                className="items-center gap-1.5 rounded-[24px] px-5 py-6"
-                style={{ backgroundColor: 'rgba(255, 255, 255, 0.92)' }}
-              >
-                <Text className="text-center text-[15px] font-semibold text-[#1a1a1a]">
-                  Aucune information pour l’instant
-                </Text>
-                <Text className="text-center text-[13px] leading-[18px] text-[#6b6b6b]">
-                  Ajoutez groupe sanguin, allergies, numéros utiles… avec le
-                  bouton +. Elles seront partagées avec votre co-parent.
-                </Text>
-              </View>
+              <EmptyInfoState accent={accent} onPickCategory={openCreate} />
             ) : null}
             {INFO_CATEGORY_ORDER.map((category) => {
               const meta = INFO_CATEGORY_META[category];
@@ -381,20 +376,21 @@ export default function InformationsScreen() {
         )}
       </ScrollView>
 
-      {/* Pulsation discrète tant qu'aucune information n'est saisie
-          (demande explicite) — pas pendant le chargement, où la liste est
-          vide sans l'être vraiment. */}
+      {/* Rebond d'invitation, comme la sélection d'un onglet, tant
+          qu'aucune information n'est saisie (demande explicite) — pas
+          pendant le chargement, où la liste est vide sans l'être vraiment. */}
       <BlobFab
         accessibilityLabel="Ajouter une information"
-        onPress={openCreate}
+        onPress={() => openCreate()}
         className="absolute bottom-6 right-6"
-        pulse={!isHouseholdLoading && !areItemsLoading && items.length === 0}
+        invite={!isHouseholdLoading && !areItemsLoading && items.length === 0}
       />
 
       <InfoItemFormModal
         visible={isModalOpen}
         isSaving={createItems.isPending || updateItem.isPending}
         editingItem={editingItem}
+        initialCategory={initialCategory}
         onCancel={closeModal}
         onSubmit={submit}
       />

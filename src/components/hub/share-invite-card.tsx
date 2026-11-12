@@ -173,14 +173,14 @@ export function ShareInviteCard({
             className="text-[13px] leading-[18px]"
             style={{ color: GLASS_BODY_COLOR }}
           >
-            Ajoutez le co-parent ou un proche, tout se synchronisera en temps
-            réel.
+            Ajoutez votre partenaire ou un proche, tout se synchronisera en
+            temps réel.
           </Text>
         </View>
       </View>
 
       <PillButton
-        label="Ajouter le co-parent"
+        label="Ajouter votre partenaire"
         icon="people-outline"
         size="compact"
         onPress={onAddPartner}

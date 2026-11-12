@@ -37,7 +37,7 @@ const CROISSANCE_ICON = BABY_MODULES.croissance.image;
 const BAIN_ICON = BABY_MODULES.bain.image;
 const ALLAITEMENT_ICON = BABY_MODULES.allaitement.image;
 const DESCRIPTION =
-  'Centralisez la croissance, les repas et le sommeil de bébé, et gardez votre co-parent connecté à chaque étape.';
+  'Centralisez la croissance, les repas et le sommeil de bébé, et gardez votre partenaire connecté à chaque étape.';
 
 /**
  * Ouvre le détail d'un suivi. Les 4 routes vivent dans le groupe `(tabs)`

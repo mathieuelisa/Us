@@ -32,7 +32,7 @@ export const PROFESSIONAL_STATUS_OPTIONS: {
 export const PRIORITY_OPTIONS: { value: string; label: string }[] = [
   { value: 'demarches', label: 'Démarches administratives' },
   { value: 'sante', label: 'Suivi santé' },
-  { value: 'partage', label: 'Partage avec le co-parent' },
+  { value: 'partage', label: 'Partage avec votre partenaire' },
   { value: 'rendez_vous', label: 'Dates et rendez-vous importants' },
 ];
 

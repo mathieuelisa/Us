@@ -150,7 +150,7 @@ export default function SettingsScreen() {
               className="text-[14px] leading-5"
               style={{ color: GLASS_BODY_COLOR }}
             >
-              Personnels — non partagés avec votre co-parent.
+              Personnels — non partagés avec votre partenaire.
             </Text>
             <Svg width={110} height={12} viewBox="0 0 110 12">
               <Path

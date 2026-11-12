@@ -141,7 +141,7 @@ export function AppointmentsTab({
                   ) : (
                     <View className="rounded-full bg-accent/10 px-2 py-0.5">
                       <Text className="text-[10.5px] font-medium text-accent">
-                        De votre co-parent
+                        De votre partenaire
                       </Text>
                     </View>
                   )}

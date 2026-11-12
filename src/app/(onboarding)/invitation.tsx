@@ -51,11 +51,13 @@ export default function InvitePartnerStep() {
     <OnboardingStepShell
       step={null}
       centered
-      title={partnerName ? `Inviter ${partnerName}` : 'Inviter le co-parent'}
+      title={
+        partnerName ? `Inviter ${partnerName}` : 'Inviter votre partenaire'
+      }
       subtitle={
         partnerName
           ? `${partnerName} pourra suivre les démarches, les infos concernant son bébé et rester connecté à votre grossesse`
-          : 'Le co-parent pourra suivre les démarches, les infos concernant son bébé et rester connecté à votre grossesse'
+          : 'Votre partenaire pourra suivre les démarches, les infos concernant son bébé et rester connecté à votre grossesse'
       }
       primaryLabel="Envoyer l’invitation"
       isPrimaryDisabled={!isValidEmail}
@@ -67,7 +69,9 @@ export default function InvitePartnerStep() {
         <PlainInput
           isInvalid={isTouched && !isValidEmail}
           placeholder={
-            partnerName ? `Email de ${partnerName}` : 'Email du co-parent'
+            partnerName
+              ? `Email de ${partnerName}`
+              : 'Email de votre partenaire'
           }
           value={partnerEmail}
           onChangeText={setPartnerEmail}

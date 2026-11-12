@@ -358,7 +358,7 @@ export default function PartnerScreen() {
 
   const notJoinedText = partnerName
     ? `${partnerName} n’a pas encore rejoint votre espace. Sa tendance d’humeur apparaîtra ici dès qu’il ou elle aura créé son compte.`
-    : 'Le co-parent n’a pas encore rejoint votre espace.';
+    : 'Votre partenaire n’a pas encore rejoint votre espace.';
 
   return (
     <SafeAreaView

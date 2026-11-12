@@ -129,7 +129,7 @@ export default function AccompanimentStep() {
               className="flex-1 text-[14.5px] font-medium"
               style={{ color: GLASS_TITLE_COLOR }}
             >
-              Le co-parent utilisera-t-il aussi l’app ?
+              Votre partenaire utilisera-t-il aussi l’app ?
             </Text>
           </View>
           <YesNoChoice

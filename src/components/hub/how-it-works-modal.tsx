@@ -20,7 +20,7 @@ const HEART_PINK = '#f08aa8';
  */
 const STEPS: { text: string; icon: IoniconName; badge?: IoniconName }[] = [
   {
-    text: 'Cliquer sur « Ajouter le co-parent »',
+    text: 'Cliquer sur « Ajouter votre partenaire »',
     icon: 'person-outline',
     badge: 'add',
   },

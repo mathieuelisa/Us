@@ -199,7 +199,7 @@ export function ContactsTab({
                 className="text-[13px] leading-[18px]"
                 style={{ color: GLASS_BODY_COLOR }}
               >
-                Un numéro utile, partagé avec votre co-parent.
+                Un numéro utile, partagé avec votre partenaire.
               </Text>
             </View>
             <Pressable

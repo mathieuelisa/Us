@@ -90,7 +90,7 @@ export default function FirstNamesStep() {
             isInvalid={
               touchedField.partnerFirstName && isPartnerFirstNameMissing
             }
-            placeholder="Prénom du co-parent"
+            placeholder="Prénom de votre partenaire"
             value={partnerFirstName}
             onChangeText={setPartnerFirstName}
             onBlur={() =>
@@ -103,7 +103,7 @@ export default function FirstNamesStep() {
           />
           {touchedField.partnerFirstName && isPartnerFirstNameMissing ? (
             <Text className="text-[12.5px] text-red-600">
-              Le prénom du co-parent est nécessaire.
+              Le prénom de votre partenaire est nécessaire.
             </Text>
           ) : null}
         </View>

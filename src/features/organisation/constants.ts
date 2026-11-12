@@ -45,7 +45,7 @@ export const CHECKLIST_ORDER = ['valise-maternite', 'sac-naissance'];
 export const CHECKLIST_CATEGORY_META: Record<string, { title: string }> = {
   maman: { title: 'Maman' },
   bebe: { title: 'Bébé' },
-  co_parent: { title: 'Co-parent' },
+  co_parent: { title: 'Partenaire' },
 };
 
 export const CHECKLIST_CATEGORY_ORDER = ['maman', 'bebe', 'co_parent'];

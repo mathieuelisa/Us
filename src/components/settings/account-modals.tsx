@@ -259,7 +259,7 @@ export function DeleteAccountModal({
           style={{ color: GLASS_TITLE_COLOR }}
         >
           {isPregnant
-            ? 'Votre espace partagé sera supprimé avec toutes ses données — journal, rendez-vous, démarches, valises, informations — y compris pour votre co-parent.'
+            ? 'Votre espace partagé sera supprimé avec toutes ses données — journal, rendez-vous, démarches, valises, informations — y compris pour votre partenaire.'
             : 'Vos humeurs, vos rendez-vous et votre accès à l’espace partagé seront supprimés. L’espace et ses données restent à l’autre parent.'}
         </Text>
         <Text

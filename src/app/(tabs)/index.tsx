@@ -340,7 +340,7 @@ export default function HubScreen() {
                   <Text className="text-[16px] font-semibold text-white">
                     {partnerName
                       ? `Avec ${partnerName}`
-                      : 'Avec votre co-parent'}
+                      : 'Avec votre partenaire'}
                   </Text>
                   <Text className="text-[13px] text-white/80">
                     {!hasPartnerJoined
