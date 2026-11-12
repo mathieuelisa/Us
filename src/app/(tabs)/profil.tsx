@@ -3,6 +3,7 @@ import { useAtomValue } from 'jotai';
 import { type ComponentProps, useEffect, useRef, useState } from 'react';
 import { Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
+import Svg, { Path } from 'react-native-svg';
 import { withUniwind } from 'uniwind';
 
 import {
@@ -113,6 +114,16 @@ export default function ProfileScreen() {
           <Text className="text-[15px]" style={{ color: GLASS_BODY_COLOR }}>
             Gérez vos informations personnelles.
           </Text>
+          {/* Même trait dessiné que sous l'en-tête de Réglages. */}
+          <Svg width={110} height={12} viewBox="0 0 110 12">
+            <Path
+              d="M4 8 C 32 3, 74 2, 106 5"
+              stroke={hexToRgba(accent, 0.5)}
+              strokeWidth={3.5}
+              strokeLinecap="round"
+              fill="none"
+            />
+          </Svg>
         </View>
 
         <View className="items-center gap-3">
