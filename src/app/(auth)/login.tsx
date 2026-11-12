@@ -26,7 +26,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import { withUniwind } from 'uniwind';
-
+import { PasswordStrengthMeter } from '@/components/auth/password-strength-meter';
 import {
   GLASS_BODY_COLOR,
   GLASS_TITLE_COLOR,
@@ -188,12 +188,12 @@ export default function LoginScreen() {
     }
   };
 
+  // La longueur minimale se lit dans la jauge de solidité : il ne reste
+  // ici que l'écart entre les deux saisies.
   const passwordHint =
-    isSignUp && password.length > 0 && !isPasswordLongEnough
-      ? `${PASSWORD_MIN_LENGTH} caractères minimum.`
-      : isSignUp && passwordConfirmation.length > 0 && !doPasswordsMatch
-        ? 'Les deux mots de passe ne correspondent pas.'
-        : null;
+    isSignUp && passwordConfirmation.length > 0 && !doPasswordsMatch
+      ? 'Les deux mots de passe ne correspondent pas.'
+      : null;
 
   const eyeToggle = (
     <Pressable
@@ -293,6 +293,15 @@ export default function LoginScreen() {
               onSubmitEditing={isSignUp ? undefined : handleSubmit}
               trailing={eyeToggle}
             />
+            {isSignUp && password.length > 0 ? (
+              <Animated.View
+                entering={FadeInDown.duration(SWITCH_DURATION)}
+                exiting={FadeOutUp.duration(180)}
+                layout={BLOCK_LAYOUT}
+              >
+                <PasswordStrengthMeter password={password} />
+              </Animated.View>
+            ) : null}
             {isSignUp ? (
               <Animated.View
                 entering={FadeInDown.duration(SWITCH_DURATION)}
