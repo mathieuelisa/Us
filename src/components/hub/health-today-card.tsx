@@ -43,7 +43,8 @@ import { todayIso } from '@/lib/date';
  * Pastille d'en-tête : l'ourson de l'humeur du jour de la personne enceinte
  * (check-in d'Ensemble) dès qu'elle l'a notée, à la place du cœur — pour
  * elle comme pour le co-parent (demande explicite). Le cœur reste tant
- * qu'elle n'a rien noté.
+ * qu'elle n'a rien noté. Pour elle, la pastille ouvre Ensemble, où l'humeur
+ * se note et se modifie.
  *
  * Juste au-dessus, quand des symptômes sont notés, un carré « Conseil »
  * propre à l'un d'eux (demande explicite), sur la teinte de ce symptôme —
@@ -94,18 +95,31 @@ export function HealthTodayCard({
       }}
     >
       <View className="flex-row items-center gap-3">
-        <View
-          accessibilityRole={pregnantMood ? 'image' : undefined}
-          accessibilityLabel={
-            pregnantMood
-              ? `Humeur du jour : ${MOOD_PRESENTATION[pregnantMood].label}`
-              : undefined
+        {/* La personne enceinte touche son ourson (ou le cœur, tant
+            qu'elle n'a rien noté) pour aller noter ou changer son humeur du
+            jour dans Ensemble (demande explicite). Côté partenaire, c'est
+            l'humeur de l'autre : simple image, pas de lien. */}
+        <Pressable
+          disabled={!isPregnant}
+          onPress={() => router.push('/ensemble')}
+          accessibilityRole={
+            isPregnant ? 'button' : pregnantMood ? 'image' : undefined
           }
+          accessibilityLabel={
+            isPregnant
+              ? pregnantMood
+                ? `Humeur du jour : ${MOOD_PRESENTATION[pregnantMood].label}. Modifier dans Ensemble`
+                : 'Noter mon humeur du jour dans Ensemble'
+              : pregnantMood
+                ? `Humeur du jour : ${MOOD_PRESENTATION[pregnantMood].label}`
+                : undefined
+          }
+          hitSlop={6}
           // Plus grand quand c'est l'ourson (demande explicite) : à 44 px
           // son expression ne se lisait pas.
           className={`${
             pregnantMood ? 'h-[60px] w-[60px]' : 'h-11 w-11'
-          } items-center justify-center overflow-hidden rounded-full`}
+          } items-center justify-center overflow-hidden rounded-full active:opacity-70`}
           style={{ backgroundColor: hexToRgba('#e8739a', 0.14) }}
         >
           {pregnantMood ? (
@@ -117,7 +131,7 @@ export function HealthTodayCard({
           ) : (
             <Ionicons name="heart" size={21} color="#e8739a" />
           )}
-        </View>
+        </Pressable>
         <View className="flex-1 gap-0.5">
           <Text
             className="text-[16.5px] font-bold"
