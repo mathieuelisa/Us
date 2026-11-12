@@ -7,7 +7,7 @@ import { currentRoleAtom } from '@/lib/atoms/role';
 import { sessionAtom } from '@/lib/atoms/session';
 import { queryKeys } from '@/lib/query/keys';
 import {
-  createInfoItem,
+  createInfoItems,
   deleteInfoItem,
   fetchInfoItems,
   fetchMyHousehold,
@@ -72,23 +72,23 @@ export function useInfoItems(householdId: string | undefined) {
   });
 }
 
-export function useCreateInfoItem(householdId: string | undefined) {
+/**
+ * Crée une ou plusieurs informations (plusieurs points de vigilance cochés
+ * d'un coup) en une seule requête.
+ */
+export function useCreateInfoItems(householdId: string | undefined) {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: ({
-      label,
-      value,
-      category,
-      sortOrder,
+      items,
+      firstSortOrder,
     }: {
-      label: string;
-      value: string | null;
-      category: string | null;
-      sortOrder: number;
+      items: { label: string; value: string | null; category: string | null }[];
+      firstSortOrder: number;
     }) => {
       if (!householdId) throw new Error('No household');
-      return createInfoItem(householdId, { label, value, category }, sortOrder);
+      return createInfoItems(householdId, items, firstSortOrder);
     },
     onSuccess: () => {
       if (householdId) {

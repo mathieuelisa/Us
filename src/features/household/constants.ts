@@ -53,6 +53,11 @@ export const INFO_CATEGORY_META: Record<
     isChip?: boolean;
     /** Valeur choisie parmi une liste fermée plutôt que saisie libre. */
     valueOptions?: string[];
+    /**
+     * Exemples à toucher sous le champ libre : remplissent la valeur, qui
+     * reste modifiable (contrairement à `valueOptions`).
+     */
+    valueSuggestions?: string[];
   }
 > = {
   blood_type: {
@@ -63,7 +68,7 @@ export const INFO_CATEGORY_META: Record<
     tint: '#FFE4E6',
     needsLabel: true,
     labelPlaceholder: 'Qui — ex. Maman',
-    labelSuggestions: ['Maman', 'Papa'],
+    labelSuggestions: ['Maman', 'Papa', 'Co-parent'],
     defaultLabel: '',
     valuePlaceholder: 'Groupe sanguin',
     valueOptions: ['O+', 'O-', 'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-'],
@@ -79,6 +84,18 @@ export const INFO_CATEGORY_META: Record<
     labelSuggestions: [],
     defaultLabel: 'Point de vigilance',
     valuePlaceholder: 'ex. Diabète gestationnel, hypertension',
+    // Exemples fréquents (demande explicite), simples raccourcis de saisie —
+    // l'app n'en tire aucune conséquence médicale.
+    valueSuggestions: [
+      'Diabète gestationnel',
+      'Hypertension',
+      'Anémie',
+      'Rhésus négatif',
+      'Placenta bas',
+      'Grossesse gémellaire',
+      'Césarienne antérieure',
+      'Asthme',
+    ],
     isChip: true,
   },
   allergy: {
@@ -92,6 +109,22 @@ export const INFO_CATEGORY_META: Record<
     labelSuggestions: [],
     defaultLabel: 'Allergie',
     valuePlaceholder: 'ex. Pénicilline, arachides',
+    // Allergies fréquentes (demande explicite), à cocher à plusieurs comme
+    // les points de vigilance — simples raccourcis de saisie.
+    valueSuggestions: [
+      'Pénicilline',
+      'Aspirine',
+      'Ibuprofène',
+      'Latex',
+      'Arachides',
+      'Fruits à coque',
+      'Lait',
+      'Œufs',
+      'Gluten',
+      'Fruits de mer',
+      'Pollen',
+      'Iode',
+    ],
     isChip: true,
   },
   phone: {
@@ -141,7 +174,7 @@ export const INFO_CATEGORY_META: Record<
     tint: '#E0E7FF',
     needsLabel: true,
     labelPlaceholder: 'Qui — ex. Maman',
-    labelSuggestions: ['Maman', 'Papa'],
+    labelSuggestions: ['Maman', 'Papa', 'Co-parent'],
     defaultLabel: '',
     valuePlaceholder: 'Numéro à 15 chiffres',
     valueKeyboardType: 'number-pad',

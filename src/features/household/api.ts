@@ -29,22 +29,28 @@ export async function fetchInfoItems(
   return data;
 }
 
-export async function createInfoItem(
+/**
+ * Crée une ou plusieurs informations d'un coup (plusieurs points de
+ * vigilance cochés ensemble) : une seule requête, rangées à la suite de
+ * `firstSortOrder`. RLS : `household_info_items_all_members`.
+ */
+export async function createInfoItems(
   householdId: string,
-  input: { label: string; value: string | null; category: string | null },
-  sortOrder: number,
-): Promise<HouseholdInfoItem> {
+  inputs: { label: string; value: string | null; category: string | null }[],
+  firstSortOrder: number,
+): Promise<HouseholdInfoItem[]> {
   const { data, error } = await supabase
     .from('household_info_items')
-    .insert({
-      household_id: householdId,
-      label: input.label,
-      value: input.value,
-      category: input.category,
-      sort_order: sortOrder,
-    })
-    .select()
-    .single();
+    .insert(
+      inputs.map((input, index) => ({
+        household_id: householdId,
+        label: input.label,
+        value: input.value,
+        category: input.category,
+        sort_order: firstSortOrder + index,
+      })),
+    )
+    .select();
 
   if (error) throw error;
   return data;

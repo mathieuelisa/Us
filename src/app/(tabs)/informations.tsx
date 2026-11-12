@@ -22,7 +22,7 @@ import {
   isInfoCategory,
 } from '@/features/household/constants';
 import {
-  useCreateInfoItem,
+  useCreateInfoItems,
   useDeleteInfoItem,
   useInfoItems,
   useMyHousehold,
@@ -185,7 +185,7 @@ export default function InformationsScreen() {
 
   const { data: items = [], isLoading: areItemsLoading } =
     useInfoItems(householdId);
-  const createItem = useCreateInfoItem(householdId);
+  const createItems = useCreateInfoItems(householdId);
   const updateItem = useUpdateInfoItem(householdId);
   const deleteItem = useDeleteInfoItem(householdId);
 
@@ -212,7 +212,7 @@ export default function InformationsScreen() {
   const submit = (input: {
     category: InfoCategory;
     label: string;
-    value: string;
+    values: string[];
   }) => {
     if (editingItem) {
       updateItem.mutate(
@@ -220,23 +220,40 @@ export default function InformationsScreen() {
           id: editingItem.id,
           patch: {
             label: input.label,
-            value: input.value || null,
+            value: input.values[0] || null,
             category: input.category,
           },
         },
         { onSuccess: closeModal },
       );
-    } else {
-      createItem.mutate(
-        {
-          label: input.label,
-          value: input.value || null,
-          category: input.category,
-          sortOrder: items.length,
-        },
-        { onSuccess: closeModal },
-      );
+      return;
     }
+
+    // Plusieurs exemples cochés → plusieurs éléments. Un élément déjà
+    // présent dans la même catégorie n'est pas recréé en double.
+    const existing = new Set(
+      items
+        .filter((item) => item.category === input.category)
+        .map((item) => (item.value ?? '').trim().toLowerCase()),
+    );
+    const newValues = input.values.filter(
+      (value) => !existing.has(value.toLowerCase()),
+    );
+    if (newValues.length === 0) {
+      closeModal();
+      return;
+    }
+    createItems.mutate(
+      {
+        items: newValues.map((value) => ({
+          label: input.label,
+          value: value || null,
+          category: input.category,
+        })),
+        firstSortOrder: items.length,
+      },
+      { onSuccess: closeModal },
+    );
   };
 
   // Exemples fictifs en mode contournement DEV seulement — voir
@@ -501,7 +518,7 @@ export default function InformationsScreen() {
 
       <InfoItemFormModal
         visible={isModalOpen}
-        isSaving={createItem.isPending || updateItem.isPending}
+        isSaving={createItems.isPending || updateItem.isPending}
         editingItem={editingItem}
         onCancel={closeModal}
         onSubmit={submit}

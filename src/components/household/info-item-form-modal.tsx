@@ -56,19 +56,26 @@ export function InfoItemFormModal({
   isSaving: boolean;
   editingItem?: HouseholdInfoItem | null;
   onCancel: () => void;
+  /**
+   * `values` : une valeur en modification ; en création, une par exemple
+   * coché, plus le texte saisi s'il y en a un.
+   */
   onSubmit: (input: {
     category: InfoCategory;
     label: string;
-    value: string;
+    values: string[];
   }) => void;
 }) {
   const accent = useThemeAccent();
   const [category, setCategory] = useState<InfoCategory | null>(null);
   const [label, setLabel] = useState('');
   const [value, setValue] = useState('');
+  // Exemples cochés (création seulement) : plusieurs à la fois.
+  const [pickedSuggestions, setPickedSuggestions] = useState<string[]>([]);
 
   useEffect(() => {
     if (!visible) return;
+    setPickedSuggestions([]);
 
     if (editingItem && isInfoCategory(editingItem.category)) {
       setCategory(editingItem.category);
@@ -92,20 +99,44 @@ export function InfoItemFormModal({
     setCategory(next);
     setLabel('');
     setValue(INFO_CATEGORY_META[next].isDate ? todayIso() : '');
+    setPickedSuggestions([]);
   };
+
+  const togglePickedSuggestion = (suggestion: string) =>
+    setPickedSuggestions((current) =>
+      current.includes(suggestion)
+        ? current.filter((item) => item !== suggestion)
+        : [...current, suggestion],
+    );
+
+  // En création, chaque exemple coché + le texte saisi donnent un élément ;
+  // doublons retirés (même texte, casse ignorée).
+  const submittedValues = (() => {
+    if (meta?.isDate) return value ? [value] : [];
+    const all = isEditing
+      ? [value.trim()]
+      : [...pickedSuggestions, value.trim()];
+    const seen = new Set<string>();
+    return all.filter((item) => {
+      const key = item.toLowerCase();
+      if (!item || seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  })();
 
   const canSubmit =
     category !== null &&
     !isSaving &&
     (meta?.needsLabel ? label.trim() !== '' : true) &&
-    (meta?.isDate ? value !== '' : value.trim() !== '');
+    submittedValues.length > 0;
 
   const submit = () => {
     if (!category || !meta || !canSubmit) return;
     onSubmit({
       category,
       label: meta.needsLabel ? label.trim() : meta.defaultLabel,
-      value: value.trim(),
+      values: submittedValues,
     });
   };
 
@@ -367,13 +398,70 @@ export function InfoItemFormModal({
                   />
                 )}
 
+                {meta?.valueSuggestions ? (
+                  <View className="flex-row flex-wrap gap-1.5">
+                    {meta.valueSuggestions.map((suggestion) => {
+                      // Création : cases à cocher, plusieurs à la fois.
+                      // Modification d'un seul élément : l'exemple remplace
+                      // la valeur.
+                      const isPicked = isEditing
+                        ? value === suggestion
+                        : pickedSuggestions.includes(suggestion);
+                      return (
+                        <Pressable
+                          key={suggestion}
+                          accessibilityRole={isEditing ? 'button' : 'checkbox'}
+                          accessibilityLabel={suggestion}
+                          accessibilityState={
+                            isEditing
+                              ? { selected: isPicked }
+                              : { checked: isPicked }
+                          }
+                          onPress={() =>
+                            isEditing
+                              ? setValue(suggestion)
+                              : togglePickedSuggestion(suggestion)
+                          }
+                          className="rounded-full px-3 py-1.5"
+                          style={{
+                            borderWidth: 1,
+                            borderColor: isPicked
+                              ? meta.color
+                              : 'rgba(0, 0, 0, 0.08)',
+                            backgroundColor: isPicked ? meta.tint : '#ffffff',
+                          }}
+                        >
+                          <Text
+                            className="text-[12.5px]"
+                            style={{
+                              color: isPicked ? meta.color : '#6b6b6b',
+                              fontWeight: isPicked ? '600' : '400',
+                            }}
+                          >
+                            {isPicked && !isEditing ? '✓ ' : ''}
+                            {suggestion}
+                          </Text>
+                        </Pressable>
+                      );
+                    })}
+                  </View>
+                ) : null}
+
                 <PillButton
                   label={
                     isSaving
                       ? 'Enregistrement…'
                       : isEditing
                         ? 'Enregistrer'
-                        : 'Ajouter'
+                        : submittedValues.length > 1
+                          ? `Ajouter ${submittedValues.length} ${
+                              category === 'allergy'
+                                ? 'allergies'
+                                : category === 'vigilance'
+                                  ? 'points'
+                                  : 'éléments'
+                            }`
+                          : 'Ajouter'
                   }
                   icon={isEditing ? 'save-outline' : 'add-circle-outline'}
                   size="compact"
