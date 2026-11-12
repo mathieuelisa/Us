@@ -1,6 +1,17 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
+import { useEffect, useState } from 'react';
 import { Image, Pressable, Text, View } from 'react-native';
+import Animated, {
+  Easing,
+  Extrapolation,
+  interpolate,
+  type SharedValue,
+  useAnimatedStyle,
+  useReducedMotion,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
 
 import {
   GLASS_BODY_COLOR,
@@ -14,7 +25,7 @@ import {
   withoutNoSymptom,
 } from '@/features/health/constants';
 import { usePregnantSymptomsForDate } from '@/features/health/hooks';
-import { getSymptomTipOfTheDay } from '@/features/health/symptom-tips';
+import { getSymptomTips } from '@/features/health/symptom-tips';
 import type { Household } from '@/features/household/api';
 import type { MoodValue } from '@/features/hub/api';
 import { MOOD_PRESENTATION } from '@/features/hub/constants';
@@ -47,8 +58,9 @@ import { todayIso } from '@/lib/date';
  * se note et se modifie.
  *
  * Juste au-dessus, quand des symptômes sont notés, un carré « Conseil »
- * propre à l'un d'eux (demande explicite), sur la teinte de ce symptôme —
- * même partage par rôle (`getSymptomTipOfTheDay`).
+ * par symptôme (demande explicite), sur la teinte de ce symptôme — même
+ * partage par rôle (`getSymptomTips`). Plusieurs conseils défilent l'un
+ * après l'autre (`SymptomTipCarousel`).
  */
 export function HealthTodayCard({
   household,
@@ -70,7 +82,7 @@ export function HealthTodayCard({
     todayIso(),
   );
   const tip = getTipOfTheDay(role);
-  const symptomTip = getSymptomTipOfTheDay(symptoms, role);
+  const symptomTips = getSymptomTips(symptoms, role);
   // « Pas de symptômes » (valeur `NO_SYMPTOM`) n'est pas un symptôme : on
   // ne le compte ni ne l'affiche en pastille, il change seulement le texte.
   const realSymptoms = withoutNoSymptom(symptoms);
@@ -210,7 +222,14 @@ export function HealthTodayCard({
         </View>
       )}
 
-      {symptomTip ? <SymptomTipSquare tip={symptomTip} /> : null}
+      {symptomTips.length > 0 ? (
+        // Nouvelle liste (symptôme ajouté ou retiré) : le cycle repart du
+        // premier conseil.
+        <SymptomTipCarousel
+          key={symptomTips.map((tip) => tip.symptom).join('|')}
+          tips={symptomTips}
+        />
+      ) : null}
 
       {tip ? (
         <View
@@ -244,18 +263,160 @@ export function HealthTodayCard({
   );
 }
 
+/** Temps d'affichage de chaque conseil avant de passer au suivant. */
+const TIP_DISPLAY_MS = 7000;
+/** Durée du fondu enchaîné entre deux conseils. */
+const TIP_FADE_MS = 700;
+/** Léger décalage horizontal pendant le fondu, en points. */
+const TIP_DRIFT = 18;
+
+/**
+ * Conseils des symptômes du jour, un à la fois (demande explicite) : chacun
+ * reste 7 s, puis fondu enchaîné vers le suivant — le conseil sortant
+ * s'efface en glissant légèrement vers la gauche, le suivant apparaît depuis
+ * la droite. Après le dernier, le premier revient de la même façon, sans fin.
+ *
+ * Les cartes sont posées en ligne (pour qu'elles s'étirent toutes à la
+ * hauteur de la plus haute, sans saut de hauteur), puis ramenées les unes
+ * sur les autres par `translateX`. Une seule valeur, `progress` (le conseil
+ * affiché, fractionnaire pendant le fondu), pilote l'opacité et le décalage
+ * de chacune. Mouvement réduit : changement sans fondu.
+ */
+function SymptomTipCarousel({
+  tips,
+}: {
+  tips: { symptom: string; text: string }[];
+}) {
+  const [width, setWidth] = useState(0);
+  const progress = useSharedValue(0);
+  const reduceMotion = useReducedMotion();
+  const count = tips.length;
+
+  useEffect(() => {
+    progress.value = 0;
+    if (count < 2) return;
+
+    let index = 0;
+    const timer = setInterval(() => {
+      index += 1;
+      const isBackToFirst = index === count;
+      progress.value = withTiming(
+        index,
+        {
+          duration: reduceMotion ? 0 : TIP_FADE_MS,
+          easing: Easing.inOut(Easing.quad),
+        },
+        (finished) => {
+          // `count` équivaut à 0 (voir `TipLayer`) : remise à zéro invisible.
+          if (finished && isBackToFirst) progress.value = 0;
+        },
+      );
+      if (isBackToFirst) index = 0;
+    }, TIP_DISPLAY_MS);
+
+    return () => clearInterval(timer);
+  }, [count, reduceMotion, progress]);
+
+  if (count === 1) return <SymptomTipSquare tip={tips[0]} />;
+
+  return (
+    <View
+      className="overflow-hidden rounded-[20px]"
+      onLayout={(event) => setWidth(event.nativeEvent.layout.width)}
+    >
+      {/* Tant que la largeur n'est pas mesurée, le premier conseil seul. */}
+      {width === 0 ? (
+        <SymptomTipSquare tip={tips[0]} />
+      ) : (
+        <View className="flex-row" style={{ width: width * count }}>
+          {tips.map((tip, index) => (
+            <TipLayer
+              key={tip.symptom}
+              tip={tip}
+              index={index}
+              count={count}
+              width={width}
+              progress={progress}
+            />
+          ))}
+        </View>
+      )}
+    </View>
+  );
+}
+
+/**
+ * Un conseil du carrousel. `distance` : écart entre ce conseil et celui
+ * affiché, ramené entre -count/2 et count/2 pour que la boucle passe du
+ * dernier au premier dans le même sens. 0 = affiché ; 1 = parti à gauche ;
+ * -1 = en attente à droite.
+ */
+function TipLayer({
+  tip,
+  index,
+  count,
+  width,
+  progress,
+}: {
+  tip: { symptom: string; text: string };
+  index: number;
+  count: number;
+  width: number;
+  progress: SharedValue<number>;
+}) {
+  const layerStyle = useAnimatedStyle(() => {
+    const raw = progress.value - index + count / 2;
+    const distance = (((raw % count) + count) % count) - count / 2;
+    return {
+      opacity: interpolate(
+        Math.abs(distance),
+        [0, 1],
+        [1, 0],
+        Extrapolation.CLAMP,
+      ),
+      transform: [
+        {
+          translateX:
+            -index * width -
+            interpolate(
+              distance,
+              [-1, 0, 1],
+              [-TIP_DRIFT, 0, TIP_DRIFT],
+              Extrapolation.CLAMP,
+            ),
+        },
+      ],
+    };
+  });
+
+  return (
+    <Animated.View style={[{ width }, layerStyle]}>
+      <SymptomTipSquare tip={tip} fillHeight />
+    </Animated.View>
+  );
+}
+
 /**
  * Carré « Conseil » lié à un symptôme du jour : pictogramme du symptôme dans
  * un rond blanc, intitulé « CONSEIL · <SYMPTÔME> », puis l'astuce — le tout
  * sur la teinte du symptôme (`SYMPTOM_VISUALS`), pour qu'on voie d'un coup
  * d'œil à quoi il répond.
  */
-function SymptomTipSquare({ tip }: { tip: { symptom: string; text: string } }) {
+function SymptomTipSquare({
+  tip,
+  fillHeight = false,
+}: {
+  tip: { symptom: string; text: string };
+  /** Dans le carrousel : prend la hauteur du plus haut conseil. */
+  fillHeight?: boolean;
+}) {
   const visual = getSymptomVisual(tip.symptom);
 
   return (
     <View
-      className="gap-2.5 rounded-[20px] px-3.5 py-3.5"
+      className={`gap-2.5 rounded-[20px] px-3.5 py-3.5 ${
+        fillHeight ? 'flex-1' : ''
+      }`}
       style={{ backgroundColor: visual.tint }}
     >
       <View className="flex-row items-center gap-2.5">

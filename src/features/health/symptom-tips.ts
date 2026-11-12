@@ -1,6 +1,4 @@
-import { SYMPTOM_OPTIONS } from '@/features/health/constants';
 import type { HouseholdRole } from '@/lib/atoms/role';
-import { pickForToday } from '@/lib/date';
 
 /**
  * Astuce liée aux symptômes du jour (bloc « Aujourd'hui » du hub, demande
@@ -71,21 +69,21 @@ export const SYMPTOM_TIPS: Record<
 };
 
 /**
- * Astuce du jour pour les symptômes notés aujourd'hui, ou `null` s'il n'y en
- * a aucun (ou aucun avec une astuce). Un seul symptôme est retenu par jour,
- * toujours le même pour une même liste, pris dans l'ordre du catalogue
- * (`pickForToday`) — l'astuce ne change pas à chaque rechargement.
+ * Conseils pour les symptômes notés aujourd'hui, un par symptôme qui en a
+ * un, dans l'ordre où ils ont été notés (celui des pastilles du hub) — le
+ * hub les fait défiler (`SymptomTipCarousel`). Vide s'il n'y en a aucun.
  */
-export function getSymptomTipOfTheDay(
+export function getSymptomTips(
   symptoms: string[],
   role: HouseholdRole,
-): { symptom: string; text: string } | null {
-  const withTips = SYMPTOM_OPTIONS.map((option) => option.value).filter(
-    (value) => symptoms.includes(value) && SYMPTOM_TIPS[value],
-  );
-  const symptom = pickForToday(withTips);
-  if (!symptom) return null;
-
-  const tip = SYMPTOM_TIPS[symptom];
-  return { symptom, text: role === 'pregnant' ? tip.pregnant : tip.partner };
+): { symptom: string; text: string }[] {
+  return symptoms
+    .filter((symptom) => SYMPTOM_TIPS[symptom])
+    .map((symptom) => {
+      const tip = SYMPTOM_TIPS[symptom];
+      return {
+        symptom,
+        text: role === 'pregnant' ? tip.pregnant : tip.partner,
+      };
+    });
 }
