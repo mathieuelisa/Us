@@ -10,18 +10,25 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-import {
-  GLASS_BODY_COLOR,
-  GLASS_TITLE_COLOR,
-} from '@/components/ui/glass-card';
 import { PASSWORD_MIN_LENGTH } from '@/features/auth/api';
-import { hexToRgba } from '@/lib/color';
 
-/** Du plus faible au plus fort : rouge, orange, vert tendre, vert. */
-const LEVEL_COLORS = ['#e0533d', '#f0a03c', '#7cc47f', '#2fa36b'] as const;
-const LEVEL_LABELS = ['Faible', 'Moyen', 'Bon', 'Fort'] as const;
+/**
+ * Teintes adoucies (demande explicite d'une jauge plus discrète), du plus
+ * faible au plus fort : corail, ambre, vert tendre, vert sauge.
+ */
+const LEVEL_COLORS = ['#e3998b', '#e6bf7a', '#a3d39c', '#78bf79'] as const;
+/** Teinte du libellé, un ton plus soutenu que les barres pour se lire. */
+const LABEL_COLORS = ['#b8695c', '#ad8540', '#5f9a64', '#4f7c66'] as const;
+const LEVEL_LABELS = [
+  'Mot de passe faible',
+  'Mot de passe moyen',
+  'Bon mot de passe',
+  'Mot de passe robuste',
+] as const;
 const SEGMENTS = [0, 1, 2, 3] as const;
-const TRACK_COLOR = '#ebe9f0';
+const TRACK_COLOR = '#e9e8ee';
+const CRITERION_MET = '#6b7a72';
+const CRITERION_PENDING = '#aeacb8';
 
 type Criterion = { key: string; label: string; isMet: boolean };
 
@@ -38,18 +45,18 @@ export function evaluatePassword(password: string): {
   const criteria: Criterion[] = [
     {
       key: 'length',
-      label: `${PASSWORD_MIN_LENGTH} caractères`,
+      label: `${PASSWORD_MIN_LENGTH} caractères min.`,
       isMet: password.length >= PASSWORD_MIN_LENGTH,
     },
     {
       key: 'case',
-      label: 'Maj. et min.',
+      label: 'Majuscule et minuscule',
       isMet: /[a-zà-ÿ]/.test(password) && /[A-ZÀ-Ý]/.test(password),
     },
-    { key: 'digit', label: 'Un chiffre', isMet: /\d/.test(password) },
+    { key: 'digit', label: 'Chiffre', isMet: /\d/.test(password) },
     {
       key: 'symbol',
-      label: 'Un symbole',
+      label: 'Symbole',
       isMet: /[^\p{L}\p{N}]/u.test(password),
     },
   ];
@@ -62,11 +69,12 @@ export function evaluatePassword(password: string): {
 }
 
 /**
- * Jauge de solidité du mot de passe à l'inscription (demande explicite d'un
- * rendu « design et moderne ») : quatre segments qui se remplissent et
- * changent de teinte en douceur, le niveau en toutes lettres, puis les
- * critères en pastilles qui se cochent au fil de la saisie. Indicative :
- * seule la longueur minimale empêche de s'inscrire.
+ * Jauge de solidité du mot de passe à l'inscription, version discrète
+ * (capture de référence, demande explicite) : quatre barres fines aux
+ * teintes douces qui se remplissent, le niveau en toutes lettres à droite,
+ * puis les critères en simple texte, cochés au fil de la saisie — sans
+ * pastilles. Indicative : seule la longueur minimale empêche de
+ * s'inscrire.
  */
 export function PasswordStrengthMeter({ password }: { password: string }) {
   const { level, criteria } = evaluatePassword(password);
@@ -84,13 +92,13 @@ export function PasswordStrengthMeter({ password }: { password: string }) {
   }, [target, progress]);
 
   const label = level === 0 ? 'Trop court' : LEVEL_LABELS[level - 1];
-  const color = LEVEL_COLORS[Math.max(0, level - 1)];
+  const color = LABEL_COLORS[Math.max(0, level - 1)];
 
   return (
     <View
       accessible
       accessibilityLabel={`Solidité du mot de passe : ${label}`}
-      className="gap-2.5 px-1"
+      className="gap-2 px-1"
     >
       <View className="flex-row items-center gap-3">
         <View className="flex-1 flex-row gap-1.5">
@@ -98,47 +106,23 @@ export function PasswordStrengthMeter({ password }: { password: string }) {
             <Segment key={index} index={index} progress={progress} />
           ))}
         </View>
-        <Text
-          className="min-w-[70px] text-right text-[12.5px] font-bold"
-          style={{ color }}
-        >
+        <Text className="text-[13px] font-semibold" style={{ color }}>
           {label}
         </Text>
       </View>
 
-      <View className="flex-row flex-wrap gap-1.5">
+      <View className="flex-row flex-wrap gap-x-3.5 gap-y-1">
         {criteria.map((criterion) => (
-          <View
-            key={criterion.key}
-            className="flex-row items-center gap-1 rounded-full py-1 pl-1 pr-2.5"
-            style={{
-              backgroundColor: criterion.isMet
-                ? hexToRgba(LEVEL_COLORS[3], 0.12)
-                : 'rgba(255, 255, 255, 0.85)',
-              borderWidth: 1,
-              borderColor: criterion.isMet
-                ? hexToRgba(LEVEL_COLORS[3], 0.25)
-                : 'rgba(0, 0, 0, 0.05)',
-            }}
-          >
-            <View
-              className="h-[18px] w-[18px] items-center justify-center rounded-full"
-              style={{
-                backgroundColor: criterion.isMet
-                  ? LEVEL_COLORS[3]
-                  : TRACK_COLOR,
-              }}
-            >
-              <Ionicons
-                name={criterion.isMet ? 'checkmark' : 'ellipse'}
-                size={criterion.isMet ? 12 : 5}
-                color={criterion.isMet ? '#ffffff' : '#b9b6c4'}
-              />
-            </View>
+          <View key={criterion.key} className="flex-row items-center gap-1">
+            <Ionicons
+              name={criterion.isMet ? 'checkmark' : 'ellipse-outline'}
+              size={criterion.isMet ? 14 : 8}
+              color={criterion.isMet ? CRITERION_MET : CRITERION_PENDING}
+            />
             <Text
-              className="text-[12px] font-medium"
+              className="text-[12.5px]"
               style={{
-                color: criterion.isMet ? GLASS_TITLE_COLOR : GLASS_BODY_COLOR,
+                color: criterion.isMet ? CRITERION_MET : CRITERION_PENDING,
               }}
             >
               {criterion.label}
@@ -172,10 +156,10 @@ function Segment({
 
   return (
     <View
-      className="h-1.5 flex-1 overflow-hidden rounded-full"
+      className="h-[5px] flex-1 overflow-hidden rounded-full"
       style={{ backgroundColor: TRACK_COLOR }}
     >
-      <Animated.View className="h-1.5 rounded-full" style={fillStyle} />
+      <Animated.View className="h-[5px] rounded-full" style={fillStyle} />
     </View>
   );
 }
