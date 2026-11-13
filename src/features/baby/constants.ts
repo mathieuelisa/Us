@@ -104,6 +104,16 @@ export type BabyModule = {
    * pas forcément trois d'un coup.
    */
   requiredFieldCount: number;
+  /**
+   * Historique regroupé par jour (demande explicite), avec le total du
+   * jour : nombre de gestes (`noun`) et somme du champ `sumField` s'il y en
+   * a un (« 5 biberons · 640 ml », « 4 tétées · 52 min »). Absent : liste
+   * simple, chaque entrée avec sa date (croissance, mesures espacées).
+   */
+  dailySummary?: {
+    noun: { singular: string; plural: string };
+    sumField?: string;
+  };
 };
 
 export const BABY_MODULES: Record<BabyModuleSlug, BabyModule> = {
@@ -199,6 +209,10 @@ export const BABY_MODULES: Record<BabyModuleSlug, BabyModule> = {
       },
     ],
     requiredFieldCount: 1,
+    dailySummary: {
+      noun: { singular: 'biberon', plural: 'biberons' },
+      sumField: 'quantity',
+    },
   },
   allaitement: {
     slug: 'allaitement',
@@ -218,6 +232,10 @@ export const BABY_MODULES: Record<BabyModuleSlug, BabyModule> = {
     hasComment: false,
     fields: [{ key: 'duration', label: 'Durée', unit: 'min', kind: 'timer' }],
     requiredFieldCount: 1,
+    dailySummary: {
+      noun: { singular: 'tétée', plural: 'tétées' },
+      sumField: 'duration',
+    },
   },
   bain: {
     slug: 'bain',
@@ -238,6 +256,7 @@ export const BABY_MODULES: Record<BabyModuleSlug, BabyModule> = {
     // libre tant que le modèle de données n'est pas tranché.
     fields: [],
     requiredFieldCount: 0,
+    dailySummary: { noun: { singular: 'soin', plural: 'soins' } },
   },
 };
 
@@ -312,4 +331,72 @@ export function formatBabyEntrySummary(
 
   if (entry.segment) parts.unshift(entry.segment);
   return parts.join(' · ');
+}
+
+/** Entrées d'un même jour, dans l'ordre de l'historique (récentes d'abord). */
+export function groupBabyEntriesByDay(
+  entries: BabyEntry[],
+): { date: string; entries: BabyEntry[] }[] {
+  const groups: { date: string; entries: BabyEntry[] }[] = [];
+  for (const entry of entries) {
+    const last = groups.at(-1);
+    if (last && last.date === entry.date) last.entries.push(entry);
+    else groups.push({ date: entry.date, entries: [entry] });
+  }
+  return groups;
+}
+
+const DAY_FORMATTER = new Intl.DateTimeFormat('fr-FR', {
+  weekday: 'long',
+  day: 'numeric',
+  month: 'long',
+});
+const DAY_WITH_YEAR_FORMATTER = new Intl.DateTimeFormat('fr-FR', {
+  weekday: 'long',
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+});
+
+/** « Aujourd'hui », « Hier », sinon « Mardi 10 novembre » (+ l'année si autre). */
+export function formatBabyDayLabel(date: string, today: string): string {
+  const [year, month, day] = date.split('-').map(Number);
+  const [todayYear, todayMonth, todayDay] = today.split('-').map(Number);
+  const value = new Date(year, month - 1, day);
+  const dayDiff = Math.round(
+    (new Date(todayYear, todayMonth - 1, todayDay).getTime() -
+      value.getTime()) /
+      (24 * 60 * 60 * 1000),
+  );
+  if (dayDiff === 0) return 'Aujourd’hui';
+  if (dayDiff === 1) return 'Hier';
+  const label = (
+    year === todayYear ? DAY_FORMATTER : DAY_WITH_YEAR_FORMATTER
+  ).format(value);
+  return label.charAt(0).toUpperCase() + label.slice(1);
+}
+
+/** Total d'un jour : « 5 biberons · 640 ml », « 4 tétées · 52 min 10 s ». */
+export function formatBabyDayTotal(
+  module: BabyModule,
+  entries: BabyEntry[],
+): string {
+  const summary = module.dailySummary;
+  if (!summary) return '';
+  const count = `${entries.length} ${
+    entries.length > 1 ? summary.noun.plural : summary.noun.singular
+  }`;
+  const field = module.fields.find((item) => item.key === summary.sumField);
+  if (!field) return count;
+
+  const total = entries.reduce((sum, entry) => {
+    const value = Number(entry.values[field.key]);
+    return Number.isFinite(value) ? sum + value : sum;
+  }, 0);
+  if (total === 0) return count;
+  const measure =
+    field.kind === 'timer'
+      ? formatDurationSeconds(total)
+      : `${String(Math.round(total * 100) / 100).replace('.', ',')} ${field.unit}`;
+  return `${count} · ${measure}`;
 }

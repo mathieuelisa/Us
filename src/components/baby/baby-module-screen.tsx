@@ -34,8 +34,11 @@ import { PillButton } from '@/components/ui/pill-button';
 import type { BabyEntryInput } from '@/features/baby/api';
 import type { BabyEntry, BabyModule } from '@/features/baby/constants';
 import {
+  formatBabyDayLabel,
+  formatBabyDayTotal,
   formatBabyEntryDate,
   formatBabyEntrySummary,
+  groupBabyEntriesByDay,
 } from '@/features/baby/constants';
 import {
   useBabyEntries,
@@ -47,6 +50,7 @@ import {
   useThemeBabyWallpaper,
 } from '@/features/settings/hooks';
 import { hexToRgba } from '@/lib/color';
+import { todayIso } from '@/lib/date';
 
 const SafeAreaView = withUniwind(RNSafeAreaView);
 
@@ -156,6 +160,70 @@ export function BabyModuleScreen({ module }: { module: BabyModule }) {
     setEditingEntry(null);
   }
 
+  // Une ligne d'historique. Regroupée par jour, la pastille ne garde que
+  // l'heure : le jour est dans l'intitulé du groupe.
+  const renderEntry = (entry: BabyEntry) => (
+    // Même animation que la suppression d'un contact : la
+    // ligne supprimée glisse vers la gauche, les suivantes
+    // remontent en douceur.
+    <Animated.View
+      key={entry.id}
+      entering={FadeInDown.duration(260)}
+      exiting={FadeOutLeft.duration(320)}
+      layout={ROW_LAYOUT}
+    >
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={`${module.editLabel} du ${formatBabyEntryDate(entry)}`}
+        onPress={() => openForm(entry)}
+        className="flex-row items-center gap-3 rounded-[22px] py-3 pl-3 pr-3 active:opacity-70"
+        style={[tintedShadow(accent), GLASS_SURFACE]}
+      >
+        {/* Icône du module sur sa propre tuile (demande
+            explicite), à la place de l'émoji sur rond teinté. */}
+        <Image
+          source={module.image}
+          style={{ width: 46, height: 46 }}
+          resizeMode="contain"
+        />
+        <View className="flex-1 gap-0.5">
+          <Text
+            className="text-[15px] font-bold"
+            style={{ color: GLASS_TITLE_COLOR }}
+          >
+            {formatBabyEntrySummary(module, entry) || module.title}
+          </Text>
+          {entry.comment ? (
+            <Text
+              className="text-[12.5px] leading-4"
+              style={{ color: GLASS_BODY_COLOR }}
+            >
+              {entry.comment}
+            </Text>
+          ) : null}
+        </View>
+        {module.dailySummary && !entry.time ? null : (
+          <View
+            className="rounded-full px-2.5 py-1"
+            style={{ backgroundColor: hexToRgba(accent, 0.1) }}
+          >
+            <Text
+              className="text-[11.5px] font-semibold"
+              style={{ color: accent }}
+            >
+              {module.dailySummary && entry.time
+                ? entry.time.replace(':', 'h')
+                : formatBabyEntryDate(entry)}
+            </Text>
+          </View>
+        )}
+        <Ionicons name="create-outline" size={17} color={GLASS_BODY_COLOR} />
+      </Pressable>
+    </Animated.View>
+  );
+
+  const today = todayIso();
+
   return (
     <SafeAreaView className="flex-1">
       <ImageBackground source={wallpaper} resizeMode="cover" className="flex-1">
@@ -236,69 +304,45 @@ export function BabyModuleScreen({ module }: { module: BabyModule }) {
                 </Text>
               </View>
             ) : (
-              <View className="gap-2.5">
+              <View className={module.dailySummary ? 'gap-5' : 'gap-2.5'}>
                 {/* Un appui rouvre la modale préremplie pour corriger une
-                    saisie (demande explicite). */}
-                {entries.map((entry) => (
-                  // Même animation que la suppression d'un contact : la
-                  // ligne supprimée glisse vers la gauche, les suivantes
-                  // remontent en douceur.
-                  <Animated.View
-                    key={entry.id}
-                    entering={FadeInDown.duration(260)}
-                    exiting={FadeOutLeft.duration(320)}
-                    layout={ROW_LAYOUT}
-                  >
-                    <Pressable
-                      accessibilityRole="button"
-                      accessibilityLabel={`${module.editLabel} du ${formatBabyEntryDate(entry)}`}
-                      onPress={() => openForm(entry)}
-                      className="flex-row items-center gap-3 rounded-[22px] py-3 pl-3 pr-3 active:opacity-70"
-                      style={[tintedShadow(accent), GLASS_SURFACE]}
-                    >
-                      {/* Icône du module sur sa propre tuile (demande
-                          explicite), à la place de l'émoji sur rond teinté. */}
-                      <Image
-                        source={module.image}
-                        style={{ width: 46, height: 46 }}
-                        resizeMode="contain"
-                      />
-                      <View className="flex-1 gap-0.5">
-                        <Text
-                          className="text-[15px] font-bold"
-                          style={{ color: GLASS_TITLE_COLOR }}
-                        >
-                          {formatBabyEntrySummary(module, entry) ||
-                            module.title}
-                        </Text>
-                        {entry.comment ? (
-                          <Text
-                            className="text-[12.5px] leading-4"
-                            style={{ color: GLASS_BODY_COLOR }}
-                          >
-                            {entry.comment}
-                          </Text>
-                        ) : null}
-                      </View>
-                      <View
-                        className="rounded-full px-2.5 py-1"
-                        style={{ backgroundColor: hexToRgba(accent, 0.1) }}
+                    saisie (demande explicite). Biberons, tétées et soins
+                    sont regroupés par jour avec leur total (demande
+                    explicite). */}
+                {module.dailySummary
+                  ? groupBabyEntriesByDay(entries).map((group) => (
+                      <Animated.View
+                        key={group.date}
+                        entering={FadeInDown.duration(260)}
+                        layout={ROW_LAYOUT}
+                        className="gap-2.5"
                       >
-                        <Text
-                          className="text-[11.5px] font-semibold"
-                          style={{ color: accent }}
-                        >
-                          {formatBabyEntryDate(entry)}
-                        </Text>
-                      </View>
-                      <Ionicons
-                        name="create-outline"
-                        size={17}
-                        color={GLASS_BODY_COLOR}
-                      />
-                    </Pressable>
-                  </Animated.View>
-                ))}
+                        <View className="flex-row items-center justify-between gap-2 px-1">
+                          <Text
+                            className="text-[15px] font-extrabold"
+                            style={{
+                              color: GLASS_TITLE_COLOR,
+                              letterSpacing: -0.2,
+                            }}
+                          >
+                            {formatBabyDayLabel(group.date, today)}
+                          </Text>
+                          <View
+                            className="rounded-full px-2.5 py-1"
+                            style={{ backgroundColor: hexToRgba(accent, 0.1) }}
+                          >
+                            <Text
+                              className="text-[12px] font-bold"
+                              style={{ color: accent }}
+                            >
+                              {formatBabyDayTotal(module, group.entries)}
+                            </Text>
+                          </View>
+                        </View>
+                        {group.entries.map(renderEntry)}
+                      </Animated.View>
+                    ))
+                  : entries.map(renderEntry)}
               </View>
             )}
           </View>
