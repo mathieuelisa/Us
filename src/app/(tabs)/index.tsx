@@ -35,7 +35,7 @@ import { useMyProfile } from '@/features/profile/hooks';
 import { useThemeAccent, useThemeBackground } from '@/features/settings/hooks';
 import { currentRoleAtom } from '@/lib/atoms/role';
 import { darkenHex, hexToRgba, lightenHex } from '@/lib/color';
-import { todayIso } from '@/lib/date';
+import { daysBetween, todayIso } from '@/lib/date';
 
 const SafeAreaView = withUniwind(RNSafeAreaView);
 
@@ -122,6 +122,15 @@ export default function HubScreen() {
   const healthState = summary?.nextAppointment
     ? `Prochain rendez-vous le ${formatAppointmentDate(summary.nextAppointment.date)}`
     : 'Journal du jour';
+  // La veille et le jour du prochain rendez-vous, l'état passe en rouge
+  // pour le rappeler (demande explicite).
+  const daysToAppointment = summary?.nextAppointment
+    ? daysBetween(todayIso(), summary.nextAppointment.date)
+    : null;
+  const isAppointmentSoon =
+    daysToAppointment !== null &&
+    daysToAppointment >= 0 &&
+    daysToAppointment <= 1;
 
   const organisationState = summary?.checklistProgress
     ? summary.checklistProgress.total === 0
@@ -250,6 +259,7 @@ export default function HubScreen() {
               imageFillsTile
               title="Suivi santé"
               state={healthState}
+              isStateUrgent={isAppointmentSoon}
               waveColor={WAVE_MINT}
               onPress={() => router.push('/sante')}
             />

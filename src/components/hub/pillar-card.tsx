@@ -11,6 +11,9 @@ import {
 import { useThemeAccent } from '@/features/settings/hooks';
 import { hexToRgba } from '@/lib/color';
 
+/** Rouge des rappels, celui des numéros d'urgence des contacts. */
+const URGENT_RED = '#d64545';
+
 /**
  * Carte d'un des 3 piliers (et d'« Organisation & Préparation », juste
  * dessous). Toutes ont volontairement le **même poids visuel** (CONCEPT.md :
@@ -26,6 +29,9 @@ import { hexToRgba } from '@/lib/color';
  * une description de la section.
  *
  * `id` sert à nommer les dégradés SVG de la vague : unique par carte.
+ *
+ * `isStateUrgent` passe l'état en rouge, comme rappel (« Prochain
+ * rendez-vous » la veille et le jour du rendez-vous, demande explicite).
  */
 export function PillarCard({
   id,
@@ -34,6 +40,7 @@ export function PillarCard({
   imageFillsTile,
   title,
   state,
+  isStateUrgent = false,
   waveColor,
   onPress,
 }: {
@@ -45,6 +52,7 @@ export function PillarCard({
   imageFillsTile?: boolean;
   title: string;
   state: string;
+  isStateUrgent?: boolean;
   waveColor: string;
   onPress: () => void;
 }) {
@@ -73,8 +81,10 @@ export function PillarCard({
             {title}
           </Text>
           <Text
-            className="text-[12.5px] leading-4"
-            style={{ color: GLASS_BODY_COLOR }}
+            className={`text-[12.5px] leading-4 ${
+              isStateUrgent ? 'font-semibold' : ''
+            }`}
+            style={{ color: isStateUrgent ? URGENT_RED : GLASS_BODY_COLOR }}
           >
             {state}
           </Text>
