@@ -1556,6 +1556,12 @@ export const NAME_COUNTRIES: NameCountry[] = [
 
 export const MAX_SELECTED_COUNTRIES = 3;
 
+/**
+ * Pays mis en avant en tête du choix (« Pays populaires », capture de
+ * référence) : les origines les plus courantes en France.
+ */
+export const POPULAR_COUNTRY_IDS = ['france', 'italie', 'espagne', 'maroc'];
+
 export const GENDER_META: Record<
   NameGender,
   { label: string; title: string; color: string; tint: string }

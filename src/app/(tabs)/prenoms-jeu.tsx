@@ -1,12 +1,14 @@
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { Image, Pressable, ScrollView, Text, View } from 'react-native';
 import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import { withUniwind } from 'uniwind';
 
+import { CountryPicker } from '@/components/names/country-picker';
 import {
   DEFAULT_CARD_HEIGHT,
   MIN_CARD_HEIGHT,
@@ -45,11 +47,17 @@ import { hexToRgba } from '@/lib/color';
 
 const SafeAreaView = withUniwind(RNSafeAreaView);
 
+/** Illustration de l'en-tête du choix des pays, celle de l'entrée du jeu. */
+const GENDER_IMAGES = {
+  girl: require('@/assets/images/Prenoms_filles.png'),
+  boy: require('@/assets/images/Prenoms_garcons.png'),
+} as const;
+
 /**
  * Jeu du match des prénoms (demande explicite), ouvert depuis « Prénoms
  * filles » ou « Prénoms garçons » de `/prenoms` (`?gender=girl|boy`).
  *
- * 1. Choix des pays : 14, 3 au plus.
+ * 1. Choix des pays : 14, 3 au plus (`CountryPicker`).
  * 2. Cartes : un prénom par carte, des pays choisis, sans ceux déjà
  *    swipés. Droite = gardé (alimente « Vos matchs »), gauche = écarté,
  *    toucher = favori. Chaque choix est enregistré tout de suite
@@ -148,6 +156,13 @@ export default function NameGameScreen() {
       style={{ backgroundColor }}
     >
       <ScreenCornerShapes />
+      {/* Voile à la teinte du genre en haut de l'écran (capture de
+          référence) : rose pour les filles, bleu pour les garçons. */}
+      <LinearGradient
+        pointerEvents="none"
+        colors={[hexToRgba(meta.tint, 0.95), hexToRgba(meta.tint, 0)]}
+        style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 460 }}
+      />
 
       <ScrollView
         contentContainerClassName="grow gap-5 px-5 pt-4"
@@ -174,31 +189,102 @@ export default function NameGameScreen() {
           <Ionicons name="chevron-back" size={22} color={GLASS_TITLE_COLOR} />
         </Pressable>
 
-        <View className="gap-1.5">
-          <Text
-            className="text-[28px] font-extrabold leading-[34px]"
-            style={{ color: GLASS_TITLE_COLOR, letterSpacing: -0.6 }}
-          >
-            {meta.title}
-          </Text>
-          <Svg width={120} height={10} viewBox="0 0 120 10">
-            <Path
-              d="M3 7 C 34 2, 80 1.5, 117 4"
-              stroke={hexToRgba(meta.color, 0.5)}
-              strokeWidth={3}
-              strokeLinecap="round"
-              fill="none"
-            />
-          </Svg>
-          <Text
-            className="text-[14.5px] leading-5"
-            style={{ color: GLASS_BODY_COLOR }}
-          >
-            {deck
-              ? 'Glissez à droite pour garder, à gauche pour écarter.'
-              : `Choisissez jusqu’à ${MAX_SELECTED_COUNTRIES} pays d’origine.`}
-          </Text>
-        </View>
+        {deck ? (
+          <View className="gap-1.5">
+            <Text
+              className="text-[28px] font-extrabold leading-[34px]"
+              style={{ color: GLASS_TITLE_COLOR, letterSpacing: -0.6 }}
+            >
+              {meta.title}
+            </Text>
+            <Svg width={120} height={10} viewBox="0 0 120 10">
+              <Path
+                d="M3 7 C 34 2, 80 1.5, 117 4"
+                stroke={hexToRgba(meta.color, 0.5)}
+                strokeWidth={3}
+                strokeLinecap="round"
+                fill="none"
+              />
+            </Svg>
+            <Text
+              className="text-[14.5px] leading-5"
+              style={{ color: GLASS_BODY_COLOR }}
+            >
+              Glissez à droite pour garder, à gauche pour écarter.
+            </Text>
+          </View>
+        ) : (
+          // En-tête du choix des pays (capture de référence) : grand titre
+          // souligné, sous-titre sur deux lignes, illustration du genre en
+          // haut à droite sur une tache et un cœur.
+          <View className="min-h-[132px] justify-center">
+            <View
+              pointerEvents="none"
+              style={{ position: 'absolute', top: -46, right: -22 }}
+            >
+              <View
+                style={{
+                  position: 'absolute',
+                  top: 10,
+                  left: 0,
+                  width: 200,
+                  height: 180,
+                  borderTopLeftRadius: 110,
+                  borderTopRightRadius: 90,
+                  borderBottomLeftRadius: 80,
+                  borderBottomRightRadius: 110,
+                  backgroundColor: hexToRgba(meta.color, 0.08),
+                }}
+              />
+              <Image
+                source={GENDER_IMAGES[gender]}
+                style={{
+                  width: 172,
+                  height: 172,
+                  marginLeft: 6,
+                  marginTop: 14,
+                  transform: [{ rotate: '6deg' }],
+                }}
+                resizeMode="contain"
+              />
+              <Ionicons
+                name="heart"
+                size={30}
+                color={hexToRgba(meta.color, 0.75)}
+                style={{
+                  position: 'absolute',
+                  top: 12,
+                  left: 128,
+                  transform: [{ rotate: '14deg' }],
+                }}
+              />
+            </View>
+            <View className="gap-2" style={{ maxWidth: '60%' }}>
+              <Text
+                className="text-[32px] font-extrabold leading-[38px]"
+                style={{ color: GLASS_TITLE_COLOR, letterSpacing: -0.8 }}
+              >
+                {meta.title}
+              </Text>
+              <Svg width={130} height={10} viewBox="0 0 130 10">
+                <Path
+                  d="M3 7 C 38 2, 88 1.5, 127 4"
+                  stroke={hexToRgba(meta.color, 0.6)}
+                  strokeWidth={3.5}
+                  strokeLinecap="round"
+                  fill="none"
+                />
+              </Svg>
+              <Text
+                className="text-[14.5px] leading-[21px]"
+                style={{ color: GLASS_BODY_COLOR }}
+              >
+                Choisissez jusqu’à {MAX_SELECTED_COUNTRIES} pays d’origine pour
+                découvrir des prénoms.
+              </Text>
+            </View>
+          </View>
+        )}
 
         {deck ? (
           <DeckStep
@@ -214,7 +300,7 @@ export default function NameGameScreen() {
             onSeeMatches={() => router.navigate('/prenoms-matchs')}
           />
         ) : (
-          <CountryStep
+          <CountryPicker
             gender={gender}
             selected={selectedCountries}
             onToggle={toggleCountry}
@@ -230,101 +316,6 @@ export default function NameGameScreen() {
         accent={accent}
       />
     </SafeAreaView>
-  );
-}
-
-/** Étape 1 : la grille des pays, 3 au plus. */
-function CountryStep({
-  gender,
-  selected,
-  onToggle,
-  onStart,
-  isLoading,
-}: {
-  gender: NameGender;
-  selected: string[];
-  onToggle: (id: string) => void;
-  onStart: () => void;
-  isLoading: boolean;
-}) {
-  const meta = GENDER_META[gender];
-  const isFull = selected.length >= MAX_SELECTED_COUNTRIES;
-
-  return (
-    <Animated.View entering={FadeIn.duration(220)} className="gap-4">
-      <View className="flex-row items-center justify-between px-1">
-        <Text
-          className="text-[12.5px] font-bold"
-          style={{ color: '#5b5470', letterSpacing: 1.1 }}
-        >
-          PAYS
-        </Text>
-        <View
-          className="rounded-full px-2.5 py-1"
-          style={{ backgroundColor: hexToRgba(meta.color, 0.1) }}
-        >
-          <Text
-            className="text-[12.5px] font-bold"
-            style={{ color: meta.color }}
-          >
-            {selected.length} / {MAX_SELECTED_COUNTRIES}
-          </Text>
-        </View>
-      </View>
-
-      <View className="flex-row flex-wrap justify-between gap-y-2.5">
-        {NAME_COUNTRIES.map((country) => {
-          const isSelected = selected.includes(country.id);
-          const isDisabled = !isSelected && isFull;
-          return (
-            <Pressable
-              key={country.id}
-              accessibilityRole="checkbox"
-              accessibilityState={{
-                checked: isSelected,
-                disabled: isDisabled,
-              }}
-              accessibilityLabel={country.label}
-              disabled={isDisabled}
-              onPress={() => onToggle(country.id)}
-              className="h-[60px] flex-row items-center gap-3 rounded-[20px] px-3.5 active:opacity-70"
-              style={{
-                width: '48.5%',
-                opacity: isDisabled ? 0.45 : 1,
-                backgroundColor: isSelected
-                  ? hexToRgba(meta.color, 0.1)
-                  : 'rgba(255, 255, 255, 0.92)',
-                borderWidth: 1.5,
-                borderColor: isSelected
-                  ? hexToRgba(meta.color, 0.5)
-                  : 'rgba(255, 255, 255, 0.95)',
-              }}
-            >
-              <Text style={{ fontSize: 26 }}>{country.flag}</Text>
-              <Text
-                numberOfLines={1}
-                className="flex-1 text-[14.5px] font-semibold"
-                style={{ color: GLASS_TITLE_COLOR }}
-              >
-                {country.label}
-              </Text>
-              <Ionicons
-                name={isSelected ? 'checkmark-circle' : 'ellipse-outline'}
-                size={20}
-                color={isSelected ? meta.color : '#c4c2cc'}
-              />
-            </Pressable>
-          );
-        })}
-      </View>
-
-      <PillButton
-        label={isLoading ? 'Chargement…' : 'Découvrir les prénoms'}
-        icon="sparkles-outline"
-        isDisabled={selected.length === 0 || isLoading}
-        onPress={onStart}
-      />
-    </Animated.View>
   );
 }
 
