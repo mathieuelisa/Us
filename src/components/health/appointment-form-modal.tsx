@@ -19,6 +19,8 @@ import { useThemeAccent } from '@/features/settings/hooks';
 import { hexToRgba, lightenHex } from '@/lib/color';
 import { todayIso } from '@/lib/date';
 
+/** Heure proposée à l'ouverture d'un nouveau rendez-vous. */
+const DEFAULT_TIME = '09:00';
 /**
  * Écran 4g, ouvert par l'un ou l'autre parent. Le choix partagé/non partagé
  * est fait **à la création** : c'est lui qui décide si l'autre parent verra
@@ -77,7 +79,7 @@ export function AppointmentFormModal({
   const accent = useThemeAccent();
   const [title, setTitle] = useState('');
   const [date, setDate] = useState<string>(todayIso());
-  const [time, setTime] = useState('');
+  const [time, setTime] = useState(DEFAULT_TIME);
   const [address, setAddress] = useState('');
   const [isShared, setIsShared] = useState(true);
 
@@ -94,7 +96,9 @@ export function AppointmentFormModal({
       setTitle(editingAppointment.title);
       setDate(editingAppointment.appointment_date);
       // `HH:MM:SS` en base → « 10:30 », format de la molette d'heure.
-      setTime(editingAppointment.appointment_time?.slice(0, 5) ?? '');
+      // Rendez-vous enregistré sans heure (quand elle était facultative) :
+      // la molette part de l'heure par défaut.
+      setTime(editingAppointment.appointment_time?.slice(0, 5) ?? DEFAULT_TIME);
       setAddress(editingAppointment.address ?? '');
       setIsShared(editingAppointment.is_shared);
       return;
@@ -102,7 +106,7 @@ export function AppointmentFormModal({
     setTitle('');
     const currentDay = todayIso();
     setDate(initialDate && initialDate > currentDay ? initialDate : currentDay);
-    setTime('');
+    setTime(DEFAULT_TIME);
     setAddress('');
     setIsShared(true);
   }, [visible, initialDate, editingAppointment]);
@@ -236,62 +240,19 @@ export function AppointmentFormModal({
             </View>
 
             {/* Heure à la molette (demande explicite, plus pratique qu'une
-                saisie au clavier). Facultative : sans heure, un simple
-                bouton ; « Retirer » revient à un rendez-vous sans heure. */}
+                saisie au clavier), obligatoire et toujours affichée
+                (demande explicite). */}
             <View className="gap-2">
               <View className="flex-row items-center gap-2.5">
                 <IconBubble icon="time-outline" color={accent} />
                 <Text
-                  className="flex-1 text-[14px] font-semibold"
+                  className="text-[14px] font-semibold"
                   style={{ color: GLASS_TITLE_COLOR }}
                 >
                   Heure
                 </Text>
-                {time ? (
-                  <Pressable
-                    accessibilityRole="button"
-                    accessibilityLabel="Retirer l'heure du rendez-vous"
-                    hitSlop={8}
-                    onPress={() => setTime('')}
-                    className="flex-row items-center gap-1 rounded-full px-2.5 py-1 active:opacity-70"
-                    style={{ backgroundColor: hexToRgba(accent, 0.08) }}
-                  >
-                    <Ionicons name="close" size={13} color={accent} />
-                    <Text
-                      className="text-[12px] font-semibold"
-                      style={{ color: accent }}
-                    >
-                      Retirer
-                    </Text>
-                  </Pressable>
-                ) : null}
               </View>
-              {time ? (
-                <WheelTimePicker value={time} onChange={setTime} compact />
-              ) : (
-                <Pressable
-                  accessibilityRole="button"
-                  onPress={() => setTime('09:00')}
-                  className="h-11 flex-row items-center justify-center gap-1.5 rounded-[16px] active:opacity-70"
-                  style={{
-                    borderWidth: 1.5,
-                    borderStyle: 'dashed',
-                    borderColor: hexToRgba(accent, 0.35),
-                    backgroundColor: hexToRgba(accent, 0.04),
-                  }}
-                >
-                  <Ionicons name="add" size={17} color={accent} />
-                  <Text
-                    className="text-[13.5px] font-semibold"
-                    style={{ color: accent }}
-                  >
-                    Ajouter une heure
-                  </Text>
-                  <Text className="text-[12.5px]" style={{ color: '#a3a1b0' }}>
-                    (facultatif)
-                  </Text>
-                </Pressable>
-              )}
+              <WheelTimePicker value={time} onChange={setTime} compact />
             </View>
 
             <IconInput
