@@ -12,6 +12,7 @@ import {
 import { IconBubble, IconInput } from '@/components/ui/icon-input';
 import { PillButton } from '@/components/ui/pill-button';
 import { WheelDatePicker } from '@/components/wheel-date-picker';
+import { WheelTimePicker } from '@/components/wheel-time-picker';
 import type { Appointment } from '@/features/health/api';
 import { parseTimeInput } from '@/features/health/constants';
 import { useThemeAccent } from '@/features/settings/hooks';
@@ -92,7 +93,7 @@ export function AppointmentFormModal({
     if (editingAppointment) {
       setTitle(editingAppointment.title);
       setDate(editingAppointment.appointment_date);
-      // `HH:MM:SS` en base → « 10:30 », format accepté par `parseTimeInput`.
+      // `HH:MM:SS` en base → « 10:30 », format de la molette d'heure.
       setTime(editingAppointment.appointment_time?.slice(0, 5) ?? '');
       setAddress(editingAppointment.address ?? '');
       setIsShared(editingAppointment.is_shared);
@@ -106,13 +107,8 @@ export function AppointmentFormModal({
     setIsShared(true);
   }, [visible, initialDate, editingAppointment]);
 
-  const isTimeInvalid = time.trim().length > 0 && parseTimeInput(time) === null;
   const canSubmit =
-    title.trim().length > 0 &&
-    date >= minDate &&
-    !isTimeInvalid &&
-    !isSaving &&
-    !isDeleting;
+    title.trim().length > 0 && date >= minDate && !isSaving && !isDeleting;
 
   return (
     <Modal
@@ -148,8 +144,7 @@ export function AppointmentFormModal({
           </View>
 
           {/* La feuille doit tenir sans défiler (demande explicite) : tailles
-              resserrées, sélecteur de date compact, heure et adresse côte à
-              côte. Le `ScrollView` ne reste qu'en filet de sécurité (très
+              resserrées, molettes de date et d'heure compactes. Le `ScrollView` ne reste qu'en filet de sécurité (très
               petit écran, clavier ouvert). */}
           <ScrollView
             showsVerticalScrollIndicator={false}
@@ -240,37 +235,72 @@ export function AppointmentFormModal({
               />
             </View>
 
-            <View className="gap-1.5">
-              <View className="flex-row gap-2.5">
-                <View className="flex-1">
-                  <IconInput
-                    icon="time-outline"
-                    placeholder="Ex. 10h30"
-                    value={time}
-                    onChangeText={setTime}
-                    accent={accent}
-                    isInvalid={isTimeInvalid}
-                  />
-                </View>
-                <View style={{ flex: 1.25 }}>
-                  <IconInput
-                    icon="document-text-outline"
-                    placeholder="Adresse, notes…"
-                    value={address}
-                    onChangeText={setAddress}
-                    accent={accent}
-                  />
-                </View>
+            {/* Heure à la molette (demande explicite, plus pratique qu'une
+                saisie au clavier). Facultative : sans heure, un simple
+                bouton ; « Retirer » revient à un rendez-vous sans heure. */}
+            <View className="gap-2">
+              <View className="flex-row items-center gap-2.5">
+                <IconBubble icon="time-outline" color={accent} />
+                <Text
+                  className="flex-1 text-[14px] font-semibold"
+                  style={{ color: GLASS_TITLE_COLOR }}
+                >
+                  Heure
+                </Text>
+                {time ? (
+                  <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel="Retirer l'heure du rendez-vous"
+                    hitSlop={8}
+                    onPress={() => setTime('')}
+                    className="flex-row items-center gap-1 rounded-full px-2.5 py-1 active:opacity-70"
+                    style={{ backgroundColor: hexToRgba(accent, 0.08) }}
+                  >
+                    <Ionicons name="close" size={13} color={accent} />
+                    <Text
+                      className="text-[12px] font-semibold"
+                      style={{ color: accent }}
+                    >
+                      Retirer
+                    </Text>
+                  </Pressable>
+                ) : null}
               </View>
-              <Text
-                className={`px-2 text-[12px] ${isTimeInvalid ? 'text-red-600' : ''}`}
-                style={isTimeInvalid ? undefined : { color: '#a3a1b0' }}
-              >
-                {isTimeInvalid
-                  ? 'Heure non reconnue. Formats acceptés : 10h30, 10:30.'
-                  : 'Heure et adresse facultatives.'}
-              </Text>
+              {time ? (
+                <WheelTimePicker value={time} onChange={setTime} compact />
+              ) : (
+                <Pressable
+                  accessibilityRole="button"
+                  onPress={() => setTime('09:00')}
+                  className="h-11 flex-row items-center justify-center gap-1.5 rounded-[16px] active:opacity-70"
+                  style={{
+                    borderWidth: 1.5,
+                    borderStyle: 'dashed',
+                    borderColor: hexToRgba(accent, 0.35),
+                    backgroundColor: hexToRgba(accent, 0.04),
+                  }}
+                >
+                  <Ionicons name="add" size={17} color={accent} />
+                  <Text
+                    className="text-[13.5px] font-semibold"
+                    style={{ color: accent }}
+                  >
+                    Ajouter une heure
+                  </Text>
+                  <Text className="text-[12.5px]" style={{ color: '#a3a1b0' }}>
+                    (facultatif)
+                  </Text>
+                </Pressable>
+              )}
             </View>
+
+            <IconInput
+              icon="document-text-outline"
+              placeholder="Adresse, notes… (facultatif)"
+              value={address}
+              onChangeText={setAddress}
+              accent={accent}
+            />
 
             <View
               className="flex-row items-center gap-2.5 rounded-full py-1.5 pl-1.5 pr-3"
