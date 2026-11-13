@@ -1,5 +1,5 @@
 import { NameListScreen } from '@/components/names/name-list-screen';
-import type { NameGender } from '@/features/names/catalog';
+import { GENDER_META, type NameGender } from '@/features/names/catalog';
 import {
   useNameFavorites,
   useToggleNameFavorite,
@@ -25,7 +25,11 @@ export default function NameFavoritesScreen() {
       isLoading={isLoading}
       emptyTitle="Aucun favori pour l’instant"
       emptyText="Pendant le jeu, touchez une carte pour garder un prénom ici."
-      emptyImage={require('@/assets/images/Prenoms_favoris.png')}
+      image={require('@/assets/images/Prenoms_favoris.png')}
+      itemNoun={{ singular: 'favori', plural: 'favoris' }}
+      sectionSubtitle={(gender) =>
+        `Vos prénoms ${GENDER_META[gender].label}s préférés.`
+      }
       onRemove={(item) =>
         toggleFavorite.mutate({
           gender: item.gender,

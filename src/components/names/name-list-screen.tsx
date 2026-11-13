@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { type ComponentProps, useEffect } from 'react';
+import { type ComponentProps, useEffect, useState } from 'react';
 import {
   Image,
   type ImageSourcePropType,
@@ -49,8 +49,10 @@ const LEAF_IMAGE = require('@/assets/images/Leaf_branch.png');
 
 /**
  * Liste de prénoms du match des prénoms — « Vos matchs » et « Favoris »
- * partagent la même mise en page : retour, titre souligné, prénoms rangés
- * par genre (filles puis garçons), état vide.
+ * partagent la même mise en page : retour, titre souligné avec
+ * l'illustration de la liste, puis un sélecteur Garçons / Filles, l'intitulé
+ * du genre avec son compteur et les cartes de prénoms (capture de référence,
+ * demande explicite d'un design plus soigné). État vide illustré.
  *
  * `onRemove` (favoris) ajoute un cœur qui retire le prénom de la liste.
  */
@@ -62,7 +64,9 @@ export function NameListScreen({
   isLoading,
   emptyTitle,
   emptyText,
-  emptyImage,
+  image,
+  itemNoun,
+  sectionSubtitle,
   onRemove,
 }: {
   title: string;
@@ -72,8 +76,12 @@ export function NameListScreen({
   isLoading: boolean;
   emptyTitle: string;
   emptyText: string;
-  /** Illustration 3D de l'état vide (celle de l'entrée du jeu). */
-  emptyImage: ImageSourcePropType;
+  /** Illustration 3D de la liste (celle de l'entrée du jeu). */
+  image: ImageSourcePropType;
+  /** Nom d'un élément pour le compteur : « 1 favori », « 2 favoris ». */
+  itemNoun: { singular: string; plural: string };
+  /** Sous-titre de la section d'un genre, ex. « Vos prénoms filles… ». */
+  sectionSubtitle: (gender: NameGender) => string;
   onRemove?: (item: NameListItem) => void;
 }) {
   // Place de la barre du bas, qui flotte au-dessus du contenu.
@@ -81,7 +89,15 @@ export function NameListScreen({
   const router = useRouter();
   const accent = useThemeAccent();
   const backgroundColor = useThemeBackground();
-  const groups: NameGender[] = ['girl', 'boy'];
+
+  const boys = items.filter((item) => item.gender === 'boy');
+  const girls = items.filter((item) => item.gender === 'girl');
+  // Garçons d'abord (capture de référence), sauf s'il n'y a que des filles.
+  const [chosenGender, setChosenGender] = useState<NameGender | null>(null);
+  const gender: NameGender =
+    chosenGender ?? (boys.length === 0 && girls.length > 0 ? 'girl' : 'boy');
+  const genderItems = gender === 'boy' ? boys : girls;
+  const meta = GENDER_META[gender];
 
   return (
     <SafeAreaView
@@ -94,44 +110,83 @@ export function NameListScreen({
         contentContainerStyle={{ paddingBottom: tabBarInset }}
         showsVerticalScrollIndicator={false}
       >
-        <Pressable
-          accessibilityLabel="Revenir au match des prénoms"
-          accessibilityRole="button"
-          hitSlop={12}
-          onPress={() => router.navigate('/prenoms')}
-          className="h-12 w-12 items-center justify-center rounded-full bg-white"
-          style={{
-            shadowColor: accent,
-            shadowOffset: { width: 0, height: 8 },
-            shadowOpacity: 0.1,
-            shadowRadius: 16,
-            elevation: 3,
-          }}
-        >
-          <Ionicons name="chevron-back" size={22} color={GLASS_TITLE_COLOR} />
-        </Pressable>
-
-        <View className="gap-1.5">
-          <View className="flex-row items-center gap-2.5">
-            <Ionicons name={icon} size={26} color={accent} />
-            <Text
-              className="text-[28px] font-extrabold leading-[34px]"
-              style={{ color: GLASS_TITLE_COLOR, letterSpacing: -0.6 }}
+        <View>
+          {/* Illustration de la liste en haut à droite, sur une tache —
+              pas quand la liste est vide : l'état vide la reprend déjà. */}
+          {items.length > 0 ? (
+            <View
+              pointerEvents="none"
+              style={{ position: 'absolute', top: 6, right: -6 }}
             >
-              {title}
-            </Text>
+              <View
+                style={{
+                  position: 'absolute',
+                  top: 18,
+                  left: 10,
+                  width: 120,
+                  height: 104,
+                  borderTopLeftRadius: 64,
+                  borderTopRightRadius: 52,
+                  borderBottomLeftRadius: 46,
+                  borderBottomRightRadius: 64,
+                  backgroundColor: hexToRgba(accent, 0.1),
+                }}
+              />
+              <Image
+                source={image}
+                style={{
+                  width: 140,
+                  height: 140,
+                  transform: [{ rotate: '8deg' }],
+                }}
+                resizeMode="contain"
+              />
+              <SparkLines
+                color={hexToRgba(accent, 0.55)}
+                style={{ left: -4, top: 10, transform: [{ rotate: '-70deg' }] }}
+              />
+            </View>
+          ) : null}
+
+          <Pressable
+            accessibilityLabel="Revenir au match des prénoms"
+            accessibilityRole="button"
+            hitSlop={12}
+            onPress={() => router.navigate('/prenoms')}
+            className="h-12 w-12 items-center justify-center rounded-full bg-white"
+            style={{
+              shadowColor: accent,
+              shadowOffset: { width: 0, height: 8 },
+              shadowOpacity: 0.1,
+              shadowRadius: 16,
+              elevation: 3,
+            }}
+          >
+            <Ionicons name="chevron-back" size={22} color={GLASS_TITLE_COLOR} />
+          </Pressable>
+
+          <View className="mt-6 gap-1.5" style={{ maxWidth: '62%' }}>
+            <View className="flex-row items-center gap-2.5">
+              <Ionicons name={icon} size={28} color={accent} />
+              <Text
+                className="text-[32px] font-extrabold leading-[38px]"
+                style={{ color: GLASS_TITLE_COLOR, letterSpacing: -0.8 }}
+              >
+                {title}
+              </Text>
+            </View>
+            <Svg width={130} height={10} viewBox="0 0 130 10">
+              <Path
+                d="M3 7 C 38 2, 88 1.5, 127 4"
+                stroke={hexToRgba(accent, 0.5)}
+                strokeWidth={3.5}
+                strokeLinecap="round"
+                fill="none"
+              />
+            </Svg>
           </View>
-          <Svg width={120} height={10} viewBox="0 0 120 10">
-            <Path
-              d="M3 7 C 34 2, 80 1.5, 117 4"
-              stroke={hexToRgba(accent, 0.5)}
-              strokeWidth={3}
-              strokeLinecap="round"
-              fill="none"
-            />
-          </Svg>
           <Text
-            className="text-[14.5px] leading-5"
+            className="mt-2 text-[14.5px] leading-5"
             style={{ color: GLASS_BODY_COLOR }}
           >
             {subtitle}
@@ -155,7 +210,7 @@ export function NameListScreen({
               elevation: 4,
             }}
           >
-            <EmptyIllustration image={emptyImage} accent={accent} />
+            <EmptyIllustration image={image} accent={accent} />
             <Text
               className="mt-4 text-center text-[19px] font-extrabold"
               style={{ color: GLASS_TITLE_COLOR, letterSpacing: -0.3 }}
@@ -170,79 +225,318 @@ export function NameListScreen({
             </Text>
           </Animated.View>
         ) : (
-          groups.map((gender) => {
-            const groupItems = items.filter((item) => item.gender === gender);
-            if (groupItems.length === 0) return null;
-            const meta = GENDER_META[gender];
-            return (
-              <View key={gender} className="gap-2.5">
-                <Text
-                  className="px-1 text-[12.5px] font-bold"
-                  style={{ color: meta.color, letterSpacing: 1.1 }}
-                >
-                  {meta.title.toUpperCase()}
-                </Text>
-                {groupItems.map((item) => (
-                  <Animated.View
-                    key={`${item.gender}-${item.name}`}
-                    entering={FadeInDown.duration(240)}
-                    exiting={FadeOutLeft.duration(300)}
-                    layout={ROW_LAYOUT}
-                    className="flex-row items-center gap-3 rounded-[22px] py-3 pl-3 pr-3"
-                    style={{
-                      backgroundColor: 'rgba(255, 255, 255, 0.92)',
-                      borderWidth: 1,
-                      borderColor: 'rgba(255, 255, 255, 0.95)',
-                    }}
-                  >
-                    <View
-                      className="h-11 w-11 items-center justify-center rounded-full"
-                      style={{ backgroundColor: meta.tint }}
+          <>
+            <GenderToggle
+              accent={accent}
+              gender={gender}
+              counts={{ boy: boys.length, girl: girls.length }}
+              onChange={setChosenGender}
+            />
+
+            <Animated.View
+              key={`section-${gender}`}
+              entering={FadeInDown.duration(240)}
+              className="gap-3.5"
+            >
+              <View className="gap-1 px-1">
+                <View className="flex-row items-center gap-2">
+                  <View className="flex-1">
+                    <SparkLines
+                      color={hexToRgba(meta.color, 0.7)}
+                      style={{
+                        left: -10,
+                        top: -12,
+                        transform: [{ rotate: '-80deg' }, { scale: 0.75 }],
+                      }}
+                    />
+                    <Text
+                      className="text-[22px] font-extrabold"
+                      style={{ color: GLASS_TITLE_COLOR, letterSpacing: -0.4 }}
                     >
-                      <Text
-                        className="text-[17px] font-extrabold"
-                        style={{ color: meta.color }}
-                      >
-                        {item.name.charAt(0)}
-                      </Text>
-                    </View>
-                    <View className="flex-1 gap-0.5">
-                      <Text
-                        className="text-[16px] font-bold"
-                        style={{ color: GLASS_TITLE_COLOR }}
-                      >
-                        {item.name}
-                      </Text>
-                      <Text
-                        className="text-[12.5px]"
-                        style={{ color: GLASS_BODY_COLOR }}
-                      >
-                        {getNameCountries(
-                          findNameCountryIds(item.name, item.gender),
-                        )
-                          .map((country) => `${country.flag} ${country.label}`)
-                          .join('  ·  ')}
-                      </Text>
-                    </View>
-                    {onRemove ? (
-                      <Pressable
-                        accessibilityRole="button"
-                        accessibilityLabel={`Retirer ${item.name} des favoris`}
-                        hitSlop={8}
-                        onPress={() => onRemove(item)}
-                        className="h-10 w-10 items-center justify-center rounded-full active:opacity-60"
-                      >
-                        <Ionicons name="heart" size={22} color="#e8739a" />
-                      </Pressable>
-                    ) : null}
-                  </Animated.View>
-                ))}
+                      {meta.title}
+                    </Text>
+                  </View>
+                  <View
+                    className="rounded-full px-3 py-1"
+                    style={{ backgroundColor: hexToRgba(meta.color, 0.12) }}
+                  >
+                    <Text
+                      className="text-[12.5px] font-bold"
+                      style={{ color: meta.color }}
+                    >
+                      {genderItems.length}{' '}
+                      {genderItems.length > 1
+                        ? itemNoun.plural
+                        : itemNoun.singular}
+                    </Text>
+                  </View>
+                </View>
+                <Text
+                  className="text-[14px]"
+                  style={{ color: GLASS_BODY_COLOR }}
+                >
+                  {sectionSubtitle(gender)}
+                </Text>
               </View>
-            );
-          })
+
+              {genderItems.length === 0 ? (
+                <View
+                  className="items-center gap-1.5 rounded-[24px] px-5 py-6"
+                  style={{ backgroundColor: hexToRgba(meta.color, 0.06) }}
+                >
+                  <Ionicons
+                    name={gender === 'boy' ? 'male' : 'female'}
+                    size={22}
+                    color={meta.color}
+                  />
+                  <Text
+                    className="text-center text-[14px]"
+                    style={{ color: GLASS_BODY_COLOR }}
+                  >
+                    Rien côté {meta.label}s pour l’instant.
+                  </Text>
+                </View>
+              ) : (
+                genderItems.map((item) => (
+                  <NameRow
+                    key={`${item.gender}-${item.name}`}
+                    item={item}
+                    onRemove={onRemove}
+                  />
+                ))
+              )}
+            </Animated.View>
+          </>
         )}
       </ScrollView>
     </SafeAreaView>
+  );
+}
+
+const TOGGLE_PADDING = 5;
+const GENDER_OPTIONS: {
+  value: NameGender;
+  label: string;
+  icon: IoniconName;
+}[] = [
+  { value: 'boy', label: 'Garçons', icon: 'male' },
+  { value: 'girl', label: 'Filles', icon: 'female' },
+];
+
+/**
+ * Sélecteur Garçons / Filles : pastille d'accent qui glisse sous le genre
+ * choisi, comme la bascule Connexion / Inscription. Le nombre de prénoms de
+ * chaque genre suit son libellé.
+ */
+function GenderToggle({
+  accent,
+  gender,
+  counts,
+  onChange,
+}: {
+  accent: string;
+  gender: NameGender;
+  counts: Record<NameGender, number>;
+  onChange: (gender: NameGender) => void;
+}) {
+  const [trackWidth, setTrackWidth] = useState(0);
+  const selectedIndex = gender === 'boy' ? 0 : 1;
+  const position = useSharedValue(selectedIndex);
+
+  useEffect(() => {
+    position.value = withTiming(selectedIndex, {
+      duration: 260,
+      easing: Easing.out(Easing.cubic),
+    });
+  }, [selectedIndex, position]);
+
+  const segmentWidth = Math.max(trackWidth - TOGGLE_PADDING * 2, 0) / 2;
+  const pillStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: position.value * segmentWidth }],
+  }));
+
+  return (
+    <View
+      accessibilityRole="tablist"
+      className="flex-row rounded-full"
+      style={{
+        padding: TOGGLE_PADDING,
+        backgroundColor: 'rgba(255, 255, 255, 0.85)',
+        borderWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.95)',
+        shadowColor: accent,
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.08,
+        shadowRadius: 16,
+        elevation: 2,
+      }}
+      onLayout={(event) => {
+        const { width } = event.nativeEvent.layout;
+        setTrackWidth((current) => (current === width ? current : width));
+      }}
+    >
+      {segmentWidth > 0 ? (
+        <Animated.View
+          pointerEvents="none"
+          style={[
+            {
+              position: 'absolute',
+              top: TOGGLE_PADDING,
+              bottom: TOGGLE_PADDING,
+              left: TOGGLE_PADDING,
+              width: segmentWidth,
+              borderRadius: 999,
+              backgroundColor: accent,
+              shadowColor: accent,
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.25,
+              shadowRadius: 8,
+              elevation: 4,
+            },
+            pillStyle,
+          ]}
+        />
+      ) : null}
+      {GENDER_OPTIONS.map((option) => {
+        const isActive = option.value === gender;
+        const color = isActive ? '#ffffff' : GLASS_BODY_COLOR;
+        return (
+          <Pressable
+            key={option.value}
+            accessibilityRole="tab"
+            accessibilityState={{ selected: isActive }}
+            accessibilityLabel={`${option.label}, ${counts[option.value]}`}
+            onPress={() => onChange(option.value)}
+            className="h-12 flex-1 flex-row items-center justify-center gap-2 rounded-full"
+          >
+            <Ionicons name={option.icon} size={18} color={color} />
+            <Text
+              className="text-[15.5px]"
+              style={{ color, fontWeight: isActive ? '700' : '600' }}
+            >
+              {option.label}
+            </Text>
+            {counts[option.value] > 0 ? (
+              <View
+                className="min-w-[22px] items-center rounded-full px-1.5 py-0.5"
+                style={{
+                  backgroundColor: isActive
+                    ? 'rgba(255, 255, 255, 0.25)'
+                    : hexToRgba(accent, 0.1),
+                }}
+              >
+                <Text
+                  className="text-[11.5px] font-bold"
+                  style={{ color: isActive ? '#ffffff' : accent }}
+                >
+                  {counts[option.value]}
+                </Text>
+              </View>
+            ) : null}
+          </Pressable>
+        );
+      })}
+    </View>
+  );
+}
+
+/**
+ * Carte d'un prénom : initiale dans une pastille à la teinte du genre, nom,
+ * pays en petites gélules (drapeau + nom), cœur pour le retirer (favoris).
+ * Tache pâle du genre en bas à gauche (capture de référence).
+ */
+function NameRow({
+  item,
+  onRemove,
+}: {
+  item: NameListItem;
+  onRemove?: (item: NameListItem) => void;
+}) {
+  const meta = GENDER_META[item.gender];
+  const countries = getNameCountries(
+    findNameCountryIds(item.name, item.gender),
+  );
+
+  return (
+    <Animated.View
+      entering={FadeInDown.duration(240)}
+      exiting={FadeOutLeft.duration(300)}
+      layout={ROW_LAYOUT}
+      className="flex-row items-center gap-3.5 overflow-hidden rounded-[26px] py-3.5 pl-3.5 pr-3"
+      style={{
+        backgroundColor: 'rgba(255, 255, 255, 0.94)',
+        borderWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.95)',
+        shadowColor: meta.color,
+        shadowOffset: { width: 0, height: 10 },
+        shadowOpacity: 0.1,
+        shadowRadius: 18,
+        elevation: 3,
+      }}
+    >
+      <View
+        pointerEvents="none"
+        style={{
+          position: 'absolute',
+          bottom: -46,
+          left: -24,
+          width: 170,
+          height: 80,
+          borderRadius: 85,
+          backgroundColor: hexToRgba(meta.color, 0.06),
+        }}
+      />
+      <View
+        className="h-14 w-14 items-center justify-center rounded-full"
+        style={{ backgroundColor: meta.tint }}
+      >
+        <Text
+          className="text-[22px] font-extrabold"
+          style={{ color: meta.color }}
+        >
+          {item.name.charAt(0)}
+        </Text>
+      </View>
+      <View className="flex-1 gap-1.5">
+        <Text
+          className="text-[18px] font-extrabold"
+          style={{ color: GLASS_TITLE_COLOR, letterSpacing: -0.3 }}
+        >
+          {item.name}
+        </Text>
+        {countries.length > 0 ? (
+          <View className="flex-row flex-wrap gap-1.5">
+            {countries.map((country) => (
+              <View
+                key={country.id}
+                className="flex-row items-center gap-1 rounded-full px-2 py-0.5"
+                style={{ backgroundColor: '#f4f3f7' }}
+              >
+                <Text style={{ fontSize: 13 }}>{country.flag}</Text>
+                <Text
+                  className="text-[12px] font-medium"
+                  style={{ color: GLASS_BODY_COLOR }}
+                >
+                  {country.label}
+                </Text>
+              </View>
+            ))}
+          </View>
+        ) : null}
+      </View>
+      {onRemove ? (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={`Retirer ${item.name} des favoris`}
+          hitSlop={8}
+          onPress={() => onRemove(item)}
+          className="h-11 w-11 items-center justify-center rounded-full active:opacity-60"
+          style={{ backgroundColor: hexToRgba('#e8739a', 0.1) }}
+        >
+          <Ionicons name="heart" size={22} color="#e8739a" />
+        </Pressable>
+      ) : null}
+    </Animated.View>
   );
 }
 

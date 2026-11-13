@@ -1,4 +1,5 @@
 import { NameListScreen } from '@/components/names/name-list-screen';
+import { GENDER_META } from '@/features/names/catalog';
 import { useNameMatches } from '@/features/names/hooks';
 
 /**
@@ -17,7 +18,11 @@ export default function NameMatchesScreen() {
       isLoading={isLoading}
       emptyTitle="Pas encore de match"
       emptyText="Swipez chacun de votre côté : un prénom gardé par vous deux apparaîtra ici."
-      emptyImage={require('@/assets/images/Prenoms_matchs.png')}
+      image={require('@/assets/images/Prenoms_matchs.png')}
+      itemNoun={{ singular: 'match', plural: 'matchs' }}
+      sectionSubtitle={(gender) =>
+        `Les prénoms ${GENDER_META[gender].label}s gardés par vous deux.`
+      }
     />
   );
 }
