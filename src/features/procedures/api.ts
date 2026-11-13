@@ -28,14 +28,19 @@ export async function fetchProcedures(
 
   if (error) throw error;
 
-  return data
-    .filter((row) => row.procedure_templates !== null)
-    .map((row) => ({
-      ...(row.procedure_templates as ProcedureTemplate),
-      householdProcedureId: row.id,
-      status: row.status,
-      reminderEnabled: row.reminder_enabled,
-    }));
+  return (
+    data
+      .filter((row) => row.procedure_templates !== null)
+      .map((row) => ({
+        ...(row.procedure_templates as ProcedureTemplate),
+        householdProcedureId: row.id,
+        status: row.status,
+        reminderEnabled: row.reminder_enabled,
+      }))
+      // L'`order` ci-dessus ne trie que la ressource imbriquée, pas les
+      // lignes : l'ordre du référentiel (mois × 100 + rang) se rétablit ici.
+      .sort((a, b) => a.sort_order - b.sort_order)
+  );
 }
 
 export async function updateProcedureStatus(

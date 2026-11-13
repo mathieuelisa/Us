@@ -56,8 +56,32 @@ const DEFAULT_PROCEDURE_ICON_STYLE: {
   color: string;
 } = { icon: 'document-text-outline', bg: '#EDEDED', color: '#8A8A8A' };
 
+/**
+ * Icône des démarches mois par mois (migration
+ * `20261113062319_procedure_templates_monthly_steps`), par catégorie : le
+ * slug commence par elle (`sante-m4-consultation`).
+ */
+const PROCEDURE_CATEGORY_ICON_STYLE: Record<
+  string,
+  { icon: IoniconName; bg: string; color: string }
+> = {
+  sante: { icon: 'medkit-outline', bg: '#FBE1E8', color: '#D9647F' },
+  cpam: { icon: 'shield-checkmark-outline', bg: '#DEF3E6', color: '#3FA66E' },
+  caf: { icon: 'business-outline', bg: '#DCEAFB', color: '#4E7FC4' },
+  maternite: { icon: 'bed-outline', bg: '#D9F2EE', color: '#2E9C93' },
+  travail: { icon: 'briefcase-outline', bg: '#FBE4D8', color: '#DD8355' },
+  garde: { icon: 'school-outline', bg: '#FCF0C9', color: '#C99A2E' },
+  mutuelle: { icon: 'heart-outline', bg: '#EAE1F8', color: '#8A63C9' },
+  mairie: { icon: 'library-outline', bg: '#E3E8F8', color: '#5A6FC0' },
+  impots: { icon: 'receipt-outline', bg: '#F3E4D3', color: '#B87A45' },
+};
+
 export function getProcedureIconStyle(slug: string) {
-  return PROCEDURE_ICON_STYLE[slug] ?? DEFAULT_PROCEDURE_ICON_STYLE;
+  return (
+    PROCEDURE_ICON_STYLE[slug] ??
+    PROCEDURE_CATEGORY_ICON_STYLE[slug.split('-m')[0]] ??
+    DEFAULT_PROCEDURE_ICON_STYLE
+  );
 }
 
 export const STATUS_OPTIONS: { value: string; label: string }[] = [
