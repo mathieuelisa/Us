@@ -181,28 +181,28 @@ export default function HealthScreen() {
             />
           </View>
 
-          {router.canGoBack() ? (
-            <Pressable
-              accessibilityLabel="Revenir en arrière"
-              accessibilityRole="button"
-              hitSlop={12}
-              onPress={() => router.back()}
-              style={{
-                shadowColor: accent,
-                shadowOffset: { width: 0, height: 8 },
-                shadowOpacity: 0.12,
-                shadowRadius: 16,
-                elevation: 4,
-              }}
-              className="h-12 w-12 items-center justify-center rounded-full bg-white"
-            >
-              <Ionicons
-                name="chevron-back"
-                size={22}
-                color={GLASS_TITLE_COLOR}
-              />
-            </Pressable>
-          ) : null}
+          {/* Toujours affiché, comme Ensemble et Démarches (demande
+              explicite). L'écran reste monté entre deux visites et s'ouvre
+              aussi par lien direct (`/sante?tab=…`) : sans historique, le
+              retour ramène à l'accueil. */}
+          <Pressable
+            accessibilityLabel="Revenir en arrière"
+            accessibilityRole="button"
+            hitSlop={12}
+            onPress={() =>
+              router.canGoBack() ? router.back() : router.navigate('/')
+            }
+            style={{
+              shadowColor: accent,
+              shadowOffset: { width: 0, height: 8 },
+              shadowOpacity: 0.12,
+              shadowRadius: 16,
+              elevation: 4,
+            }}
+            className="h-12 w-12 items-center justify-center rounded-full bg-white"
+          >
+            <Ionicons name="chevron-back" size={22} color={GLASS_TITLE_COLOR} />
+          </Pressable>
 
           <Ionicons
             name="heart-outline"
