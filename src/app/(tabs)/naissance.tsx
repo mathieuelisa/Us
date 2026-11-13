@@ -8,7 +8,7 @@ import { withUniwind } from 'uniwind';
 
 import { ConfirmBirthModal } from '@/components/birth/confirm-birth-modal';
 import { DeclareBirthButton } from '@/components/birth/declare-birth-button';
-import { useTabBarContentInset } from '@/components/navigation/use-tab-bar-height';
+import { useTabBarHeight } from '@/components/navigation/use-tab-bar-height';
 import {
   ChevronBubble,
   GLASS_BODY_COLOR,
@@ -88,7 +88,9 @@ const tintedShadow = (accent: string) =>
  */
 export default function BirthScreen() {
   // Place de la barre du bas, qui flotte au-dessus du contenu.
-  const tabBarInset = useTabBarContentInset();
+  // La barre d'onglets flotte au-dessus de l'écran : le pied d'action se
+  // place juste au-dessus d'elle (il passait dessous, demande explicite).
+  const tabBarHeight = useTabBarHeight();
   const router = useRouter();
   const backgroundColor = useThemeBackground();
   const accent = useThemeAccent();
@@ -140,7 +142,7 @@ export default function BirthScreen() {
       <ScrollView
         className="flex-1"
         contentContainerClassName="gap-5 px-6 pt-4"
-        contentContainerStyle={{ paddingBottom: tabBarInset }}
+        contentContainerStyle={{ paddingBottom: 24 }}
         showsVerticalScrollIndicator={false}
       >
         <Pressable
@@ -265,7 +267,10 @@ export default function BirthScreen() {
           d'écran — sans quoi le contenu défilerait visiblement derrière le
           bouton et son ombre. */}
       {isFormVisible ? (
-        <View className="gap-2 px-6 pb-3 pt-3" style={{ backgroundColor }}>
+        <View
+          className="gap-2 px-6 pt-3"
+          style={{ backgroundColor, paddingBottom: tabBarHeight + 4 }}
+        >
           <DeclareBirthButton
             label={isCorrecting ? 'Corriger la date' : 'Confirmer la naissance'}
             isDisabled={!canConfirm}
@@ -291,7 +296,10 @@ export default function BirthScreen() {
         /* Même emplacement que le bouton principal une fois la naissance
            déclarée : la correction est une action mineure, mais laisser ce
            pied d'écran vide déséquilibrait l'état final. */
-        <View className="px-6 pb-3 pt-3" style={{ backgroundColor }}>
+        <View
+          className="px-6 pt-3"
+          style={{ backgroundColor, paddingBottom: tabBarHeight + 4 }}
+        >
           <Pressable
             accessibilityRole="button"
             onPress={startCorrecting}
