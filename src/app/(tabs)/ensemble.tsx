@@ -255,10 +255,9 @@ function GestureOfTheDayCard({
 
         <View className="flex-1 items-start gap-2">
           <View
-            className="flex-row items-center gap-1.5 rounded-full px-3 py-1.5"
+            className="rounded-full px-3 py-1.5"
             style={{ backgroundColor: hexToRgba(accent, 0.1) }}
           >
-            <Ionicons name="sparkles" size={13} color={accent} />
             <Text
               className="text-[11.5px] font-bold"
               style={{ color: accent, letterSpacing: 0.8 }}
