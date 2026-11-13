@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import {
+  Image,
   Linking,
   Pressable,
   ScrollView,
@@ -738,6 +739,16 @@ function MonthPill({
   );
 }
 
+const DETAIL_IMAGE = require('@/assets/images/Icon_demarches.png');
+
+/**
+ * Détail d'une démarche, d'après une capture de référence (demande
+ * explicite d'un rendu plus moderne) : titre souligné avec l'illustration
+ * des démarches en haut à droite, échéance en gélule, description, puis une
+ * carte qui réunit le statut, le rappel et le repère de calendrier. Les
+ * choix s'enregistrent au toucher (pas de bouton « Enregistrer ») ; le
+ * téléservice officiel reste le bouton principal quand il existe.
+ */
 function ProcedureDetail({
   procedure,
   birthDate,
@@ -746,11 +757,13 @@ function ProcedureDetail({
   onToggleReminder,
 }: {
   procedure: {
+    slug: string;
     title: string;
     description: string | null;
     documents: string[];
     official_link: string | null;
     deadline_days_after_birth: number | null;
+    pregnancy_month: number | null;
     status: string;
     reminderEnabled: boolean;
   };
@@ -763,67 +776,210 @@ function ProcedureDetail({
     procedure.deadline_days_after_birth,
     birthDate,
   );
+  const iconStyle = getProcedureIconStyle(procedure.slug);
+  // Repère de calendrier en pied de carte : le délai après la naissance
+  // s'il y en a un, sinon le mois de grossesse où la prévoir.
+  const timing =
+    procedure.deadline_days_after_birth !== null
+      ? `À faire après la naissance, dans les ${procedure.deadline_days_after_birth} jours.`
+      : procedure.pregnancy_month !== null
+        ? `À prévoir pendant le ${getPregnancyMonthLabel(procedure.pregnancy_month)}.`
+        : null;
 
   return (
     <View className="gap-5">
-      <View className="gap-1.5">
-        <Text
-          className="text-[28px] font-extrabold leading-9"
-          style={{ color: GLASS_TITLE_COLOR, letterSpacing: -0.5 }}
+      <View className="min-h-[150px] justify-center">
+        <View
+          pointerEvents="none"
+          style={{ position: 'absolute', top: -64, right: -26 }}
         >
-          {procedure.title}
-        </Text>
-        {deadline ? (
-          <Text className="text-[14px] font-semibold" style={{ color: accent }}>
+          <View
+            style={{
+              position: 'absolute',
+              top: 18,
+              left: 6,
+              width: 150,
+              height: 140,
+              borderTopLeftRadius: 80,
+              borderTopRightRadius: 64,
+              borderBottomLeftRadius: 58,
+              borderBottomRightRadius: 84,
+              backgroundColor: hexToRgba(accent, 0.1),
+            }}
+          />
+          <Image
+            source={DETAIL_IMAGE}
+            style={{
+              width: 140,
+              height: 140,
+              marginLeft: 12,
+              marginTop: 10,
+              transform: [{ rotate: '8deg' }],
+            }}
+            resizeMode="contain"
+          />
+          <SparkLines
+            color={hexToRgba(accent, 0.6)}
+            style={{ left: -6, top: 6, transform: [{ rotate: '-70deg' }] }}
+          />
+        </View>
+
+        <View className="gap-2" style={{ maxWidth: '62%' }}>
+          <Text
+            className="text-[27px] font-extrabold leading-[33px]"
+            style={{ color: GLASS_TITLE_COLOR, letterSpacing: -0.6 }}
+          >
+            {procedure.title}
+          </Text>
+          <Svg width={120} height={10} viewBox="0 0 120 10">
+            <Path
+              d="M3 7 C 34 2, 80 1.5, 117 4"
+              stroke={hexToRgba(accent, 0.5)}
+              strokeWidth={3.5}
+              strokeLinecap="round"
+              fill="none"
+            />
+          </Svg>
+        </View>
+      </View>
+
+      <View className="gap-3">
+        <View
+          className="flex-row items-center gap-1.5 self-start rounded-full py-2 pl-3 pr-4"
+          style={{ backgroundColor: hexToRgba(accent, 0.1) }}
+        >
+          <Ionicons name="flash" size={15} color={accent} />
+          <Text className="text-[13.5px] font-bold" style={{ color: accent }}>
             {deadline}
+          </Text>
+        </View>
+        {procedure.description ? (
+          <Text
+            className="text-[14.5px] leading-[21px]"
+            style={{ color: GLASS_BODY_COLOR }}
+          >
+            {procedure.description}
           </Text>
         ) : null}
       </View>
 
-      {procedure.description ? (
-        <Text className="text-[14px] leading-5 text-[#6b6b6b]">
-          {procedure.description}
-        </Text>
-      ) : null}
-
-      <View className="gap-2.5">
-        <Text className="text-[13px] font-medium text-[#1a1a1a]">Statut</Text>
+      <View
+        className="gap-4 rounded-[28px] p-4"
+        style={{
+          backgroundColor: 'rgba(255, 255, 255, 0.94)',
+          borderWidth: 1,
+          borderColor: 'rgba(255, 255, 255, 0.95)',
+          ...tintedShadow(accent),
+        }}
+      >
+        <View className="flex-row items-center gap-2.5">
+          <View
+            className="h-10 w-10 items-center justify-center rounded-full"
+            style={{ backgroundColor: iconStyle.bg }}
+          >
+            <Ionicons name={iconStyle.icon} size={19} color={iconStyle.color} />
+          </View>
+          <Text
+            className="text-[16px] font-bold"
+            style={{ color: GLASS_TITLE_COLOR }}
+          >
+            Statut
+          </Text>
+        </View>
         <StatusSelector status={procedure.status} onChange={onChangeStatus} />
+
+        <View className="h-px" style={{ backgroundColor: '#eeedf2' }} />
+
+        <View className="flex-row items-center gap-3">
+          <View
+            className="h-11 w-11 items-center justify-center rounded-[14px]"
+            style={{ backgroundColor: hexToRgba(accent, 0.1) }}
+          >
+            <Ionicons name="notifications-outline" size={20} color={accent} />
+          </View>
+          <View className="flex-1 gap-0.5">
+            <Text
+              className="text-[15px] font-bold"
+              style={{ color: GLASS_TITLE_COLOR }}
+            >
+              Me rappeler avant l’échéance
+            </Text>
+            <Text className="text-[12.5px]" style={{ color: GLASS_BODY_COLOR }}>
+              Pour ne pas laisser passer cette démarche.
+            </Text>
+          </View>
+          <Switch
+            accessibilityLabel="Me rappeler avant l’échéance"
+            value={procedure.reminderEnabled}
+            onValueChange={onToggleReminder}
+            trackColor={{ true: accent }}
+          />
+        </View>
+
+        {timing ? (
+          <View
+            className="flex-row items-center gap-2.5 rounded-[16px] px-3.5 py-3"
+            style={{ backgroundColor: hexToRgba(accent, 0.07) }}
+          >
+            <Ionicons
+              name="information-circle-outline"
+              size={20}
+              color={accent}
+            />
+            <Text
+              className="flex-1 text-[13.5px] leading-[19px]"
+              style={{ color: GLASS_TITLE_COLOR }}
+            >
+              {timing}
+            </Text>
+          </View>
+        ) : null}
       </View>
 
       {procedure.documents.length > 0 ? (
-        <View className="gap-2.5">
-          <Text className="text-[13px] font-medium text-[#1a1a1a]">
-            Documents à fournir
-          </Text>
-          <View className="gap-2 rounded-2xl bg-white px-4 py-3.5 shadow-sm">
-            {procedure.documents.map((document) => (
-              <View key={document} className="flex-row items-start gap-2">
-                <Text className="text-[13px] text-accent">•</Text>
-                <Text className="flex-1 text-[14px] text-[#1a1a1a]">
-                  {document}
-                </Text>
-              </View>
-            ))}
+        <View
+          className="gap-3 rounded-[28px] p-4"
+          style={{
+            backgroundColor: 'rgba(255, 255, 255, 0.94)',
+            borderWidth: 1,
+            borderColor: 'rgba(255, 255, 255, 0.95)',
+            ...tintedShadow(accent),
+          }}
+        >
+          <View className="flex-row items-center gap-2.5">
+            <View
+              className="h-10 w-10 items-center justify-center rounded-full"
+              style={{ backgroundColor: hexToRgba(accent, 0.1) }}
+            >
+              <Ionicons name="folder-open-outline" size={19} color={accent} />
+            </View>
+            <Text
+              className="text-[16px] font-bold"
+              style={{ color: GLASS_TITLE_COLOR }}
+            >
+              Documents à fournir
+            </Text>
           </View>
+          {procedure.documents.map((document) => (
+            <View key={document} className="flex-row items-center gap-2.5">
+              <Ionicons
+                name="document-text-outline"
+                size={17}
+                color={GLASS_BODY_COLOR}
+              />
+              <Text
+                className="flex-1 text-[14px]"
+                style={{ color: GLASS_TITLE_COLOR }}
+              >
+                {document}
+              </Text>
+            </View>
+          ))}
         </View>
       ) : null}
 
-      <View className="flex-row items-center justify-between gap-3 shadow-sm rounded-xl bg-white px-3.5 py-3">
-        <Text className="flex-1 text-[14px] text-[#1a1a1a]">
-          Me rappeler avant l’échéance
-        </Text>
-        <Switch
-          value={procedure.reminderEnabled}
-          onValueChange={onToggleReminder}
-          trackColor={{ true: accent }}
-        />
-      </View>
-
       {/* Pas d'explication de procédure dans l'app (CONCEPT.md) : juste le
-          lien vers le téléservice officiel. Absent pour la mutuelle — c'est
-          un assureur privé propre à chaque foyer, aucun lien officiel
-          générique n'existe. */}
+          lien vers le téléservice officiel, quand il en existe un. */}
       {procedure.official_link ? (
         <PillButton
           label="Accéder au téléservice officiel"
