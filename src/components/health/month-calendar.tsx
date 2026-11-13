@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import { Pressable, Text, View } from 'react-native';
 
 import { formatMonthTitle } from '@/features/health/constants';
@@ -44,6 +45,46 @@ function getMonthGrid(year: number, month: number): GridCell[] {
   });
 }
 
+/**
+ * Couleurs du style « pastille teintée » (demande explicite), en variables
+ * pour pouvoir les changer facilement : teinte de fond des jours avec
+ * rendez-vous, et accent de leur chiffre.
+ */
+export const CALENDAR_TINT = '#D3EADF';
+export const CALENDAR_ACCENT = '#1F4D40';
+const INK = '#161616';
+const HOVER_BG = '#F2F2F2';
+const PILL_SIZE = 44;
+
+const MONTH_NAMES = new Intl.DateTimeFormat('fr-FR', { month: 'long' });
+
+/** « 16 novembre, 2 rendez-vous » ou « 13 novembre, aujourd'hui ». */
+function dayAccessibilityLabel(
+  isoDate: string,
+  appointmentCount: number,
+  isToday: boolean,
+): string {
+  const [year, month, day] = isoDate.split('-').map(Number);
+  const parts = [
+    `${day} ${MONTH_NAMES.format(new Date(year, month - 1, day))}`,
+  ];
+  if (isToday) parts.push('aujourd’hui');
+  if (appointmentCount > 0) {
+    parts.push(`${appointmentCount} rendez-vous`);
+  }
+  return parts.join(', ');
+}
+
+/**
+ * Calendrier mensuel des rendez-vous, style « pastille teintée » (demande
+ * explicite) : un jour avec rendez-vous est une pastille ronde vert clair
+ * au chiffre vert foncé et gras, aujourd'hui est cerclé d'un trait fin
+ * (par-dessus la pastille s'il a aussi un rendez-vous), les autres jours
+ * restent sobres. Légende sous la grille.
+ *
+ * `markedDates` contient une date par rendez-vous : un jour qui y figure
+ * deux fois a deux rendez-vous (libellé d'accessibilité).
+ */
 export function MonthCalendar({
   year,
   month,
@@ -61,33 +102,28 @@ export function MonthCalendar({
 }) {
   const grid = getMonthGrid(year, month);
   const today = todayIso();
+  const appointmentCounts = new Map<string, number>();
+  for (const date of markedDates) {
+    appointmentCounts.set(date, (appointmentCounts.get(date) ?? 0) + 1);
+  }
 
   return (
-    <View className="gap-3 rounded-2xl bg-white px-4 py-4">
+    <View
+      className="gap-3 rounded-[24px] bg-white px-4 py-4"
+      style={{
+        shadowColor: INK,
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.04,
+        shadowRadius: 2,
+        elevation: 1,
+      }}
+    >
       <View className="flex-row items-center justify-between">
-        <Pressable
-          accessibilityLabel="Mois précédent"
-          accessibilityRole="button"
-          hitSlop={10}
-          onPress={() => onChangeMonth(-1)}
-          className="h-8 w-8 items-center justify-center rounded-full bg-[#f4f4f4]"
-        >
-          <Text className="text-[16px] text-[#1a1a1a]">‹</Text>
-        </Pressable>
-
-        <Text className="text-[15px] font-semibold text-[#1a1a1a]">
+        <MonthArrow direction="previous" onPress={() => onChangeMonth(-1)} />
+        <Text className="text-[15px] font-semibold" style={{ color: INK }}>
           {formatMonthTitle(year, month)}
         </Text>
-
-        <Pressable
-          accessibilityLabel="Mois suivant"
-          accessibilityRole="button"
-          hitSlop={10}
-          onPress={() => onChangeMonth(1)}
-          className="h-8 w-8 items-center justify-center rounded-full bg-[#f4f4f4]"
-        >
-          <Text className="text-[16px] text-[#1a1a1a]">›</Text>
-        </Pressable>
+        <MonthArrow direction="next" onPress={() => onChangeMonth(1)} />
       </View>
 
       <View className="flex-row">
@@ -104,55 +140,129 @@ export function MonthCalendar({
         {grid.map(({ key, isoDate }) => {
           if (!isoDate) {
             return (
-              <View
-                key={key}
-                className="h-10 items-center justify-center"
-                style={{ width: `${100 / 7}%` }}
-              />
+              <View key={key} style={{ width: `${100 / 7}%`, height: 56 }} />
             );
           }
 
           const dayNumber = Number(isoDate.slice(-2));
           const isToday = isoDate === today;
           const isSelected = isoDate === selectedDate;
-          const isMarked = markedDates.includes(isoDate);
+          const appointmentCount = appointmentCounts.get(isoDate) ?? 0;
+          const hasAppointment = appointmentCount > 0;
 
           return (
             <Pressable
               key={isoDate}
               accessibilityRole="button"
+              accessibilityLabel={dayAccessibilityLabel(
+                isoDate,
+                appointmentCount,
+                isToday,
+              )}
               accessibilityState={{ selected: isSelected }}
               disabled={!onSelectDate}
               onPress={() => onSelectDate?.(isoDate)}
-              className="h-10 items-center justify-center"
-              style={{ width: `${100 / 7}%` }}
+              className="items-center justify-center"
+              style={{ width: `${100 / 7}%`, height: 56 }}
             >
-              <View
-                className={`h-8 w-8 items-center justify-center rounded-full ${
-                  isSelected
-                    ? 'bg-accent'
-                    : isToday
-                      ? 'bg-accent/10'
-                      : 'bg-transparent'
-                }`}
-              >
-                <Text
-                  className={`text-[13px] ${
-                    isSelected
-                      ? 'font-medium text-accent-foreground'
-                      : 'text-[#1a1a1a]'
-                  }`}
-                >
-                  {dayNumber}
-                </Text>
-              </View>
-              {isMarked ? (
-                <View className="absolute bottom-0.5 h-1 w-1 rounded-full bg-accent" />
-              ) : null}
+              {(state) => {
+                // `hovered` n'existe que sur le web (react-native-web).
+                const isHovered = Boolean(
+                  (state as { hovered?: boolean }).hovered,
+                );
+                return (
+                  <View
+                    className="items-center justify-center rounded-full"
+                    style={{
+                      width: PILL_SIZE,
+                      height: PILL_SIZE,
+                      backgroundColor: isSelected
+                        ? CALENDAR_ACCENT
+                        : hasAppointment
+                          ? CALENDAR_TINT
+                          : isHovered
+                            ? HOVER_BG
+                            : 'transparent',
+                      borderWidth: isToday ? 1.5 : 0,
+                      borderColor: INK,
+                      opacity: state.pressed ? 0.7 : 1,
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontSize: 16,
+                        color: isSelected
+                          ? '#ffffff'
+                          : hasAppointment
+                            ? CALENDAR_ACCENT
+                            : INK,
+                        fontWeight:
+                          hasAppointment || isSelected
+                            ? '700'
+                            : isToday
+                              ? '600'
+                              : '400',
+                      }}
+                    >
+                      {dayNumber}
+                    </Text>
+                  </View>
+                );
+              }}
             </Pressable>
           );
         })}
       </View>
+
+      <View className="h-px" style={{ backgroundColor: '#EFEFEF' }} />
+      <View className="flex-row items-center gap-5 px-1">
+        <View className="flex-row items-center gap-2">
+          <View
+            className="h-3.5 w-3.5 rounded-full"
+            style={{ backgroundColor: CALENDAR_TINT }}
+          />
+          <Text className="text-[13px]" style={{ color: '#6B6B6B' }}>
+            Rendez-vous
+          </Text>
+        </View>
+        <View className="flex-row items-center gap-2">
+          <View
+            className="h-3.5 w-3.5 rounded-full"
+            style={{ borderWidth: 1.5, borderColor: INK }}
+          />
+          <Text className="text-[13px]" style={{ color: '#6B6B6B' }}>
+            Aujourd’hui
+          </Text>
+        </View>
+      </View>
     </View>
+  );
+}
+
+/** Bouton rond de 44 px, fond gris clair, chevron en trait. */
+function MonthArrow({
+  direction,
+  onPress,
+}: {
+  direction: 'previous' | 'next';
+  onPress: () => void;
+}) {
+  return (
+    <Pressable
+      accessibilityLabel={
+        direction === 'previous' ? 'Mois précédent' : 'Mois suivant'
+      }
+      accessibilityRole="button"
+      hitSlop={6}
+      onPress={onPress}
+      className="h-11 w-11 items-center justify-center rounded-full active:opacity-70"
+      style={{ backgroundColor: HOVER_BG }}
+    >
+      <Ionicons
+        name={direction === 'previous' ? 'chevron-back' : 'chevron-forward'}
+        size={20}
+        color={INK}
+      />
+    </Pressable>
   );
 }
