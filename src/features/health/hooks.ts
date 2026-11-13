@@ -18,6 +18,7 @@ import {
   reorderContacts,
   saveSymptoms,
   updateAppointment,
+  updateContact,
 } from './api';
 
 function useIds(household: Household | null | undefined) {
@@ -234,6 +235,26 @@ export function useCreateContact(household: Household | null | undefined) {
       if (!householdId) throw new Error('No household');
       return createContact({ householdId, ...input });
     },
+    onSuccess: () => {
+      invalidate([queryKeys.health.contacts(householdId as string)]);
+    },
+  });
+}
+
+export function useUpdateContact(household: Household | null | undefined) {
+  const { householdId } = useIds(household);
+  const invalidate = useInvalidate(householdId);
+
+  return useMutation({
+    mutationFn: ({
+      id,
+      ...input
+    }: {
+      id: string;
+      name: string;
+      phone: string | null;
+      isEmergency: boolean;
+    }) => updateContact(id, input),
     onSuccess: () => {
       invalidate([queryKeys.health.contacts(householdId as string)]);
     },

@@ -193,6 +193,29 @@ export async function createContact(input: {
   return data;
 }
 
+/**
+ * Correction d'un contact (nom, téléphone, urgence). RLS :
+ * `contacts_all_members`, les deux parents modifient tout le carnet.
+ */
+export async function updateContact(
+  id: string,
+  input: { name: string; phone: string | null; isEmergency: boolean },
+): Promise<Contact> {
+  const { data, error } = await supabase
+    .from('contacts')
+    .update({
+      name: input.name,
+      phone: input.phone,
+      is_emergency: input.isEmergency,
+    })
+    .eq('id', id)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
 export async function deleteContact(id: string): Promise<void> {
   const { error } = await supabase.from('contacts').delete().eq('id', id);
   if (error) throw error;
