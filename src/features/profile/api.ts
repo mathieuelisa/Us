@@ -46,3 +46,16 @@ export async function updateMyTheme(
 
   if (error) throw error;
 }
+
+/** `null` revient à l'initiale du prénom. RLS : `profiles_update_own`. */
+export async function updateMyAvatar(
+  userId: string,
+  avatar: string | null,
+): Promise<void> {
+  const { error } = await supabase
+    .from('profiles')
+    .update({ avatar })
+    .eq('id', userId);
+
+  if (error) throw error;
+}

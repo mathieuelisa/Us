@@ -3,7 +3,12 @@ import { useAtomValue } from 'jotai';
 
 import { sessionAtom } from '@/lib/atoms/session';
 import { queryKeys } from '@/lib/query/keys';
-import { fetchMyProfile, updateMyProfile, updateMyTheme } from './api';
+import {
+  fetchMyProfile,
+  updateMyAvatar,
+  updateMyProfile,
+  updateMyTheme,
+} from './api';
 
 export function useMyProfile() {
   const session = useAtomValue(sessionAtom);
@@ -47,6 +52,23 @@ export function useUpdateMyTheme() {
     mutationFn: (theme: string) => {
       if (!userId) throw new Error('No authenticated user');
       return updateMyTheme(userId, theme);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.profile.all });
+    },
+  });
+}
+
+/** Choix de l'avatar dans la modale de la page Profil. */
+export function useUpdateMyAvatar() {
+  const session = useAtomValue(sessionAtom);
+  const userId = session?.user.id;
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (avatar: string | null) => {
+      if (!userId) throw new Error('No authenticated user');
+      return updateMyAvatar(userId, avatar);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.profile.all });

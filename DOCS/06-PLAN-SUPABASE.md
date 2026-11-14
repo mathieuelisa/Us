@@ -100,7 +100,7 @@ configurer le SMTP. Détail dans l'[architecture](./04-ARCHITECTURE.md#connexion
 | Élément | État |
 |---|---|
 | Projet | `hsclyntlnoyevstdhgvu`, Paris. Ancien projet de Londres encore présent (dette n°4) |
-| Migrations | 36, **identiques** entre le dépôt et le cloud (dernière : `20261113062319`, 48 démarches mois par mois) |
+| Migrations | 37, **identiques** entre le dépôt et le cloud (dernière : `20261114134453`, avatar du profil) |
 | Tables | 22, toutes avec RLS |
 | Données réelles | 2 comptes, **1 foyer sans co-parent rattaché** : le parcours à deux n'a jamais été joué pour de vrai (dette n°5) |
 | Auth | Email + mot de passe actif ; Google désactivé (dette n°56) ; confirmation d'email désactivée pour les tests (dette n°60) ; SMTP mutualisé de Supabase |

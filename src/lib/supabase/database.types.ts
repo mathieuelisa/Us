@@ -834,18 +834,21 @@ export type Database = {
       };
       profiles: {
         Row: {
+          avatar: string | null;
           created_at: string;
           first_name: string | null;
           id: string;
           theme: string;
         };
         Insert: {
+          avatar?: string | null;
           created_at?: string;
           first_name?: string | null;
           id: string;
           theme?: string;
         };
         Update: {
+          avatar?: string | null;
           created_at?: string;
           first_name?: string | null;
           id?: string;

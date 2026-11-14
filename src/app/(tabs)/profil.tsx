@@ -6,6 +6,7 @@ import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import { withUniwind } from 'uniwind';
 import { useTabBarContentInset } from '@/components/navigation/use-tab-bar-height';
+import { AvatarPickerModal } from '@/components/profile/avatar-picker-modal';
 import {
   FeedbackBanner,
   useFeedbackBanner,
@@ -17,7 +18,12 @@ import {
 } from '@/components/ui/glass-card';
 import { PillButton } from '@/components/ui/pill-button';
 import { ScreenCornerShapes } from '@/components/ui/screen-corner-shapes';
-import { useMyProfile, useUpdateMyProfile } from '@/features/profile/hooks';
+import { getProfileAvatar } from '@/features/profile/avatars';
+import {
+  useMyProfile,
+  useUpdateMyAvatar,
+  useUpdateMyProfile,
+} from '@/features/profile/hooks';
 import { useThemeAccent, useThemeBackground } from '@/features/settings/hooks';
 import { sessionAtom } from '@/lib/atoms/session';
 import { hexToRgba, lightenHex } from '@/lib/color';
@@ -39,8 +45,9 @@ type IoniconName = ComponentProps<typeof Ionicons>['name'];
  * - pas de chevrons : le prénom se modifie directement dans sa ligne (un
  *   crayon l'indique) et l'email n'ouvre aucun écran — une flèche promettrait
  *   une navigation qui n'existe pas ;
- * - pas d'appareil photo sur l'avatar : le choix de la photo viendra plus
- *   tard (demande explicite).
+ * - pas d'appareil photo sur l'avatar : on y choisit un avatar simple
+ *   dans une modale (`AvatarPickerModal`, demande explicite du
+ *   2026-11-14), la photo viendra plus tard.
  *
  * Enregistrer confirme visiblement le résultat : bandeau « Prénom mis à
  * jour » et bouton « Enregistré » pendant 2,5 s, ou bandeau d'erreur rouge.
@@ -52,6 +59,26 @@ export default function ProfileScreen() {
   const session = useAtomValue(sessionAtom);
   const { data: profile, isLoading } = useMyProfile();
   const updateProfile = useUpdateMyProfile();
+  const updateAvatar = useUpdateMyAvatar();
+  const [isAvatarPickerOpen, setIsAvatarPickerOpen] = useState(false);
+  const [lastSaved, setLastSaved] = useState<'name' | 'avatar' | null>(null);
+  const avatarKey = profile?.avatar ?? null;
+
+  const chooseAvatar = (avatar: string | null) => {
+    if (avatar === avatarKey) {
+      setIsAvatarPickerOpen(false);
+      return;
+    }
+    updateAvatar.mutate(avatar, {
+      onSuccess: () => {
+        setLastSaved('avatar');
+        setIsAvatarPickerOpen(false);
+        showFeedback('success', 'Votre avatar est à jour.');
+      },
+      onError: () =>
+        showFeedback('error', 'Impossible d’enregistrer votre avatar.'),
+    });
+  };
   const backgroundColor = useThemeBackground();
   const accent = useThemeAccent();
 
@@ -69,7 +96,9 @@ export default function ProfileScreen() {
 
   const initials = (savedFirstName || '?').trim().charAt(0).toUpperCase();
   const hasChanges = firstName.trim() !== savedFirstName.trim();
-  const justSaved = feedback?.tone === 'success' && !hasChanges;
+  // « Enregistré » sur le bouton ne concerne que le prénom, pas l'avatar.
+  const justSaved =
+    feedback?.tone === 'success' && lastSaved === 'name' && !hasChanges;
 
   const save = () => {
     if (!hasChanges || updateProfile.isPending || firstName.trim() === '') {
@@ -78,6 +107,7 @@ export default function ProfileScreen() {
     const newFirstName = firstName.trim();
     updateProfile.mutate(newFirstName, {
       onSuccess: () => {
+        setLastSaved('name');
         nameInputRef.current?.blur();
         // Message plus chaleureux, avec le nouveau prénom (demande
         // explicite).
@@ -130,9 +160,14 @@ export default function ProfileScreen() {
         </View>
 
         <View className="items-center gap-3">
-          <ProfileAvatar initials={initials} accent={accent} />
+          <ProfileAvatar
+            initials={initials}
+            avatarKey={avatarKey}
+            accent={accent}
+            onPress={() => setIsAvatarPickerOpen(true)}
+          />
           <Text className="text-[13px]" style={{ color: GLASS_BODY_COLOR }}>
-            Photo de profil — bientôt disponible
+            Touchez pour choisir un avatar
           </Text>
         </View>
 
@@ -231,6 +266,16 @@ export default function ProfileScreen() {
         />
       </ScrollView>
 
+      <AvatarPickerModal
+        visible={isAvatarPickerOpen}
+        accent={accent}
+        initials={initials}
+        selected={avatarKey}
+        isSaving={updateAvatar.isPending}
+        onSelect={chooseAvatar}
+        onClose={() => setIsAvatarPickerOpen(false)}
+      />
+
       <FeedbackBanner
         message={feedback?.message ?? null}
         tone={feedback?.tone}
@@ -241,20 +286,33 @@ export default function ProfileScreen() {
 }
 
 /**
- * Avatar : initiale blanche sur un grand rond d'accent, cerclé d'un halo
- * clair et surmonté de petits traits (même vocabulaire que la barre
- * d'onglets). En attendant une vraie photo — `Avatar` de Hero UI Native n'a
- * jamais reçu ses variables pour nos thèmes custom.
+ * Avatar : l'animal choisi sur son rond pastel, ou à défaut l'initiale
+ * blanche sur un grand rond d'accent — cerclé d'un halo clair et surmonté
+ * de petits traits (même vocabulaire que la barre d'onglets). Le toucher
+ * ouvre le choix d'avatar (demande explicite), un crayon l'indique.
+ * `Avatar` de Hero UI Native n'a jamais reçu ses variables pour nos thèmes
+ * custom.
  */
 function ProfileAvatar({
   initials,
+  avatarKey,
   accent,
+  onPress,
 }: {
   initials: string;
+  avatarKey: string | null;
   accent: string;
+  onPress: () => void;
 }) {
+  const avatar = getProfileAvatar(avatarKey);
+
   return (
-    <View className="h-[156px] w-[156px] items-center justify-center">
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={`Changer d’avatar${avatar ? `, actuellement ${avatar.label}` : ''}`}
+      onPress={onPress}
+      className="h-[156px] w-[156px] items-center justify-center active:opacity-85"
+    >
       <View
         className="absolute h-[156px] w-[156px] rounded-full"
         style={{ backgroundColor: hexToRgba(accent, 0.1) }}
@@ -262,7 +320,7 @@ function ProfileAvatar({
       <View
         className="h-[132px] w-[132px] items-center justify-center rounded-full"
         style={{
-          backgroundColor: accent,
+          backgroundColor: avatar ? avatar.bg : accent,
           borderWidth: 4,
           borderColor: lightenHex(accent, 0.75),
           shadowColor: accent,
@@ -272,18 +330,36 @@ function ProfileAvatar({
           elevation: 8,
         }}
       >
-        <Text
-          className="text-[54px] font-extrabold text-white"
-          style={{ letterSpacing: -1 }}
-        >
-          {initials}
-        </Text>
+        {avatar ? (
+          <Text style={{ fontSize: 70, lineHeight: 82 }}>{avatar.emoji}</Text>
+        ) : (
+          <Text
+            className="text-[54px] font-extrabold text-white"
+            style={{ letterSpacing: -1 }}
+          >
+            {initials}
+          </Text>
+        )}
+      </View>
+      <View
+        className="absolute h-10 w-10 items-center justify-center rounded-full bg-white"
+        style={{
+          right: 10,
+          bottom: 12,
+          shadowColor: accent,
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.2,
+          shadowRadius: 8,
+          elevation: 4,
+        }}
+      >
+        <Ionicons name="pencil" size={17} color={accent} />
       </View>
       <SparkLines
         color={hexToRgba(accent, 0.75)}
         style={{ top: -6, right: 0, transform: [{ scale: 1.3 }] }}
       />
-    </View>
+    </Pressable>
   );
 }
 
