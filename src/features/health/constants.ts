@@ -53,7 +53,9 @@ export const SYMPTOM_VISUALS: Record<string, { emoji: string; tint: string }> =
     nausees: { emoji: '🤢', tint: '#e0f2ec' },
     [NO_SYMPTOM]: { emoji: '😊', tint: '#e5f4e7' },
   };
-const FALLBACK_SYMPTOM_VISUAL = { emoji: '•', tint: '#f0f0f3' };
+// Repli des symptômes saisis à la main (demande explicite) : un crayon sur
+// un fond lavande, pour les distinguer de ceux de la liste.
+const FALLBACK_SYMPTOM_VISUAL = { emoji: '📝', tint: '#efeaf7' };
 
 export function getSymptomVisual(value: string): {
   emoji: string;
@@ -67,6 +69,50 @@ export function getSymptomLabel(value: string): string {
   return (
     SYMPTOM_OPTIONS.find((option) => option.value === value)?.label ?? value
   );
+}
+
+/** Longueur maximale d'un symptôme saisi à la main. */
+export const CUSTOM_SYMPTOM_MAX_LENGTH = 40;
+
+/** Symptôme saisi à la main : ni de la liste, ni « Pas de symptômes ». */
+export function isCustomSymptom(value: string): boolean {
+  return (
+    value !== NO_SYMPTOM &&
+    !SYMPTOM_OPTIONS.some((option) => option.value === value)
+  );
+}
+
+function normalizeSymptom(text: string): string {
+  return text
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim();
+}
+
+/**
+ * Valeur à enregistrer pour un symptôme saisi à la main (demande
+ * explicite), stocké tel quel dans `symptoms_log.symptoms` — `getSymptomLabel`
+ * l'affiche alors directement. Un texte qui correspond à un symptôme de la
+ * liste (« fatigue ») renvoie sa valeur, pour ne pas créer de doublon ;
+ * `null` pour un texte vide ou qui désigne « Pas de symptômes ».
+ */
+export function resolveSymptomInput(text: string): string | null {
+  const label = text
+    .trim()
+    .replace(/\s+/g, ' ')
+    .slice(0, CUSTOM_SYMPTOM_MAX_LENGTH);
+  if (!label) return null;
+  const needle = normalizeSymptom(label);
+  if (needle === normalizeSymptom(NO_SYMPTOM_LABEL) || needle === NO_SYMPTOM) {
+    return null;
+  }
+  const preset = SYMPTOM_OPTIONS.find(
+    (option) =>
+      normalizeSymptom(option.label) === needle ||
+      normalizeSymptom(option.value) === needle,
+  );
+  return preset ? preset.value : label.charAt(0).toUpperCase() + label.slice(1);
 }
 
 /** Durée de référence d'une grossesse, comptée depuis les dernières règles. */

@@ -11,11 +11,15 @@ import {
   SPARKS_ABOVE,
   SparkLines,
 } from '@/components/ui/glass-card';
+import { IconInput } from '@/components/ui/icon-input';
 import { PillButton } from '@/components/ui/pill-button';
 import {
+  CUSTOM_SYMPTOM_MAX_LENGTH,
   getSymptomVisual,
+  isCustomSymptom,
   NO_SYMPTOM,
   NO_SYMPTOM_LABEL,
+  resolveSymptomInput,
   SYMPTOM_OPTIONS,
   withoutNoSymptom,
 } from '@/features/health/constants';
@@ -81,6 +85,23 @@ export function JournalTab({
   const saveSymptoms = useSaveSymptoms(household);
 
   const [selected, setSelected] = useState<string[]>([]);
+  // Saisie d'un symptôme hors liste (demande explicite).
+  const [isAddingCustom, setIsAddingCustom] = useState(false);
+  const [customText, setCustomText] = useState('');
+  const customSymptoms = selected.filter(isCustomSymptom);
+
+  const addCustomSymptom = () => {
+    const value = resolveSymptomInput(customText);
+    if (value) {
+      setSelected((current) =>
+        current.includes(value)
+          ? current
+          : [...withoutNoSymptom(current), value],
+      );
+    }
+    setCustomText('');
+    setIsAddingCustom(false);
+  };
 
   // Resynchronise à chaque changement de jour ou d'arrivée des données :
   // sans ça, passer du mardi au mercredi garderait les cases du mardi.
@@ -187,7 +208,91 @@ export function JournalTab({
               onPress={() => toggle(option.value)}
             />
           ))}
+          {/* Symptômes saisis à la main : cochés tant qu'ils sont dans la
+              journée, un toucher les retire. */}
+          {customSymptoms.map((symptom) => (
+            <SymptomChip
+              key={`custom-${symptom}`}
+              label={symptom}
+              visual={getSymptomVisual(symptom)}
+              isSelected
+              accent={accent}
+              onPress={() => toggle(symptom)}
+            />
+          ))}
+          {isAddingCustom ? null : (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Ajouter un autre symptôme"
+              onPress={() => setIsAddingCustom(true)}
+              className="flex-row items-center gap-2.5 rounded-full py-1.5 pl-1.5 pr-4 active:opacity-70"
+              style={{
+                borderWidth: 1.5,
+                borderStyle: 'dashed',
+                borderColor: hexToRgba(accent, 0.4),
+                backgroundColor: hexToRgba(accent, 0.04),
+              }}
+            >
+              <View
+                className="h-10 w-10 items-center justify-center rounded-full"
+                style={{ backgroundColor: hexToRgba(accent, 0.1) }}
+              >
+                <Ionicons name="add" size={22} color={accent} />
+              </View>
+              <Text
+                className="text-[14.5px] font-semibold"
+                style={{ color: accent }}
+              >
+                Autre symptôme
+              </Text>
+            </Pressable>
+          )}
         </View>
+
+        {isAddingCustom ? (
+          <View className="flex-row items-center gap-2">
+            <View className="flex-1">
+              <IconInput
+                icon="create-outline"
+                placeholder="Ex. crampes, migraine…"
+                value={customText}
+                onChangeText={(text) =>
+                  setCustomText(text.slice(0, CUSTOM_SYMPTOM_MAX_LENGTH))
+                }
+                accent={accent}
+                autoCapitalize="sentences"
+                returnKeyType="done"
+                onSubmitEditing={addCustomSymptom}
+              />
+            </View>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Ajouter ce symptôme"
+              accessibilityState={{ disabled: customText.trim() === '' }}
+              disabled={customText.trim() === ''}
+              onPress={addCustomSymptom}
+              className="h-[46px] w-[46px] items-center justify-center rounded-full active:opacity-80"
+              style={{
+                backgroundColor: accent,
+                opacity: customText.trim() === '' ? 0.45 : 1,
+              }}
+            >
+              <Ionicons name="checkmark" size={22} color="#ffffff" />
+            </Pressable>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Annuler l'ajout"
+              hitSlop={6}
+              onPress={() => {
+                setCustomText('');
+                setIsAddingCustom(false);
+              }}
+              className="h-[46px] w-[46px] items-center justify-center rounded-full bg-white active:opacity-70"
+            >
+              <Ionicons name="close" size={20} color={GLASS_TITLE_COLOR} />
+            </Pressable>
+          </View>
+        ) : null}
       </View>
 
       {/* « Enregistré » reste pleinement visible (pas grisé) le temps de la
