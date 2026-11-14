@@ -8,16 +8,12 @@ import * as SplashScreen from 'expo-splash-screen';
 import { HeroUINativeProvider } from 'heroui-native';
 import { useAtomValue } from 'jotai';
 import { useEffect, useState } from 'react';
-import {
-  ActivityIndicator,
-  Platform,
-  useColorScheme,
-  View,
-} from 'react-native';
+import { Platform, useColorScheme } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Uniwind } from 'uniwind';
 
 import { AnimatedSplashOverlay } from '@/components/animated-icon';
+import { LoadingScreen } from '@/components/ui/loading-screen';
 import { useApplySession } from '@/features/auth/hooks';
 import { useMyHousehold, useSyncCurrentRole } from '@/features/household/hooks';
 import { useMyProfile } from '@/features/profile/hooks';
@@ -82,12 +78,10 @@ function AuthGate() {
   const hasSession = !!session;
   const isResolvingHousehold = hasSession && isPending;
 
+  // Écran de chargement illustré (demande explicite), à la place du simple
+  // indicateur sur fond blanc.
   if (isResolvingHousehold) {
-    return (
-      <View className="flex-1 items-center justify-center bg-white">
-        <ActivityIndicator color="#2D5E5A" />
-      </View>
-    );
+    return <LoadingScreen />;
   }
 
   return (
