@@ -27,6 +27,7 @@ import Animated, {
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import { withUniwind } from 'uniwind';
 import { PasswordStrengthMeter } from '@/components/auth/password-strength-meter';
+import { SignupRoleCard } from '@/components/auth/signup-role-card';
 import {
   GLASS_BODY_COLOR,
   GLASS_TITLE_COLOR,
@@ -284,7 +285,7 @@ export default function LoginScreen() {
               </Text>
               <View className="flex-row gap-2.5">
                 <SignupRoleCard
-                  icon="heart"
+                  kind="pregnant"
                   title="J’attends un bébé"
                   subtitle="Je crée notre espace"
                   isSelected={signupRole === 'pregnant'}
@@ -292,7 +293,7 @@ export default function LoginScreen() {
                   onPress={() => setSignupRole('pregnant')}
                 />
                 <SignupRoleCard
-                  icon="people"
+                  kind="partner"
                   title="Je suis partenaire"
                   subtitle="Je rejoins avec un code"
                   isSelected={signupRole === 'partner'}
@@ -605,74 +606,5 @@ function ToggleLabel({
     <Animated.Text style={[{ fontSize: 15, fontWeight: '600' }, textStyle]}>
       {label}
     </Animated.Text>
-  );
-}
-
-/**
- * Carte de rôle à l'inscription : pastille d'icône, titre, sous-titre ;
- * bordure et fond d'accent une fois choisie, comme les cartes de choix de
- * l'onboarding.
- */
-function SignupRoleCard({
-  icon,
-  title,
-  subtitle,
-  isSelected,
-  accent,
-  onPress,
-}: {
-  icon: 'heart' | 'people';
-  title: string;
-  subtitle: string;
-  isSelected: boolean;
-  accent: string;
-  onPress: () => void;
-}) {
-  return (
-    <Pressable
-      accessibilityRole="radio"
-      accessibilityState={{ selected: isSelected }}
-      accessibilityLabel={`${title}, ${subtitle}`}
-      onPress={onPress}
-      className="flex-1 gap-2 rounded-[22px] p-3 active:opacity-80"
-      style={{
-        backgroundColor: isSelected
-          ? hexToRgba(accent, 0.1)
-          : 'rgba(255, 255, 255, 0.85)',
-        borderWidth: 1.5,
-        borderColor: isSelected ? accent : 'rgba(0, 0, 0, 0.05)',
-      }}
-    >
-      <View className="flex-row items-center justify-between">
-        <View
-          className="h-9 w-9 items-center justify-center rounded-full"
-          style={{
-            backgroundColor: isSelected ? accent : hexToRgba(accent, 0.1),
-          }}
-        >
-          <Ionicons
-            name={icon}
-            size={17}
-            color={isSelected ? '#ffffff' : accent}
-          />
-        </View>
-        <Ionicons
-          name={isSelected ? 'checkmark-circle' : 'ellipse-outline'}
-          size={20}
-          color={isSelected ? accent : '#c4c2cc'}
-        />
-      </View>
-      <View className="gap-0.5">
-        <Text
-          className="text-[14px] font-bold"
-          style={{ color: GLASS_TITLE_COLOR }}
-        >
-          {title}
-        </Text>
-        <Text className="text-[12px]" style={{ color: GLASS_BODY_COLOR }}>
-          {subtitle}
-        </Text>
-      </View>
-    </Pressable>
   );
 }
