@@ -1,16 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useQueryClient } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { useAtomValue } from 'jotai';
 import { useState } from 'react';
-import {
-  Image,
-  Pressable,
-  RefreshControl,
-  ScrollView,
-  Text,
-  View,
-} from 'react-native';
+import { Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import { withUniwind } from 'uniwind';
 
@@ -30,6 +22,7 @@ import {
   WAVE_PINK,
 } from '@/components/ui/glass-card';
 import { ScreenCornerShapes } from '@/components/ui/screen-corner-shapes';
+import { usePullToRefresh } from '@/components/ui/use-pull-to-refresh';
 import { useAppointments } from '@/features/health/hooks';
 import { useMyHousehold } from '@/features/household/hooks';
 import {
@@ -122,16 +115,7 @@ export default function HubScreen() {
   // Tirer vers le bas en haut de l'accueil recharge les données (demande
   // explicite : il fallait quitter et relancer l'app). Toutes les requêtes
   // affichées sont relancées — foyer, résumé, humeur, symptômes, rendez-vous.
-  const queryClient = useQueryClient();
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const refresh = async () => {
-    setIsRefreshing(true);
-    try {
-      await queryClient.refetchQueries({ type: 'active' });
-    } finally {
-      setIsRefreshing(false);
-    }
-  };
+  const refresh = usePullToRefresh();
 
   // Tant que le résumé n'est pas chargé, on affiche le libellé neutre de la
   // section plutôt qu'un indicateur de chargement : il s'afficherait dans
@@ -179,14 +163,7 @@ export default function HubScreen() {
         contentContainerClassName="gap-6 px-6 pt-4"
         contentContainerStyle={{ paddingBottom: tabBarInset }}
         showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl
-            refreshing={isRefreshing}
-            onRefresh={refresh}
-            tintColor={accent}
-            colors={[accent]}
-          />
-        }
+        refreshControl={refresh}
       >
         <View className="flex-row items-center justify-between gap-3">
           <Text className="flex-1 text-[26px] font-bold text-[#1a1a1a]">

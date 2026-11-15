@@ -16,6 +16,7 @@ import {
   GLASS_TITLE_COLOR,
 } from '@/components/ui/glass-card';
 import { ScreenCornerShapes } from '@/components/ui/screen-corner-shapes';
+import { usePullToRefresh } from '@/components/ui/use-pull-to-refresh';
 import type { HouseholdInfoItem } from '@/features/household/api';
 import {
   formatInfoDate,
@@ -60,6 +61,8 @@ function displayValue(item: HouseholdInfoItem, category: InfoCategory) {
  * ligne : la création choisit d'abord une catégorie parmi 6.
  */
 export default function InformationsScreen() {
+  // Tirer vers le bas recharge les données affichées.
+  const refresh = usePullToRefresh();
   // Place de la barre du bas, qui flotte au-dessus du contenu.
   const tabBarInset = useTabBarContentInset();
   const tabBarHeight = useTabBarHeight();
@@ -157,6 +160,7 @@ export default function InformationsScreen() {
       <ScreenCornerShapes />
 
       <ScrollView
+        refreshControl={refresh}
         contentContainerClassName="gap-4 px-6 pt-4"
         // Place en plus pour le bouton + flottant.
         contentContainerStyle={{ paddingBottom: tabBarInset + 72 }}

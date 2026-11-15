@@ -31,6 +31,7 @@ import {
   GLASS_TITLE_COLOR,
 } from '@/components/ui/glass-card';
 import { PillButton } from '@/components/ui/pill-button';
+import { usePullToRefresh } from '@/components/ui/use-pull-to-refresh';
 import type { BabyEntryInput } from '@/features/baby/api';
 import type { BabyEntry, BabyModule } from '@/features/baby/constants';
 import {
@@ -97,6 +98,8 @@ const tintedShadow = (accent: string) =>
  * revue explicitement dans la migration `20261112110000_baby_entries`.
  */
 export function BabyModuleScreen({ module }: { module: BabyModule }) {
+  // Tirer vers le bas recharge les données affichées.
+  const refresh = usePullToRefresh();
   // Place de la barre du bas, qui flotte au-dessus du contenu.
   const tabBarInset = useTabBarContentInset();
   const router = useRouter();
@@ -228,6 +231,7 @@ export function BabyModuleScreen({ module }: { module: BabyModule }) {
     <SafeAreaView className="flex-1">
       <ImageBackground source={wallpaper} resizeMode="cover" className="flex-1">
         <ScrollView
+          refreshControl={refresh}
           contentContainerClassName="gap-5 px-5 pt-4"
           contentContainerStyle={{ paddingBottom: tabBarInset }}
           showsVerticalScrollIndicator={false}

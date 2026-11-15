@@ -21,6 +21,7 @@ import {
   GLASS_BODY_COLOR,
   GLASS_TITLE_COLOR,
 } from '@/components/ui/glass-card';
+import { usePullToRefresh } from '@/components/ui/use-pull-to-refresh';
 import { getWeeksOfAmenorrhea } from '@/features/health/constants';
 import { useBabySize } from '@/features/health/hooks';
 import { useMyHousehold } from '@/features/household/hooks';
@@ -332,6 +333,8 @@ function PartnerStateCard({
  * Journal — sa seule porte d'entrée vers cette donnée de santé.
  */
 export default function PartnerScreen() {
+  // Tirer vers le bas recharge les données affichées.
+  const refresh = usePullToRefresh();
   // Place de la barre du bas, qui flotte au-dessus du contenu.
   const tabBarInset = useTabBarContentInset();
   const router = useRouter();
@@ -375,6 +378,7 @@ export default function PartnerScreen() {
       <PinkBackdrop />
 
       <ScrollView
+        refreshControl={refresh}
         contentContainerClassName="gap-7 px-6 pt-4"
         contentContainerStyle={{ paddingBottom: tabBarInset }}
         showsVerticalScrollIndicator={false}

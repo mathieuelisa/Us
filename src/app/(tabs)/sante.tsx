@@ -26,6 +26,7 @@ import {
   GLASS_TITLE_COLOR,
 } from '@/components/ui/glass-card';
 import { ScreenCornerShapes } from '@/components/ui/screen-corner-shapes';
+import { usePullToRefresh } from '@/components/ui/use-pull-to-refresh';
 import { useMyHousehold } from '@/features/household/hooks';
 import { useThemeAccent, useThemeBackground } from '@/features/settings/hooks';
 import { currentRoleAtom } from '@/lib/atoms/role';
@@ -74,6 +75,8 @@ function isHealthTab(value: string | undefined): value is HealthTab {
  * premier onglet par défaut.
  */
 export default function HealthScreen() {
+  // Tirer vers le bas recharge les données affichées.
+  const refresh = usePullToRefresh();
   // Place de la barre du bas, qui flotte au-dessus du contenu.
   const tabBarInset = useTabBarContentInset();
   const tabBarHeight = useTabBarHeight();
@@ -135,6 +138,7 @@ export default function HealthScreen() {
       <ScreenCornerShapes />
 
       <ScrollView
+        refreshControl={refresh}
         contentContainerClassName="gap-5 px-6 pt-4"
         // Sur Contacts, place en plus pour le bouton + flottant.
         contentContainerStyle={{

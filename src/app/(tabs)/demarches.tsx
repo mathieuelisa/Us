@@ -36,6 +36,7 @@ import {
 } from '@/components/ui/glass-card';
 import { PillButton } from '@/components/ui/pill-button';
 import { ScreenCornerShapes } from '@/components/ui/screen-corner-shapes';
+import { usePullToRefresh } from '@/components/ui/use-pull-to-refresh';
 import { getPregnancyMonth } from '@/features/health/constants';
 import { useMyHousehold } from '@/features/household/hooks';
 import {
@@ -75,6 +76,8 @@ const SafeAreaView = withUniwind(RNSafeAreaView);
  * translucides à grande pastille d'icône, statut et chevron.
  */
 export default function ProceduresScreen() {
+  // Tirer vers le bas recharge les données affichées.
+  const refresh = usePullToRefresh();
   // Place de la barre du bas, qui flotte au-dessus du contenu.
   const tabBarInset = useTabBarContentInset();
   const router = useRouter();
@@ -207,6 +210,7 @@ export default function ProceduresScreen() {
       <ScreenCornerShapes />
 
       <ScrollView
+        refreshControl={refresh}
         contentContainerClassName="gap-6 px-6 pt-4"
         contentContainerStyle={{ paddingBottom: tabBarInset }}
         showsVerticalScrollIndicator={false}

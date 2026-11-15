@@ -29,6 +29,7 @@ import {
   SparkLines,
 } from '@/components/ui/glass-card';
 import { ScreenCornerShapes } from '@/components/ui/screen-corner-shapes';
+import { usePullToRefresh } from '@/components/ui/use-pull-to-refresh';
 import {
   findNameCountryIds,
   GENDER_META,
@@ -84,6 +85,8 @@ export function NameListScreen({
   sectionSubtitle: (gender: NameGender) => string;
   onRemove?: (item: NameListItem) => void;
 }) {
+  // Tirer vers le bas recharge les données affichées.
+  const refresh = usePullToRefresh();
   // Place de la barre du bas, qui flotte au-dessus du contenu.
   const tabBarInset = useTabBarContentInset();
   const router = useRouter();
@@ -106,6 +109,7 @@ export function NameListScreen({
     >
       <ScreenCornerShapes />
       <ScrollView
+        refreshControl={refresh}
         contentContainerClassName="gap-5 px-5 pt-4"
         contentContainerStyle={{ paddingBottom: tabBarInset }}
         showsVerticalScrollIndicator={false}

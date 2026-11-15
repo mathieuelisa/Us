@@ -19,6 +19,7 @@ import {
   GlassCard,
 } from '@/components/ui/glass-card';
 import { ScreenCornerShapes } from '@/components/ui/screen-corner-shapes';
+import { usePullToRefresh } from '@/components/ui/use-pull-to-refresh';
 import { useMyHousehold } from '@/features/household/hooks';
 import type { ChecklistItem } from '@/features/organisation/api';
 import {
@@ -90,6 +91,8 @@ const CATEGORY_IMAGES: Record<string, number> = {
  * d'emoji, avancement coché, barre de progression, chevron en pastille).
  */
 export default function OrganisationScreen() {
+  // Tirer vers le bas recharge les données affichées.
+  const refresh = usePullToRefresh();
   // Place de la barre du bas, qui flotte au-dessus du contenu.
   const tabBarInset = useTabBarContentInset();
   const router = useRouter();
@@ -153,6 +156,7 @@ export default function OrganisationScreen() {
       <ScreenCornerShapes />
 
       <ScrollView
+        refreshControl={refresh}
         contentContainerClassName="gap-5 px-6 pt-4"
         contentContainerStyle={{ paddingBottom: tabBarInset }}
         showsVerticalScrollIndicator={false}

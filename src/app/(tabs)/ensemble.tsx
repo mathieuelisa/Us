@@ -17,6 +17,7 @@ import {
   SparkLines,
 } from '@/components/ui/glass-card';
 import { ScreenCornerShapes } from '@/components/ui/screen-corner-shapes';
+import { usePullToRefresh } from '@/components/ui/use-pull-to-refresh';
 import { useMyHousehold } from '@/features/household/hooks';
 import type { MoodValue } from '@/features/hub/api';
 import { MOOD_PRESENTATION } from '@/features/hub/constants';
@@ -50,6 +51,8 @@ const SafeAreaView = withUniwind(RNSafeAreaView);
  * jour en carte illustrée (`GestureOfTheDayCard`).
  */
 export default function TogetherScreen() {
+  // Tirer vers le bas recharge les données affichées.
+  const refresh = usePullToRefresh();
   // Place de la barre du bas, qui flotte au-dessus du contenu.
   const tabBarInset = useTabBarContentInset();
   const router = useRouter();
@@ -106,6 +109,7 @@ export default function TogetherScreen() {
       <ScreenCornerShapes />
 
       <ScrollView
+        refreshControl={refresh}
         contentContainerClassName="gap-6 px-6 pt-4"
         contentContainerStyle={{ paddingBottom: tabBarInset }}
         showsVerticalScrollIndicator={false}
