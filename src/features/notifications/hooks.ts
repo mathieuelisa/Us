@@ -77,8 +77,20 @@ export function useNotifications() {
         });
       }
     })();
+
+    // Nouvel essai à chaque retour dans l'app : le premier peut échouer
+    // (réseau, autorisation donnée plus tard dans les réglages du
+    // téléphone…). Sans effet si le token est déjà à jour (upsert).
+    const subscription = AppState.addEventListener('change', (status) => {
+      if (status !== 'active') return;
+      getNotificationPermission().then((permission) => {
+        if (permission === 'granted') registerPushToken().catch(() => {});
+      });
+    });
+
     return () => {
       isCancelled = true;
+      subscription.remove();
     };
   }, [userId]);
 
