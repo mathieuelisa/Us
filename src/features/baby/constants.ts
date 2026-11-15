@@ -15,7 +15,12 @@ import type { ImageSourcePropType } from 'react-native';
  * formulaires sont pleinement actifs. Les entrées sont enregistrées dans
  * `baby_entries` (Supabase) — voir `features/baby/api.ts`.
  */
-export type BabyModuleSlug = 'croissance' | 'biberon' | 'allaitement' | 'bain';
+export type BabyModuleSlug =
+  | 'croissance'
+  | 'biberon'
+  | 'allaitement'
+  | 'bain'
+  | 'sommeil';
 
 /**
  * Champ chiffré du formulaire — `unit` sert au libellé et au résumé.
@@ -23,12 +28,17 @@ export type BabyModuleSlug = 'croissance' | 'biberon' | 'allaitement' | 'bain';
  * `kind: 'timer'` remplace la saisie par un chronomètre (écran 8g) : la
  * valeur stockée est alors un nombre de **secondes**, pas l'unité
  * affichée. `unit` reste utile au libellé du champ.
+ *
+ * `kind: 'time'` : une heure `HH:MM` facultative, à la molette (réveil du
+ * sommeil). `hidden` : valeur calculée à l'enregistrement, jamais saisie
+ * (durée du sommeil).
  */
 export type BabyNumberField = {
   key: string;
   label: string;
   unit: string;
-  kind: 'number' | 'timer';
+  kind: 'number' | 'timer' | 'time';
+  hidden?: boolean;
   /**
    * Saisie à la molette plutôt qu'au clavier (demande explicite sur le
    * poids et la taille) : une colonne pour la partie entière, une pour la
@@ -91,6 +101,10 @@ export type BabyModule = {
    * qu'une date.
    */
   hasTime: boolean;
+  /** Libellé de la molette d'heure (« Coucher ») ; « Heure » par défaut. */
+  timeLabel?: string;
+  /** L'heure est-elle obligatoire pour enregistrer ? (coucher du sommeil) */
+  timeRequired?: boolean;
   /**
    * Le formulaire propose-t-il un commentaire libre ? Retiré de
    * l'allaitement (demande explicite) : le geste se résume au sein, à
@@ -258,6 +272,54 @@ export const BABY_MODULES: Record<BabyModuleSlug, BabyModule> = {
     requiredFieldCount: 0,
     dailySummary: { noun: { singular: 'soin', plural: 'soins' } },
   },
+  sommeil: {
+    slug: 'sommeil',
+    emoji: '😴',
+    // Pas encore d'icône 3D dédiée (comme Icon_biberon…) : icône bébé en
+    // attendant `Icon_sommeil.png`.
+    image: require('@/assets/images/Icon_bebe.png'),
+    title: 'Sommeil',
+    subtitle: 'Siestes, nuits, réveils',
+    sectionTitle: 'Derniers sommeils',
+    emptyState: 'Aucun sommeil enregistré pour le moment.',
+    actionLabel: 'Ajouter un sommeil',
+    editLabel: 'Modifier le sommeil',
+    formSubtitle: 'Notez le coucher, et le réveil une fois bébé levé.',
+    segments: { label: 'Type', options: ['Sieste', 'Nuit'] },
+    hasTime: true,
+    timeLabel: 'Coucher',
+    timeRequired: true,
+    hasComment: true,
+    fields: [
+      { key: 'wakeTime', label: 'Réveil', unit: '', kind: 'time' },
+      {
+        key: 'wakeups',
+        label: 'Réveils',
+        unit: 'fois',
+        kind: 'number',
+        wheel: {
+          min: 1,
+          max: 20,
+          fractionDigits: 0,
+          fractionStep: 1,
+          defaultValue: 1,
+        },
+      },
+      // Calculée à partir du coucher et du réveil (`withSleepDuration`).
+      {
+        key: 'duration',
+        label: 'Durée',
+        unit: 'min',
+        kind: 'timer',
+        hidden: true,
+      },
+    ],
+    requiredFieldCount: 0,
+    dailySummary: {
+      noun: { singular: 'sommeil', plural: 'sommeils' },
+      sumField: 'duration',
+    },
+  },
 };
 
 /** Une entrée saisie dans un suivi. Valeurs chiffrées indexées par `key`. */
@@ -314,6 +376,7 @@ export function formatBabyEntrySummary(
   module: BabyModule,
   entry: BabyEntry,
 ): string {
+  if (module.slug === 'sommeil') return formatSleepSummary(entry);
   const withLabels = module.fields.length > 1;
 
   const parts = module.fields
@@ -395,8 +458,95 @@ export function formatBabyDayTotal(
   }, 0);
   if (total === 0) return count;
   const measure =
-    field.kind === 'timer'
-      ? formatDurationSeconds(total)
-      : `${String(Math.round(total * 100) / 100).replace('.', ',')} ${field.unit}`;
+    module.slug === 'sommeil'
+      ? formatSleepDuration(total)
+      : field.kind === 'timer'
+        ? formatDurationSeconds(total)
+        : `${String(Math.round(total * 100) / 100).replace('.', ',')} ${field.unit}`;
   return `${count} · ${measure}`;
+}
+
+// Sommeil ---------------------------------------------------------------
+
+const MINUTES_PER_DAY = 24 * 60;
+
+function minutesOf(time: string): number {
+  const [hours, minutes] = time.split(':').map(Number);
+  return hours * 60 + minutes;
+}
+
+/**
+ * Durée en secondes du coucher `bedTime` au réveil `wakeTime` (`HH:MM`). Un
+ * réveil « avant » le coucher tombe le lendemain (nuit qui passe minuit) ;
+ * un sommeil se compte donc toujours en moins de 24 h.
+ */
+export function sleepDurationSeconds(
+  bedTime: string,
+  wakeTime: string,
+): number {
+  const minutes =
+    (minutesOf(wakeTime) - minutesOf(bedTime) + MINUTES_PER_DAY) %
+    MINUTES_PER_DAY;
+  return minutes * 60;
+}
+
+/**
+ * Ajoute la durée calculée aux valeurs saisies d'un sommeil (coucher et
+ * réveil connus) ; la retire sinon. Sans effet sur les autres modules.
+ */
+export function withSleepDuration(
+  module: BabyModule,
+  time: string | null,
+  values: Record<string, string>,
+): Record<string, string> {
+  if (module.slug !== 'sommeil') return values;
+  const { duration: _previous, ...rest } = values;
+  if (!time || !rest.wakeTime) return rest;
+  const seconds = sleepDurationSeconds(time, rest.wakeTime);
+  return seconds > 0 ? { ...rest, duration: String(seconds) } : rest;
+}
+
+/** « 45 min », « 9 h 30 » : un sommeil ne se compte pas à la seconde. */
+export function formatSleepDuration(totalSeconds: number): string {
+  const totalMinutes = Math.round(totalSeconds / 60);
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  if (hours === 0) return `${minutes} min`;
+  return minutes === 0
+    ? `${hours} h`
+    : `${hours} h ${String(minutes).padStart(2, '0')}`;
+}
+
+/** Sommeil en cours : coucher noté, réveil pas encore. */
+export function isSleepOngoing(entry: BabyEntry): boolean {
+  return Boolean(entry.time) && !entry.values.wakeTime;
+}
+
+/** « Nuit · 9 h 30 min · 2 réveils », ou « Sieste · en cours ». */
+function formatSleepSummary(entry: BabyEntry): string {
+  const parts: string[] = [];
+  if (entry.segment) parts.push(entry.segment);
+  if (isSleepOngoing(entry)) {
+    parts.push('en cours');
+  } else if (entry.values.duration) {
+    parts.push(formatSleepDuration(Number(entry.values.duration)));
+  }
+  const wakeups = Number(entry.values.wakeups);
+  if (wakeups > 0) parts.push(`${wakeups} réveil${wakeups > 1 ? 's' : ''}`);
+  return parts.join(' · ');
+}
+
+/**
+ * Pastille horaire d'une ligne d'historique : « 21h05 → 06h30 » pour un
+ * sommeil, « 21h05 → … » s'il est en cours ; l'heure seule ailleurs.
+ */
+export function formatBabyEntryTimeLabel(
+  module: BabyModule,
+  entry: BabyEntry,
+): string | null {
+  if (!entry.time) return null;
+  const start = entry.time.replace(':', 'h');
+  if (module.slug !== 'sommeil') return start;
+  const end = entry.values.wakeTime?.replace(':', 'h') ?? '…';
+  return `${start} → ${end}`;
 }

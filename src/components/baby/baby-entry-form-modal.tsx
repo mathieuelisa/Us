@@ -33,6 +33,7 @@ import {
   formatBabyEntryDate,
   formatBabyEntrySummary,
   formatDurationSeconds,
+  withSleepDuration,
 } from '@/features/baby/constants';
 import { useThemeAccent } from '@/features/settings/hooks';
 import { hexToRgba, lightenHex } from '@/lib/color';
@@ -144,7 +145,9 @@ export function BabyEntryFormModal({
    * Champ chronométré du module, le cas échéant — un seul aujourd'hui
    * (la durée d'allaitement), d'où le `find`.
    */
-  const timerField = module.fields.find((field) => field.kind === 'timer');
+  const timerField = module.fields.find(
+    (field) => field.kind === 'timer' && !field.hidden,
+  );
   /** Durée déjà mesurée et arrêtée, en secondes ; `0` si aucune. */
   const stoppedSeconds =
     timerField && isNumberFilled(values[timerField.key])
@@ -176,16 +179,26 @@ export function BabyEntryFormModal({
     }
   }
 
-  const filledFieldCount = module.fields.filter((field) =>
+  // Champs chiffrés saisis : ni les heures (réveil), ni les valeurs
+  // calculées (durée du sommeil).
+  const numberFields = module.fields.filter(
+    (field) => field.kind !== 'time' && !field.hidden,
+  );
+  const filledFieldCount = numberFields.filter((field) =>
     isNumberFilled(values[field.key]),
   ).length;
-  const hasInvalidNumber = module.fields.some(
+  const hasInvalidNumber = numberFields.some(
     (field) =>
       (values[field.key] ?? '').trim().length > 0 &&
       !isNumberFilled(values[field.key]),
   );
   const canSubmit =
-    filledFieldCount >= module.requiredFieldCount && !hasInvalidNumber;
+    filledFieldCount >= module.requiredFieldCount &&
+    !hasInvalidNumber &&
+    (!module.timeRequired || Boolean(time));
+
+  // Heures supplémentaires (réveil du sommeil), à côté de celle du module.
+  const timeFields = module.fields.filter((field) => field.kind === 'time');
 
   // Heure, poids, taille, quantité : molettes côte à côte (demandes
   // explicites).
@@ -313,7 +326,7 @@ export function BabyEntryFormModal({
             </View>
 
             {module.fields
-              .filter((field) => field.kind === 'timer')
+              .filter((field) => field.kind === 'timer' && !field.hidden)
               .map((field) => (
                 <TimerField
                   // Remonter le composant est la remise à zéro : plus
@@ -329,13 +342,42 @@ export function BabyEntryFormModal({
                 />
               ))}
 
-            {module.hasTime || wheelFields.length > 0 ? (
+            {/* Sommeil : coucher et réveil côte à côte, le nombre de
+                réveils en dessous. */}
+            {timeFields.length > 0 ? (
               <View className="flex-row gap-2.5">
                 {module.hasTime ? (
+                  <TimeWheelField
+                    key={`time-${timerResetToken}`}
+                    label={module.timeLabel}
+                    value={time || null}
+                    startTime={initialEntry?.time ?? currentTime()}
+                    onChange={(next) => setTime(next ?? '')}
+                    accent={accent}
+                  />
+                ) : null}
+                {timeFields.map((field) => (
+                  <TimeWheelField
+                    key={`${field.key}-${timerResetToken}`}
+                    label={field.label}
+                    value={values[field.key] || null}
+                    startTime={initialEntry?.values[field.key] ?? currentTime()}
+                    onChange={(next) => setValue(field.key, next ?? '')}
+                    accent={accent}
+                  />
+                ))}
+              </View>
+            ) : null}
+
+            {(module.hasTime && timeFields.length === 0) ||
+            wheelFields.length > 0 ? (
+              <View className="flex-row gap-2.5">
+                {module.hasTime && timeFields.length === 0 ? (
                   <TimeWheelField
                     // Remontée à chaque ouverture, comme les mesures : elle
                     // repart de l'heure de l'entrée ou de l'heure actuelle.
                     key={`time-${timerResetToken}`}
+                    label={module.timeLabel}
                     value={time || null}
                     startTime={initialEntry?.time ?? currentTime()}
                     onChange={(next) => setTime(next ?? '')}
@@ -402,7 +444,11 @@ export function BabyEntryFormModal({
                   date,
                   time: module.hasTime && time ? time : null,
                   segment,
-                  values: normalizeValues(module, values),
+                  values: withSleepDuration(
+                    module,
+                    module.hasTime && time ? time : null,
+                    normalizeValues(module, values),
+                  ),
                   comment: module.hasComment ? comment.trim() || null : null,
                 })
               }
@@ -742,6 +788,11 @@ function normalizeValues(
   const normalized: Record<string, string> = {};
   for (const field of module.fields) {
     const raw = values[field.key];
+    if (field.hidden) continue;
+    if (field.kind === 'time') {
+      if (raw && /^\d{2}:\d{2}$/.test(raw)) normalized[field.key] = raw;
+      continue;
+    }
     if (isNumberFilled(raw))
       normalized[field.key] = raw.trim().replace(',', '.');
   }
@@ -893,6 +944,7 @@ const FIELD_ICONS: Record<string, IoniconName> = {
   height: 'resize-outline',
   weight: 'scale-outline',
   headCircumference: 'ellipse-outline',
+  wakeups: 'alarm-outline',
 };
 
 /** Libellé de champ précédé d'une icône dans un rond teinté. */

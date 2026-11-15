@@ -19,6 +19,7 @@ import { withUniwind } from 'uniwind';
 
 import { BabyEntryFormModal } from '@/components/baby/baby-entry-form-modal';
 import { GrowthChart } from '@/components/baby/growth-chart';
+import { SleepNowCard } from '@/components/baby/sleep-now-card';
 import { useTabBarContentInset } from '@/components/navigation/use-tab-bar-height';
 import { BlobIllustration } from '@/components/ui/blob-illustration';
 import {
@@ -39,6 +40,7 @@ import {
   formatBabyDayTotal,
   formatBabyEntryDate,
   formatBabyEntrySummary,
+  formatBabyEntryTimeLabel,
   groupBabyEntriesByDay,
 } from '@/features/baby/constants';
 import {
@@ -75,7 +77,7 @@ const tintedShadow = (accent: string) =>
 
 /**
  * Écran de détail d'un suivi bébé, ouvert depuis la grille bento de
- * `/bebe`. Structure commune aux 4 modules (décrite dans
+ * `/bebe`. Structure commune aux 5 modules (décrite dans
  * `BABY_MODULES`) : en-tête avec retour, carte du module, historique,
  * bouton d'ajout ouvrant `BabyEntryFormModal`.
  *
@@ -135,6 +137,19 @@ export function BabyModuleScreen({ module }: { module: BabyModule }) {
       showFeedback(
         'success',
         editingEntry ? 'Modification enregistrée.' : 'Entrée enregistrée.',
+      );
+    } catch {
+      showFeedback('error', 'Enregistrement impossible. Réessayez.');
+    }
+  }
+
+  /** « Bébé dort » / « Bébé est réveillé » (carte du sommeil). */
+  async function quickSaveSleep(id: string | null, input: BabyEntryInput) {
+    try {
+      await saveMutation.mutateAsync({ id, input });
+      showFeedback(
+        'success',
+        id ? 'Réveil enregistré.' : 'Bonne sieste ! Coucher enregistré.',
       );
     } catch {
       showFeedback('error', 'Enregistrement impossible. Réessayez.');
@@ -215,7 +230,7 @@ export function BabyModuleScreen({ module }: { module: BabyModule }) {
               style={{ color: accent }}
             >
               {module.dailySummary && entry.time
-                ? entry.time.replace(':', 'h')
+                ? formatBabyEntryTimeLabel(module, entry)
                 : formatBabyEntryDate(entry)}
             </Text>
           </View>
@@ -277,6 +292,16 @@ export function BabyModuleScreen({ module }: { module: BabyModule }) {
             >
               <GrowthChart entries={entries} accent={accent} />
             </View>
+          ) : null}
+
+          {/* Sommeil : coucher et réveil en un tap (demande explicite). */}
+          {module.slug === 'sommeil' && !entriesQuery.isPending ? (
+            <SleepNowCard
+              entries={entries}
+              accent={accent}
+              isSaving={saveMutation.isPending}
+              onSave={quickSaveSleep}
+            />
           ) : null}
 
           <View className="gap-3">

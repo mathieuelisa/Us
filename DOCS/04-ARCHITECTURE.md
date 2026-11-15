@@ -171,7 +171,7 @@ filer bord à bord (`exercice.tsx`, une route).
 | `/profil`, `/reglages`, `/legal` | Prénom, thème, compte (email, mot de passe, suppression), liens légaux | `profiles`, Auth, Edge Function `delete-account` | Personnel |
 | `/bebe`, `/prenoms`, `/contractions` | Écrans premium : paywall tant que le foyer n'a pas le premium (`useIsPremium`), contenu direct sinon | `household_entitlements` (lecture) | Barrière réelle en base : `has_premium()` dans les policies |
 | `/premium` | Offre premium et achat (`PremiumPurchaseButton`, aussi dans les paywalls) | `household_entitlements` | Edge Functions `stripe-create-payment`, `stripe-webhook` |
-| `/bebe-*` | Suivis bébé : historique, courbe de croissance, ajout et modification d'une entrée | `baby_entries` | Les deux parents lisent et modifient toutes les entrées ; réservé aux foyers premium (`has_premium()`) |
+| `/bebe-*` | Suivis bébé (croissance, biberon, allaitement, bain, **sommeil**) : historique, courbe de croissance, ajout et modification d'une entrée ; sommeil avec « Bébé dort / est réveillé » (`SleepNowCard`) | `baby_entries` | Les deux parents lisent et modifient toutes les entrées ; réservé aux foyers premium (`has_premium()`) |
 
 ## Plus de mode contournement DEV
 

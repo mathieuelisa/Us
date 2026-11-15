@@ -17,13 +17,20 @@ import {
   WAVE_PINK,
   WAVE_SKY,
 } from '@/components/ui/glass-card';
-import { BABY_MODULES, type BabyModuleSlug } from '@/features/baby/constants';
+import {
+  BABY_MODULES,
+  type BabyModuleSlug,
+  formatSleepDuration,
+  isSleepOngoing,
+} from '@/features/baby/constants';
+import { useBabyEntries } from '@/features/baby/hooks';
 import { useIsSoloHousehold } from '@/features/household/hooks';
 import {
   useThemeAccent,
   useThemeBabyWallpaper,
 } from '@/features/settings/hooks';
 import { hexToRgba, lightenHex } from '@/lib/color';
+import { todayIso } from '@/lib/date';
 
 const TITLE_COLOR = GLASS_TITLE_COLOR;
 const BODY_COLOR = GLASS_BODY_COLOR;
@@ -37,6 +44,7 @@ const BIBERON_ICON = BABY_MODULES.biberon.image;
 const CROISSANCE_ICON = BABY_MODULES.croissance.image;
 const BAIN_ICON = BABY_MODULES.bain.image;
 const ALLAITEMENT_ICON = BABY_MODULES.allaitement.image;
+const SOMMEIL_ICON = BABY_MODULES.sommeil.image;
 const DESCRIPTION =
   'Centralisez la croissance, les repas et le sommeil de bébé, et gardez votre partenaire connecté à chaque étape.';
 /** Espace « Seul·e » (demande explicite) : sans le partenaire. */
@@ -44,7 +52,7 @@ const SOLO_DESCRIPTION =
   'Centralisez la croissance, les repas et le sommeil de bébé.';
 
 /**
- * Ouvre le détail d'un suivi. Les 4 routes vivent dans le groupe `(tabs)`
+ * Ouvre le détail d'un suivi. Les 5 routes vivent dans le groupe `(tabs)`
  * (`bebe-<slug>`, déclarées `href: null` dans `_layout.tsx`) pour que la
  * barre de navigation reste visible pendant la consultation, comme pour
  * `/premium`.
@@ -413,8 +421,71 @@ function BabyModulesGrid({ accent }: { accent: string }) {
         </View>
       </GlassCard>
 
+      <SleepModuleCard accent={accent} />
+
       <DashedLoopDoodle color={accent} />
     </View>
+  );
+}
+
+/**
+ * Bloc large « Sommeil » sous Bain & Soins (demande explicite du
+ * 2026-11-15) : le sommeil en cours s'il y en a un, sinon le total du jour,
+ * sinon ce que couvre le suivi. Sans premium, la base ne renvoie rien : le
+ * bloc garde son texte de présentation.
+ */
+function SleepModuleCard({ accent }: { accent: string }) {
+  const { data: entries = [] } = useBabyEntries('sommeil');
+  const ongoing = entries.find(isSleepOngoing);
+  const todaySeconds = entries
+    .filter((entry) => entry.date === todayIso())
+    .reduce((sum, entry) => sum + (Number(entry.values.duration) || 0), 0);
+
+  const status = ongoing
+    ? `${ongoing.segment ?? 'Sommeil'} en cours depuis ${ongoing.time?.replace(':', 'h')}`
+    : todaySeconds > 0
+      ? `Aujourd’hui : ${formatSleepDuration(todaySeconds)} de sommeil`
+      : BABY_MODULES.sommeil.subtitle;
+
+  return (
+    <GlassCard
+      accessibilityLabel="Ouvrir le suivi Sommeil"
+      accent={accent}
+      onPress={() => openBabyModule('sommeil')}
+    >
+      <CardWave
+        id="wave-sommeil"
+        color={WAVE_SKY}
+        secondColor={lightenHex(accent, 0.5)}
+        height={40}
+      />
+      <View className="flex-row items-center gap-3.5 p-4">
+        <IconTile
+          emoji="😴"
+          image={SOMMEIL_ICON}
+          imageFillsTile
+          tint={hexToRgba(accent, 0.12)}
+        />
+        <View className="flex-1 gap-0.5">
+          <View className="flex-row items-center gap-2">
+            <Text
+              className="text-[17px] font-bold"
+              style={{ color: TITLE_COLOR }}
+            >
+              Sommeil
+            </Text>
+            {ongoing ? <Ionicons name="moon" size={14} color={accent} /> : null}
+          </View>
+          <Text
+            className="text-[12.5px] leading-4"
+            style={{ color: ongoing ? accent : BODY_COLOR }}
+          >
+            {status}
+          </Text>
+        </View>
+        <ChevronBubble accent={accent} />
+      </View>
+    </GlassCard>
   );
 }
 

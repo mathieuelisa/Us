@@ -402,6 +402,14 @@ comme en écriture — les deux parents saisissent indifféremment (CONCEPT.md).
 - [ ] Table `household_baby_favorites` : modules choisis et leur ordre
       (écrans 8y/8a). Les favoris « sommeil », « couche », « visite
       médecin » restent à confirmer avant d'avoir leurs tables.
+- [x] **Sommeil** (demande explicite du 2026-11-15, migration
+      `baby_entries_sommeil`) : 5e module de `baby_entries` — coucher
+      (`entry_date`/`entry_time`), type Sieste/Nuit (`segment`), réveil
+      `wakeTime`, durée `duration` (secondes, calculée), `wakeups`. Un
+      sommeil sans réveil est « en cours » : boutons « Bébé dort » / « Bébé
+      est réveillé », visibles par les deux parents. Icône provisoire
+      (`Icon_bebe.png`) en attendant une `Icon_sommeil.png` 3D comme les
+      autres suivis.
 - [x] Courbe de croissance : lecture des mesures de `baby_entries`
       (module `croissance`), sans calcul serveur.
 - [x] Ajouter `has_premium(household_id)` aux 4 policies de

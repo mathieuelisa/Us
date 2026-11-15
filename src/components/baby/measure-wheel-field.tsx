@@ -156,6 +156,7 @@ export function TimeWheelField({
   startTime,
   onChange,
   accent,
+  label = 'Heure',
 }: {
   /** `HH:MM`, ou `null` si non renseignée. */
   value: string | null;
@@ -163,6 +164,8 @@ export function TimeWheelField({
   startTime: string;
   onChange: (value: string | null) => void;
   accent: string;
+  /** « Coucher », « Réveil »… ; « Heure » par défaut. */
+  label?: string;
 }) {
   const [position, setPosition] = useState(() => {
     const [hour, minute] = startTime.split(':').map(Number);
@@ -176,7 +179,7 @@ export function TimeWheelField({
 
   return (
     <WheelFieldShell
-      label="Heure"
+      label={label}
       display={`${String(position.hour).padStart(2, '0')}h${String(
         position.minute,
       ).padStart(2, '0')}`}
