@@ -32,18 +32,12 @@ export default function FinalisationScreen() {
     if (hasSubmitted.current) return;
     hasSubmitted.current = true;
 
-    mutate(
-      {
-        draft,
-        partnerEmail: draft.partnerEmail.trim() || null,
-      },
-      { onSuccess: () => setDraft(EMPTY_ONBOARDING_DRAFT) },
-    );
+    mutate({ draft }, { onSuccess: () => setDraft(EMPTY_ONBOARDING_DRAFT) });
   }, [mutate, draft, setDraft]);
 
   const retry = () => {
     submitOnboarding.mutate(
-      { draft, partnerEmail: draft.partnerEmail.trim() || null },
+      { draft },
       { onSuccess: () => setDraft(EMPTY_ONBOARDING_DRAFT) },
     );
   };

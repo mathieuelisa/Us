@@ -21,8 +21,6 @@ export type OnboardingDraft = {
   professionalStatus: string | null;
   priorities: string[];
   reminderFrequency: ReminderFrequency | null;
-  /** Email d'invitation du co-parent, vide si l'étape a été passée. */
-  partnerEmail: string;
 };
 
 export const EMPTY_ONBOARDING_DRAFT: OnboardingDraft = {
@@ -35,7 +33,6 @@ export const EMPTY_ONBOARDING_DRAFT: OnboardingDraft = {
   professionalStatus: null,
   priorities: [],
   reminderFrequency: null,
-  partnerEmail: '',
 };
 
 export const onboardingDraftAtom = atom<OnboardingDraft>(

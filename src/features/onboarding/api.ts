@@ -57,31 +57,6 @@ export async function completeOnboarding(
 }
 
 /**
- * Invite le co-parent : enregistre son adresse dans `household_invites`,
- * sans envoyer d'email (décision du 2026-11-11, abandon du lien magique).
- * Le co-parent crée son compte avec cette adresse — mot de passe ou
- * Google — et `accept_household_invite()` le rattache au foyer à sa
- * première connexion, **à condition que son email soit confirmé** (sinon
- * n'importe qui pourrait s'inscrire avec l'adresse invitée).
- *
- * C'est au premier parent de le prévenir. Un vrai email d'invitation
- * (« Camille vous invite… ») suppose une Edge Function et un SMTP configuré
- * — plan Supabase, lot 3.
- */
-export async function invitePartner(
-  householdId: string,
-  email: string,
-): Promise<void> {
-  const invitedEmail = email.trim().toLowerCase();
-
-  const { error: inviteError } = await supabase
-    .from('household_invites')
-    .insert({ household_id: householdId, invited_email: invitedEmail });
-
-  if (inviteError) throw inviteError;
-}
-
-/**
  * Rattache l'utilisateur courant au foyer qui l'a invité, s'il y en a un.
  * Toute la logique (et les garde-fous) vit dans la fonction SQL
  * `security definer` — le client n'envoie aucun paramètre, le matching se

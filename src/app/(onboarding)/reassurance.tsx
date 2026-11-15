@@ -1,14 +1,11 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { useAtomValue } from 'jotai';
 import { type ComponentProps, useState } from 'react';
 import { Image, Text, View } from 'react-native';
 import { PaywallModal } from '@/components/onboarding/paywall-modal';
 import { OnboardingStepShell } from '@/components/onboarding/step-shell';
 import { GLASS_BODY_COLOR } from '@/components/ui/glass-card';
-import { shouldInvitePartner } from '@/features/onboarding/constants';
 import { useThemeAccent } from '@/features/settings/hooks';
-import { onboardingDraftAtom } from '@/lib/atoms/onboarding';
 import { hexToRgba } from '@/lib/color';
 
 type IoniconName = ComponentProps<typeof Ionicons>['name'];
@@ -21,7 +18,6 @@ type IoniconName = ComponentProps<typeof Ionicons>['name'];
  * terminée » teinté, chiffres clés en cartes à pastille d'icône.
  */
 export default function ReassuranceStep() {
-  const draft = useAtomValue(onboardingDraftAtom);
   const accent = useThemeAccent();
   const [isPaywallOpen, setIsPaywallOpen] = useState(false);
 
@@ -29,13 +25,9 @@ export default function ReassuranceStep() {
   // continue exactement où l'ancienne route menait.
   const closePaywallAndContinue = () => {
     setIsPaywallOpen(false);
-    const nextRoute = shouldInvitePartner(
-      draft.accompanimentType,
-      draft.partnerUsesApp,
-    )
-      ? '/invitation'
-      : '/finalisation';
-    router.push(nextRoute);
+    // Plus d'étape d'invitation par email (demande explicite) : le ou la
+    // partenaire rejoint ensuite avec un code temporaire, depuis l'accueil.
+    router.push('/finalisation');
   };
 
   return (

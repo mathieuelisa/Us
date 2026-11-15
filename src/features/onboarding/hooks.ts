@@ -3,14 +3,13 @@ import { useAtomValue } from 'jotai';
 import type { OnboardingDraft } from '@/lib/atoms/onboarding';
 import { sessionAtom } from '@/lib/atoms/session';
 import { queryKeys } from '@/lib/query/keys';
-import { completeOnboarding, invitePartner } from './api';
+import { completeOnboarding } from './api';
 
 /**
- * Soumission finale de l'onboarding : crée le foyer puis, si un email de
- * co-parent a été saisi, envoie l'invitation. L'invitation est volontairement
- * non bloquante — un foyer créé mais un email non parti reste un état
- * rattrapable (l'invitation pourra être renvoyée), alors que perdre tout
- * l'onboarding parce que l'email a échoué ne l'est pas.
+ * Soumission finale de l'onboarding : crée le foyer. Plus d'invitation par
+ * email (demande explicite du 2026-11-15) : le ou la partenaire rejoint
+ * ensuite l'espace avec un code temporaire, partagé depuis l'accueil
+ * (« Ajouter votre partenaire »).
  */
 export function useSubmitOnboarding() {
   const session = useAtomValue(sessionAtom);
@@ -18,26 +17,9 @@ export function useSubmitOnboarding() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({
-      draft,
-      partnerEmail,
-    }: {
-      draft: OnboardingDraft;
-      partnerEmail: string | null;
-    }) => {
+    mutationFn: async ({ draft }: { draft: OnboardingDraft }) => {
       if (!userId) throw new Error('No authenticated user');
-
-      const household = await completeOnboarding(userId, draft);
-
-      if (partnerEmail) {
-        try {
-          await invitePartner(household.id, partnerEmail);
-        } catch (error) {
-          console.warn('Household created but partner invite failed', error);
-        }
-      }
-
-      return household;
+      return completeOnboarding(userId, draft);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.household.all });

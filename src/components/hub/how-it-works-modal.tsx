@@ -25,7 +25,7 @@ const STEPS: { text: string; icon: IoniconName; badge?: IoniconName }[] = [
     badge: 'add',
   },
   {
-    text: 'Partager-lui le code à 6 chiffres ou le QR code',
+    text: 'Partager-lui le code à 6 caractères ou le QR code',
     icon: 'qr-code-outline',
   },
   {
@@ -179,14 +179,11 @@ function StepRow({
  * colonnes (numéro dans un rond teinté, tuile d'icône, texte), bouton
  * « Compris » en gélule (`PillButton`).
  *
- * ⚠️ Texte fourni tel quel par l'utilisateur, décrit un parcours code à 6
- * chiffres / QR code qui **n'existe pas encore** : le mécanisme réel est
- * un email + lien magique envoyé pendant l'onboarding (`invitePartner()`),
- * et le bouton « Ajouter le co-parent » ne fait d'ailleurs qu'ouvrir
- * l'écran « Mon partenaire » sans envoyer quoi que ce soit — voir le point
- * ouvert n°31 de DOCS/05-DETTE-ET-POINTS-OUVERTS.md. Cette pop-up décrit
- * donc la cible produit, pas le comportement actuel ; à corriger dès que
- * le vrai mécanisme d'invitation post-onboarding est tranché.
+ * Décrit le parcours réel depuis le 2026-11-15 : « Ajouter votre
+ * partenaire » ouvre un code temporaire et son QR code
+ * (`InvitePartnerModal`), que l'autre parent saisit ou scanne après avoir
+ * choisi « Je suis partenaire » à l'inscription. L'invitation par email de
+ * l'onboarding a été retirée (point ouvert n°31 résolu).
  *
  * `animationType="none"` sur `Modal` (demande explicite) : le fond opaque
  * doit apparaître instantanément, sans glisser avec le reste — seule la
