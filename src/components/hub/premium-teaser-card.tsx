@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { Pressable, Text, View } from 'react-native';
 
 import { CARD_SHADOW } from '@/features/hub/constants';
+import { useIsPremium } from '@/features/premium/hooks';
 
 /**
  * Carte teaser des fonctionnalités premium (paiement hors MVP) — partagée
@@ -38,6 +39,8 @@ export function PremiumTeaserCard({
   illustration?: ReactNode;
 }) {
   const Container = onPress ? Pressable : View;
+  // Cadenas ouvert une fois le premium acheté par le foyer (demande explicite).
+  const { isPremium } = useIsPremium();
   const isFeatured = Boolean(illustration);
 
   return (
@@ -95,7 +98,7 @@ export function PremiumTeaserCard({
         }`}
       >
         <Ionicons
-          name="lock-closed"
+          name={isPremium ? 'lock-open' : 'lock-closed'}
           size={isFeatured ? 13 : 12}
           color="#e8c874"
         />

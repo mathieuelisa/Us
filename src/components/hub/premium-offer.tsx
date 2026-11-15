@@ -4,6 +4,7 @@ import type { ImageSourcePropType } from 'react-native';
 import { Image, Text, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
+import { PremiumPurchaseButton } from '@/components/hub/premium-purchase-button';
 import { PREMIUM_FEATURES } from '@/components/onboarding/paywall-modal';
 import {
   GLASS_BODY_COLOR,
@@ -11,7 +12,7 @@ import {
   SparkLines,
 } from '@/components/ui/glass-card';
 import { useThemeAccent } from '@/features/settings/hooks';
-import { hexToRgba, lightenHex } from '@/lib/color';
+import { hexToRgba } from '@/lib/color';
 
 /**
  * Contenu de l'offre premium — illustration sur une tache d'accent, titre
@@ -20,9 +21,8 @@ import { hexToRgba, lightenHex } from '@/lib/color';
  * des écrans d'accès (`PremiumPaywallModal`) et la page `/premium`, pour
  * qu'ils restent identiques (demande explicite).
  *
- * Le bouton reste **inerte** (« bientôt disponible ») : le paiement est hors
- * périmètre MVP (DOCS/versions/MVP.md). Il est rendu comme une gélule
- * d'accent mais sans `Pressable`, pour ne rien promettre au toucher.
+ * Le bouton achète réellement le premium (`PremiumPurchaseButton`, paiement
+ * dans l'app via Stripe — choix du 2026-11-15, demande explicite).
  */
 export function PremiumOffer({
   title,
@@ -210,47 +210,7 @@ export function PremiumOffer({
         ))}
       </View>
 
-      <View className={compact ? '' : 'mt-1'}>
-        <View
-          accessibilityRole="text"
-          accessibilityLabel="Débloquer — bientôt disponible"
-          className="flex-row items-center justify-center gap-2.5 overflow-hidden rounded-full"
-          style={{
-            height: size.buttonHeight,
-            backgroundColor: accent,
-            shadowColor: accent,
-            shadowOffset: { width: 0, height: 10 },
-            shadowOpacity: 0.2,
-            shadowRadius: 18,
-            elevation: 4,
-          }}
-        >
-          <View
-            pointerEvents="none"
-            style={{
-              position: 'absolute',
-              right: -30,
-              top: -20,
-              width: 110,
-              height: 110,
-              borderRadius: 55,
-              backgroundColor: lightenHex(accent, 0.12),
-              opacity: 0.6,
-            }}
-          />
-          <Ionicons name="lock-open-outline" size={20} color="#ffffff" />
-          <Text
-            className="font-bold text-white"
-            style={{ fontSize: compact ? 15 : 16 }}
-          >
-            Débloquer — bientôt disponible
-          </Text>
-        </View>
-        <SparkLines
-          color={hexToRgba(accent, 0.6)}
-          style={{ right: -6, top: -20 }}
-        />
-      </View>
+      <PremiumPurchaseButton compact={compact} />
     </>
   );
 }
@@ -261,7 +221,6 @@ const REGULAR = {
   titleSize: 22,
   checkSize: 28,
   featureSize: 13.5,
-  buttonHeight: 54,
 };
 
 const COMPACT = {
@@ -270,5 +229,4 @@ const COMPACT = {
   titleSize: 19,
   checkSize: 22,
   featureSize: 12.5,
-  buttonHeight: 48,
 };

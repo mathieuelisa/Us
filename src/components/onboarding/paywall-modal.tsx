@@ -16,10 +16,10 @@ export const PREMIUM_FEATURES = [
  * part entière. Ouvert depuis la réassurance (`reassurance.tsx`), fermé
  * (« Plus tard » ou geste de fermeture) vers la même suite que prévue.
  *
- * Affiché tel quel mais **non fonctionnel** : le MVP ne contient ni
- * paiement ni module « Votre bébé » (cf. DOCS/versions/MVP.md). Le bouton
- * « Débloquer » est donc désactivé et annoncé comme bientôt disponible ;
- * l'intégration réelle (RevenueCat) arrive en Phase 3.
+ * Le bouton « Débloquer » reste **inerte** ici : le premium est porté par
+ * le foyer, et le foyer n'existe qu'à la fin de l'onboarding
+ * (`finalisation`). L'achat (Stripe, dans l'app) se fait ensuite depuis
+ * l'entrée « Premium » ou les paywalls des écrans premium.
  *
  * `animationType="none"` sur `Modal` (demande explicite) : le fond opaque
  * doit apparaître d'un coup, sans glisser avec le reste — seule la carte
@@ -94,7 +94,7 @@ export function PaywallModal({
           <View className="gap-3 pt-2">
             <View className="items-center rounded-full bg-[#191818] py-3.5">
               <Text className="text-[15px] font-medium text-[#e8c874]">
-                Débloquer — bientôt disponible
+                Débloquable depuis votre espace
               </Text>
             </View>
 

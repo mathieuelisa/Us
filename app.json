@@ -56,7 +56,8 @@
           "icon": "./assets/images/android-icon-monochrome.png",
           "color": "#2D5E5A"
         }
-      ]
+      ],
+      ["@stripe/stripe-react-native", { "enableGooglePay": false }]
     ],
     "experiments": {
       "typedRoutes": true,

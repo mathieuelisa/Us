@@ -20,7 +20,8 @@ type RealtimeTable =
   | 'baby_entries'
   | 'name_swipes'
   | 'contraction_sessions'
-  | 'contractions';
+  | 'contractions'
+  | 'household_entitlements';
 
 /**
  * Requêtes à recharger quand une table change. `null` : tout recharger
@@ -64,6 +65,15 @@ function keysForTable(
     case 'contraction_sessions':
     case 'contractions':
       return [queryKeys.contractions.all];
+    // Premium acheté (ou remboursé) par l'autre parent : le droit change, et
+    // avec lui les données premium visibles (bébé, prénoms, contractions).
+    case 'household_entitlements':
+      return [
+        queryKeys.premium.all,
+        queryKeys.baby.all,
+        queryKeys.names.all,
+        queryKeys.contractions.all,
+      ];
   }
 }
 
@@ -80,6 +90,7 @@ const HOUSEHOLD_TABLES: RealtimeTable[] = [
   'name_swipes',
   'contraction_sessions',
   'contractions',
+  'household_entitlements',
 ];
 
 /** Regroupe les événements rapprochés (ex. une série d'insertions) en un seul rechargement. */

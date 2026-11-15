@@ -412,3 +412,8 @@ enabled = true
 # declarative_schema_path = "./database"
 # JSON string passed through to pg-delta SQL formatting.
 # format_options = "{\"keywordCase\":\"upper\",\"indent\":2,\"maxWidth\":80,\"commaStyle\":\"trailing\"}"
+
+# Stripe (premium) : Stripe appelle le webhook sans jeton Supabase. La
+# sécurité vient de la vérification de la signature Stripe.
+[functions.stripe-webhook]
+verify_jwt = false

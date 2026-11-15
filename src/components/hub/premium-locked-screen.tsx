@@ -19,6 +19,7 @@ import { PremiumPaywallModal } from '@/components/hub/premium-paywall-modal';
 import { useTabBarContentInset } from '@/components/navigation/use-tab-bar-height';
 import { GLASS_TITLE_COLOR } from '@/components/ui/glass-card';
 import { CARD_SHADOW } from '@/features/hub/constants';
+import { useIsPremium } from '@/features/premium/hooks';
 import { useThemeAccent, useThemeBackground } from '@/features/settings/hooks';
 
 const SafeAreaView = withUniwind(RNSafeAreaView);
@@ -86,11 +87,17 @@ export function PremiumLockedScreen({
   const tabBarInset = useTabBarContentInset();
   const backgroundColor = useThemeBackground();
   const accent = useThemeAccent();
-  const [isPaywallVisible, setIsPaywallVisible] = useState(true);
+  const { isPremium, isLoading: isPremiumLoading } = useIsPremium();
+  const [isPaywallRequested, setIsPaywallRequested] = useState(true);
+  // Foyer premium : jamais de paywall. Pendant le chargement non plus, pour
+  // ne pas le faire clignoter devant un foyer qui a payé.
+  const isPaywallVisible =
+    !isPremium && !isPremiumLoading && isPaywallRequested;
+  const isLocked = !isPremium;
 
   useFocusEffect(
     useCallback(() => {
-      setIsPaywallVisible(true);
+      setIsPaywallRequested(true);
     }, []),
   );
 
@@ -137,33 +144,46 @@ export function PremiumLockedScreen({
           </>
         )}
 
-        {(typeof gridContent === 'function'
-          ? gridContent({ isPaywallVisible })
-          : gridContent) ?? (
-          <View className="flex-row flex-wrap gap-3">
-            {modules?.map((module) => (
-              <View
-                key={module.label}
-                style={CARD_SHADOW}
-                className="aspect-square w-[47%] items-center justify-center gap-2.5 rounded-3xl bg-white px-3 py-4"
-              >
-                <Ionicons
-                  name="lock-closed"
-                  size={13}
-                  color="#1f3d3a"
-                  style={{ position: 'absolute', top: 12, right: 12 }}
-                />
+        <View>
+          {(typeof gridContent === 'function'
+            ? gridContent({ isPaywallVisible })
+            : gridContent) ?? (
+            <View className="flex-row flex-wrap gap-3">
+              {modules?.map((module) => (
+                <View
+                  key={module.label}
+                  style={CARD_SHADOW}
+                  className="aspect-square w-[47%] items-center justify-center gap-2.5 rounded-3xl bg-white px-3 py-4"
+                >
+                  <Ionicons
+                    name={isLocked ? 'lock-closed' : 'lock-open'}
+                    size={13}
+                    color="#1f3d3a"
+                    style={{ position: 'absolute', top: 12, right: 12 }}
+                  />
 
-                <View className="h-14 w-14 items-center justify-center rounded-full bg-[#1f3d3a]/10">
-                  <Text className="text-[28px]">{module.emoji}</Text>
+                  <View className="h-14 w-14 items-center justify-center rounded-full bg-[#1f3d3a]/10">
+                    <Text className="text-[28px]">{module.emoji}</Text>
+                  </View>
+                  <Text className="text-[14px] font-semibold text-[#1a1a1a]">
+                    {module.label}
+                  </Text>
                 </View>
-                <Text className="text-[14px] font-semibold text-[#1a1a1a]">
-                  {module.label}
-                </Text>
-              </View>
-            ))}
-          </View>
-        )}
+              ))}
+            </View>
+          )}
+          {/* Sans premium, la grille reste une vitrine : la toucher rouvre
+              le paywall au lieu d'ouvrir un module que la base refuserait
+              de toute façon (`has_premium()` dans les policies). */}
+          {isLocked ? (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Débloquer avec le premium"
+              onPress={() => setIsPaywallRequested(true)}
+              className="absolute inset-0"
+            />
+          ) : null}
+        </View>
       </ScrollView>
 
       {isPaywallVisible ? (
@@ -196,7 +216,7 @@ export function PremiumLockedScreen({
 
       <PremiumPaywallModal
         visible={isPaywallVisible}
-        onClose={() => setIsPaywallVisible(false)}
+        onClose={() => setIsPaywallRequested(false)}
         title={paywallTitle}
         image={image}
         illustration={paywallIllustration}

@@ -60,6 +60,11 @@ export const queryKeys = {
     favorites: (householdId: string) =>
       ['names', householdId, 'favorites'] as const,
   },
+  premium: {
+    all: ['premium'] as const,
+    entitlement: (householdId: string) =>
+      ['premium', householdId, 'entitlement'] as const,
+  },
   organisation: {
     all: ['organisation'] as const,
     checklistItems: (householdId: string) =>

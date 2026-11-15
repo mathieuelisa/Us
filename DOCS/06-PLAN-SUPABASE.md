@@ -93,8 +93,8 @@ configurer le SMTP. Détail dans l'[architecture](./04-ARCHITECTURE.md#connexion
   RLS foyer, les deux parents écrivent ; seule la fin (`ended_at`) se
   modifie. Vérifié par simulation SQL annulée : un utilisateur hors foyer
   ne voit et n'écrit rien, le début d'un suivi ne se réécrit pas. Advisors
-  sans nouvel avertissement. Comme `baby_entries`, `has_premium()` reste à
-  ajouter aux policies (lot 4).
+  sans nouvel avertissement. `has_premium()` ajoutée aux policies le
+  2026-11-15 (lot 4, dette n°53).
 
 ## État des lieux (2026-11-12)
 
@@ -344,6 +344,19 @@ le module bébé. Correspond à la Phase 3 du plan d'action (→ [V1](./versions
 
 ### Droit premium (D1 : par foyer)
 
+> ✅ **Stripe, paiement dans l'app (2026-11-15, demande explicite)**, en
+> écart avec RevenueCat : `household_entitlements` + `has_premium()`
+> (migration `20261115182313_household_entitlements.sql`, source `stripe`
+> ajoutée), Edge Functions `stripe-create-payment` (PaymentIntent pour le
+> foyer de l'appelant) et `stripe-webhook` (seule à écrire le droit,
+> signature vérifiée ; un remboursement total le retire). Achat par
+> `PremiumPurchaseButton` (PaymentSheet) dans les paywalls et sur
+> `/premium`. Moyens de paiement dynamiques : carte et **PayPal** (activé
+> dans le tableau de bord Stripe, aucun code dédié). Le parcours web
+> (Checkout) a été testé puis retiré. `has_premium()` est branchée sur les
+> policies des tables premium depuis `20261115184435_premium_rls.sql`
+> (dette n°53 résolue). Risque de refus Apple/Google : dette n°61.
+
 - [ ] Table `household_entitlements` : `household_id` (unique), produit,
       source (`revenuecat`, `promo`), date d'achat, date d'expiration
       éventuelle. **Aucune écriture depuis l'app** : lecture seule pour les
@@ -391,8 +404,10 @@ comme en écriture — les deux parents saisissent indifféremment (CONCEPT.md).
       médecin » restent à confirmer avant d'avoir leurs tables.
 - [x] Courbe de croissance : lecture des mesures de `baby_entries`
       (module `croissance`), sans calcul serveur.
-- [ ] Ajouter `has_premium(household_id)` aux 4 policies de
+- [x] Ajouter `has_premium(household_id)` aux 4 policies de
       `baby_entries` (`alter policy`) une fois le droit premium en place.
+      Fait le 2026-11-15 (lecture, création, modification ; suppression
+      laissée libre).
       → dette n°53
 
 ### Match des prénoms
@@ -414,8 +429,8 @@ comme en écriture — les deux parents saisissent indifféremment (CONCEPT.md).
       deux.
 - [ ] Catalogue en base (`baby_name_catalog`) le jour où il doit grossir
       ou être modifié sans mise à jour de l'app.
-- [ ] Ajouter `has_premium(household_id)` aux policies des deux tables une
-      fois le droit premium en place.
+- [x] Ajouter `has_premium(household_id)` aux policies des deux tables une
+      fois le droit premium en place (2026-11-15).
 
 **Terminé quand** : un achat sur un téléphone débloque les deux parents,
 les suivis persistent et sont refusés sans premium (prouvé par des tests

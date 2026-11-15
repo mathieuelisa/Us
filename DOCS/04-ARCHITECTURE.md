@@ -19,7 +19,7 @@ title: Architecture technique — US
 | Formulaires | TanStack Form en principe — **non installé**, tous les formulaires sont en `useState` (voir plus bas) |
 | État client global | Jotai |
 | Lint / format | Biome |
-| Paiement premium | À trancher en phase MVP+1 (RevenueCat recommandé pour achat unique + restauration cross-plateforme) |
+| Paiement premium | **Stripe, paiement dans l'app** (PaymentSheet, `@stripe/stripe-react-native`) — choix du 2026-11-15 (demande explicite). Le droit est porté par le foyer (`household_entitlements`), écrit par le webhook `stripe-webhook` : pas de « restauration d'achat » à gérer, il suit le compte. Risque de refus Apple/Google : dette n°61 |
 | Notifications | `expo-notifications` (2026-11-15). Rappels de rendez-vous et de démarches programmés **en local** sur le téléphone (`src/features/notifications/reminders.ts`). Alertes de l'autre parent en **push** : déclencheurs en base → `notification_outbox` → Edge Function `send-push` → Expo Push → Firebase (Android). iOS : pas encore de compte Apple Developer |
 | Animations | Reanimated 4 (+ worklets), `react-native-svg` pour les doodles et formes, `expo-blur` pour le flou des écrans premium |
 | Styles / theming | Tailwind v4 via [Uniwind](https://docs.uniwind.dev) — Hero UI Native est bâti dessus, `className` sur les composants plutôt que `StyleSheet.create` pour tout ce que le kit ne fournit pas déjà |
@@ -169,8 +169,9 @@ filer bord à bord (`exercice.tsx`, une route).
 | `/naissance` | 7a — déclaration de naissance | `households.birth_date` | Personne enceinte |
 | `/informations` | Informations importantes par catégorie | `household_info_items` | Aucune (les deux lisent et écrivent) |
 | `/profil`, `/reglages`, `/legal` | Prénom, thème, compte (email, mot de passe, suppression), liens légaux | `profiles`, Auth, Edge Function `delete-account` | Personnel |
-| `/bebe`, `/prenoms`, `/premium` | Vitrine premium (paywall inerte) | aucune | Dette n°53 |
-| `/bebe-*` | Suivis bébé : historique, courbe de croissance, ajout et modification d'une entrée | `baby_entries` | Les deux parents lisent et modifient toutes les entrées ; pas encore de contrôle premium (dette n°53) |
+| `/bebe`, `/prenoms`, `/contractions` | Écrans premium : paywall tant que le foyer n'a pas le premium (`useIsPremium`), contenu direct sinon | `household_entitlements` (lecture) | Barrière réelle en base : `has_premium()` dans les policies |
+| `/premium` | Offre premium et achat (`PremiumPurchaseButton`, aussi dans les paywalls) | `household_entitlements` | Edge Functions `stripe-create-payment`, `stripe-webhook` |
+| `/bebe-*` | Suivis bébé : historique, courbe de croissance, ajout et modification d'une entrée | `baby_entries` | Les deux parents lisent et modifient toutes les entrées ; réservé aux foyers premium (`has_premium()`) |
 
 ## Plus de mode contournement DEV
 

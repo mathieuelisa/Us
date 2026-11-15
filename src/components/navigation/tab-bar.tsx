@@ -20,6 +20,7 @@ import Svg, {
 } from 'react-native-svg';
 
 import { PARTNER_PINK } from '@/features/partner/constants';
+import { useIsPremium } from '@/features/premium/hooks';
 import { useThemeAccent, useThemeBackground } from '@/features/settings/hooks';
 import { darkenHex, hexToRgba, lightenHex } from '@/lib/color';
 
@@ -72,6 +73,12 @@ const TAB_ICONS: Record<string, IconPair> = {
 const PREMIUM_ICONS: IconPair = {
   outline: 'lock-closed-outline',
   filled: 'lock-closed',
+};
+
+/** Cadenas ouvert une fois le premium acheté par le foyer (demande explicite). */
+const PREMIUM_UNLOCKED_ICONS: IconPair = {
+  outline: 'lock-open-outline',
+  filled: 'lock-open',
 };
 
 const INACTIVE_COLOR = '#8f8f99';
@@ -190,6 +197,8 @@ export function AppTabBar({
   const navigation = rawNavigation as AppTabBarNavigation;
   const accent = useThemeAccent();
   const pastelBackground = useThemeBackground();
+  const { isPremium } = useIsPremium();
+  const premiumIcons = isPremium ? PREMIUM_UNLOCKED_ICONS : PREMIUM_ICONS;
 
   // Seuls les 4 onglets fixes (CONCEPT.md) ont une icône : les autres
   // routes du navigateur (`HUB_DESTINATIONS`/`SETTINGS_DESTINATIONS` dans
@@ -394,7 +403,7 @@ export function AppTabBar({
             <TabItem
               label="Premium"
               icon={
-                isPremiumFocused ? PREMIUM_ICONS.filled : PREMIUM_ICONS.outline
+                isPremiumFocused ? premiumIcons.filled : premiumIcons.outline
               }
               restColor={PREMIUM_GOLD}
               isFocused={isPremiumFocused}

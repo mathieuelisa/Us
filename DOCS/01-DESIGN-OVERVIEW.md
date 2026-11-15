@@ -89,5 +89,5 @@ schéma Supabase (voir [Architecture](./04-ARCHITECTURE.md)).
 - **Double vue par rôle** : presque tous les écrans changent de couleur de fond et de contenu selon que l'utilisateur est la personne enceinte ou le·la partenaire. Prévoir un contexte de rôle global plutôt que dupliquer les écrans.
 - **Données de santé sensibles** (`important_info`, `symptoms_log`) → RLS Supabase stricte, accès limité aux membres du household, chiffrement à évaluer.
 - **Transition grossesse → bébé** (écran 7a) est un événement pivot qui change la navigation (le pilier "Votre bébé" apparaît/se débloque, "Aujourd'hui" change de contenu).
-- **Achat unique premium** (pas d'abonnement) → intégration RevenueCat ou StoreKit/Billing direct à valider ; restauration d'achat obligatoire (Apple/Google review).
+- **Achat unique premium** (pas d'abonnement) → **Stripe, paiement dans l'app** retenu le 2026-11-15 (cf. [Architecture](./04-ARCHITECTURE.md#stack)) ; le droit est porté par le foyer côté serveur, la conformité aux règles Apple/Google reste à valider (dette n°61).
 - **Notifications push** apparaissent dans plusieurs flux (rappels démarches, gestes du jour, réassurance) → nécessite Expo Notifications + un scheduler côté backend (Supabase Edge Functions + cron, ou service externe).

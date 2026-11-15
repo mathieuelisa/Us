@@ -483,6 +483,47 @@ export type Database = {
           },
         ];
       };
+      household_entitlements: {
+        Row: {
+          created_at: string;
+          expires_at: string | null;
+          household_id: string;
+          livemode: boolean;
+          product: string;
+          provider_ref: string | null;
+          purchased_at: string;
+          source: string;
+        };
+        Insert: {
+          created_at?: string;
+          expires_at?: string | null;
+          household_id: string;
+          livemode?: boolean;
+          product?: string;
+          provider_ref?: string | null;
+          purchased_at?: string;
+          source: string;
+        };
+        Update: {
+          created_at?: string;
+          expires_at?: string | null;
+          household_id?: string;
+          livemode?: boolean;
+          product?: string;
+          provider_ref?: string | null;
+          purchased_at?: string;
+          source?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'household_entitlements_household_id_fkey';
+            columns: ['household_id'];
+            isOneToOne: true;
+            referencedRelation: 'households';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       household_info_items: {
         Row: {
           category: string | null;
@@ -947,6 +988,7 @@ export type Database = {
     Functions: {
       accept_household_invite: { Args: never; Returns: string };
       household_role: { Args: { hh_id: string }; Returns: string };
+      has_premium: { Args: { p_household_id: string }; Returns: boolean };
       is_household_member: { Args: { hh_id: string }; Returns: boolean };
       join_household_by_code: { Args: { p_code: string }; Returns: string };
       create_household_join_code: {

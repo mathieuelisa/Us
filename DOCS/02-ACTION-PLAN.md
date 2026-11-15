@@ -535,9 +535,13 @@ le plan.
 
 ## Phase 3 — Paiement & module "Votre bébé" (→ V1)
 
-- [ ] Décision + intégration du provider de paiement (RevenueCat recommandé,
-      cf. [Architecture](./04-ARCHITECTURE.md#stack))
+- [x] Décision + intégration du provider de paiement : **Stripe, paiement
+      dans l'app** (2026-11-15, demande explicite — cf.
+      [Architecture](./04-ARCHITECTURE.md#stack)). Conformité stores : dette n°61
 - [ ] Écran 1g/paywall rendu fonctionnel (achat unique, restauration, code promo)
+      — paywalls des écrans premium et page `/premium` fonctionnels ; le
+      paywall de l'onboarding reste inerte (le foyer n'existe pas encore) ;
+      codes promo à faire
 - [ ] Système de favoris (8y, 8a) — liste ordonnée, activable/désactivable
       par drag-and-drop
 - [ ] **4 modules confirmés par CONCEPT.md** : biberons, mesures
