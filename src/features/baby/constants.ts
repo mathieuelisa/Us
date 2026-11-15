@@ -275,9 +275,7 @@ export const BABY_MODULES: Record<BabyModuleSlug, BabyModule> = {
   sommeil: {
     slug: 'sommeil',
     emoji: '😴',
-    // Pas encore d'icône 3D dédiée (comme Icon_biberon…) : icône bébé en
-    // attendant `Icon_sommeil.png`.
-    image: require('@/assets/images/Icon_bebe.png'),
+    image: require('@/assets/images/Icon_sommeil.png'),
     title: 'Sommeil',
     subtitle: 'Siestes, nuits, réveils',
     sectionTitle: 'Derniers sommeils',
