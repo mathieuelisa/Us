@@ -77,6 +77,9 @@ export default function HubScreen() {
   const { data: household } = useMyHousehold();
   const { data: summary } = useHubSummary(household);
   const { data: appointments = [] } = useAppointments(household);
+  // Espace « Seul·e » (demande explicite) : pas d'invitation, et la carte
+  // « Mon partenaire » devient « Cette semaine » (taille du bébé, astuces).
+  const isSolo = household?.accompaniment_type === 'seul';
   const backgroundColor = useThemeBackground();
   const accent = useThemeAccent();
 
@@ -94,6 +97,9 @@ export default function HubScreen() {
     date: appointment.appointment_date,
     time: appointment.appointment_time,
     address: appointment.address,
+    // Seuls ses propres rendez-vous peuvent être non partagés (la RLS cache
+    // ceux de l'autre parent) ; en « Seul·e », il n'y a rien à signaler.
+    isPrivate: !appointment.is_shared && !isSolo,
   }));
 
   const greetingName = profile?.first_name || null;
@@ -105,9 +111,6 @@ export default function HubScreen() {
 
   const partnerName = summary?.partnerFirstName?.trim();
   const hasPartnerJoined = Boolean(household?.partner_user_id);
-  // Espace « Seul·e » (demande explicite) : pas d'invitation, et la carte
-  // « Mon partenaire » devient « Cette semaine » (taille du bébé, astuces).
-  const isSolo = household?.accompaniment_type === 'seul';
   const partnerMood = hasPartnerJoined ? (summary?.partnerMood ?? null) : null;
   const [isHowItWorksOpen, setIsHowItWorksOpen] = useState(false);
   const [isInviteOpen, setIsInviteOpen] = useState(false);
@@ -440,6 +443,21 @@ export default function HubScreen() {
                       <Text className="text-[13px] text-[#6b6b6b]">
                         {subtitle}
                       </Text>
+                    ) : null}
+                    {/* Rendez-vous non partagé : mention discrète (demande
+                        explicite), pour savoir que l'autre parent ne le
+                        voit pas. */}
+                    {appointment.isPrivate ? (
+                      <View className="mt-1 flex-row items-center gap-1">
+                        <Ionicons
+                          name="lock-closed-outline"
+                          size={11}
+                          color="#a3a1b0"
+                        />
+                        <Text className="text-[11.5px] text-[#a3a1b0]">
+                          Non partagé · visible par vous seul·e
+                        </Text>
+                      </View>
                     ) : null}
                   </View>
                   {/* Pavé date teinté du fond d'écran (demande explicite) :
