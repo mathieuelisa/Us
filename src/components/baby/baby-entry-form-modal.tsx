@@ -37,7 +37,7 @@ import {
 } from '@/features/baby/constants';
 import { useThemeAccent } from '@/features/settings/hooks';
 import { hexToRgba, lightenHex } from '@/lib/color';
-import { todayIso } from '@/lib/date';
+import { todayIso, toLocalIsoDate } from '@/lib/date';
 
 /**
  * Formulaire d'ajout d'une entrée de suivi bébé (écrans 8d/8f/8g/8h du
@@ -179,10 +179,23 @@ export function BabyEntryFormModal({
     }
   }
 
-  // Champs chiffrés saisis : ni les heures (réveil), ni les valeurs
-  // calculées (durée du sommeil).
-  const numberFields = module.fields.filter(
-    (field) => field.kind !== 'time' && !field.hidden,
+  // Champs affichés pour l'option de tête choisie (le rappel, le médecin et
+  // le lot d'un vaccin n'ont de sens que s'il est « Fait »).
+  const visibleFields = module.fields.filter(
+    (field) =>
+      !field.segments || (segment !== null && field.segments.includes(segment)),
+  );
+
+  // Champs chiffrés saisis : ni les heures (réveil), ni les textes et dates
+  // (vaccins), ni les valeurs calculées (durée du sommeil).
+  const numberFields = visibleFields.filter(
+    (field) =>
+      (field.kind === 'number' || field.kind === 'timer') && !field.hidden,
+  );
+  const textFields = visibleFields.filter((field) => field.kind === 'text');
+  const dateFields = visibleFields.filter((field) => field.kind === 'date');
+  const isMissingRequiredText = textFields.some(
+    (field) => field.required && !(values[field.key] ?? '').trim(),
   );
   const filledFieldCount = numberFields.filter((field) =>
     isNumberFilled(values[field.key]),
@@ -195,6 +208,7 @@ export function BabyEntryFormModal({
   const canSubmit =
     filledFieldCount >= module.requiredFieldCount &&
     !hasInvalidNumber &&
+    !isMissingRequiredText &&
     (!module.timeRequired || Boolean(time));
 
   // Heures supplémentaires (réveil du sommeil), à côté de celle du module.
@@ -319,11 +333,56 @@ export function BabyEntryFormModal({
             <View className="gap-2">
               <FieldLabel
                 icon="calendar-outline"
-                label="Date"
+                label={(segment && module.dateLabels?.[segment]) || 'Date'}
                 accent={accent}
               />
               <WheelDatePicker value={date} onChange={setDate} compact />
             </View>
+
+            {/* Vaccins : nom (obligatoire), médecin et lot en texte libre. */}
+            {textFields.length > 0 ? (
+              <View className="gap-1.5">
+                {textFields
+                  .filter((field) => field.required)
+                  .map((field) => (
+                    <IconInput
+                      key={field.key}
+                      icon={FIELD_ICONS[field.key] ?? 'create-outline'}
+                      placeholder={field.label}
+                      value={values[field.key] ?? ''}
+                      onChangeText={(next) => setValue(field.key, next)}
+                      accent={accent}
+                    />
+                  ))}
+                {chunkPairs(textFields.filter((field) => !field.required)).map(
+                  (pair) => (
+                    <View key={pair[0].key} className="flex-row gap-2.5">
+                      {pair.map((field) => (
+                        <View key={field.key} className="flex-1">
+                          <IconInput
+                            icon={FIELD_ICONS[field.key] ?? 'create-outline'}
+                            placeholder={field.label}
+                            value={values[field.key] ?? ''}
+                            onChangeText={(next) => setValue(field.key, next)}
+                            accent={accent}
+                          />
+                        </View>
+                      ))}
+                    </View>
+                  ),
+                )}
+              </View>
+            ) : null}
+
+            {dateFields.map((field) => (
+              <OptionalDateField
+                key={field.key}
+                label={field.label}
+                value={values[field.key] || null}
+                onChange={(next) => setValue(field.key, next ?? '')}
+                accent={accent}
+              />
+            ))}
 
             {module.fields
               .filter((field) => field.kind === 'timer' && !field.hidden)
@@ -447,7 +506,10 @@ export function BabyEntryFormModal({
                   values: withSleepDuration(
                     module,
                     module.hasTime && time ? time : null,
-                    normalizeValues(module, values),
+                    normalizeValues(
+                      { ...module, fields: visibleFields },
+                      values,
+                    ),
                   ),
                   comment: module.hasComment ? comment.trim() || null : null,
                 })
@@ -789,6 +851,15 @@ function normalizeValues(
   for (const field of module.fields) {
     const raw = values[field.key];
     if (field.hidden) continue;
+    if (field.kind === 'text') {
+      const text = raw?.trim();
+      if (text) normalized[field.key] = text.slice(0, 120);
+      continue;
+    }
+    if (field.kind === 'date') {
+      if (raw && /^\d{4}-\d{2}-\d{2}$/.test(raw)) normalized[field.key] = raw;
+      continue;
+    }
     if (field.kind === 'time') {
       if (raw && /^\d{2}:\d{2}$/.test(raw)) normalized[field.key] = raw;
       continue;
@@ -945,6 +1016,9 @@ const FIELD_ICONS: Record<string, IoniconName> = {
   weight: 'scale-outline',
   headCircumference: 'ellipse-outline',
   wakeups: 'alarm-outline',
+  name: 'medkit-outline',
+  doctor: 'person-outline',
+  lot: 'barcode-outline',
 };
 
 /** Libellé de champ précédé d'une icône dans un rond teinté. */
@@ -985,4 +1059,78 @@ function currentTime(): string {
   return `${String(now.getHours()).padStart(2, '0')}:${String(
     now.getMinutes(),
   ).padStart(2, '0')}`;
+}
+
+/**
+ * Date facultative (prochain rappel d'un vaccin) : un bouton « Ajouter »
+ * tant qu'elle est vide, puis la molette de date et « Retirer ». Elle part
+ * d'un mois après aujourd'hui, une échéance de rappel étant dans le futur.
+ */
+function OptionalDateField({
+  label,
+  value,
+  onChange,
+  accent,
+}: {
+  label: string;
+  value: string | null;
+  onChange: (value: string | null) => void;
+  accent: string;
+}) {
+  if (!value) {
+    return (
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={`Ajouter : ${label}`}
+        onPress={() => {
+          const start = new Date();
+          start.setMonth(start.getMonth() + 1);
+          onChange(toLocalIsoDate(start));
+        }}
+        className="flex-row items-center gap-2.5 rounded-2xl px-3 py-3"
+        style={{
+          borderWidth: 1,
+          borderStyle: 'dashed',
+          borderColor: hexToRgba(accent, 0.35),
+        }}
+      >
+        <IconBubble icon="notifications-outline" color={accent} />
+        <Text
+          className="flex-1 text-[14px] font-semibold"
+          style={{ color: GLASS_TITLE_COLOR }}
+        >
+          {label}
+        </Text>
+        <Text className="text-[13px] font-bold" style={{ color: accent }}>
+          Ajouter
+        </Text>
+      </Pressable>
+    );
+  }
+
+  return (
+    <View className="gap-2">
+      <View className="flex-row items-center justify-between">
+        <FieldLabel
+          icon="notifications-outline"
+          label={label}
+          accent={accent}
+        />
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={`Retirer : ${label}`}
+          hitSlop={8}
+          onPress={() => onChange(null)}
+        >
+          <Text
+            className="text-[13px] font-semibold"
+            style={{ color: GLASS_BODY_COLOR }}
+          >
+            Retirer
+          </Text>
+        </Pressable>
+      </View>
+      <WheelDatePicker value={value} onChange={onChange} compact />
+    </View>
+  );
 }

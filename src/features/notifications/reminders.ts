@@ -1,4 +1,9 @@
 import * as Notifications from 'expo-notifications';
+import {
+  type BabyEntry,
+  formatShortDate,
+  getVaccinesDue,
+} from '@/features/baby/constants';
 import type { Appointment } from '@/features/health/api';
 import type { Household } from '@/features/household/api';
 import { formatAppointmentTime } from '@/features/hub/constants';
@@ -25,6 +30,8 @@ const MAX_SCHEDULED = 50;
 const PREGNANCY_DAYS = 280;
 const PROCEDURE_REMINDER_HOUR = 9;
 const APPOINTMENT_EVE_HOUR = 19;
+const VACCINE_REMINDER_HOUR = 9;
+const VACCINE_EARLY_DAYS = 7;
 
 function atLocalTime(iso: string, hours: number, minutes = 0): Date {
   const [year, month, day] = iso.split('-').map(Number);
@@ -210,6 +217,51 @@ export function buildProcedureReminders(
     });
   }
 
+  return reminders;
+}
+
+/**
+ * Vaccins de bébé (demande explicite du 2026-11-15) : pour chaque vaccin
+ * « À faire » et chaque prochain rappel encore attendu, une notification
+ * 7 jours avant (le temps de prendre rendez-vous) puis le jour J, à 9h.
+ * Rien pour une échéance déjà passée : elle s'affiche « en retard » dans
+ * l'app. Pour les deux parents (chacun programme sur son téléphone).
+ */
+export function buildVaccineReminders(
+  entries: BabyEntry[],
+  now: Date = new Date(),
+): LocalReminder[] {
+  const reminders: LocalReminder[] = [];
+  const url = '/bebe-vaccin';
+
+  for (const due of getVaccinesDue(entries, todayIso())) {
+    const what = due.kind === 'booster' ? `Rappel ${due.name}` : due.name;
+    const dueDay = atLocalTime(due.date, VACCINE_REMINDER_HOUR);
+    const earlyDay = atLocalTime(
+      shiftIsoDate(due.date, -VACCINE_EARLY_DAYS),
+      VACCINE_REMINDER_HOUR,
+    );
+    const id = `vaccine-${due.entry.id}-${due.kind}`;
+
+    if (earlyDay > now) {
+      reminders.push({
+        id: `${id}-early`,
+        date: earlyDay,
+        title: 'Vaccin de bébé dans 7 jours',
+        body: `${what}, le ${formatShortDate(due.date)}. Pensez à prendre rendez-vous.`,
+        url,
+      });
+    }
+    if (dueDay > now) {
+      reminders.push({
+        id: `${id}-day`,
+        date: dueDay,
+        title: 'Vaccin de bébé aujourd’hui',
+        body: `${what} est prévu aujourd’hui.`,
+        url,
+      });
+    }
+  }
   return reminders;
 }
 

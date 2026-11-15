@@ -108,6 +108,7 @@ export type NotificationPreferences = Pick<
   | 'notify_procedures'
   | 'notify_partner'
   | 'notify_mood_reminder'
+  | 'notify_vaccines'
 >;
 
 /**

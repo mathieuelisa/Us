@@ -889,6 +889,7 @@ export type Database = {
           notify_appointments: boolean;
           notify_mood_reminder: boolean;
           notify_partner: boolean;
+          notify_vaccines: boolean;
           notify_procedures: boolean;
           pronoun: string | null;
           theme: string;
@@ -902,6 +903,7 @@ export type Database = {
           notify_appointments?: boolean;
           notify_mood_reminder?: boolean;
           notify_partner?: boolean;
+          notify_vaccines?: boolean;
           notify_procedures?: boolean;
           pronoun?: string | null;
           theme?: string;
@@ -915,6 +917,7 @@ export type Database = {
           notify_appointments?: boolean;
           notify_mood_reminder?: boolean;
           notify_partner?: boolean;
+          notify_vaccines?: boolean;
           notify_procedures?: boolean;
           pronoun?: string | null;
           theme?: string;

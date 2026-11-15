@@ -20,6 +20,7 @@ import { withUniwind } from 'uniwind';
 import { BabyEntryFormModal } from '@/components/baby/baby-entry-form-modal';
 import { GrowthChart } from '@/components/baby/growth-chart';
 import { SleepNowCard } from '@/components/baby/sleep-now-card';
+import { VaccinesDueCard } from '@/components/baby/vaccines-due-card';
 import { useTabBarContentInset } from '@/components/navigation/use-tab-bar-height';
 import { BlobIllustration } from '@/components/ui/blob-illustration';
 import {
@@ -77,7 +78,7 @@ const tintedShadow = (accent: string) =>
 
 /**
  * Écran de détail d'un suivi bébé, ouvert depuis la grille bento de
- * `/bebe`. Structure commune aux 5 modules (décrite dans
+ * `/bebe`. Structure commune aux 6 modules (décrite dans
  * `BABY_MODULES`) : en-tête avec retour, carte du module, historique,
  * bouton d'ajout ouvrant `BabyEntryFormModal`.
  *
@@ -295,6 +296,15 @@ export function BabyModuleScreen({ module }: { module: BabyModule }) {
           ) : null}
 
           {/* Sommeil : coucher et réveil en un tap (demande explicite). */}
+          {/* Vaccins : échéances à venir et retards (demande explicite). */}
+          {module.slug === 'vaccin' && !entriesQuery.isPending ? (
+            <VaccinesDueCard
+              entries={entries}
+              accent={accent}
+              onOpen={openForm}
+            />
+          ) : null}
+
           {module.slug === 'sommeil' && !entriesQuery.isPending ? (
             <SleepNowCard
               entries={entries}

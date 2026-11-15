@@ -49,6 +49,12 @@ const ROWS: {
     description: 'Celles où « Me rappeler » est activé',
   },
   {
+    key: 'notify_vaccines',
+    icon: 'medkit-outline',
+    label: 'Vaccins de bébé',
+    description: '7 jours avant et le jour J, à 9h',
+  },
+  {
     key: 'notify_mood_reminder',
     icon: 'happy-outline',
     label: 'Humeur du jour',

@@ -20,7 +20,9 @@ import {
 import {
   BABY_MODULES,
   type BabyModuleSlug,
+  formatShortDate,
   formatSleepDuration,
+  getVaccinesDue,
   isSleepOngoing,
 } from '@/features/baby/constants';
 import { useBabyEntries } from '@/features/baby/hooks';
@@ -45,6 +47,7 @@ const CROISSANCE_ICON = BABY_MODULES.croissance.image;
 const BAIN_ICON = BABY_MODULES.bain.image;
 const ALLAITEMENT_ICON = BABY_MODULES.allaitement.image;
 const SOMMEIL_ICON = BABY_MODULES.sommeil.image;
+const VACCIN_ICON = BABY_MODULES.vaccin.image;
 const DESCRIPTION =
   'Centralisez la croissance, les repas et le sommeil de bébé, et gardez votre partenaire connecté à chaque étape.';
 /** Espace « Seul·e » (demande explicite) : sans le partenaire. */
@@ -52,7 +55,7 @@ const SOLO_DESCRIPTION =
   'Centralisez la croissance, les repas et le sommeil de bébé.';
 
 /**
- * Ouvre le détail d'un suivi. Les 5 routes vivent dans le groupe `(tabs)`
+ * Ouvre le détail d'un suivi. Les 6 routes vivent dans le groupe `(tabs)`
  * (`bebe-<slug>`, déclarées `href: null` dans `_layout.tsx`) pour que la
  * barre de navigation reste visible pendant la consultation, comme pour
  * `/premium`.
@@ -422,6 +425,7 @@ function BabyModulesGrid({ accent }: { accent: string }) {
       </GlassCard>
 
       <SleepModuleCard accent={accent} />
+      <VaccineModuleCard accent={accent} />
 
       <DashedLoopDoodle color={accent} />
     </View>
@@ -515,5 +519,60 @@ export default function BabyScreen() {
       gridContent={<BabyModulesGrid accent={accent} />}
       backgroundImage={wallpaper}
     />
+  );
+}
+
+/**
+ * Bloc large « Vaccins » sous Sommeil (demande explicite du 2026-11-15) :
+ * la prochaine échéance (en rouge si elle est en retard), sinon ce que
+ * couvre le suivi. Sans premium, la base ne renvoie rien : le bloc garde
+ * son texte de présentation.
+ */
+function VaccineModuleCard({ accent }: { accent: string }) {
+  const { data: entries = [] } = useBabyEntries('vaccin');
+  const next = getVaccinesDue(entries, todayIso())[0];
+
+  const status = next
+    ? `${next.isLate ? 'En retard' : 'Prochain'} : ${next.name}, ${
+        next.kind === 'booster' ? 'rappel' : 'prévu'
+      } le ${formatShortDate(next.date)}`
+    : BABY_MODULES.vaccin.subtitle;
+
+  return (
+    <GlassCard
+      accessibilityLabel="Ouvrir le suivi Vaccins"
+      accent={accent}
+      onPress={() => openBabyModule('vaccin')}
+    >
+      <CardWave
+        id="wave-vaccin"
+        color={WAVE_PINK}
+        secondColor={WAVE_PEACH}
+        height={40}
+      />
+      <View className="flex-row items-center gap-3.5 p-4">
+        <IconTile
+          emoji="💉"
+          image={VACCIN_ICON}
+          imageFillsTile
+          tint={hexToRgba(accent, 0.12)}
+        />
+        <View className="flex-1 gap-0.5">
+          <Text
+            className="text-[17px] font-bold"
+            style={{ color: TITLE_COLOR }}
+          >
+            Vaccins
+          </Text>
+          <Text
+            className="text-[12.5px] leading-4"
+            style={{ color: next?.isLate ? '#d14b3a' : BODY_COLOR }}
+          >
+            {status}
+          </Text>
+        </View>
+        <ChevronBubble accent={accent} />
+      </View>
+    </GlassCard>
   );
 }

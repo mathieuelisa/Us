@@ -16,7 +16,7 @@ const HUB_DESTINATIONS = [
   'contractions',
 ] as const;
 
-// Sous-destinations de « Votre bébé » : les 5 suivis de la grille bento de
+// Sous-destinations de « Votre bébé » : les 6 suivis de la grille bento de
 // `/bebe` (voir BABY_MODULES). Gardées à part de HUB_DESTINATIONS parce
 // qu'elles ne s'ouvrent pas depuis le hub mais depuis `/bebe` lui-même —
 // même traitement `href: null`.
@@ -26,6 +26,7 @@ const BABY_DESTINATIONS = [
   'bebe-allaitement',
   'bebe-bain',
   'bebe-sommeil',
+  'bebe-vaccin',
 ] as const;
 
 // Le jeu du match des prénoms et ses listes, ouverts depuis la grille de

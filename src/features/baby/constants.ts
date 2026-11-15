@@ -20,7 +20,8 @@ export type BabyModuleSlug =
   | 'biberon'
   | 'allaitement'
   | 'bain'
-  | 'sommeil';
+  | 'sommeil'
+  | 'vaccin';
 
 /**
  * Champ chiffré du formulaire — `unit` sert au libellé et au résumé.
@@ -32,13 +33,20 @@ export type BabyModuleSlug =
  * `kind: 'time'` : une heure `HH:MM` facultative, à la molette (réveil du
  * sommeil). `hidden` : valeur calculée à l'enregistrement, jamais saisie
  * (durée du sommeil).
+ *
+ * `kind: 'text'` : texte libre (nom du vaccin, médecin) ; `required` le rend
+ * obligatoire. `kind: 'date'` : une date `AAAA-MM-JJ` facultative (prochain
+ * rappel d'un vaccin). `segments` : champ affiché seulement pour ces
+ * options de tête (« Fait » pour le rappel, le médecin, le lot).
  */
 export type BabyNumberField = {
   key: string;
   label: string;
   unit: string;
-  kind: 'number' | 'timer' | 'time';
+  kind: 'number' | 'timer' | 'time' | 'text' | 'date';
   hidden?: boolean;
+  required?: boolean;
+  segments?: string[];
   /**
    * Saisie à la molette plutôt qu'au clavier (demande explicite sur le
    * poids et la taille) : une colonne pour la partie entière, une pour la
@@ -105,6 +113,8 @@ export type BabyModule = {
   timeLabel?: string;
   /** L'heure est-elle obligatoire pour enregistrer ? (coucher du sommeil) */
   timeRequired?: boolean;
+  /** Libellé de la date selon l'option de tête (« Date prévue »). */
+  dateLabels?: Record<string, string>;
   /**
    * Le formulaire propose-t-il un commentaire libre ? Retiré de
    * l'allaitement (demande explicite) : le geste se résume au sein, à
@@ -318,6 +328,57 @@ export const BABY_MODULES: Record<BabyModuleSlug, BabyModule> = {
       sumField: 'duration',
     },
   },
+  vaccin: {
+    slug: 'vaccin',
+    emoji: '💉',
+    // Pas encore d'icône 3D dédiée : icône santé en attendant
+    // `Icon_vaccin.png`.
+    image: require('@/assets/images/Icon_sante.png'),
+    title: 'Vaccins',
+    subtitle: 'Vaccins faits et rappels à venir',
+    sectionTitle: 'Carnet de vaccination',
+    emptyState: 'Aucun vaccin noté pour le moment.',
+    actionLabel: 'Ajouter un vaccin',
+    editLabel: 'Modifier le vaccin',
+    formSubtitle: 'D’après le carnet de santé : un vaccin fait ou à venir.',
+    segments: { label: 'Statut', options: ['Fait', 'À faire'] },
+    hasTime: false,
+    hasComment: true,
+    dateLabels: { Fait: 'Date du vaccin', 'À faire': 'Date prévue' },
+    // Saisie libre, sans calendrier vaccinal intégré (choix explicite du
+    // 2026-11-15 : pas de contenu médical à faire valider).
+    fields: [
+      {
+        key: 'name',
+        label: 'Nom du vaccin',
+        unit: '',
+        kind: 'text',
+        required: true,
+      },
+      {
+        key: 'boosterDate',
+        label: 'Prochain rappel',
+        unit: '',
+        kind: 'date',
+        segments: ['Fait'],
+      },
+      {
+        key: 'doctor',
+        label: 'Médecin',
+        unit: '',
+        kind: 'text',
+        segments: ['Fait'],
+      },
+      {
+        key: 'lot',
+        label: 'N° de lot',
+        unit: '',
+        kind: 'text',
+        segments: ['Fait'],
+      },
+    ],
+    requiredFieldCount: 0,
+  },
 };
 
 /** Une entrée saisie dans un suivi. Valeurs chiffrées indexées par `key`. */
@@ -375,6 +436,7 @@ export function formatBabyEntrySummary(
   entry: BabyEntry,
 ): string {
   if (module.slug === 'sommeil') return formatSleepSummary(entry);
+  if (module.slug === 'vaccin') return formatVaccineSummary(entry);
   const withLabels = module.fields.length > 1;
 
   const parts = module.fields
@@ -547,4 +609,102 @@ export function formatBabyEntryTimeLabel(
   if (module.slug !== 'sommeil') return start;
   const end = entry.values.wakeTime?.replace(':', 'h') ?? '…';
   return `${start} → ${end}`;
+}
+
+// Vaccins --------------------------------------------------------------
+
+const SHORT_DATE = new Intl.DateTimeFormat('fr-FR', {
+  day: 'numeric',
+  month: 'long',
+});
+const SHORT_DATE_WITH_YEAR = new Intl.DateTimeFormat('fr-FR', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+});
+
+function isoToLocalDate(iso: string): Date {
+  const [year, month, day] = iso.split('-').map(Number);
+  return new Date(year, month - 1, day);
+}
+
+/** « 12 mars », ou « 12 mars 2027 » hors de l'année en cours. */
+export function formatShortDate(iso: string): string {
+  const date = isoToLocalDate(iso);
+  return (
+    date.getFullYear() === new Date().getFullYear()
+      ? SHORT_DATE
+      : SHORT_DATE_WITH_YEAR
+  ).format(date);
+}
+
+/** « Hexavalent · rappel le 12 mars », « ROR · à faire ». */
+function formatVaccineSummary(entry: BabyEntry): string {
+  const parts = [entry.values.name || 'Vaccin'];
+  if (entry.segment === 'À faire') parts.push('à faire');
+  if (entry.segment === 'Fait' && entry.values.boosterDate) {
+    parts.push(`rappel le ${formatShortDate(entry.values.boosterDate)}`);
+  }
+  return parts.join(' · ');
+}
+
+const normalizeName = (name: string | undefined) =>
+  (name ?? '').trim().toLocaleLowerCase('fr-FR');
+
+/** Une échéance de vaccin : vaccin prévu, ou rappel d'un vaccin fait. */
+export type VaccineDue = {
+  /** Entrée qui porte l'échéance (à rouvrir pour la modifier). */
+  entry: BabyEntry;
+  name: string;
+  /** `AAAA-MM-JJ`. */
+  date: string;
+  kind: 'planned' | 'booster';
+  isLate: boolean;
+};
+
+/**
+ * Échéances à venir ou en retard, de la plus proche à la plus lointaine :
+ *   - chaque vaccin « À faire » ;
+ *   - le prochain rappel d'un vaccin « Fait », tant qu'aucun vaccin du même
+ *     nom n'a été noté « Fait » après lui — noter le rappel l'éteint, sans
+ *     rien avoir à décocher.
+ */
+export function getVaccinesDue(
+  entries: BabyEntry[],
+  today: string,
+): VaccineDue[] {
+  const done = entries.filter((entry) => entry.segment === 'Fait');
+  const due: VaccineDue[] = [];
+
+  for (const entry of entries) {
+    const name = entry.values.name || 'Vaccin';
+    if (entry.segment === 'À faire') {
+      due.push({
+        entry,
+        name,
+        date: entry.date,
+        kind: 'planned',
+        isLate: entry.date < today,
+      });
+      continue;
+    }
+    const boosterDate = entry.values.boosterDate;
+    if (entry.segment !== 'Fait' || !boosterDate) continue;
+    const isSuperseded = done.some(
+      (other) =>
+        other.id !== entry.id &&
+        normalizeName(other.values.name) === normalizeName(name) &&
+        other.date > entry.date,
+    );
+    if (isSuperseded) continue;
+    due.push({
+      entry,
+      name,
+      date: boosterDate,
+      kind: 'booster',
+      isLate: boosterDate < today,
+    });
+  }
+
+  return due.sort((a, b) => a.date.localeCompare(b.date));
 }

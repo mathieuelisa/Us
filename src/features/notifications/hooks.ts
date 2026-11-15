@@ -5,6 +5,7 @@ import { useAtomValue } from 'jotai';
 import { useEffect, useMemo } from 'react';
 import { AppState } from 'react-native';
 
+import { useBabyEntries } from '@/features/baby/hooks';
 import { useAppointments } from '@/features/health/hooks';
 import { useMyHousehold } from '@/features/household/hooks';
 import { useProcedures } from '@/features/procedures/hooks';
@@ -19,6 +20,7 @@ import { queryKeys } from '@/lib/query/keys';
 import {
   buildAppointmentReminders,
   buildProcedureReminders,
+  buildVaccineReminders,
   syncLocalReminders,
 } from './reminders';
 import {
@@ -62,6 +64,8 @@ export function useNotifications() {
   const { data: household } = useMyHousehold();
   const appointmentsQuery = useAppointments(household);
   const proceduresQuery = useProcedures(household);
+  // Vaccins de bébé (vide sans premium : la base ne renvoie rien).
+  const vaccinesQuery = useBabyEntries('vaccin');
 
   // 1. Mise en place, autorisation, token push.
   useEffect(() => {
@@ -99,7 +103,8 @@ export function useNotifications() {
     Boolean(profile) &&
     Boolean(household) &&
     appointmentsQuery.isSuccess &&
-    proceduresQuery.isSuccess;
+    proceduresQuery.isSuccess &&
+    vaccinesQuery.isSuccess;
 
   const reminders = useMemo(() => {
     if (!isDataReady || !profile || !household) return [];
@@ -110,6 +115,9 @@ export function useNotifications() {
       ...(profile.notify_procedures
         ? buildProcedureReminders(proceduresQuery.data ?? [], household)
         : []),
+      ...(profile.notify_vaccines
+        ? buildVaccineReminders(vaccinesQuery.data ?? [])
+        : []),
     ];
   }, [
     isDataReady,
@@ -117,6 +125,7 @@ export function useNotifications() {
     household,
     appointmentsQuery.data,
     proceduresQuery.data,
+    vaccinesQuery.data,
   ]);
 
   const signature = reminders

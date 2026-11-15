@@ -409,6 +409,16 @@ comme en écriture — les deux parents saisissent indifféremment (CONCEPT.md).
       sommeil sans réveil est « en cours » : boutons « Bébé dort » / « Bébé
       est réveillé », visibles par les deux parents. Icône 3D `Icon_sommeil.png` (fournie
       par l'utilisateur, fond noir retiré).
+- [x] **Vaccins** (demande explicite du 2026-11-15, migration
+      `baby_entries_vaccin`) : 6e module de `baby_entries`, **saisie
+      libre** (aucun calendrier vaccinal intégré, choix explicite pour ne
+      pas porter de contenu médical à valider). Statut Fait / À faire
+      (`segment`), date du vaccin ou date prévue (`entry_date`), `name`,
+      `boosterDate` (prochain rappel), `doctor`, `lot`. Un rappel s'éteint
+      dès qu'un vaccin du même nom est noté « Fait » après lui. Rappels
+      locaux 7 jours avant et le jour J à 9h, pour les deux parents
+      (`profiles.notify_vaccines`, Réglages). Icône provisoire
+      (`Icon_sante.png`) en attendant une `Icon_vaccin.png` 3D.
 - [x] Courbe de croissance : lecture des mesures de `baby_entries`
       (module `croissance`), sans calcul serveur.
 - [x] Ajouter `has_premium(household_id)` aux 4 policies de
