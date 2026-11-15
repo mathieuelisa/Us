@@ -1,4 +1,4 @@
-import { router } from 'expo-router';
+import { Redirect, router } from 'expo-router';
 import { Button } from 'heroui-native';
 import { useState } from 'react';
 import { Image, Pressable, Text, View } from 'react-native';
@@ -6,6 +6,7 @@ import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import { withUniwind } from 'uniwind';
 import { SlideInText } from '@/components/onboarding/slide-in-text';
 import { CARD_SHADOW } from '@/features/hub/constants';
+import { useMyProfile } from '@/features/profile/hooks';
 import { useThemeBackground } from '@/features/settings/hooks';
 
 const SafeAreaView = withUniwind(RNSafeAreaView);
@@ -58,6 +59,7 @@ const SLIDES = [
 export default function WelcomeCarousel() {
   const [index, setIndex] = useState(0);
   const backgroundColor = useThemeBackground();
+  const { data: profile, isPending: isProfilePending } = useMyProfile();
 
   const slide = SLIDES[index];
   const isLast = index === SLIDES.length - 1;
@@ -75,6 +77,16 @@ export default function WelcomeCarousel() {
   const goPrevious = () => {
     setIndex((current) => Math.max(current - 1, 0));
   };
+
+  // Inscrit comme partenaire (`profiles.is_partner`, choix de
+  // l'inscription, demande explicite) : pas d'onboarding, il ou elle
+  // rejoint l'espace de l'autre avec un code. Rien à l'écran tant que le
+  // profil n'est pas connu, pour ne pas montrer l'onboarding une fraction
+  // de seconde avant de rediriger.
+  if (isProfilePending) return null;
+  if (profile?.is_partner) {
+    return <Redirect href="/rejoindre" />;
+  }
 
   return (
     <SafeAreaView className="flex-1" style={{ backgroundColor }}>
@@ -144,6 +156,22 @@ export default function WelcomeCarousel() {
           <Button onPress={goNext} className="w-52 self-center">
             <Button.Label>{isLast ? 'Commencer' : 'Suivant'}</Button.Label>
           </Button>
+
+          {/* Pour qui n'a pas pu choisir son rôle à l'inscription (compte
+              Google) : rejoindre l'espace de l'autre parent avec un code. */}
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => router.push('/rejoindre')}
+            hitSlop={8}
+            className="self-center"
+          >
+            <Text className="text-[13.5px] text-[#6b6b6b]">
+              Vous êtes partenaire ?{' '}
+              <Text className="font-semibold text-accent">
+                Rejoindre un espace
+              </Text>
+            </Text>
+          </Pressable>
         </View>
       </View>
     </SafeAreaView>

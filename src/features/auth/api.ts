@@ -31,14 +31,27 @@ export async function signInWithPassword(email: string, password: string) {
  * exige une confirmation par email (réglage « Confirm email » du projet) :
  * aucune session n'est alors ouverte avant le clic sur le lien.
  */
+/**
+ * Rôle annoncé à l'inscription (demande explicite) : la personne qui attend
+ * le bébé crée son espace (onboarding) ; le ou la partenaire rejoint celui
+ * de l'autre avec un code. Envoyé dans les métadonnées de l'inscription,
+ * d'où `handle_new_user` remplit `profiles.is_partner` — c'est ce champ du
+ * profil que l'app lit ensuite (`useMyProfile`).
+ */
+export type SignupRole = 'pregnant' | 'partner';
+
 export async function signUpWithPassword(
   email: string,
   password: string,
+  role: SignupRole = 'pregnant',
 ): Promise<{ needsEmailConfirmation: boolean }> {
   const { data, error } = await supabase.auth.signUp({
     email: email.trim().toLowerCase(),
     password,
-    options: { emailRedirectTo: getAuthRedirectTo() },
+    options: {
+      emailRedirectTo: getAuthRedirectTo(),
+      data: { signup_role: role },
+    },
   });
   if (error) throw error;
   return { needsEmailConfirmation: data.session === null };

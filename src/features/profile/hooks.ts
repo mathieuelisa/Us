@@ -5,7 +5,9 @@ import { sessionAtom } from '@/lib/atoms/session';
 import { queryKeys } from '@/lib/query/keys';
 import {
   fetchMyProfile,
+  type Profile,
   updateMyAvatar,
+  updateMyIsPartner,
   updateMyProfile,
   updateMyTheme,
 } from './api';
@@ -72,6 +74,29 @@ export function useUpdateMyAvatar() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.profile.all });
+    },
+  });
+}
+
+/** « Je crée mon espace » depuis l'écran Rejoindre : n'est plus partenaire. */
+export function useUpdateMyIsPartner() {
+  const session = useAtomValue(sessionAtom);
+  const userId = session?.user.id;
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (isPartner: boolean) => {
+      if (!userId) throw new Error('No authenticated user');
+      return updateMyIsPartner(userId, isPartner);
+    },
+    // Cache mis à jour tout de suite : l'écran suivant lit `is_partner` pour
+    // aiguiller, il ne doit pas voir l'ancienne valeur le temps du
+    // rechargement.
+    onSuccess: (_data, isPartner) => {
+      queryClient.setQueryData<Profile>(queryKeys.profile.mine, (current) =>
+        current ? { ...current, is_partner: isPartner } : current,
+      );
+      return queryClient.invalidateQueries({ queryKey: queryKeys.profile.all });
     },
   });
 }

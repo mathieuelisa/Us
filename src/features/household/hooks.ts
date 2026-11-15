@@ -7,12 +7,14 @@ import { currentRoleAtom } from '@/lib/atoms/role';
 import { sessionAtom } from '@/lib/atoms/session';
 import { queryKeys } from '@/lib/query/keys';
 import {
+  createHouseholdJoinCode,
   createInfoItems,
   deleteInfoItem,
   fetchInfoItems,
   fetchMyHousehold,
   type Household,
   type HouseholdInfoItem,
+  joinHouseholdByCode,
   updateInfoItem,
 } from './api';
 
@@ -136,4 +138,27 @@ export function useDeleteInfoItem(householdId: string | undefined) {
       }
     },
   });
+}
+
+/**
+ * Rejoindre un espace avec son code (choix « partenaire » à l'inscription).
+ * Une fois rattaché, le foyer se recharge : `AuthGate` quitte alors
+ * l'onboarding pour l'app, en rôle partenaire.
+ */
+export function useJoinHouseholdByCode() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (code: string) => joinHouseholdByCode(code),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: queryKeys.household.mine }),
+  });
+}
+
+/**
+ * Code temporaire d'invitation, demandé à l'ouverture de « Ajouter votre
+ * partenaire » et redemandé à son expiration.
+ */
+export function useCreateHouseholdJoinCode() {
+  return useMutation({ mutationFn: createHouseholdJoinCode });
 }

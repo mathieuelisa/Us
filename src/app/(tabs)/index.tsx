@@ -8,6 +8,7 @@ import { withUniwind } from 'uniwind';
 
 import { HealthTodayCard } from '@/components/hub/health-today-card';
 import { HowItWorksModal } from '@/components/hub/how-it-works-modal';
+import { InvitePartnerModal } from '@/components/hub/invite-partner-modal';
 import { PillarCard } from '@/components/hub/pillar-card';
 import { PremiumTeaserCard } from '@/components/hub/premium-teaser-card';
 import { ShareInviteCard } from '@/components/hub/share-invite-card';
@@ -104,6 +105,7 @@ export default function HubScreen() {
   const hasPartnerJoined = Boolean(household?.partner_user_id);
   const partnerMood = hasPartnerJoined ? (summary?.partnerMood ?? null) : null;
   const [isHowItWorksOpen, setIsHowItWorksOpen] = useState(false);
+  const [isInviteOpen, setIsInviteOpen] = useState(false);
 
   // Tant que le résumé n'est pas chargé, on affiche le libellé neutre de la
   // section plutôt qu'un indicateur de chargement : il s'afficherait dans
@@ -213,7 +215,9 @@ export default function HubScreen() {
             l'invitation tant que le co-parent n'a pas rejoint. */}
         {hasPartnerJoined ? null : (
           <ShareInviteCard
-            onAddPartner={() => router.push('/partenaire')}
+            // Code d'espace + QR code pour l'autre parent (demande
+            // explicite), au lieu de la page « Mon partenaire ».
+            onAddPartner={() => setIsInviteOpen(true)}
             onHowItWorks={() => setIsHowItWorksOpen(true)}
           />
         )}
@@ -458,6 +462,12 @@ export default function HubScreen() {
         </View>
       </ScrollView>
 
+      <InvitePartnerModal
+        visible={isInviteOpen}
+        accent={accent}
+        partnerName={partnerName || null}
+        onClose={() => setIsInviteOpen(false)}
+      />
       <HowItWorksModal
         visible={isHowItWorksOpen}
         onClose={() => setIsHowItWorksOpen(false)}

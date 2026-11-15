@@ -606,6 +606,8 @@ export type Database = {
           due_date: string | null;
           id: string;
           is_first_child: boolean | null;
+          join_code: string;
+          join_code_expires_at: string | null;
           partner_first_name: string | null;
           partner_user_id: string | null;
           partner_uses_app: boolean;
@@ -622,6 +624,8 @@ export type Database = {
           due_date?: string | null;
           id?: string;
           is_first_child?: boolean | null;
+          join_code?: string;
+          join_code_expires_at?: string | null;
           partner_first_name?: string | null;
           partner_user_id?: string | null;
           partner_uses_app?: boolean;
@@ -638,6 +642,8 @@ export type Database = {
           due_date?: string | null;
           id?: string;
           is_first_child?: boolean | null;
+          join_code?: string;
+          join_code_expires_at?: string | null;
           partner_first_name?: string | null;
           partner_user_id?: string | null;
           partner_uses_app?: boolean;
@@ -838,6 +844,7 @@ export type Database = {
           created_at: string;
           first_name: string | null;
           id: string;
+          is_partner: boolean;
           theme: string;
         };
         Insert: {
@@ -845,6 +852,7 @@ export type Database = {
           created_at?: string;
           first_name?: string | null;
           id: string;
+          is_partner?: boolean;
           theme?: string;
         };
         Update: {
@@ -852,6 +860,7 @@ export type Database = {
           created_at?: string;
           first_name?: string | null;
           id?: string;
+          is_partner?: boolean;
           theme?: string;
         };
         Relationships: [];
@@ -906,6 +915,13 @@ export type Database = {
       accept_household_invite: { Args: never; Returns: string };
       household_role: { Args: { hh_id: string }; Returns: string };
       is_household_member: { Args: { hh_id: string }; Returns: boolean };
+      join_household_by_code: { Args: { p_code: string }; Returns: string };
+      create_household_join_code: {
+        Args: never;
+        Returns: { code: string; expires_at: string }[];
+      };
+      mark_household_partner_profile: { Args: never; Returns: unknown };
+      generate_household_join_code: { Args: never; Returns: string };
     };
     Enums: {
       [_ in never]: never;

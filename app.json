@@ -39,6 +39,14 @@
         {
           "hidden": true
         }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "US utilise l’appareil photo pour scanner le QR code d’invitation de votre partenaire.",
+          "microphonePermission": false,
+          "recordAudioAndroid": false
+        }
       ]
     ],
     "experiments": {

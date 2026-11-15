@@ -59,3 +59,20 @@ export async function updateMyAvatar(
 
   if (error) throw error;
 }
+
+/**
+ * Inscrit comme partenaire ou non (`profiles.is_partner`) : sert seulement à
+ * l'aiguillage onboarding / « Rejoindre l'espace », jamais à une
+ * autorisation. RLS : `profiles_update_own`.
+ */
+export async function updateMyIsPartner(
+  userId: string,
+  isPartner: boolean,
+): Promise<void> {
+  const { error } = await supabase
+    .from('profiles')
+    .update({ is_partner: isPartner })
+    .eq('id', userId);
+
+  if (error) throw error;
+}
