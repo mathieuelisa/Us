@@ -6,8 +6,10 @@ import { queryKeys } from '@/lib/query/keys';
 import {
   fetchMyProfile,
   type Profile,
+  type ProfilePronoun,
   updateMyAvatar,
   updateMyIsPartner,
+  updateMyPartnerIntro,
   updateMyProfile,
   updateMyTheme,
 } from './api';
@@ -95,6 +97,33 @@ export function useUpdateMyIsPartner() {
     onSuccess: (_data, isPartner) => {
       queryClient.setQueryData<Profile>(queryKeys.profile.mine, (current) =>
         current ? { ...current, is_partner: isPartner } : current,
+      );
+      return queryClient.invalidateQueries({ queryKey: queryKeys.profile.all });
+    },
+  });
+}
+
+/** Prénom et pronom du partenaire, avant de rejoindre l'espace. */
+export function useSavePartnerIntro() {
+  const session = useAtomValue(sessionAtom);
+  const userId = session?.user.id;
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (intro: { firstName: string; pronoun: ProfilePronoun }) => {
+      if (!userId) throw new Error('No authenticated user');
+      return updateMyPartnerIntro(userId, intro);
+    },
+    onSuccess: (_data, intro) => {
+      queryClient.setQueryData<Profile>(queryKeys.profile.mine, (current) =>
+        current
+          ? {
+              ...current,
+              first_name: intro.firstName,
+              pronoun: intro.pronoun,
+              is_partner: true,
+            }
+          : current,
       );
       return queryClient.invalidateQueries({ queryKey: queryKeys.profile.all });
     },

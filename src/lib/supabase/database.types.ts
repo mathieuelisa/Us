@@ -845,6 +845,7 @@ export type Database = {
           first_name: string | null;
           id: string;
           is_partner: boolean;
+          pronoun: string | null;
           theme: string;
         };
         Insert: {
@@ -853,6 +854,7 @@ export type Database = {
           first_name?: string | null;
           id: string;
           is_partner?: boolean;
+          pronoun?: string | null;
           theme?: string;
         };
         Update: {
@@ -861,6 +863,7 @@ export type Database = {
           first_name?: string | null;
           id?: string;
           is_partner?: boolean;
+          pronoun?: string | null;
           theme?: string;
         };
         Relationships: [];

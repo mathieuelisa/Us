@@ -76,3 +76,27 @@ export async function updateMyIsPartner(
 
   if (error) throw error;
 }
+
+/** Comment parler de la personne : accorde les textes de l'app. */
+export type ProfilePronoun = 'il' | 'elle' | 'neutre';
+
+/**
+ * « Faisons connaissance » du parcours partenaire : prénom et façon d'en
+ * parler, et `is_partner` confirmé (un compte Google arrive ici sans avoir
+ * choisi son rôle à l'inscription). RLS : `profiles_update_own`.
+ */
+export async function updateMyPartnerIntro(
+  userId: string,
+  intro: { firstName: string; pronoun: ProfilePronoun },
+): Promise<void> {
+  const { error } = await supabase
+    .from('profiles')
+    .update({
+      first_name: intro.firstName,
+      pronoun: intro.pronoun,
+      is_partner: true,
+    })
+    .eq('id', userId);
+
+  if (error) throw error;
+}

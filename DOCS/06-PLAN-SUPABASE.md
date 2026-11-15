@@ -29,7 +29,7 @@ title: Plan d'action Supabase — US
 | D7 | Que contient le compte dans Réglages ? | Email et moyen de connexion, **changement de mot de passe**, **suppression du compte**. |
 | D8 | Qui modifie une entrée de suivi bébé ? | **Les deux parents**, y compris celles saisies par l'autre (journal partagé). *(2026-11-12)* |
 | D9 | Match des prénoms : où et comment ? | **Supabase, par parent.** Swipe à droite = prénom gardé, qui alimente « Vos matchs » (gardé par les deux) ; **favoris personnels**, invisibles du partenaire. Catalogue de prénoms dans l'app. *(2026-11-12)* |
-| D10 | Comment le ou la partenaire rejoint-il l'espace ? | **Par un code temporaire (6 caractères, 30 min, usage unique) ou son QR code**, créé depuis l'accueil (« Ajouter votre partenaire », `create_household_join_code`). À l'inscription, le choix « Je suis partenaire » mène à « Rejoindre l'espace » au lieu de l'onboarding. RPC `join_household_by_code` (`security definer`). L'invitation par email de l'onboarding est retirée. Le choix est gardé dans `profiles.is_partner` (rempli à l'inscription par `handle_new_user`, passé à vrai dès qu'un compte devient partenaire d'un foyer) — aiguillage seulement, jamais une autorisation. *(2026-11-15)* |
+| D10 | Comment le ou la partenaire rejoint-il l'espace ? | **Par un code temporaire (6 caractères, 30 min, usage unique) ou son QR code**, créé depuis l'accueil (« Ajouter votre partenaire », `create_household_join_code`). À l'inscription, le choix « Je suis partenaire » mène à « Rejoindre l'espace » au lieu de l'onboarding. RPC `join_household_by_code` (`security definer`). L'invitation par email de l'onboarding est retirée. Le choix est gardé dans `profiles.is_partner` (rempli à l'inscription par `handle_new_user`, passé à vrai dès qu'un compte devient partenaire d'un foyer) — aiguillage seulement, jamais une autorisation. Parcours du partenaire : présentation de l'app, « Faisons connaissance » (prénom et `profiles.pronoun` : il / elle / neutre, pour accorder les textes), puis le code. *(2026-11-15)* |
 
 ## Principes
 
@@ -101,7 +101,7 @@ configurer le SMTP. Détail dans l'[architecture](./04-ARCHITECTURE.md#connexion
 | Élément | État |
 |---|---|
 | Projet | `hsclyntlnoyevstdhgvu`, Paris. Ancien projet de Londres encore présent (dette n°4) |
-| Migrations | 40, **identiques** entre le dépôt et le cloud (dernière : `20261115144856`, code d'espace temporaire) |
+| Migrations | 41, **identiques** entre le dépôt et le cloud (dernière : `20261115162834`, `profiles.pronoun`) |
 | Tables | 22, toutes avec RLS |
 | Données réelles | 2 comptes, **1 foyer sans co-parent rattaché** : le parcours à deux n'a jamais été joué pour de vrai (dette n°5) |
 | Auth | Email + mot de passe actif ; Google désactivé (dette n°56) ; confirmation d'email désactivée pour les tests (dette n°60) ; SMTP mutualisé de Supabase |

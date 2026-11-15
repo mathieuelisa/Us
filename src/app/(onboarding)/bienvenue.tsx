@@ -1,4 +1,4 @@
-import { Redirect, router } from 'expo-router';
+import { router } from 'expo-router';
 import { Button } from 'heroui-native';
 import { useState } from 'react';
 import { Image, Pressable, Text, View } from 'react-native';
@@ -64,7 +64,12 @@ export default function WelcomeCarousel() {
   const slide = SLIDES[index];
   const isLast = index === SLIDES.length - 1;
 
-  const goToOnboarding = () => router.push('/');
+  // Après la présentation (vue par les deux parents, demande explicite) :
+  // le ou la partenaire (`profiles.is_partner`) passe à « Faisons
+  // connaissance » puis au code d'espace, la personne enceinte à son
+  // onboarding.
+  const goToOnboarding = () =>
+    router.push(profile?.is_partner ? '/faire-connaissance' : '/');
 
   const goNext = () => {
     if (isLast) {
@@ -78,15 +83,9 @@ export default function WelcomeCarousel() {
     setIndex((current) => Math.max(current - 1, 0));
   };
 
-  // Inscrit comme partenaire (`profiles.is_partner`, choix de
-  // l'inscription, demande explicite) : pas d'onboarding, il ou elle
-  // rejoint l'espace de l'autre avec un code. Rien à l'écran tant que le
-  // profil n'est pas connu, pour ne pas montrer l'onboarding une fraction
-  // de seconde avant de rediriger.
+  // Rien à l'écran tant que le profil n'est pas connu : la fin de la
+  // présentation en dépend.
   if (isProfilePending) return null;
-  if (profile?.is_partner) {
-    return <Redirect href="/rejoindre" />;
-  }
 
   return (
     <SafeAreaView className="flex-1" style={{ backgroundColor }}>
@@ -156,22 +155,6 @@ export default function WelcomeCarousel() {
           <Button onPress={goNext} className="w-52 self-center">
             <Button.Label>{isLast ? 'Commencer' : 'Suivant'}</Button.Label>
           </Button>
-
-          {/* Pour qui n'a pas pu choisir son rôle à l'inscription (compte
-              Google) : rejoindre l'espace de l'autre parent avec un code. */}
-          <Pressable
-            accessibilityRole="button"
-            onPress={() => router.push('/rejoindre')}
-            hitSlop={8}
-            className="self-center"
-          >
-            <Text className="text-[13.5px] text-[#6b6b6b]">
-              Vous êtes partenaire ?{' '}
-              <Text className="font-semibold text-accent">
-                Rejoindre un espace
-              </Text>
-            </Text>
-          </Pressable>
         </View>
       </View>
     </SafeAreaView>

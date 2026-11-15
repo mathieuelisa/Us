@@ -60,7 +60,8 @@ export default function JoinHouseholdScreen() {
   // passe à l'onboarding pour créer son espace.
   const createOwnSpace = () =>
     updateIsPartner.mutate(false, {
-      onSuccess: () => router.replace('/bienvenue'),
+      // La présentation a déjà été vue : droit à l'onboarding.
+      onSuccess: () => router.replace('/'),
       onError: () =>
         setErrorMessage('Impossible de changer de parcours. Réessayez.'),
     });
