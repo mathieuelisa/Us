@@ -7,6 +7,11 @@
 
 export const ONBOARDING_STEP_COUNT = 6;
 
+/**
+ * `autre` n'est plus proposé à l'onboarding (demande explicite), mais reste
+ * dans le type : des espaces déjà créés peuvent l'avoir, et la contrainte
+ * `households.accompaniment_type` l'accepte toujours.
+ */
 export type AccompanimentType = 'couple' | 'coparentalite' | 'seul' | 'autre';
 
 export const ACCOMPANIMENT_OPTIONS: {
@@ -16,7 +21,6 @@ export const ACCOMPANIMENT_OPTIONS: {
   { value: 'couple', label: 'En couple' },
   { value: 'coparentalite', label: 'Coparentalité sans vivre ensemble' },
   { value: 'seul', label: 'Seul·e' },
-  { value: 'autre', label: 'Autre' },
 ];
 
 export const PROFESSIONAL_STATUS_OPTIONS: {
@@ -65,9 +69,9 @@ export const REMINDER_OPTIONS: {
  *  - sinon, c'est la réponse à « Le co-parent utilisera-t-il aussi l'app ? »
  *    qui décide.
  *
- * « Autre » est donc traité comme les modes avec co-parent : on ne sait pas
- * ce qu'il recouvre, et c'est l'utilisateur qui tranche en répondant Oui/Non
- * — plutôt que de décider à sa place qu'il n'a personne.
+ * « Autre » (plus proposé, mais présent sur d'anciens espaces) est donc
+ * traité comme les modes avec co-parent : c'est la réponse Oui/Non qui
+ * tranche.
  *
  * Déduit de CONCEPT.md, non spécifié explicitement par les maquettes.
  */
