@@ -1,8 +1,16 @@
 import { Ionicons } from '@expo/vector-icons';
+import { useQueryClient } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { useAtomValue } from 'jotai';
 import { useState } from 'react';
-import { Image, Pressable, ScrollView, Text, View } from 'react-native';
+import {
+  Image,
+  Pressable,
+  RefreshControl,
+  ScrollView,
+  Text,
+  View,
+} from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import { withUniwind } from 'uniwind';
 
@@ -107,6 +115,20 @@ export default function HubScreen() {
   const [isHowItWorksOpen, setIsHowItWorksOpen] = useState(false);
   const [isInviteOpen, setIsInviteOpen] = useState(false);
 
+  // Tirer vers le bas en haut de l'accueil recharge les données (demande
+  // explicite : il fallait quitter et relancer l'app). Toutes les requêtes
+  // affichées sont relancées — foyer, résumé, humeur, symptômes, rendez-vous.
+  const queryClient = useQueryClient();
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const refresh = async () => {
+    setIsRefreshing(true);
+    try {
+      await queryClient.refetchQueries({ type: 'active' });
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
   // Tant que le résumé n'est pas chargé, on affiche le libellé neutre de la
   // section plutôt qu'un indicateur de chargement : il s'afficherait dans
   // tous les cas, et resterait figé si la requête ne peut pas aboutir.
@@ -153,6 +175,14 @@ export default function HubScreen() {
         contentContainerClassName="gap-6 px-6 pt-4"
         contentContainerStyle={{ paddingBottom: tabBarInset }}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefreshing}
+            onRefresh={refresh}
+            tintColor={accent}
+            colors={[accent]}
+          />
+        }
       >
         <View className="flex-row items-center justify-between gap-3">
           <Text className="flex-1 text-[26px] font-bold text-[#1a1a1a]">
@@ -211,7 +241,7 @@ export default function HubScreen() {
         </View>
 
         {/* L'humeur et les besoins du jour de l'autre parent vivent dans la
-            carte « Mon partenaire » plus bas (demande explicite) ; ici, seule
+            carte « Mon partenaire » juste au-dessus des sections (demande explicite) ; ici, seule
             l'invitation tant que le co-parent n'a pas rejoint. */}
         {hasPartnerJoined ? null : (
           <ShareInviteCard
@@ -231,81 +261,9 @@ export default function HubScreen() {
           pregnantMood={summary?.pregnantMood ?? null}
         />
 
-        <View className="gap-2">
-          <Text className="text-[11.5px] font-semibold tracking-wide text-[#8a8a8a]">
-            VOS SECTIONS
-          </Text>
-          <View className="gap-3">
-            <PillarCard
-              id="demarches"
-              emoji="📋"
-              image={DEMARCHES_ICON}
-              imageFillsTile
-              title="Démarches"
-              state={proceduresState}
-              waveColor={WAVE_PEACH}
-              onPress={() => router.push('/demarches')}
-            />
-            <PillarCard
-              id="ensemble"
-              emoji="💬"
-              image={ENSEMBLE_ICON}
-              imageFillsTile
-              title="Ensemble"
-              state={togetherState}
-              waveColor={WAVE_PINK}
-              onPress={() => router.push('/ensemble')}
-            />
-            <PillarCard
-              id="sante"
-              emoji="🩺"
-              image={SANTE_ICON}
-              imageFillsTile
-              title="Suivi santé"
-              state={healthState}
-              isStateUrgent={isAppointmentSoon}
-              waveColor={WAVE_MINT}
-              onPress={() => router.push('/sante')}
-            />
-          </View>
-
-          {/* Hors du bloc des 3 piliers (CONCEPT.md : poids visuel égal
-              réservé à Démarches/Ensemble/Suivi santé) — nouvelle section,
-              pas un 4e pilier, demande explicite placée juste en dessous. */}
-          <View className="mt-1">
-            <PillarCard
-              id="organisation"
-              emoji="🧳"
-              image={ORGANISATION_ICON}
-              imageFillsTile
-              title="Organisation & Préparation"
-              state={organisationState}
-              waveColor={WAVE_LILAC}
-              onPress={() => router.push('/organisation')}
-            />
-          </View>
-
-          {/* Traitement visuel distinct : « Votre bébé » n'est pas un 4e
-              pilier, c'est le module premium, verrouillé hors MVP — même
-              carte teaser sobre que « Le match des prénoms »
-              (PremiumTeaserCard), pour un langage visuel cohérent. */}
-          <View className="mt-1">
-            <PremiumTeaserCard
-              icon={
-                <Image
-                  source={require('@/assets/images/Baby_head.png')}
-                  className="h-7 w-6"
-                  resizeMode="contain"
-                />
-              }
-              title="Votre bébé"
-              subtitle="Courbe de croissance"
-              onPress={() => router.push('/bebe')}
-            />
-          </View>
-        </View>
-
-        {/* Toujours affiché, même avant l'arrivée du co-parent : la
+        {/* Juste au-dessus de « Vos sections » (demande explicite) : chacun
+            voit d'emblée l'état et le ressenti de l'autre.
+            Toujours affiché, même avant l'arrivée du co-parent : la
             maquette 2b ne montrait ce bloc qu'une fois l'espace partagé,
             mais depuis la Phase 1.5 cet écran porte aussi la taille du bébé
             et les astuces du jour — le masquer les rendrait inatteignables.
@@ -385,6 +343,80 @@ export default function HubScreen() {
               ) : null}
             </View>
           </Pressable>
+        </View>
+
+        <View className="gap-2">
+          <Text className="text-[11.5px] font-semibold tracking-wide text-[#8a8a8a]">
+            VOS SECTIONS
+          </Text>
+          <View className="gap-3">
+            <PillarCard
+              id="demarches"
+              emoji="📋"
+              image={DEMARCHES_ICON}
+              imageFillsTile
+              title="Démarches"
+              state={proceduresState}
+              waveColor={WAVE_PEACH}
+              onPress={() => router.push('/demarches')}
+            />
+            <PillarCard
+              id="ensemble"
+              emoji="💬"
+              image={ENSEMBLE_ICON}
+              imageFillsTile
+              title="Ensemble"
+              state={togetherState}
+              waveColor={WAVE_PINK}
+              onPress={() => router.push('/ensemble')}
+            />
+            <PillarCard
+              id="sante"
+              emoji="🩺"
+              image={SANTE_ICON}
+              imageFillsTile
+              title="Suivi santé"
+              state={healthState}
+              isStateUrgent={isAppointmentSoon}
+              waveColor={WAVE_MINT}
+              onPress={() => router.push('/sante')}
+            />
+          </View>
+
+          {/* Hors du bloc des 3 piliers (CONCEPT.md : poids visuel égal
+              réservé à Démarches/Ensemble/Suivi santé) — nouvelle section,
+              pas un 4e pilier, demande explicite placée juste en dessous. */}
+          <View className="mt-1">
+            <PillarCard
+              id="organisation"
+              emoji="🧳"
+              image={ORGANISATION_ICON}
+              imageFillsTile
+              title="Organisation & Préparation"
+              state={organisationState}
+              waveColor={WAVE_LILAC}
+              onPress={() => router.push('/organisation')}
+            />
+          </View>
+
+          {/* Traitement visuel distinct : « Votre bébé » n'est pas un 4e
+              pilier, c'est le module premium, verrouillé hors MVP — même
+              carte teaser sobre que « Le match des prénoms »
+              (PremiumTeaserCard), pour un langage visuel cohérent. */}
+          <View className="mt-1">
+            <PremiumTeaserCard
+              icon={
+                <Image
+                  source={require('@/assets/images/Baby_head.png')}
+                  className="h-7 w-6"
+                  resizeMode="contain"
+                />
+              }
+              title="Votre bébé"
+              subtitle="Courbe de croissance"
+              onPress={() => router.push('/bebe')}
+            />
+          </View>
         </View>
 
         <View className="gap-2">

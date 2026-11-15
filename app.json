@@ -18,7 +18,8 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.anonymous.us"
+      "package": "com.anonymous.us",
+      "permissions": ["android.permission.CAMERA"]
     },
     "web": {
       "output": "single",
@@ -52,6 +53,16 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "expo-navigation-bar": {
+        "hidden": true
+      },
+      "eas": {
+        "projectId": "1b538900-10ad-4476-a4e3-e87433228c5a"
+      }
+    },
+    "owner": "mills971"
   }
 }
