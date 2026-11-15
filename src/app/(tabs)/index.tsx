@@ -38,6 +38,7 @@ import {
   formatAppointmentDayMonth,
   formatAppointmentTime,
   MOOD_PRESENTATION,
+  PARTNER_MOOD_PHRASES,
 } from '@/features/hub/constants';
 import { useHubSummary } from '@/features/hub/hooks';
 import { useMyProfile } from '@/features/profile/hooks';
@@ -322,8 +323,8 @@ export default function HubScreen() {
                     {!hasPartnerJoined
                       ? 'Taille du bébé et astuces du jour'
                       : partnerMood
-                        ? `${MOOD_PRESENTATION[partnerMood.mood].label} aujourd’hui`
-                        : 'Pas encore de nouvelles aujourd’hui'}
+                        ? `${partnerName || 'Votre partenaire'} ${PARTNER_MOOD_PHRASES[partnerMood.mood]}`
+                        : `${partnerName || 'Votre partenaire'} n’a pas encore donné de nouvelles aujourd’hui`}
                   </Text>
                 </View>
                 <Text className="text-[20px] text-white/60">›</Text>
@@ -332,7 +333,7 @@ export default function HubScreen() {
               {hasPartnerJoined && partnerMood?.needNote ? (
                 <View className="gap-1.5">
                   <Text className="text-[11px] font-bold tracking-wide text-white/75">
-                    SES BESOINS DU JOUR
+                    POUR L’AIDER AUJOURD’HUI
                   </Text>
                   <NeedChips
                     note={partnerMood.needNote}

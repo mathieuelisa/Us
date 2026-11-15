@@ -2,6 +2,21 @@ import type { ImageSourcePropType } from 'react-native';
 import type { MoodValue } from './api';
 
 /**
+ * Humeur de l'autre parent en phrase (carte « Mon partenaire » de
+ * l'accueil, demande explicite d'un texte plus humain et « tourné vers
+ * l'action ») : complète le prénom, sans accord de genre — les libellés de
+ * `MOOD_PRESENTATION` sont au féminin, faux quand c'est le co-parent qui
+ * les note.
+ */
+export const PARTNER_MOOD_PHRASES: Record<MoodValue, string> = {
+  great: 'est en pleine forme',
+  good: 'va bien',
+  neutral: 'va à peu près',
+  bad: 'a besoin d’un peu de douceur',
+  terrible: 'a besoin de vous aujourd’hui',
+};
+
+/**
  * Rendu **qualitatif** de l'humeur : un emoji et une phrase, jamais un
  * score ni un historique jour par jour (CONCEPT.md — la tendance se lit,
  * elle ne se mesure pas). C'est aussi ce qui corrige le graphique à barres

@@ -88,9 +88,28 @@ export function HealthTodayCard({
   const realSymptoms = withoutNoSymptom(symptoms);
   const hasDeclaredNoSymptom = symptoms.includes(NO_SYMPTOM);
 
+  // Côté partenaire, une formulation plus humaine (demande explicite) :
+  // « La journée de Vina », puis ce qu'elle a partagé.
+  const otherName = partnerName ?? 'votre partenaire';
   const title = isPregnant
     ? 'Votre forme aujourd’hui'
-    : `${partnerName ?? 'Votre partenaire'} aujourd’hui`;
+    : `La journée de ${otherName}`;
+  const count = realSymptoms.length;
+  const subtitle = isPregnant
+    ? hasDeclaredNoSymptom
+      ? 'Pas de symptôme aujourd’hui'
+      : count === 0
+        ? 'Aucun symptôme noté aujourd’hui'
+        : `${count} symptôme${count > 1 ? 's' : ''} noté${
+            count > 1 ? 's' : ''
+          } aujourd’hui`
+    : hasDeclaredNoSymptom
+      ? 'Une journée sans symptôme 🌿'
+      : count === 0
+        ? `${otherName.charAt(0).toUpperCase()}${otherName.slice(1)} n’a encore rien partagé aujourd’hui`
+        : `${count} petit${count > 1 ? 's' : ''} ma${
+            count > 1 ? 'ux' : 'l'
+          } à surveiller aujourd’hui`;
 
   return (
     <View
@@ -152,13 +171,7 @@ export function HealthTodayCard({
             {title}
           </Text>
           <Text className="text-[12.5px]" style={{ color: GLASS_BODY_COLOR }}>
-            {hasDeclaredNoSymptom
-              ? 'Pas de symptôme aujourd’hui'
-              : realSymptoms.length === 0
-                ? 'Aucun symptôme noté aujourd’hui'
-                : `${realSymptoms.length} symptôme${
-                    realSymptoms.length > 1 ? 's' : ''
-                  } noté${realSymptoms.length > 1 ? 's' : ''} aujourd’hui`}
+            {subtitle}
           </Text>
         </View>
         {isPregnant ? (
@@ -214,10 +227,10 @@ export function HealthTodayCard({
             {hasDeclaredNoSymptom
               ? isPregnant
                 ? 'Journée sans symptôme, notée dans votre Journal. 🌿'
-                : 'Pas de symptôme signalé aujourd’hui. 🌿'
+                : 'Rien à surveiller pour l’instant.'
               : isPregnant
                 ? 'Une journée sans symptôme pour l’instant. Notez-les si quelque chose change.'
-                : 'Rien de signalé pour l’instant aujourd’hui.'}
+                : `Les symptômes de ${otherName} apparaîtront ici dès qu’ils seront notés.`}
           </Text>
         </View>
       )}
