@@ -12,6 +12,7 @@ import {
   DeleteAccountModal,
 } from '@/components/settings/account-modals';
 import { NotificationSettings } from '@/components/settings/notification-settings';
+import { ShareAppCard } from '@/components/settings/share-app-card';
 import {
   DashedLoopDoodle,
   GLASS_BODY_COLOR,
@@ -317,6 +318,18 @@ export default function SettingsScreen() {
             langue.
           </Text>
         </View>
+
+        <ShareAppCard
+          accent={accent}
+          cardStyle={[
+            tintedShadow(accent),
+            {
+              backgroundColor: 'rgba(255, 255, 255, 0.9)',
+              borderWidth: 1,
+              borderColor: 'rgba(255, 255, 255, 0.95)',
+            },
+          ]}
+        />
 
         <View className="gap-3.5">
           <SectionTitle
