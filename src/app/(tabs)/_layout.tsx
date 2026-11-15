@@ -1,6 +1,7 @@
 import { Tabs } from 'expo-router';
 
 import { AppTabBar } from '@/components/navigation/tab-bar';
+import { useHouseholdRealtime } from '@/features/household/realtime';
 
 const HUB_DESTINATIONS = [
   'demarches',
@@ -66,6 +67,10 @@ const FOOTER_DESTINATIONS = ['premium'] as const;
  * change.
  */
 export default function TabsLayout() {
+  // Mises à jour en direct des données de l'espace, tant que l'app est
+  // ouverte (voir `useHouseholdRealtime`).
+  useHouseholdRealtime();
+
   return (
     <Tabs
       tabBar={(props) => <AppTabBar {...props} />}

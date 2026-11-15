@@ -263,6 +263,25 @@ Phase 0/1.
   `queryClient.invalidateQueries` sans changer la forme des données consommées
   par les écrans.
 
+**Mise à jour du 2026-11-15** (demande explicite) : Realtime est activé.
+`useHouseholdRealtime` (`src/features/household/realtime.ts`, monté une fois
+dans le layout des onglets) ouvre un canal par espace et écoute les Postgres
+Changes des tables partagées (migration `realtime_household_tables`), filtrées
+sur `household_id`. Chaque événement invalide les clés TanStack Query du
+domaine (regroupées sur 300 ms) ; une reconnexion recharge tout. Les policies
+SELECT s'appliquent aux événements : un rendez-vous non partagé n'est pas
+diffusé à l'autre parent. Les profils des deux parents (prénom, photo,
+pronom) sont aussi suivis (migration `realtime_profiles`). Restent hors
+temps réel : `name_favorites` (personnels) et les référentiels fixes.
+
+Les suppressions ne passent pas par les Postgres Changes filtrés (sous RLS,
+l'ancienne ligne n'a que sa clé primaire). Un déclencheur `AFTER DELETE`
+(`broadcast_household_delete`, migration `realtime_household_deletes`)
+publie donc sur le canal privé `household:<id>` le seul nom de la table ;
+la policy `household_members_receive_broadcasts` de `realtime.messages`
+réserve ce canal aux membres de l'espace. App fermée, rien n'arrive : le rechargement au
+retour au premier plan et le tirer-pour-rafraîchir prennent le relais.
+
 ## Qualité
 
 - Biome pour lint + format (remplace ESLint/Prettier). Le hook Husky

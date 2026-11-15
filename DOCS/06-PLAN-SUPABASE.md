@@ -101,12 +101,13 @@ configurer le SMTP. Détail dans l'[architecture](./04-ARCHITECTURE.md#connexion
 | Élément | État |
 |---|---|
 | Projet | `hsclyntlnoyevstdhgvu`, Paris. Ancien projet de Londres encore présent (dette n°4) |
-| Migrations | 41, **identiques** entre le dépôt et le cloud (dernière : `20261115162834`, `profiles.pronoun`) |
+| Migrations | 45, **identiques** entre le dépôt et le cloud (dernière : `20261115172821`, `realtime_household_deletes_policy_guard`) |
 | Tables | 22, toutes avec RLS |
 | Données réelles | 2 comptes, **1 foyer sans co-parent rattaché** : le parcours à deux n'a jamais été joué pour de vrai (dette n°5) |
 | Auth | Email + mot de passe actif ; Google désactivé (dette n°56) ; confirmation d'email désactivée pour les tests (dette n°60) ; SMTP mutualisé de Supabase |
 | Edge Functions | `delete-account` |
-| Storage, Cron, Realtime | Rien |
+| Storage, Cron | Rien |
+| Realtime | Postgres Changes sur les 13 tables partagées d'un espace et sur `profiles` (les deux parents), plus un Broadcast privé `household:<id>` pour les suppressions (déclencheurs `broadcast_delete`) — `useHouseholdRealtime` |
 | Sécurité | Advisors : seuls les avertissements voulus (`accept_household_invite`, `is_household_member`, `household_role`) et la protection des mots de passe compromis (réglage du dashboard) |
 | Tests | Aucun test automatisé des règles d'accès |
 
@@ -459,10 +460,8 @@ appareil réel, et aucune n'est envoyée en double.
   mois de grossesse, texte). Depuis le 2026-11-12, cinq listes fournies
   par l'utilisateur vivent dans `features/partner/constants.ts`. → dette
   n°29
-- **Realtime** : abonnements ciblés (humeur du partenaire sur le hub,
-  statuts de démarches, cases des valises) qui invalident le cache TanStack
-  Query — seulement si l'actualisation à l'ouverture d'écran ne suffit pas
-  à l'usage (cf. [architecture](./04-ARCHITECTURE.md#stratégie-de-synchronisation-temps-réel-décision-phase-0)).
+- ~~**Realtime**~~ : fait le 2026-11-15 (demande explicite), sur toutes les
+  tables partagées d'un espace (cf. [architecture](./04-ARCHITECTURE.md#stratégie-de-synchronisation-temps-réel-décision-phase-0)).
 - **Export des données** (V2) : Edge Function qui assemble toutes les
   données du foyer de l'utilisateur.
 - **Photos** (profil, bébé) : bucket Storage **privé** par foyer, policies

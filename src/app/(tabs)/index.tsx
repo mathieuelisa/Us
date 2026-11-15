@@ -495,8 +495,10 @@ export default function HubScreen() {
         </View>
       </ScrollView>
 
+      {/* Se ferme d'elle-même quand le partenaire rejoint l'espace (reçu
+          en direct par `useHouseholdRealtime`) : le code n'a plus d'objet. */}
       <InvitePartnerModal
-        visible={isInviteOpen}
+        visible={isInviteOpen && !hasPartnerJoined}
         accent={accent}
         partnerName={partnerName || null}
         onClose={() => setIsInviteOpen(false)}
