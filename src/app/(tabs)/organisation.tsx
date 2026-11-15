@@ -318,7 +318,11 @@ export default function OrganisationScreen() {
                   />
                 }
                 title="Le match des prénoms"
-                subtitle="Trouvez le prénom parfait à deux"
+                subtitle={
+                  hideCoParent
+                    ? 'Trouvez le prénom parfait'
+                    : 'Trouvez le prénom parfait à deux'
+                }
                 onPress={() => router.push('/prenoms')}
                 illustration={<NameCardsIllustration />}
               />

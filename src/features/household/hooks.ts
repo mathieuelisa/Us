@@ -162,3 +162,14 @@ export function useJoinHouseholdByCode() {
 export function useCreateHouseholdJoinCode() {
   return useMutation({ mutationFn: createHouseholdJoinCode });
 }
+
+/**
+ * Espace « Seul·e » (choix de l'onboarding) : pas de co-parent. Les écrans
+ * retirent alors ce qui concerne l'autre parent — invitation, partage, geste
+ * du jour, « Vos matchs »… (demande explicite). `false` tant que le foyer
+ * n'est pas chargé : rien n'est retiré par erreur.
+ */
+export function useIsSoloHousehold(): boolean {
+  const { data: household } = useMyHousehold();
+  return household?.accompaniment_type === 'seul';
+}

@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/glass-card';
 import { ScreenCornerShapes } from '@/components/ui/screen-corner-shapes';
 import { signOut } from '@/features/auth/api';
+import { useIsSoloHousehold } from '@/features/household/hooks';
 import { useUpdateMyTheme } from '@/features/profile/hooks';
 import {
   resolveThemeId,
@@ -88,6 +89,8 @@ export default function SettingsScreen() {
   const { theme: activeTheme } = useUniwind();
   const updateTheme = useUpdateMyTheme();
   const backgroundColor = useThemeBackground();
+  // Espace « Seul·e » : pas de mention du partenaire (demande explicite).
+  const isSolo = useIsSoloHousehold();
   const accent = useThemeAccent();
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
@@ -154,7 +157,9 @@ export default function SettingsScreen() {
               className="text-[14px] leading-5"
               style={{ color: GLASS_BODY_COLOR }}
             >
-              Personnels — non partagés avec votre partenaire.
+              {isSolo
+                ? 'Personnels.'
+                : 'Personnels — non partagés avec votre partenaire.'}
             </Text>
             <Svg width={110} height={12} viewBox="0 0 110 12">
               <Path

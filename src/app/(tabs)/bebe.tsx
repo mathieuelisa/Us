@@ -18,6 +18,7 @@ import {
   WAVE_SKY,
 } from '@/components/ui/glass-card';
 import { BABY_MODULES, type BabyModuleSlug } from '@/features/baby/constants';
+import { useIsSoloHousehold } from '@/features/household/hooks';
 import {
   useThemeAccent,
   useThemeBabyWallpaper,
@@ -38,6 +39,9 @@ const BAIN_ICON = BABY_MODULES.bain.image;
 const ALLAITEMENT_ICON = BABY_MODULES.allaitement.image;
 const DESCRIPTION =
   'Centralisez la croissance, les repas et le sommeil de bébé, et gardez votre partenaire connecté à chaque étape.';
+/** Espace « Seul·e » (demande explicite) : sans le partenaire. */
+const SOLO_DESCRIPTION =
+  'Centralisez la croissance, les repas et le sommeil de bébé.';
 
 /**
  * Ouvre le détail d'un suivi. Les 4 routes vivent dans le groupe `(tabs)`
@@ -84,7 +88,13 @@ function Sparks({ color }: { color: string }) {
  * ourson posé sur une tache d'accent, et description dans une gélule teintée
  * — remplace le bloc centré par défaut de `PremiumLockedScreen`.
  */
-function BabyHeader({ accent }: { accent: string }) {
+function BabyHeader({
+  accent,
+  description,
+}: {
+  accent: string;
+  description: string;
+}) {
   return (
     <View className="gap-5">
       <View className="flex-row items-center">
@@ -144,7 +154,7 @@ function BabyHeader({ accent }: { accent: string }) {
           className="flex-1 text-[13.5px] leading-5"
           style={{ color: '#4a4858' }}
         >
-          {DESCRIPTION}
+          {description}
         </Text>
         <Ionicons
           name="heart-outline"
@@ -422,14 +432,15 @@ function BabyModulesGrid({ accent }: { accent: string }) {
 export default function BabyScreen() {
   const wallpaper = useThemeBabyWallpaper();
   const accent = useThemeAccent();
+  const description = useIsSoloHousehold() ? SOLO_DESCRIPTION : DESCRIPTION;
 
   return (
     <PremiumLockedScreen
       title="Votre bébé"
       image={BABY_IMAGE}
-      description={DESCRIPTION}
+      description={description}
       paywallTitle="Débloquez le suivi complet de bébé"
-      header={<BabyHeader accent={accent} />}
+      header={<BabyHeader accent={accent} description={description} />}
       gridContent={<BabyModulesGrid accent={accent} />}
       backgroundImage={wallpaper}
     />

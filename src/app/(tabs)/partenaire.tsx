@@ -358,6 +358,11 @@ export default function PartnerScreen() {
   const myTip = getSelfTipOfTheDay(role);
   const relationTip = getRelationTipOfTheDay(role);
 
+  // Espace « Seul·e » (demande explicite) : pas d'autre parent. La page
+  // devient « Cette semaine » — taille du bébé et astuce pour soi, sans
+  // tendance d'humeur ni astuce pour le couple.
+  const isSolo = household?.accompaniment_type === 'seul';
+
   const notJoinedText = partnerName
     ? `${partnerName} n’a pas encore rejoint votre espace. Sa tendance d’humeur apparaîtra ici dès qu’il ou elle aura créé son compte.`
     : 'Votre partenaire n’a pas encore rejoint votre espace.';
@@ -438,7 +443,11 @@ export default function PartnerScreen() {
               className="text-[30px] font-extrabold leading-9"
               style={{ color: GLASS_TITLE_COLOR, letterSpacing: -0.6 }}
             >
-              {partnerName ? `Avec ${partnerName}` : 'Mon partenaire'}
+              {isSolo
+                ? 'Cette semaine'
+                : partnerName
+                  ? `Avec ${partnerName}`
+                  : 'Mon partenaire'}
             </Text>
             <Svg width={140} height={12} viewBox="0 0 140 12">
               <Path
@@ -449,7 +458,7 @@ export default function PartnerScreen() {
                 fill="none"
               />
             </Svg>
-            {partnerUserId ? null : (
+            {partnerUserId || isSolo ? null : (
               <Text
                 className="mt-2 text-[15px] leading-[22px]"
                 style={{ color: GLASS_BODY_COLOR }}
@@ -542,13 +551,13 @@ export default function PartnerScreen() {
         {/* Deux conseils pour la personne connectée (demande explicite) :
             l'un pour elle-même, l'autre au sujet de son compagnon ou de sa
             compagne, ou du couple — voir `getRelationTipOfTheDay`. */}
-        {myTip || relationTip ? (
+        {myTip || (relationTip && !isSolo) ? (
           <View className="gap-3.5">
             <SectionHeading icon="calendar-outline" label="ASTUCES DU JOUR" />
             {myTip ? (
               <TipCard emoji="💡" recipient="Pour vous" tip={myTip} />
             ) : null}
-            {relationTip ? (
+            {relationTip && !isSolo ? (
               <TipCard
                 emoji="💞"
                 image={COPARENT_TIP_ICON}

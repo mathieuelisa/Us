@@ -56,6 +56,7 @@ export function AppointmentFormModal({
   onSubmit,
   onDelete,
   isDeleting = false,
+  canShare = true,
   onCancel,
 }: {
   visible: boolean;
@@ -67,6 +68,8 @@ export function AppointmentFormModal({
   /** Suppression depuis la feuille, en modification seulement. */
   onDelete?: () => void;
   isDeleting?: boolean;
+  /** Faux en espace « Seul·e » : pas d'interrupteur de partage. */
+  canShare?: boolean;
   onSubmit: (input: {
     title: string;
     appointmentDate: string;
@@ -263,25 +266,27 @@ export function AppointmentFormModal({
               accent={accent}
             />
 
-            <View
-              className="flex-row items-center gap-2.5 rounded-full py-1.5 pl-1.5 pr-3"
-              style={{ backgroundColor: hexToRgba(accent, 0.07) }}
-            >
-              <View className="h-[34px] w-[34px] items-center justify-center rounded-full bg-white">
-                <Ionicons name="people" size={17} color={accent} />
-              </View>
-              <Text
-                className="flex-1 text-[14px]"
-                style={{ color: GLASS_TITLE_COLOR }}
+            {canShare ? (
+              <View
+                className="flex-row items-center gap-2.5 rounded-full py-1.5 pl-1.5 pr-3"
+                style={{ backgroundColor: hexToRgba(accent, 0.07) }}
               >
-                Visible par les deux parents
-              </Text>
-              <Switch
-                value={isShared}
-                onValueChange={setIsShared}
-                trackColor={{ true: accent }}
-              />
-            </View>
+                <View className="h-[34px] w-[34px] items-center justify-center rounded-full bg-white">
+                  <Ionicons name="people" size={17} color={accent} />
+                </View>
+                <Text
+                  className="flex-1 text-[14px]"
+                  style={{ color: GLASS_TITLE_COLOR }}
+                >
+                  Visible par les deux parents
+                </Text>
+                <Switch
+                  value={isShared}
+                  onValueChange={setIsShared}
+                  trackColor={{ true: accent }}
+                />
+              </View>
+            ) : null}
 
             <PillButton
               label={

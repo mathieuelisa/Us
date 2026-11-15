@@ -7,6 +7,7 @@ import {
   GLASS_BODY_COLOR,
   GLASS_TITLE_COLOR,
 } from '@/components/ui/glass-card';
+import { useIsSoloHousehold } from '@/features/household/hooks';
 import { useThemeAccent } from '@/features/settings/hooks';
 import { hexToRgba } from '@/lib/color';
 
@@ -14,6 +15,9 @@ const VALISE_IMAGE = require('@/assets/images/Valise_maternite.png');
 
 const DESCRIPTION =
   'Chronométrez vos contractions à deux, suivez leur rythme et sachez quand prendre la route de la maternité.';
+/** Espace « Seul·e » (demande explicite) : sans « à deux ». */
+const SOLO_DESCRIPTION =
+  'Chronométrez vos contractions, suivez leur rythme et sachez quand prendre la route de la maternité.';
 
 /**
  * « Assistant Contractions & Départ Maternité » (demande explicite),
@@ -24,14 +28,15 @@ const DESCRIPTION =
  */
 export default function ContractionsScreen() {
   const accent = useThemeAccent();
+  const description = useIsSoloHousehold() ? SOLO_DESCRIPTION : DESCRIPTION;
 
   return (
     <PremiumLockedScreen
       title="Assistant contractions"
       image={VALISE_IMAGE}
-      description={DESCRIPTION}
+      description={description}
       paywallTitle="Débloquez l’assistant contractions"
-      header={<ContractionsHeader accent={accent} />}
+      header={<ContractionsHeader accent={accent} description={description} />}
       gridContent={({ isPaywallVisible }) => (
         <ContractionAssistant canShowDeparture={!isPaywallVisible} />
       )}
@@ -40,7 +45,13 @@ export default function ContractionsScreen() {
 }
 
 /** En-tête au gabarit du match des prénoms : titre souligné, valise penchée. */
-function ContractionsHeader({ accent }: { accent: string }) {
+function ContractionsHeader({
+  accent,
+  description,
+}: {
+  accent: string;
+  description: string;
+}) {
   return (
     <View className="gap-4">
       <View className="min-h-[118px] justify-center">
@@ -78,7 +89,7 @@ function ContractionsHeader({ accent }: { accent: string }) {
         className="text-[14.5px] leading-[21px]"
         style={{ color: GLASS_BODY_COLOR }}
       >
-        {DESCRIPTION}
+        {description}
       </Text>
     </View>
   );

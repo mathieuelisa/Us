@@ -40,6 +40,9 @@ export function AppointmentsTab({
   const createAppointment = useCreateAppointment(household);
   const updateAppointment = useUpdateAppointment(household);
   const deleteAppointment = useDeleteAppointment(household);
+  // Espace « Seul·e » (demande explicite) : rien à partager, donc ni
+  // pastille « Partagé », ni interrupteur dans le formulaire.
+  const isSolo = household?.accompaniment_type === 'seul';
 
   const today = todayIso();
   const [year, setYear] = useState(Number(today.slice(0, 4)));
@@ -122,7 +125,7 @@ export function AppointmentsTab({
                   {/* Partagé / non partagé n'a de sens que pour ses propres
                     rendez-vous : ceux de l'autre parent sont forcément
                     partagés, sans quoi la RLS ne les renverrait pas. */}
-                  {isMine ? (
+                  {isSolo ? null : isMine ? (
                     <View
                       className={`rounded-full px-2 py-0.5 ${
                         appointment.is_shared ? 'bg-accent/10' : 'bg-[#f0f0f0]'
@@ -181,6 +184,7 @@ export function AppointmentsTab({
         }
         initialDate={pickedDate}
         editingAppointment={editingAppointment}
+        canShare={!isSolo}
         onCancel={closeForm}
         onSubmit={(input) =>
           editingAppointment

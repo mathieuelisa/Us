@@ -65,6 +65,9 @@ export default function TogetherScreen() {
     household?.birth_date ? 'after_birth' : 'pregnancy',
   );
   const upsertCheckin = useUpsertMoodCheckin(household);
+  // Espace « Seul·e » (demande explicite) : pas de geste du jour, pensé
+  // pour l'autre parent, ni de « à deux ».
+  const isSolo = household?.accompaniment_type === 'seul';
   const backgroundColor = useThemeBackground();
   const accent = useThemeAccent();
 
@@ -141,7 +144,9 @@ export default function TogetherScreen() {
             />
           </Svg>
           <Text className="text-[14.5px]" style={{ color: GLASS_BODY_COLOR }}>
-            Prenez le pouls de votre journée, à deux.
+            {isSolo
+              ? 'Prenez le pouls de votre journée.'
+              : 'Prenez le pouls de votre journée, à deux.'}
           </Text>
         </View>
 
@@ -164,7 +169,7 @@ export default function TogetherScreen() {
           accent={accent}
         />
 
-        {gesture ? (
+        {gesture && !isSolo ? (
           <GestureOfTheDayCard body={gesture.body} accent={accent} />
         ) : null}
 

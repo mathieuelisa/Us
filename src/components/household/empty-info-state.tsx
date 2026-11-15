@@ -12,6 +12,7 @@ import {
   INFO_CATEGORY_META,
   type InfoCategory,
 } from '@/features/household/constants';
+import { useIsSoloHousehold } from '@/features/household/hooks';
 import { hexToRgba } from '@/lib/color';
 
 type IoniconName = ComponentProps<typeof Ionicons>['name'];
@@ -53,6 +54,7 @@ export function EmptyInfoState({
   accent: string;
   onPickCategory: (category: InfoCategory) => void;
 }) {
+  const isSolo = useIsSoloHousehold();
   return (
     <View
       className="items-center rounded-[30px] px-5 pb-6 pt-4"
@@ -79,8 +81,8 @@ export function EmptyInfoState({
         className="mt-2 text-center text-[14px] leading-5"
         style={{ color: GLASS_BODY_COLOR }}
       >
-        Ajoutez groupe sanguin, allergies, numéros utiles…{'\n'}Elles seront
-        partagées avec votre partenaire.
+        Ajoutez groupe sanguin, allergies, numéros utiles…
+        {isSolo ? null : '\nElles seront partagées avec votre partenaire.'}
       </Text>
 
       <View className="mt-5 w-full flex-row items-center gap-3">

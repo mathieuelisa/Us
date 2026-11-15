@@ -112,6 +112,9 @@ export default function HubScreen() {
 
   const partnerName = summary?.partnerFirstName?.trim();
   const hasPartnerJoined = Boolean(household?.partner_user_id);
+  // Espace « Seul·e » (demande explicite) : pas d'invitation, et la carte
+  // « Mon partenaire » devient « Cette semaine » (taille du bébé, astuces).
+  const isSolo = household?.accompaniment_type === 'seul';
   const partnerMood = hasPartnerJoined ? (summary?.partnerMood ?? null) : null;
   const [isHowItWorksOpen, setIsHowItWorksOpen] = useState(false);
   const [isInviteOpen, setIsInviteOpen] = useState(false);
@@ -244,7 +247,7 @@ export default function HubScreen() {
         {/* L'humeur et les besoins du jour de l'autre parent vivent dans la
             carte « Mon partenaire » juste au-dessus des sections (demande explicite) ; ici, seule
             l'invitation tant que le co-parent n'a pas rejoint. */}
-        {hasPartnerJoined ? null : (
+        {hasPartnerJoined || isSolo ? null : (
           <ShareInviteCard
             // Code d'espace + QR code pour l'autre parent (demande
             // explicite), au lieu de la page « Mon partenaire ».
@@ -271,7 +274,7 @@ export default function HubScreen() {
             Seul le sous-titre s'adapte. */}
         <View className="gap-2">
           <Text className="text-[11.5px] font-semibold tracking-wide text-[#8a8a8a]">
-            MON PARTENAIRE
+            {isSolo ? 'CETTE SEMAINE' : 'MON PARTENAIRE'}
           </Text>
           <Pressable
             accessibilityRole="button"
@@ -315,9 +318,11 @@ export default function HubScreen() {
 
                 <View className="flex-1 gap-0.5">
                   <Text className="text-[16px] font-semibold text-white">
-                    {partnerName
-                      ? `Avec ${partnerName}`
-                      : 'Avec votre partenaire'}
+                    {isSolo
+                      ? 'Cette semaine'
+                      : partnerName
+                        ? `Avec ${partnerName}`
+                        : 'Avec votre partenaire'}
                   </Text>
                   <Text className="text-[13px] text-white/80">
                     {!hasPartnerJoined
@@ -424,7 +429,7 @@ export default function HubScreen() {
           {/* Seul intitulé de section aligné à droite (demande explicite),
               pour détacher les rendez-vous des sections qui le précèdent. */}
           <Text className="text-right text-[11.5px] font-semibold tracking-wide text-[#8a8a8a]">
-            NOS PROCHAINS RENDEZ-VOUS
+            {isSolo ? 'VOS PROCHAINS RENDEZ-VOUS' : 'NOS PROCHAINS RENDEZ-VOUS'}
           </Text>
 
           <View className="gap-2">

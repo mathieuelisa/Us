@@ -27,6 +27,7 @@ import {
 } from '@/components/ui/glass-card';
 import { PillButton } from '@/components/ui/pill-button';
 import { ScreenCornerShapes } from '@/components/ui/screen-corner-shapes';
+import { useIsSoloHousehold } from '@/features/household/hooks';
 import {
   buildNameDeck,
   GENDER_META,
@@ -71,6 +72,8 @@ export default function NameGameScreen() {
   const gender: NameGender = genderParam === 'boy' ? 'boy' : 'girl';
   const meta = GENDER_META[gender];
   const accent = useThemeAccent();
+  // Espace « Seul·e » : pas de matchs, la fin du paquet mène aux favoris.
+  const isSolo = useIsSoloHousehold();
   const backgroundColor = useThemeBackground();
   const { feedback, showFeedback } = useFeedbackBanner();
 
@@ -297,7 +300,10 @@ export default function NameGameScreen() {
             onToggleFavorite={handleToggleFavorite}
             onCommand={(direction) => setCommand({ direction, id: Date.now() })}
             onChangeCountries={() => setDeck(null)}
-            onSeeMatches={() => router.navigate('/prenoms-matchs')}
+            isSolo={isSolo}
+            onSeeMatches={() =>
+              router.navigate(isSolo ? '/prenoms-favoris' : '/prenoms-matchs')
+            }
           />
         ) : (
           <CountryPicker
@@ -330,6 +336,7 @@ function DeckStep({
   onToggleFavorite,
   onCommand,
   onChangeCountries,
+  isSolo,
   onSeeMatches,
 }: {
   deck: NameCard[];
@@ -341,6 +348,7 @@ function DeckStep({
   onToggleFavorite: (card: NameCard) => void;
   onCommand: (direction: 'left' | 'right') => void;
   onChangeCountries: () => void;
+  isSolo: boolean;
   onSeeMatches: () => void;
 }) {
   // Hauteur disponible pour le paquet, mesurée (voir le rendu).
@@ -370,8 +378,9 @@ function DeckStep({
           className="text-center text-[14px] leading-5"
           style={{ color: GLASS_BODY_COLOR }}
         >
-          Choisissez d’autres pays pour en découvrir de nouveaux, ou regardez
-          les prénoms sur lesquels vous êtes d’accord.
+          {isSolo
+            ? 'Choisissez d’autres pays pour en découvrir de nouveaux, ou retrouvez vos favoris.'
+            : 'Choisissez d’autres pays pour en découvrir de nouveaux, ou regardez les prénoms sur lesquels vous êtes d’accord.'}
         </Text>
         <View className="mt-2 w-full gap-2.5">
           <PillButton
@@ -389,7 +398,7 @@ function DeckStep({
               className="text-[15px] font-bold"
               style={{ color: meta.color }}
             >
-              Voir vos matchs
+              {isSolo ? 'Voir vos favoris' : 'Voir vos matchs'}
             </Text>
           </Pressable>
         </View>

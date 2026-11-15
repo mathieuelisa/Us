@@ -10,6 +10,7 @@ import {
   GLASS_BODY_COLOR,
   GLASS_TITLE_COLOR,
 } from '@/components/ui/glass-card';
+import { useIsSoloHousehold } from '@/features/household/hooks';
 import { useThemeAccent } from '@/features/settings/hooks';
 import { hexToRgba } from '@/lib/color';
 
@@ -18,6 +19,9 @@ const LEAF_IMAGE = require('@/assets/images/Leaf_branch.png');
 const HEADER_HEART_IMAGE = require('@/assets/images/Prenoms_heart_header.png');
 const DESCRIPTION =
   "Swipez chacun de votre côté et découvrez les prénoms sur lesquels vous êtes tombés d'accord.";
+/** Espace « Seul·e » (demande explicite) : pas de matchs à deux. */
+const SOLO_DESCRIPTION =
+  'Swipez les prénoms qui vous plaisent et retrouvez-les dans vos favoris.';
 
 /**
  * Les 4 entrées du jeu, chacune avec son illustration (fournie par
@@ -54,7 +58,13 @@ const PRENOMS_MODULES = [
  * fille / garçon en haut à droite (illustration fournie, légèrement
  * penchée), description en dessous sur toute la largeur.
  */
-function PrenomsHeader({ accent }: { accent: string }) {
+function PrenomsHeader({
+  accent,
+  description,
+}: {
+  accent: string;
+  description: string;
+}) {
   return (
     <View className="gap-4">
       <View className="min-h-[124px] justify-center">
@@ -96,7 +106,7 @@ function PrenomsHeader({ accent }: { accent: string }) {
         className="text-[14.5px] leading-[21px]"
         style={{ color: GLASS_BODY_COLOR }}
       >
-        {DESCRIPTION}
+        {description}
       </Text>
     </View>
   );
@@ -109,11 +119,15 @@ function PrenomsHeader({ accent }: { accent: string }) {
  * repris de la capture de référence à la demande explicite de
  * l'utilisateur, à titre décoratif.
  */
-function PrenomsGrid({ accent }: { accent: string }) {
+function PrenomsGrid({ accent, isSolo }: { accent: string; isSolo: boolean }) {
+  // « Vos matchs » n'a pas de sens sans partenaire (espace « Seul·e »).
+  const modules = isSolo
+    ? PRENOMS_MODULES.filter((module) => module.href !== '/prenoms-matchs')
+    : PRENOMS_MODULES;
   return (
     <View className="gap-4">
       <View className="flex-row flex-wrap justify-between gap-y-3.5">
-        {PRENOMS_MODULES.map((module) => (
+        {modules.map((module) => (
           <Pressable
             key={module.label}
             accessibilityRole="button"
@@ -180,19 +194,21 @@ function PrenomsGrid({ accent }: { accent: string }) {
  */
 export default function PrenomsScreen() {
   const accent = useThemeAccent();
+  const isSolo = useIsSoloHousehold();
+  const description = isSolo ? SOLO_DESCRIPTION : DESCRIPTION;
 
   return (
     <PremiumLockedScreen
       title="Le match des prénoms"
       image={HEART_IMAGE}
-      description={DESCRIPTION}
+      description={description}
       paywallTitle="Débloquez le match des prénoms"
       // Les deux cartes de l'entrée « Le match des prénoms »
       // d'Organisation, pour que le paywall soit raccord (demande
       // explicite).
       paywallIllustration={<NameCardsIllustration scale={1.45} />}
-      header={<PrenomsHeader accent={accent} />}
-      gridContent={<PrenomsGrid accent={accent} />}
+      header={<PrenomsHeader accent={accent} description={description} />}
+      gridContent={<PrenomsGrid accent={accent} isSolo={isSolo} />}
     />
   );
 }

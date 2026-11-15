@@ -227,7 +227,9 @@ export default function InformationsScreen() {
               className="text-[14px] leading-5"
               style={{ color: GLASS_BODY_COLOR }}
             >
-              Partagées et modifiables par vous deux.
+              {household?.accompaniment_type === 'seul'
+                ? 'Vos informations importantes, à portée de main.'
+                : 'Partagées et modifiables par vous deux.'}
             </Text>
             <Svg width={120} height={10} viewBox="0 0 120 10">
               <Path

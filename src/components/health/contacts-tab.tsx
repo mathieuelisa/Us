@@ -27,6 +27,7 @@ import {
   useUpdateContact,
 } from '@/features/health/hooks';
 import type { Household } from '@/features/household/api';
+import { useIsSoloHousehold } from '@/features/household/hooks';
 import { useThemeAccent } from '@/features/settings/hooks';
 import { hexToRgba, lightenHex } from '@/lib/color';
 import { formatPhoneNumber } from '@/lib/phone';
@@ -391,6 +392,7 @@ function ContactForm({
   const [name, setName] = useState(initial?.name ?? '');
   const [phone, setPhone] = useState(initial?.phone ?? '');
   const [isEmergency, setIsEmergency] = useState(initial?.isEmergency ?? false);
+  const isSolo = useIsSoloHousehold();
   const canSubmit = name.trim() !== '' && !isPending;
 
   return (
@@ -442,9 +444,13 @@ function ContactForm({
             className="text-[13px] leading-[18px]"
             style={{ color: GLASS_BODY_COLOR }}
           >
-            {isEditing
-              ? 'Les changements sont partagés avec votre partenaire.'
-              : 'Un numéro utile, partagé avec votre partenaire.'}
+            {isSolo
+              ? isEditing
+                ? 'Vos changements sont enregistrés.'
+                : 'Un numéro utile, toujours à portée de main.'
+              : isEditing
+                ? 'Les changements sont partagés avec votre partenaire.'
+                : 'Un numéro utile, partagé avec votre partenaire.'}
           </Text>
         </View>
         <Pressable
