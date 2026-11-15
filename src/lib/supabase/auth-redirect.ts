@@ -44,11 +44,29 @@ export function getAuthRedirectTo(): string {
  * (`#access_token=…`), jamais dans la query string — d'où le découpage sur
  * `#`. Renvoie `true` si une session a été ouverte.
  */
+/**
+ * Session ouverte par un lien « Mot de passe oublié » (`type=recovery`) :
+ * l'utilisateur n'a pas son ancien mot de passe, la modale de changement ne
+ * doit pas le lui demander. Vaut pour l'exécution en cours de l'app — le
+ * lien est consommé dans la foulée — et retombe une fois le mot de passe
+ * changé.
+ */
+let isRecoverySession = false;
+
+export function isPasswordRecoverySession(): boolean {
+  return isRecoverySession;
+}
+
+export function endPasswordRecoverySession(): void {
+  isRecoverySession = false;
+}
+
 export async function createSessionFromUrl(url: string): Promise<boolean> {
   const fragment = url.split('#')[1];
   if (!fragment) return false;
 
   const params = new URLSearchParams(fragment);
+  if (params.get('type') === 'recovery') isRecoverySession = true;
   const access_token = params.get('access_token');
   const refresh_token = params.get('refresh_token');
   if (!access_token || !refresh_token) return false;

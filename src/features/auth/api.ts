@@ -107,9 +107,50 @@ export async function signOut() {
   }
 }
 
-export async function updatePassword(password: string) {
-  const { error } = await supabase.auth.updateUser({ password });
+/** Erreur levée quand le mot de passe actuel saisi est faux. */
+export const INVALID_CURRENT_PASSWORD = 'invalid_current_password';
+
+/**
+ * Change le mot de passe. `currentPassword` (demande explicite) est vérifié
+ * côté serveur en se reconnectant avec lui avant la mise à jour — même
+ * compte, la session est simplement renouvelée. `null` après un lien
+ * « Mot de passe oublié » : l'utilisateur ne connaît plus l'ancien, le lien
+ * reçu par email fait office de preuve.
+ */
+export async function changePassword({
+  currentPassword,
+  newPassword,
+}: {
+  currentPassword: string | null;
+  newPassword: string;
+}) {
+  if (currentPassword !== null) {
+    const { data } = await supabase.auth.getUser();
+    const email = data.user?.email;
+    if (!email) throw new Error('No email on the current user');
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email,
+      password: currentPassword,
+    });
+    if (signInError) {
+      throw signInError.code === 'invalid_credentials'
+        ? Object.assign(new Error(INVALID_CURRENT_PASSWORD), {
+            code: INVALID_CURRENT_PASSWORD,
+          })
+        : signInError;
+    }
+  }
+  const { error } = await supabase.auth.updateUser({ password: newPassword });
   if (error) throw error;
+}
+
+/** Email de réinitialisation pour l'utilisateur connecté. */
+export async function sendPasswordResetToMe(): Promise<string> {
+  const { data } = await supabase.auth.getUser();
+  const email = data.user?.email;
+  if (!email) throw new Error('No email on the current user');
+  await sendPasswordReset(email);
+  return email;
 }
 
 /**
@@ -145,6 +186,8 @@ export function getAuthErrorMessage(error: unknown): string {
       return 'Un compte existe déjà avec cet email. Connectez-vous plutôt.';
     case 'weak_password':
       return `Mot de passe trop faible : ${PASSWORD_MIN_LENGTH} caractères minimum, mélangez lettres et chiffres.`;
+    case INVALID_CURRENT_PASSWORD:
+      return 'Mot de passe actuel incorrect.';
     case 'same_password':
       return 'Le nouveau mot de passe doit être différent de l’actuel.';
     case 'email_address_invalid':

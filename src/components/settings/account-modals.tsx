@@ -10,12 +10,17 @@ import {
 import { IconInput } from '@/components/ui/icon-input';
 import { PillButton } from '@/components/ui/pill-button';
 import {
+  changePassword,
   deleteMyAccount,
   getAuthErrorMessage,
   PASSWORD_MIN_LENGTH,
-  updatePassword,
+  sendPasswordResetToMe,
 } from '@/features/auth/api';
 import { useThemeAccent } from '@/features/settings/hooks';
+import {
+  endPasswordRecoverySession,
+  isPasswordRecoverySession,
+} from '@/lib/supabase/auth-redirect';
 
 const DANGER_RED = '#d14b3a';
 
@@ -56,8 +61,11 @@ function Sheet({
 
 /**
  * Nouveau mot de passe, pour les comptes créés par email (un compte Google
- * n'a pas de mot de passe chez nous). Sert aussi après un lien « Mot de
- * passe oublié », qui connecte l'utilisateur sans lui demander l'ancien.
+ * n'a pas de mot de passe chez nous). Le mot de passe actuel est demandé
+ * d'abord (demande explicite), et vérifié côté serveur — sauf après un lien
+ * « Mot de passe oublié », qui connecte l'utilisateur sans lui laisser
+ * l'ancien : le lien reçu par email fait alors office de preuve. Un lien
+ * « Mot de passe oublié ? » renvoie cet email à qui ne s'en souvient plus.
  */
 export function ChangePasswordModal({
   visible,
@@ -67,31 +75,46 @@ export function ChangePasswordModal({
   onClose: () => void;
 }) {
   const accent = useThemeAccent();
+  const [currentPassword, setCurrentPassword] = useState('');
   const [password, setPassword] = useState('');
   const [confirmation, setConfirmation] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isDone, setIsDone] = useState(false);
+  const [requiresCurrent, setRequiresCurrent] = useState(true);
+  const [resetSentTo, setResetSentTo] = useState<string | null>(null);
+  const [isSendingReset, setIsSendingReset] = useState(false);
 
   useEffect(() => {
     if (visible) {
+      setCurrentPassword('');
       setPassword('');
       setConfirmation('');
       setErrorMessage(null);
       setIsDone(false);
+      setResetSentTo(null);
+      setRequiresCurrent(!isPasswordRecoverySession());
     }
   }, [visible]);
 
+  const hasCurrent = !requiresCurrent || currentPassword.length > 0;
   const isLongEnough = password.length >= PASSWORD_MIN_LENGTH;
   const doMatch = password === confirmation;
-  const canSave = isLongEnough && doMatch && !isSaving;
+  const isSameAsCurrent =
+    requiresCurrent && password.length > 0 && password === currentPassword;
+  const canSave =
+    hasCurrent && isLongEnough && doMatch && !isSameAsCurrent && !isSaving;
 
   const save = async () => {
     if (!canSave) return;
     setIsSaving(true);
     setErrorMessage(null);
     try {
-      await updatePassword(password);
+      await changePassword({
+        currentPassword: requiresCurrent ? currentPassword : null,
+        newPassword: password,
+      });
+      endPasswordRecoverySession();
       setIsDone(true);
     } catch (error) {
       setErrorMessage(getAuthErrorMessage(error));
@@ -100,12 +123,27 @@ export function ChangePasswordModal({
     }
   };
 
+  const sendReset = async () => {
+    if (isSendingReset) return;
+    setIsSendingReset(true);
+    setErrorMessage(null);
+    try {
+      setResetSentTo(await sendPasswordResetToMe());
+    } catch (error) {
+      setErrorMessage(getAuthErrorMessage(error));
+    } finally {
+      setIsSendingReset(false);
+    }
+  };
+
   const hint =
     password.length > 0 && !isLongEnough
       ? `${PASSWORD_MIN_LENGTH} caractères minimum.`
-      : confirmation.length > 0 && !doMatch
-        ? 'Les deux mots de passe ne correspondent pas.'
-        : null;
+      : isSameAsCurrent
+        ? 'Le nouveau mot de passe doit être différent de l’actuel.'
+        : confirmation.length > 0 && !doMatch
+          ? 'Les deux mots de passe ne correspondent pas.'
+          : null;
 
   return (
     <Sheet visible={visible} onClose={onClose}>
@@ -117,7 +155,9 @@ export function ChangePasswordModal({
           Changer le mot de passe
         </Text>
         <Text className="text-[13.5px]" style={{ color: GLASS_BODY_COLOR }}>
-          Il servira dès votre prochaine connexion.
+          {requiresCurrent
+            ? 'Pour votre sécurité, confirmez d’abord votre mot de passe actuel.'
+            : 'Vous arrivez d’un lien de réinitialisation : choisissez directement votre nouveau mot de passe.'}
         </Text>
       </View>
 
@@ -139,6 +179,44 @@ export function ChangePasswordModal({
         </View>
       ) : (
         <View className="gap-3">
+          {requiresCurrent ? (
+            <View className="gap-1.5">
+              <IconInput
+                icon="key-outline"
+                placeholder="Mot de passe actuel"
+                value={currentPassword}
+                onChangeText={setCurrentPassword}
+                accent={accent}
+                secureTextEntry
+                autoCapitalize="none"
+                autoComplete="current-password"
+                textContentType="password"
+              />
+              {resetSentTo ? (
+                <Text
+                  className="px-2 text-[12.5px]"
+                  style={{ color: GLASS_BODY_COLOR }}
+                >
+                  Un lien de réinitialisation a été envoyé à {resetSentTo}.
+                </Text>
+              ) : (
+                <Pressable
+                  accessibilityRole="button"
+                  onPress={sendReset}
+                  disabled={isSendingReset}
+                  hitSlop={6}
+                  className="self-end px-2"
+                >
+                  <Text
+                    className="text-[12.5px] font-semibold"
+                    style={{ color: accent }}
+                  >
+                    {isSendingReset ? 'Envoi…' : 'Mot de passe oublié ?'}
+                  </Text>
+                </Pressable>
+              )}
+            </View>
+          ) : null}
           <IconInput
             icon="lock-closed-outline"
             placeholder="Nouveau mot de passe"
