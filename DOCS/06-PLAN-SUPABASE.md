@@ -457,8 +457,10 @@ Objectif : des notifications réellement envoyées (Phase 4 du plan d'action,
   verrouillé) — une par jour au plus, envoi différé (30 s / 60 s) par
   `upsert_partner_notification` pour que le texte inclue le besoin ou
   tous les symptômes ; l'alerte « 3 jours difficiles » reste en plus.
-  Rappel local d'humeur à 20h pour la personne enceinte
-  (`profiles.notify_mood_reminder`, Réglages) ;
+  Rappel d'humeur : d'abord un rappel local à 20h (personne enceinte),
+  remplacé le même jour par un **toast dans l'app** sur l'accueil, pour les
+  deux parents, une fois par créneau 9h / 14h / 19h au plus si l'humeur du
+  jour n'est pas remplie (`profiles.notify_mood_reminder`, Réglages) ;
 - les rappels de rendez-vous et de démarches sont **locaux** (programmés
   sur le téléphone), pas de cron ;
 - Android via Firebase (`google-services.json`, clé FCM V1 à déposer sur

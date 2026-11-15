@@ -9,6 +9,7 @@ import { withUniwind } from 'uniwind';
 import { HealthTodayCard } from '@/components/hub/health-today-card';
 import { HowItWorksModal } from '@/components/hub/how-it-works-modal';
 import { InvitePartnerModal } from '@/components/hub/invite-partner-modal';
+import { MoodNudgeToast } from '@/components/hub/mood-nudge-toast';
 import { PillarCard } from '@/components/hub/pillar-card';
 import { PremiumTeaserCard } from '@/components/hub/premium-teaser-card';
 import { ShareInviteCard } from '@/components/hub/share-invite-card';
@@ -507,6 +508,9 @@ export default function HubScreen() {
         visible={isHowItWorksOpen}
         onClose={() => setIsHowItWorksOpen(false)}
       />
+      {/* Rappel d'humeur du jour (demande explicite) : dernier enfant, posé
+          en absolu au-dessus du contenu. */}
+      <MoodNudgeToast household={household} />
     </SafeAreaView>
   );
 }

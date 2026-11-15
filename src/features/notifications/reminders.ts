@@ -25,9 +25,6 @@ const MAX_SCHEDULED = 50;
 const PREGNANCY_DAYS = 280;
 const PROCEDURE_REMINDER_HOUR = 9;
 const APPOINTMENT_EVE_HOUR = 19;
-const MOOD_REMINDER_HOUR = 20;
-/** Jours d'avance programmés : l'app recalcule à chaque ouverture. */
-const MOOD_REMINDER_DAYS = 7;
 
 function atLocalTime(iso: string, hours: number, minutes = 0): Date {
   const [year, month, day] = iso.split('-').map(Number);
@@ -213,41 +210,6 @@ export function buildProcedureReminders(
     });
   }
 
-  return reminders;
-}
-
-/**
- * Rappel d'humeur du jour pour la personne enceinte (demande explicite) :
- * chaque soir à 20h, sur les 7 prochains jours — sauf ce soir si l'humeur
- * du jour est déjà partagée. Saisir son humeur recalcule les rappels
- * (`useNotifications`), ce qui retire celui du soir.
- */
-export function buildMoodReminders({
-  hasCheckedInToday,
-  isSolo,
-  now = new Date(),
-}: {
-  hasCheckedInToday: boolean;
-  isSolo: boolean;
-  now?: Date;
-}): LocalReminder[] {
-  const reminders: LocalReminder[] = [];
-  for (let offset = 0; offset < MOOD_REMINDER_DAYS; offset += 1) {
-    if (offset === 0 && hasCheckedInToday) continue;
-    const date = new Date(now);
-    date.setDate(date.getDate() + offset);
-    date.setHours(MOOD_REMINDER_HOUR, 0, 0, 0);
-    if (date <= now) continue;
-    reminders.push({
-      id: `mood-${date.toISOString().slice(0, 10)}`,
-      date,
-      title: 'Comment vous sentez-vous aujourd’hui ?',
-      body: isSolo
-        ? 'Prenez un instant pour noter votre humeur du jour.'
-        : 'Partagez votre humeur : votre partenaire saura comment vous allez.',
-      url: '/ensemble',
-    });
-  }
   return reminders;
 }
 

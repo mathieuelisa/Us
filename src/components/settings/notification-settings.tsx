@@ -1,5 +1,4 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useAtomValue } from 'jotai';
 import type { ComponentProps } from 'react';
 import {
   Linking,
@@ -26,7 +25,6 @@ import {
 } from '@/features/notifications/setup';
 import type { NotificationPreferences } from '@/features/profile/api';
 import { useMyProfile } from '@/features/profile/hooks';
-import { currentRoleAtom } from '@/lib/atoms/role';
 import { hexToRgba } from '@/lib/color';
 
 type IoniconName = ComponentProps<typeof Ionicons>['name'];
@@ -37,8 +35,6 @@ const ROWS: {
   label: string;
   description: string;
   isPartnerOnly?: boolean;
-  /** Réservé à la personne enceinte (rappel d'humeur, demande explicite). */
-  isPregnantOnly?: boolean;
 }[] = [
   {
     key: 'notify_appointments',
@@ -56,8 +52,8 @@ const ROWS: {
     key: 'notify_mood_reminder',
     icon: 'happy-outline',
     label: 'Humeur du jour',
-    description: 'À 20h, si vous ne l’avez pas encore partagée',
-    isPregnantOnly: true,
+    description:
+      'Petit rappel dans l’app à 9h, 14h et 19h si elle n’est pas remplie',
   },
   {
     key: 'notify_partner',
@@ -85,7 +81,6 @@ export function NotificationSettings({
   cardStyle: StyleProp<ViewStyle>;
 }) {
   const { data: profile } = useMyProfile();
-  const role = useAtomValue(currentRoleAtom);
   const updatePreferences = useUpdateNotificationPreferences();
   const permissionQuery = useNotificationPermission();
   const permission = permissionQuery.data;
@@ -96,11 +91,7 @@ export function NotificationSettings({
     permissionQuery.refetch();
   };
 
-  const rows = ROWS.filter(
-    (row) =>
-      !(row.isPartnerOnly && isSolo) &&
-      !(row.isPregnantOnly && role !== 'pregnant'),
-  );
+  const rows = ROWS.filter((row) => !(row.isPartnerOnly && isSolo));
 
   return (
     <View className="gap-3">
