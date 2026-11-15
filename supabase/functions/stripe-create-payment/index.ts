@@ -11,6 +11,9 @@
 // métadonnées du PaymentIntent, et vient du jeton de l'appelant — l'app ne
 // peut pas payer pour un autre foyer.
 //
+// L'acheteur est enregistré comme client Stripe (email, prénom) pour être
+// reconnu dans le tableau de bord Stripe.
+//
 // Déployée avec `verify_jwt = true`.
 // Secret requis : `STRIPE_SECRET_KEY`.
 
@@ -73,19 +76,37 @@ Deno.serve(async (req: Request) => {
     return json({ error: 'already_premium' }, 409);
   }
 
+  // Prénom de l'acheteur (RLS : son propre profil), pour le tableau de bord
+  // Stripe (demande explicite du 2026-11-15).
+  const { data: profile } = await userClient
+    .from('profiles')
+    .select('first_name')
+    .eq('id', user.id)
+    .maybeSingle();
+  const firstName = profile?.first_name?.trim() || undefined;
+
   const stripe = new Stripe(stripeSecretKey);
 
   try {
+    const customerId = await findOrCreateCustomer(stripe, {
+      email: user.email ?? undefined,
+      name: firstName,
+      userId: user.id,
+      householdId: household.id,
+    });
+
     const paymentIntent = await stripe.paymentIntents.create({
       amount: PREMIUM_OFFER.amount,
       currency: PREMIUM_OFFER.currency,
       automatic_payment_methods: { enabled: true },
       description: PREMIUM_OFFER.name,
+      customer: customerId,
       receipt_email: user.email ?? undefined,
       metadata: {
         household_id: household.id,
         user_id: user.id,
         product: PREMIUM_OFFER.product,
+        ...(firstName ? { first_name: firstName } : {}),
       },
     });
     return json({ clientSecret: paymentIntent.client_secret }, 200);
@@ -94,3 +115,45 @@ Deno.serve(async (req: Request) => {
     return json({ error: 'stripe_error' }, 502);
   }
 });
+
+/**
+ * Client Stripe de l'acheteur, pour retrouver son email et son prénom dans
+ * le tableau de bord Stripe (Clients, et sur chaque paiement). Un client par
+ * compte : retrouvé par `metadata.user_id` parmi ceux de son email (liste
+ * Stripe, cohérente immédiatement, contrairement à la recherche), sinon
+ * créé. Le prénom est remis à jour s'il a changé dans l'app.
+ */
+async function findOrCreateCustomer(
+  stripe: Stripe,
+  buyer: {
+    email?: string;
+    name?: string;
+    userId: string;
+    householdId: string;
+  },
+): Promise<string | undefined> {
+  if (!buyer.email) return undefined;
+
+  const { data: existing } = await stripe.customers.list({
+    email: buyer.email,
+    limit: 10,
+  });
+  const customer = existing.find(
+    (candidate) => candidate.metadata?.user_id === buyer.userId,
+  );
+
+  if (customer) {
+    if (buyer.name && customer.name !== buyer.name) {
+      await stripe.customers.update(customer.id, { name: buyer.name });
+    }
+    return customer.id;
+  }
+
+  const created = await stripe.customers.create({
+    email: buyer.email,
+    name: buyer.name,
+    metadata: { user_id: buyer.userId, household_id: buyer.householdId },
+    preferred_locales: ['fr'],
+  });
+  return created.id;
+}
