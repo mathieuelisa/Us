@@ -8,6 +8,12 @@
 // encore parti (« réservation » atomique sur `sent_at`), et les identifiants
 // sont des UUID impossibles à deviner. Un appel en double n'envoie rien.
 //
+// `delaySeconds` (optionnel, 60 s au plus) : l'envoi attend avant de lire
+// la ligne, en tâche de fond (`EdgeRuntime.waitUntil`), et la réponse part
+// tout de suite. Sert à l'humeur du jour, enregistrée au tap puis complétée
+// par un besoin quelques secondes plus tard : la notification part avec le
+// texte final (`upsert_partner_notification`).
+//
 // Chaîne : Supabase → service push d'Expo → Firebase (Android). Les tokens
 // refusés par Expo (« DeviceNotRegistered » : app désinstallée…) sont
 // supprimés.
@@ -28,6 +34,12 @@ type ExpoTicket =
   | { status: 'ok'; id: string }
   | { status: 'error'; message: string; details?: { error?: string } };
 
+declare const EdgeRuntime: { waitUntil(promise: Promise<unknown>): void };
+
+const MAX_DELAY_SECONDS = 60;
+
+type Result = { status: number; body: Record<string, unknown> };
+
 function json(body: Record<string, unknown>, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
@@ -42,6 +54,26 @@ Deno.serve(async (req: Request) => {
   const id = payload?.id;
   if (typeof id !== 'string') return json({ error: 'missing_id' }, 400);
 
+  const requestedDelay = Number(payload?.delaySeconds ?? 0);
+  const delaySeconds = Number.isFinite(requestedDelay)
+    ? Math.min(Math.max(requestedDelay, 0), MAX_DELAY_SECONDS)
+    : 0;
+
+  if (delaySeconds > 0) {
+    EdgeRuntime.waitUntil(
+      new Promise((resolve) => setTimeout(resolve, delaySeconds * 1000)).then(
+        () => deliver(id),
+      ),
+    );
+    return json({ status: 'scheduled', delaySeconds }, 202);
+  }
+
+  const result = await deliver(id);
+  return json(result.body, result.status);
+});
+
+/** Envoie la ligne `id` de la file, si elle n'est pas déjà partie. */
+async function deliver(id: string): Promise<Result> {
   const supabase = createClient(
     Deno.env.get('SUPABASE_URL') ?? '',
     Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
@@ -56,8 +88,8 @@ Deno.serve(async (req: Request) => {
     .select('id, user_id, title, body, data')
     .maybeSingle<OutboxRow>();
 
-  if (claimError) return json({ error: 'claim_failed' }, 500);
-  if (!row) return json({ status: 'nothing_to_send' });
+  if (claimError) return { status: 500, body: { error: 'claim_failed' } };
+  if (!row) return { status: 200, body: { status: 'nothing_to_send' } };
 
   const { data: tokens, error: tokensError } = await supabase
     .from('push_tokens')
@@ -69,7 +101,7 @@ Deno.serve(async (req: Request) => {
       .from('notification_outbox')
       .update({ error: tokensError ? 'tokens_failed' : 'no_token' })
       .eq('id', row.id);
-    return json({ status: 'no_token' });
+    return { status: 200, body: { status: 'no_token' } };
   }
 
   const messages = tokens.map(({ token }) => ({
@@ -100,14 +132,14 @@ Deno.serve(async (req: Request) => {
         .from('notification_outbox')
         .update({ error: `expo_http_${response.status}` })
         .eq('id', row.id);
-      return json({ status: 'expo_error' }, 502);
+      return { status: 502, body: { status: 'expo_error' } };
     }
   } catch {
     await supabase
       .from('notification_outbox')
       .update({ error: 'expo_unreachable' })
       .eq('id', row.id);
-    return json({ status: 'expo_unreachable' }, 502);
+    return { status: 502, body: { status: 'expo_unreachable' } };
   }
 
   const invalidTokens: string[] = [];
@@ -129,9 +161,12 @@ Deno.serve(async (req: Request) => {
       .eq('id', row.id);
   }
 
-  return json({
-    status: 'sent',
-    devices: messages.length,
-    errors: errors.length,
-  });
-});
+  return {
+    status: 200,
+    body: {
+      status: 'sent',
+      devices: messages.length,
+      errors: errors.length,
+    },
+  };
+}

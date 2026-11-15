@@ -104,7 +104,10 @@ export async function updateMyPartnerIntro(
 /** Interrupteurs de notifications de Réglages (`profiles.notify_*`). */
 export type NotificationPreferences = Pick<
   Profile,
-  'notify_appointments' | 'notify_procedures' | 'notify_partner'
+  | 'notify_appointments'
+  | 'notify_procedures'
+  | 'notify_partner'
+  | 'notify_mood_reminder'
 >;
 
 /**

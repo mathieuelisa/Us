@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import { useAtomValue } from 'jotai';
 import type { ComponentProps } from 'react';
 import {
   Linking,
@@ -25,6 +26,7 @@ import {
 } from '@/features/notifications/setup';
 import type { NotificationPreferences } from '@/features/profile/api';
 import { useMyProfile } from '@/features/profile/hooks';
+import { currentRoleAtom } from '@/lib/atoms/role';
 import { hexToRgba } from '@/lib/color';
 
 type IoniconName = ComponentProps<typeof Ionicons>['name'];
@@ -35,6 +37,8 @@ const ROWS: {
   label: string;
   description: string;
   isPartnerOnly?: boolean;
+  /** Réservé à la personne enceinte (rappel d'humeur, demande explicite). */
+  isPregnantOnly?: boolean;
 }[] = [
   {
     key: 'notify_appointments',
@@ -49,10 +53,17 @@ const ROWS: {
     description: 'Celles où « Me rappeler » est activé',
   },
   {
+    key: 'notify_mood_reminder',
+    icon: 'happy-outline',
+    label: 'Humeur du jour',
+    description: 'À 20h, si vous ne l’avez pas encore partagée',
+    isPregnantOnly: true,
+  },
+  {
     key: 'notify_partner',
     icon: 'heart-outline',
     label: 'Votre partenaire',
-    description: 'Rendez-vous partagé, jours difficiles, naissance',
+    description: 'Humeur, symptômes, rendez-vous partagé, naissance',
     isPartnerOnly: true,
   },
 ];
@@ -74,6 +85,7 @@ export function NotificationSettings({
   cardStyle: StyleProp<ViewStyle>;
 }) {
   const { data: profile } = useMyProfile();
+  const role = useAtomValue(currentRoleAtom);
   const updatePreferences = useUpdateNotificationPreferences();
   const permissionQuery = useNotificationPermission();
   const permission = permissionQuery.data;
@@ -84,7 +96,11 @@ export function NotificationSettings({
     permissionQuery.refetch();
   };
 
-  const rows = ROWS.filter((row) => !(row.isPartnerOnly && isSolo));
+  const rows = ROWS.filter(
+    (row) =>
+      !(row.isPartnerOnly && isSolo) &&
+      !(row.isPregnantOnly && role !== 'pregnant'),
+  );
 
   return (
     <View className="gap-3">

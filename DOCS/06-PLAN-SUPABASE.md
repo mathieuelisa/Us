@@ -450,6 +450,15 @@ Objectif : des notifications réellement envoyées (Phase 4 du plan d'action,
   naissance déclarée, 3 jours d'humeur difficile d'affilée (une alerte
   par série) ; `enqueue_partner_notification` met en file puis appelle
   `send-push` via pg_net ;
+- **ajouté le 2026-11-15** (demande explicite, migration
+  `mood_and_symptom_notifications`) : alerte à chaque humeur du jour de la
+  personne enceinte (phrase + besoins), et dès qu'elle note des symptômes
+  (nommés dans la notification, choix explicite malgré l'écran
+  verrouillé) — une par jour au plus, envoi différé (30 s / 60 s) par
+  `upsert_partner_notification` pour que le texte inclue le besoin ou
+  tous les symptômes ; l'alerte « 3 jours difficiles » reste en plus.
+  Rappel local d'humeur à 20h pour la personne enceinte
+  (`profiles.notify_mood_reminder`, Réglages) ;
 - les rappels de rendez-vous et de démarches sont **locaux** (programmés
   sur le téléphone), pas de cron ;
 - Android via Firebase (`google-services.json`, clé FCM V1 à déposer sur

@@ -13,11 +13,14 @@ import {
   updateMyNotificationPreferences,
 } from '@/features/profile/api';
 import { useMyProfile } from '@/features/profile/hooks';
+import { useMyWeekCheckins } from '@/features/together/hooks';
 import { sessionAtom } from '@/lib/atoms/session';
+import { todayIso } from '@/lib/date';
 import { queryKeys } from '@/lib/query/keys';
 
 import {
   buildAppointmentReminders,
+  buildMoodReminders,
   buildProcedureReminders,
   syncLocalReminders,
 } from './reminders';
@@ -62,6 +65,9 @@ export function useNotifications() {
   const { data: household } = useMyHousehold();
   const appointmentsQuery = useAppointments(household);
   const proceduresQuery = useProcedures(household);
+  // Humeur du jour déjà partagée ? (rappel d'humeur, personne enceinte).
+  const checkinsQuery = useMyWeekCheckins(household);
+  const isPregnant = Boolean(userId && household?.pregnant_user_id === userId);
 
   // 1. Mise en place, autorisation, token push.
   useEffect(() => {
@@ -99,7 +105,8 @@ export function useNotifications() {
     Boolean(profile) &&
     Boolean(household) &&
     appointmentsQuery.isSuccess &&
-    proceduresQuery.isSuccess;
+    proceduresQuery.isSuccess &&
+    (!isPregnant || checkinsQuery.isSuccess);
 
   const reminders = useMemo(() => {
     if (!isDataReady || !profile || !household) return [];
@@ -110,6 +117,12 @@ export function useNotifications() {
       ...(profile.notify_procedures
         ? buildProcedureReminders(proceduresQuery.data ?? [], household)
         : []),
+      ...(isPregnant && profile.notify_mood_reminder
+        ? buildMoodReminders({
+            hasCheckedInToday: Boolean(checkinsQuery.data?.[todayIso()]),
+            isSolo: household.accompaniment_type === 'seul',
+          })
+        : []),
     ];
   }, [
     isDataReady,
@@ -117,6 +130,8 @@ export function useNotifications() {
     household,
     appointmentsQuery.data,
     proceduresQuery.data,
+    isPregnant,
+    checkinsQuery.data,
   ]);
 
   const signature = reminders

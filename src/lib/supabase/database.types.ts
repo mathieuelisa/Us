@@ -887,6 +887,7 @@ export type Database = {
           id: string;
           is_partner: boolean;
           notify_appointments: boolean;
+          notify_mood_reminder: boolean;
           notify_partner: boolean;
           notify_procedures: boolean;
           pronoun: string | null;
@@ -899,6 +900,7 @@ export type Database = {
           id: string;
           is_partner?: boolean;
           notify_appointments?: boolean;
+          notify_mood_reminder?: boolean;
           notify_partner?: boolean;
           notify_procedures?: boolean;
           pronoun?: string | null;
@@ -911,6 +913,7 @@ export type Database = {
           id?: string;
           is_partner?: boolean;
           notify_appointments?: boolean;
+          notify_mood_reminder?: boolean;
           notify_partner?: boolean;
           notify_procedures?: boolean;
           pronoun?: string | null;
