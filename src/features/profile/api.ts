@@ -100,3 +100,25 @@ export async function updateMyPartnerIntro(
 
   if (error) throw error;
 }
+
+/** Interrupteurs de notifications de Réglages (`profiles.notify_*`). */
+export type NotificationPreferences = Pick<
+  Profile,
+  'notify_appointments' | 'notify_procedures' | 'notify_partner'
+>;
+
+/**
+ * Lues par l'app (rappels locaux) et par la base (`enqueue_partner_notification`
+ * pour les push de l'autre parent). RLS : `profiles_update_own`.
+ */
+export async function updateMyNotificationPreferences(
+  userId: string,
+  patch: Partial<NotificationPreferences>,
+): Promise<void> {
+  const { error } = await supabase
+    .from('profiles')
+    .update(patch)
+    .eq('id', userId);
+
+  if (error) throw error;
+}

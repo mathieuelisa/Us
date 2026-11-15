@@ -20,7 +20,7 @@ title: Architecture technique — US
 | État client global | Jotai |
 | Lint / format | Biome |
 | Paiement premium | À trancher en phase MVP+1 (RevenueCat recommandé pour achat unique + restauration cross-plateforme) |
-| Notifications push | Expo Notifications + Supabase Edge Functions (scheduling) — Phase 4, rien d'installé |
+| Notifications | `expo-notifications` (2026-11-15). Rappels de rendez-vous et de démarches programmés **en local** sur le téléphone (`src/features/notifications/reminders.ts`). Alertes de l'autre parent en **push** : déclencheurs en base → `notification_outbox` → Edge Function `send-push` → Expo Push → Firebase (Android). iOS : pas encore de compte Apple Developer |
 | Animations | Reanimated 4 (+ worklets), `react-native-svg` pour les doodles et formes, `expo-blur` pour le flou des écrans premium |
 | Styles / theming | Tailwind v4 via [Uniwind](https://docs.uniwind.dev) — Hero UI Native est bâti dessus, `className` sur les composants plutôt que `StyleSheet.create` pour tout ce que le kit ne fournit pas déjà |
 | Gestionnaire de paquets | [bun](https://bun.sh) (lockfile `bun.lock`) |

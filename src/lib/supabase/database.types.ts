@@ -845,6 +845,9 @@ export type Database = {
           first_name: string | null;
           id: string;
           is_partner: boolean;
+          notify_appointments: boolean;
+          notify_partner: boolean;
+          notify_procedures: boolean;
           pronoun: string | null;
           theme: string;
         };
@@ -854,6 +857,9 @@ export type Database = {
           first_name?: string | null;
           id: string;
           is_partner?: boolean;
+          notify_appointments?: boolean;
+          notify_partner?: boolean;
+          notify_procedures?: boolean;
           pronoun?: string | null;
           theme?: string;
         };
@@ -863,8 +869,32 @@ export type Database = {
           first_name?: string | null;
           id?: string;
           is_partner?: boolean;
+          notify_appointments?: boolean;
+          notify_partner?: boolean;
+          notify_procedures?: boolean;
           pronoun?: string | null;
           theme?: string;
+        };
+        Relationships: [];
+      };
+      push_tokens: {
+        Row: {
+          platform: string;
+          token: string;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          platform: string;
+          token: string;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          platform?: string;
+          token?: string;
+          updated_at?: string;
+          user_id?: string;
         };
         Relationships: [];
       };
@@ -925,6 +955,11 @@ export type Database = {
       };
       mark_household_partner_profile: { Args: never; Returns: unknown };
       generate_household_join_code: { Args: never; Returns: string };
+      register_push_token: {
+        Args: { p_token: string; p_platform: string };
+        Returns: undefined;
+      };
+      unregister_push_token: { Args: { p_token: string }; Returns: undefined };
     };
     Enums: {
       [_ in never]: never;

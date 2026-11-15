@@ -1,7 +1,7 @@
 import type { AuthError } from '@supabase/supabase-js';
 import * as WebBrowser from 'expo-web-browser';
 import { Platform } from 'react-native';
-
+import { unregisterPushToken } from '@/features/notifications/setup';
 import {
   createSessionFromUrl,
   getAuthRedirectTo,
@@ -114,6 +114,10 @@ export async function signInWithGoogle(): Promise<boolean> {
  * l'utilisateur demande en appuyant sur le bouton.
  */
 export async function signOut() {
+  // Plus d'alertes de ce compte sur cet appareil (avant la déconnexion : la
+  // fonction exige la session). Sans réseau, tant pis : le token sera
+  // réattribué au prochain compte connecté sur ce téléphone.
+  await unregisterPushToken().catch(() => {});
   const { error } = await supabase.auth.signOut();
   if (error) {
     await supabase.auth.signOut({ scope: 'local' });

@@ -2,6 +2,7 @@ import { Tabs } from 'expo-router';
 
 import { AppTabBar } from '@/components/navigation/tab-bar';
 import { useHouseholdRealtime } from '@/features/household/realtime';
+import { useNotifications } from '@/features/notifications/hooks';
 
 const HUB_DESTINATIONS = [
   'demarches',
@@ -70,6 +71,8 @@ export default function TabsLayout() {
   // Mises à jour en direct des données de l'espace, tant que l'app est
   // ouverte (voir `useHouseholdRealtime`).
   useHouseholdRealtime();
+  // Autorisation, token push, rappels locaux (voir `useNotifications`).
+  useNotifications();
 
   return (
     <Tabs

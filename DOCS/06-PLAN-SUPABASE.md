@@ -101,11 +101,11 @@ configurer le SMTP. Détail dans l'[architecture](./04-ARCHITECTURE.md#connexion
 | Élément | État |
 |---|---|
 | Projet | `hsclyntlnoyevstdhgvu`, Paris. Ancien projet de Londres encore présent (dette n°4) |
-| Migrations | 45, **identiques** entre le dépôt et le cloud (dernière : `20261115172821`, `realtime_household_deletes_policy_guard`) |
+| Migrations | 46, **identiques** entre le dépôt et le cloud (dernière : `20261115174849`, `push_notifications`) |
 | Tables | 22, toutes avec RLS |
 | Données réelles | 2 comptes, **1 foyer sans co-parent rattaché** : le parcours à deux n'a jamais été joué pour de vrai (dette n°5) |
 | Auth | Email + mot de passe actif ; Google désactivé (dette n°56) ; confirmation d'email désactivée pour les tests (dette n°60) ; SMTP mutualisé de Supabase |
-| Edge Functions | `delete-account` |
+| Edge Functions | `delete-account`, `send-push` (`verify_jwt = false`, appelée par pg_net) |
 | Storage, Cron | Rien |
 | Realtime | Postgres Changes sur les 13 tables partagées d'un espace et sur `profiles` (les deux parents), plus un Broadcast privé `household:<id>` pour les suppressions (déclencheurs `broadcast_delete`) — `useHouseholdRealtime` |
 | Sécurité | Advisors : seuls les avertissements voulus (`accept_household_invite`, `is_household_member`, `household_role`) et la protection des mots de passe compromis (réglage du dashboard) |
@@ -425,6 +425,24 @@ RLS), les matchs ne révèlent que les prénoms aimés par les deux.
 
 Objectif : des notifications réellement envoyées (Phase 4 du plan d'action,
 → V1).
+
+**Fait le 2026-11-15** (demande explicite), migration `push_notifications` :
+- `push_tokens` (un token Expo par appareil, RPC `register_push_token` /
+  `unregister_push_token`), `notification_outbox` (file d'envoi sans
+  policy, `dedupe_key` unique), préférences `profiles.notify_appointments`,
+  `notify_procedures`, `notify_partner` (Réglages) ;
+- déclencheurs vers l'autre parent : rendez-vous partagé ajouté,
+  naissance déclarée, 3 jours d'humeur difficile d'affilée (une alerte
+  par série) ; `enqueue_partner_notification` met en file puis appelle
+  `send-push` via pg_net ;
+- les rappels de rendez-vous et de démarches sont **locaux** (programmés
+  sur le téléphone), pas de cron ;
+- Android via Firebase (`google-services.json`, clé FCM V1 à déposer sur
+  EAS) ; iOS en attente d'un compte Apple Developer ; le rythme
+  `reminder_frequency` n'est pas encore utilisé ; réassurance après un
+  symptôme (4d) non faite.
+
+Plan d'origine :
 
 - [ ] Table `push_tokens` : `user_id`, token Expo, plateforme, date de
       dernière activité. RLS : chacun gère les siens.

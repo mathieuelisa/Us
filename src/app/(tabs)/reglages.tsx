@@ -11,6 +11,7 @@ import {
   ChangePasswordModal,
   DeleteAccountModal,
 } from '@/components/settings/account-modals';
+import { NotificationSettings } from '@/components/settings/notification-settings';
 import {
   DashedLoopDoodle,
   GLASS_BODY_COLOR,
@@ -68,8 +69,9 @@ const LEGAL_LINKS: { doc: string; label: string; icon: IoniconName }[] = [
  * Section **Compte** (ajout du 2026-11-11, avec le passage à la connexion
  * par mot de passe) : email de connexion et moyen utilisé, changement de mot
  * de passe pour les comptes email, suppression du compte (Edge Function
- * `delete-account`, obligatoire pour l'App Store). Le reste de la maquette
- * 10a (notifications, aide & support, export de données) reste hors
+ * `delete-account`, obligatoire pour l'App Store). Section **Notifications**
+ * (2026-11-15) : un interrupteur par type (`NotificationSettings`). Le reste
+ * de la maquette 10a (aide & support, export de données) reste hors
  * périmètre.
  *
  * ⚠️ Distinct du « Thème sombre » + « Couleur d'accent » de la maquette :
@@ -235,6 +237,26 @@ export default function SettingsScreen() {
               />
             ) : null}
           </View>
+        </View>
+
+        <View className="gap-3.5">
+          <SectionTitle
+            icon="notifications-outline"
+            label="Notifications"
+            accent={accent}
+          />
+          <NotificationSettings
+            accent={accent}
+            isSolo={isSolo}
+            cardStyle={[
+              tintedShadow(accent),
+              {
+                backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                borderWidth: 1,
+                borderColor: 'rgba(255, 255, 255, 0.95)',
+              },
+            ]}
+          />
         </View>
 
         <View

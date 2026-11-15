@@ -19,7 +19,8 @@
       },
       "predictiveBackGestureEnabled": false,
       "package": "com.anonymous.us",
-      "permissions": ["android.permission.CAMERA"]
+      "permissions": ["android.permission.CAMERA"],
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "output": "single",
@@ -47,6 +48,13 @@
           "cameraPermission": "US utilise l’appareil photo pour scanner le QR code d’invitation de votre partenaire.",
           "microphonePermission": false,
           "recordAudioAndroid": false
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/android-icon-monochrome.png",
+          "color": "#2D5E5A"
         }
       ]
     ],
