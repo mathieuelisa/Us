@@ -1,7 +1,7 @@
 import type { ImageSourcePropType } from 'react-native';
 
 /**
- * Les 4 suivis bébé accessibles depuis la grille bento de `/bebe`
+ * Les suivis bébé accessibles depuis la grille bento de `/bebe`
  * (design US Hi-Fi, écran 8b « Votre bébé — écran principal ») et le
  * contenu de leur formulaire d'ajout (écrans 8d/8f/8g/8h).
  *
@@ -21,7 +21,8 @@ export type BabyModuleSlug =
   | 'allaitement'
   | 'bain'
   | 'sommeil'
-  | 'vaccin';
+  | 'vaccin'
+  | 'tirage';
 
 /**
  * Champ chiffré du formulaire — `unit` sert au libellé et au résumé.
@@ -259,6 +260,48 @@ export const BABY_MODULES: Record<BabyModuleSlug, BabyModule> = {
     dailySummary: {
       noun: { singular: 'tétée', plural: 'tétées' },
       sumField: 'duration',
+    },
+  },
+  tirage: {
+    slug: 'tirage',
+    emoji: '🥛',
+    // Pas encore d'icône 3D dédiée : icône du biberon en attendant
+    // `Icon_tirage.png`.
+    image: require('@/assets/images/Icon_biberon.png'),
+    title: 'Tirage de lait',
+    subtitle: 'Quantité, horaire',
+    sectionTitle: 'Derniers tirages',
+    emptyState: 'Aucun tirage enregistré pour le moment.',
+    actionLabel: 'Ajouter un tirage',
+    editLabel: 'Modifier le tirage',
+    formSubtitle: 'Notez l’heure du tirage et la quantité de lait tirée.',
+    // Heure et quantité seulement (demande explicite du 2026-11-15) : ni
+    // sein, ni commentaire.
+    segments: null,
+    hasTime: true,
+    hasComment: false,
+    fields: [
+      {
+        key: 'quantity',
+        label: 'Quantité',
+        unit: 'ml',
+        kind: 'number',
+        // Même molette que le biberon, par pas de 5 ml : le lait tiré se lit
+        // sur les graduations du biberon ou du pot de recueil.
+        wheel: {
+          min: 5,
+          max: 360,
+          integerStep: 5,
+          fractionDigits: 0,
+          fractionStep: 1,
+          defaultValue: 90,
+        },
+      },
+    ],
+    requiredFieldCount: 1,
+    dailySummary: {
+      noun: { singular: 'tirage', plural: 'tirages' },
+      sumField: 'quantity',
     },
   },
   bain: {

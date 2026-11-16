@@ -48,6 +48,7 @@ const BAIN_ICON = BABY_MODULES.bain.image;
 const ALLAITEMENT_ICON = BABY_MODULES.allaitement.image;
 const SOMMEIL_ICON = BABY_MODULES.sommeil.image;
 const VACCIN_ICON = BABY_MODULES.vaccin.image;
+const TIRAGE_ICON = BABY_MODULES.tirage.image;
 const DESCRIPTION =
   'Centralisez la croissance, les repas et le sommeil de bébé, et gardez votre partenaire connecté à chaque étape.';
 /** Espace « Seul·e » (demande explicite) : sans le partenaire. */
@@ -55,7 +56,7 @@ const SOLO_DESCRIPTION =
   'Centralisez la croissance, les repas et le sommeil de bébé.';
 
 /**
- * Ouvre le détail d'un suivi. Les 6 routes vivent dans le groupe `(tabs)`
+ * Ouvre le détail d'un suivi. Les 7 routes vivent dans le groupe `(tabs)`
  * (`bebe-<slug>`, déclarées `href: null` dans `_layout.tsx`) pour que la
  * barre de navigation reste visible pendant la consultation, comme pour
  * `/premium`.
@@ -261,6 +262,7 @@ function SmallModuleCard({
   slug,
   waveColor,
   accent,
+  labelLines = 1,
 }: {
   emoji: string;
   /** Illustration à sa propre tuile, à la place de l'émoji. */
@@ -269,6 +271,12 @@ function SmallModuleCard({
   slug: BabyModuleSlug;
   waveColor: string;
   accent: string;
+  /**
+   * Lignes du titre : 2 pour « Tirage de lait », qui ne tient pas sur une
+   * ligne dans une demi-largeur. 1 par défaut, un mot seul (« Allaitement »)
+   * se coupe en « … » plutôt qu'au milieu du mot.
+   */
+  labelLines?: number;
 }) {
   return (
     <GlassCard
@@ -288,7 +296,7 @@ function SmallModuleCard({
         />
         <View className="flex-row items-center justify-between gap-2">
           <Text
-            numberOfLines={1}
+            numberOfLines={labelLines}
             className="flex-1 text-[17px] font-bold"
             style={{ color: TITLE_COLOR }}
           >
@@ -302,15 +310,18 @@ function SmallModuleCard({
 }
 
 /**
- * Disposition en bento (Croissance haute à gauche, Biberon et Allaitement
- * empilés à droite, Bain & Soins en largeur), habillée en cartes de verre
+ * Disposition en bento (Croissance haute à gauche, Biberon, Allaitement et
+ * Tirage de lait empilés à droite, Bain & Soins en largeur), habillée en cartes de verre
  * dépoli à vague pastel, d'après une capture de référence (demande
  * explicite). Passée en `gridContent` à `PremiumLockedScreen`.
  */
 function BabyModulesGrid({ accent }: { accent: string }) {
   return (
     <View className="gap-4">
-      <View className="flex-row gap-3.5" style={{ minHeight: 270 }}>
+      {/* Hauteur portée à 3 petits blocs à droite (Tirage de lait sous
+          Allaitement, demande explicite du 2026-11-15) : Croissance
+          s'étire d'autant à gauche. */}
+      <View className="flex-row gap-3.5" style={{ minHeight: 410 }}>
         <GlassCard
           accessibilityLabel="Ouvrir le suivi Croissance"
           accent={accent}
@@ -383,6 +394,15 @@ function BabyModulesGrid({ accent }: { accent: string }) {
             label="Allaitement"
             slug="allaitement"
             waveColor={WAVE_PINK}
+            accent={accent}
+          />
+          <SmallModuleCard
+            emoji="🥛"
+            image={TIRAGE_ICON}
+            label="Tirage de lait"
+            slug="tirage"
+            labelLines={2}
+            waveColor={WAVE_MINT}
             accent={accent}
           />
         </View>
