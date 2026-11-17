@@ -1,13 +1,12 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useRef, useState } from 'react';
-import { Pressable, Switch, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import Animated, {
   FadeInDown,
   FadeOutLeft,
   LinearTransition,
 } from 'react-native-reanimated';
 import Svg, { Path } from 'react-native-svg';
-
 import type { FeedbackBannerTone } from '@/components/ui/feedback-banner';
 import {
   GLASS_BODY_COLOR,
@@ -19,11 +18,11 @@ import {
   type IoniconName,
 } from '@/components/ui/icon-input';
 import { PillButton } from '@/components/ui/pill-button';
+import { ToggleSwitch } from '@/components/ui/toggle-switch';
 import {
   useContacts,
   useCreateContact,
   useDeleteContact,
-  useReorderContacts,
   useUpdateContact,
 } from '@/features/health/hooks';
 import type { Household } from '@/features/household/api';
@@ -64,16 +63,16 @@ const ROW_LAYOUT = LinearTransition.springify().damping(18).stiffness(170);
  * s'effaçant ; les contacts suivants remontent avec un ressort. Le retrait
  * est **optimiste** — la ligne part sans attendre le serveur — et la ligne
  * revient avec un bandeau d'erreur si la suppression échoue. Le même
- * ressort anime la montée / descente d'un contact.
+ * ressort anime la place d'un contact ajouté ou renommé.
  *
  * Modification (demande explicite) : toucher un contact le remplace sur
  * place par le même formulaire, prérempli (`ContactForm`).
  *
- * « Trier A→Z » (demande explicite, « si besoin ») : range la liste une
- * fois, à la demande, et enregistre ce nouvel ordre pour les deux parents —
- * les flèches restent pour l'ajuster ensuite. Les numéros d'urgence restent
- * en tête (choix validé), triés entre eux. Le bouton s'efface en
- * « Triés de A à Z » tant que la liste l'est déjà.
+ * Ordre alphabétique **toujours** (demande explicite : plus logique qu'un
+ * bouton « Trier A→Z ») : la liste est triée à l'affichage, donc un contact
+ * ajouté ou renommé prend tout de suite sa place. Les numéros d'urgence
+ * restent en tête (choix validé), triés entre eux. Plus de flèches
+ * monter / descendre : l'ordre ne se règle plus à la main.
  */
 export function ContactsTab({
   household,
@@ -91,7 +90,6 @@ export function ContactsTab({
   const { data: contacts = [] } = useContacts(household);
   const createContact = useCreateContact(household);
   const deleteContact = useDeleteContact(household);
-  const reorderContacts = useReorderContacts(household);
   const updateContact = useUpdateContact(household);
 
   // Contact en cours de modification, affiché sous forme de formulaire à sa
@@ -140,45 +138,9 @@ export function ContactsTab({
     }, DELETE_FLASH_MS);
   };
 
-  const visibleContacts = contacts.filter(
+  const visibleContacts = sortContactsAlphabetically(contacts).filter(
     (contact) => !hiddenIds.includes(contact.id),
   );
-
-  const alphabeticalOrder = sortContactsAlphabetically(contacts);
-  const isAlreadySorted = alphabeticalOrder.every(
-    (contact, index) => contact.id === contacts[index]?.id,
-  );
-
-  const sortAlphabetically = () => {
-    if (isAlreadySorted || reorderContacts.isPending) return;
-    reorderContacts.mutate(
-      alphabeticalOrder.map((contact, sortOrder) => ({
-        id: contact.id,
-        sort_order: sortOrder,
-      })),
-      {
-        onSuccess: () => onFeedback?.('success', 'Contacts triés de A à Z'),
-        onError: () =>
-          onFeedback?.('error', 'Impossible de trier les contacts. Réessayez.'),
-      },
-    );
-  };
-
-  const moveContact = (index: number, direction: -1 | 1) => {
-    const targetIndex = index + direction;
-    if (targetIndex < 0 || targetIndex >= contacts.length) return;
-
-    const reordered = [...contacts];
-    const [moved] = reordered.splice(index, 1);
-    reordered.splice(targetIndex, 0, moved);
-
-    reorderContacts.mutate(
-      reordered.map((contact, sortOrder) => ({
-        id: contact.id,
-        sort_order: sortOrder,
-      })),
-    );
-  };
 
   return (
     <View className="gap-3">
@@ -218,17 +180,7 @@ export function ContactsTab({
         </View>
       ) : null}
 
-      {visibleContacts.length >= 2 && !isAdding && !editingId ? (
-        <SortButton
-          accent={accent}
-          isSorted={isAlreadySorted}
-          isPending={reorderContacts.isPending}
-          onPress={sortAlphabetically}
-        />
-      ) : null}
-
       {visibleContacts.map((contact) => {
-        const index = contacts.findIndex((item) => item.id === contact.id);
         if (contact.id === editingId) {
           return (
             <Animated.View
@@ -350,18 +302,6 @@ export function ContactsTab({
               </View>
             </Pressable>
 
-            <RowAction
-              icon="chevron-up"
-              label="Monter"
-              isDisabled={index === 0}
-              onPress={() => moveContact(index, -1)}
-            />
-            <RowAction
-              icon="chevron-down"
-              label="Descendre"
-              isDisabled={index === contacts.length - 1}
-              onPress={() => moveContact(index, 1)}
-            />
             {/* Corbeille plutôt qu'une croix (demande explicite : plus
                 clair que « fermer »), en rouge doux. */}
             <RowAction
@@ -388,57 +328,6 @@ function sortContactsAlphabetically<
     if (a.is_emergency !== b.is_emergency) return a.is_emergency ? -1 : 1;
     return a.name.localeCompare(b.name, 'fr', { sensitivity: 'base' });
   });
-}
-
-/** Gélule « Trier A→Z », alignée à droite au-dessus de la liste. */
-function SortButton({
-  accent,
-  isSorted,
-  isPending,
-  onPress,
-}: {
-  accent: string;
-  isSorted: boolean;
-  isPending: boolean;
-  onPress: () => void;
-}) {
-  const isDisabled = isSorted || isPending;
-  return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityLabel={
-        isSorted
-          ? 'Contacts déjà triés de A à Z'
-          : 'Trier les contacts de A à Z'
-      }
-      accessibilityState={{ disabled: isDisabled, busy: isPending }}
-      disabled={isDisabled}
-      onPress={onPress}
-      hitSlop={6}
-      className="flex-row items-center gap-1.5 self-end rounded-full px-3.5 py-2 active:opacity-70"
-      style={{
-        backgroundColor: isSorted
-          ? 'rgba(255, 255, 255, 0.6)'
-          : hexToRgba(accent, 0.1),
-      }}
-    >
-      <Ionicons
-        name={isSorted ? 'checkmark' : 'swap-vertical'}
-        size={15}
-        color={isSorted ? GLASS_BODY_COLOR : accent}
-      />
-      <Text
-        className="text-[13px] font-semibold"
-        style={{ color: isSorted ? GLASS_BODY_COLOR : accent }}
-      >
-        {isPending
-          ? 'Tri en cours…'
-          : isSorted
-            ? 'Triés de A à Z'
-            : 'Trier A→Z'}
-      </Text>
-    </Pressable>
-  );
 }
 
 /** Petit bouton rond d'action sur une ligne de contact. */
@@ -640,11 +529,11 @@ function ContactForm({
         >
           Numéro d’urgence
         </Text>
-        <Switch
+        <ToggleSwitch
           accessibilityLabel="Numéro d’urgence"
           value={isEmergency}
           onValueChange={setIsEmergency}
-          trackColor={{ true: EMERGENCY_RED }}
+          onColor={EMERGENCY_RED}
         />
       </View>
 

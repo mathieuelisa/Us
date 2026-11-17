@@ -4,7 +4,6 @@ import {
   Linking,
   Pressable,
   type StyleProp,
-  Switch,
   Text,
   View,
   type ViewStyle,
@@ -14,6 +13,7 @@ import {
   GLASS_BODY_COLOR,
   GLASS_TITLE_COLOR,
 } from '@/components/ui/glass-card';
+import { ToggleSwitch } from '@/components/ui/toggle-switch';
 import {
   useNotificationPermission,
   useUpdateNotificationPreferences,
@@ -153,14 +153,13 @@ export function NotificationSettings({
                 {row.description}
               </Text>
             </View>
-            <Switch
+            <ToggleSwitch
               accessibilityLabel={`Notifications : ${row.label}`}
               value={profile?.[row.key] ?? true}
               disabled={!profile}
               onValueChange={(value) =>
                 updatePreferences.mutate({ [row.key]: value })
               }
-              trackColor={{ true: accent }}
             />
           </View>
         ))}

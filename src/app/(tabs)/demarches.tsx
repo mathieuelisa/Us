@@ -6,7 +6,6 @@ import {
   Linking,
   Pressable,
   ScrollView,
-  Switch,
   Text,
   View,
 } from 'react-native';
@@ -36,6 +35,7 @@ import {
 } from '@/components/ui/glass-card';
 import { PillButton } from '@/components/ui/pill-button';
 import { ScreenCornerShapes } from '@/components/ui/screen-corner-shapes';
+import { ToggleSwitch } from '@/components/ui/toggle-switch';
 import { usePullToRefresh } from '@/components/ui/use-pull-to-refresh';
 import { getPregnancyMonth } from '@/features/health/constants';
 import { useMyHousehold } from '@/features/household/hooks';
@@ -912,11 +912,10 @@ function ProcedureDetail({
               Pour ne pas laisser passer cette démarche.
             </Text>
           </View>
-          <Switch
+          <ToggleSwitch
             accessibilityLabel="Me rappeler avant l’échéance"
             value={procedure.reminderEnabled}
             onValueChange={onToggleReminder}
-            trackColor={{ true: accent }}
           />
         </View>
 
