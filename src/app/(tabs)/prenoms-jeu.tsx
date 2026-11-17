@@ -9,6 +9,7 @@ import Svg, { Path } from 'react-native-svg';
 import { withUniwind } from 'uniwind';
 
 import { CountryPicker } from '@/components/names/country-picker';
+import { NameMatchCelebration } from '@/components/names/name-match-celebration';
 import {
   DEFAULT_CARD_HEIGHT,
   MIN_CARD_HEIGHT,
@@ -80,6 +81,9 @@ export default function NameGameScreen() {
   const [selectedCountries, setSelectedCountries] = useState<string[]>([]);
   const [deck, setDeck] = useState<NameCard[] | null>(null);
   const [command, setCommand] = useState<SwipeCommand>(null);
+  // Prénom qui vient de créer un match (demande explicite) : célébration
+  // en confettis par-dessus le jeu.
+  const [matchedName, setMatchedName] = useState<string | null>(null);
 
   const { isLoading: areSwipesLoading } = useNameSwipes();
   const decided = useMyDecidedNames(gender);
@@ -121,6 +125,10 @@ export default function NameGameScreen() {
     recordSwipe.mutate(
       { gender, name: card.name, liked },
       {
+        // Pas de match possible en « Seul·e » : pas d'autre parent.
+        onSuccess: ({ isMatch }) => {
+          if (isMatch && !isSolo) setMatchedName(card.name);
+        },
         onError: () =>
           showFeedback('error', 'Ce choix n’a pas pu être enregistré.'),
       },
@@ -320,6 +328,17 @@ export default function NameGameScreen() {
         message={feedback?.message ?? null}
         tone={feedback?.tone}
         accent={accent}
+      />
+
+      <NameMatchCelebration
+        name={matchedName}
+        genderColor={meta.color}
+        accent={accent}
+        onContinue={() => setMatchedName(null)}
+        onSeeMatches={() => {
+          setMatchedName(null);
+          router.navigate('/prenoms-matchs');
+        }}
       />
     </SafeAreaView>
   );

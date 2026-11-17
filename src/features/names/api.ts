@@ -47,6 +47,32 @@ export async function recordNameSwipe(input: {
   if (error) throw error;
 }
 
+/**
+ * L'autre parent a-t-il gardé ce prénom ? Lu à la source juste après son
+ * propre choix, pour annoncer un match (demande explicite) sans dépendre
+ * d'un cache qui peut dater de plusieurs minutes. RLS :
+ * `name_swipes_select_members`.
+ */
+export async function hasPartnerLikedName(input: {
+  householdId: string;
+  userId: string;
+  gender: NameGender;
+  name: string;
+}): Promise<boolean> {
+  const { data, error } = await supabase
+    .from('name_swipes')
+    .select('user_id')
+    .eq('household_id', input.householdId)
+    .eq('gender', input.gender)
+    .eq('name', input.name)
+    .eq('liked', true)
+    .neq('user_id', input.userId)
+    .limit(1);
+
+  if (error) throw error;
+  return data.length > 0;
+}
+
 /** Ses favoris, et seulement les siens (RLS : `name_favorites_select_own`). */
 export async function fetchMyNameFavorites(
   householdId: string,

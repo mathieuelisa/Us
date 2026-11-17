@@ -8,6 +8,7 @@ import {
   addNameFavorite,
   fetchMyNameFavorites,
   fetchNameSwipes,
+  hasPartnerLikedName,
   type NameFavorite,
   type NameSwipe,
   recordNameSwipe,
@@ -85,18 +86,32 @@ function computeMatches(
     }));
 }
 
+/**
+ * Enregistre un choix et dit s'il crée un match : `isMatch` vaut vrai quand
+ * le prénom est gardé et que l'autre parent l'avait déjà gardé (vérifié à
+ * la source, pas dans le cache). Un échec de cette seule vérification ne
+ * fait pas échouer le choix, déjà enregistré : pas de fête, c'est tout.
+ */
 export function useRecordNameSwipe() {
   const queryClient = useQueryClient();
   const { householdId, userId } = useHouseholdAndUser();
 
   return useMutation({
-    mutationFn: (input: {
+    mutationFn: async (input: {
       gender: NameGender;
       name: string;
       liked: boolean;
-    }) => {
+    }): Promise<{ isMatch: boolean }> => {
       if (!householdId || !userId) throw new Error('No household or user');
-      return recordNameSwipe({ householdId, userId, ...input });
+      await recordNameSwipe({ householdId, userId, ...input });
+      if (!input.liked) return { isMatch: false };
+      const isMatch = await hasPartnerLikedName({
+        householdId,
+        userId,
+        gender: input.gender,
+        name: input.name,
+      }).catch(() => false);
+      return { isMatch };
     },
     onSuccess: () => {
       if (householdId) {
