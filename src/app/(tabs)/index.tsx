@@ -6,6 +6,8 @@ import { Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import { withUniwind } from 'uniwind';
 
+import { AppointmentDetailModal } from '@/components/health/appointment-detail-modal';
+import { AppointmentFormModal } from '@/components/health/appointment-form-modal';
 import { HealthTodayCard } from '@/components/hub/health-today-card';
 import { HowItWorksModal } from '@/components/hub/how-it-works-modal';
 import { InvitePartnerModal } from '@/components/hub/invite-partner-modal';
@@ -24,7 +26,12 @@ import {
 } from '@/components/ui/glass-card';
 import { ScreenCornerShapes } from '@/components/ui/screen-corner-shapes';
 import { usePullToRefresh } from '@/components/ui/use-pull-to-refresh';
-import { useAppointments } from '@/features/health/hooks';
+import type { Appointment } from '@/features/health/api';
+import {
+  useAppointments,
+  useDeleteAppointment,
+  useUpdateAppointment,
+} from '@/features/health/hooks';
 import { useMyHousehold } from '@/features/household/hooks';
 import {
   CARD_SHADOW,
@@ -38,6 +45,7 @@ import { useHubSummary } from '@/features/hub/hooks';
 import { useMyProfile } from '@/features/profile/hooks';
 import { useThemeAccent, useThemeBackground } from '@/features/settings/hooks';
 import { currentRoleAtom } from '@/lib/atoms/role';
+import { sessionAtom } from '@/lib/atoms/session';
 import { darkenHex, hexToRgba, lightenHex } from '@/lib/color';
 import { daysBetween, todayIso } from '@/lib/date';
 
@@ -78,6 +86,9 @@ export default function HubScreen() {
   const { data: household } = useMyHousehold();
   const { data: summary } = useHubSummary(household);
   const { data: appointments = [] } = useAppointments(household);
+  const updateAppointment = useUpdateAppointment(household);
+  const deleteAppointment = useDeleteAppointment(household);
+  const currentUserId = useAtomValue(sessionAtom)?.user.id ?? null;
   // Espace « Seul·e » (demande explicite) : pas d'invitation, et la carte
   // « Mon partenaire » devient « Cette semaine » (taille du bébé, astuces).
   const isSolo = household?.accompaniment_type === 'seul';
@@ -115,6 +126,28 @@ export default function HubScreen() {
   const partnerMood = hasPartnerJoined ? (summary?.partnerMood ?? null) : null;
   const [isHowItWorksOpen, setIsHowItWorksOpen] = useState(false);
   const [isInviteOpen, setIsInviteOpen] = useState(false);
+
+  // Fiche d'un rendez-vous (demande explicite) : retrouvée par son id dans
+  // la liste, pour refléter une modification dès le retour du formulaire.
+  // Fiche et formulaire ne sont jamais ouverts ensemble (un seul `Modal`).
+  const [detailAppointmentId, setDetailAppointmentId] = useState<string | null>(
+    null,
+  );
+  const [editingAppointment, setEditingAppointment] =
+    useState<Appointment | null>(null);
+  const detailAppointment =
+    appointments.find((item) => item.id === detailAppointmentId) ?? null;
+
+  const editDetailAppointment = () => {
+    setEditingAppointment(detailAppointment);
+    setDetailAppointmentId(null);
+  };
+  // Annuler la modification ramène à la fiche ; l'enregistrer aussi, pour
+  // voir le résultat. Une suppression ferme tout.
+  const closeEditor = () => {
+    setDetailAppointmentId(editingAppointment?.id ?? null);
+    setEditingAppointment(null);
+  };
 
   // Tirer vers le bas en haut de l'accueil recharge les données (demande
   // explicite : il fallait quitter et relancer l'app). Toutes les requêtes
@@ -432,7 +465,8 @@ export default function HubScreen() {
                 <Pressable
                   key={appointment.id}
                   accessibilityRole="button"
-                  onPress={() => router.push('/sante?tab=appointments')}
+                  accessibilityLabel={`Voir le rendez-vous ${appointment.title}`}
+                  onPress={() => setDetailAppointmentId(appointment.id)}
                   style={CARD_SHADOW}
                   className="flex-row items-center justify-between gap-3 rounded-2xl border border-[#e0e0e0] bg-white px-4 py-5"
                 >
@@ -503,6 +537,40 @@ export default function HubScreen() {
         accent={accent}
         partnerName={partnerName || null}
         onClose={() => setIsInviteOpen(false)}
+      />
+      <AppointmentDetailModal
+        appointment={detailAppointment}
+        isMine={detailAppointment?.created_by === currentUserId}
+        isSolo={isSolo}
+        partnerName={partnerName || null}
+        accent={accent}
+        onEdit={editDetailAppointment}
+        onOpenAgenda={() => {
+          setDetailAppointmentId(null);
+          router.push('/sante?tab=appointments');
+        }}
+        onClose={() => setDetailAppointmentId(null)}
+      />
+      <AppointmentFormModal
+        visible={editingAppointment !== null}
+        editingAppointment={editingAppointment}
+        isSaving={updateAppointment.isPending}
+        canShare={!isSolo}
+        onCancel={closeEditor}
+        onSubmit={(input) => {
+          if (!editingAppointment) return;
+          updateAppointment.mutate(
+            { id: editingAppointment.id, ...input },
+            { onSuccess: closeEditor },
+          );
+        }}
+        isDeleting={deleteAppointment.isPending}
+        onDelete={() => {
+          if (!editingAppointment) return;
+          deleteAppointment.mutate(editingAppointment.id, {
+            onSuccess: () => setEditingAppointment(null),
+          });
+        }}
       />
       <HowItWorksModal
         visible={isHowItWorksOpen}
