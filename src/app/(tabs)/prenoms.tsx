@@ -11,11 +11,14 @@ import {
   GLASS_TITLE_COLOR,
 } from '@/components/ui/glass-card';
 import { useIsSoloHousehold } from '@/features/household/hooks';
+import { useNameFavorites, useNameMatches } from '@/features/names/hooks';
 import { useThemeAccent } from '@/features/settings/hooks';
 import { hexToRgba } from '@/lib/color';
 
 const HEART_IMAGE = require('@/assets/images/Heart_girls_boys.png');
 const LEAF_IMAGE = require('@/assets/images/Leaf_branch.png');
+/** Rouge-rose des pastilles de compte, celui des cœurs du jeu. */
+const MATCH_BADGE_RED = '#e5384f';
 const HEADER_HEART_IMAGE = require('@/assets/images/Prenoms_heart_header.png');
 const DESCRIPTION =
   "Swipez chacun de votre côté et découvrez les prénoms sur lesquels vous êtes tombés d'accord.";
@@ -124,6 +127,27 @@ function PrenomsGrid({ accent, isSolo }: { accent: string; isSolo: boolean }) {
   const modules = isSolo
     ? PRENOMS_MODULES.filter((module) => module.href !== '/prenoms-matchs')
     : PRENOMS_MODULES;
+
+  // Compteurs (demande explicite : savoir d'un coup d'œil s'il y a des
+  // matchs). Pastille sur le cœur de « Vos matchs » dès le premier match,
+  // et une ligne de compte sous « Vos matchs » et « Favoris » — les deux
+  // sur la même rangée, pour garder leurs titres alignés.
+  const { matches, isLoading: areMatchesLoading } = useNameMatches();
+  const { data: favorites = [], isPending: areFavoritesLoading } =
+    useNameFavorites();
+  const matchCount = matches.length;
+  const subtitles: Partial<Record<string, string | null>> = {
+    '/prenoms-matchs': areMatchesLoading
+      ? null
+      : matchCount === 0
+        ? 'Pas encore de match'
+        : `${matchCount} prénom${matchCount > 1 ? 's' : ''} en commun`,
+    '/prenoms-favoris': areFavoritesLoading
+      ? null
+      : favorites.length === 0
+        ? 'Aucun pour l’instant'
+        : `${favorites.length} prénom${favorites.length > 1 ? 's' : ''}`,
+  };
   return (
     <View className="gap-4">
       <View className="flex-row flex-wrap justify-between gap-y-3.5">
@@ -145,18 +169,41 @@ function PrenomsGrid({ accent, isSolo }: { accent: string; isSolo: boolean }) {
               elevation: 3,
             }}
           >
-            <Image
-              source={module.image}
-              style={{ width: 104, height: 104, marginLeft: -8, marginTop: -6 }}
-              resizeMode="contain"
-            />
+            <View className="self-start">
+              <Image
+                source={module.image}
+                style={{
+                  width: 104,
+                  height: 104,
+                  marginLeft: -8,
+                  marginTop: -6,
+                }}
+                resizeMode="contain"
+              />
+              {module.href === '/prenoms-matchs' && matchCount > 0 ? (
+                <CountBadge count={matchCount} />
+              ) : null}
+            </View>
             <View className="flex-row items-center justify-between gap-2">
-              <Text
-                className="flex-1 text-[15.5px] font-bold"
-                style={{ color: GLASS_TITLE_COLOR }}
-              >
-                {module.label}
-              </Text>
+              <View className="flex-1 gap-0.5">
+                <Text
+                  className="text-[15.5px] font-bold"
+                  style={{ color: GLASS_TITLE_COLOR }}
+                >
+                  {module.label}
+                </Text>
+                {module.href in subtitles ? (
+                  <Text
+                    numberOfLines={1}
+                    className="text-[12.5px]"
+                    style={{ color: GLASS_BODY_COLOR }}
+                  >
+                    {/* Espace insécable pendant le chargement : la ligne
+                        garde sa hauteur, rien ne saute. */}
+                    {subtitles[module.href] ?? '\u00a0'}
+                  </Text>
+                ) : null}
+              </View>
               <ChevronBubble accent={accent} />
             </View>
           </Pressable>
@@ -181,6 +228,34 @@ function PrenomsGrid({ accent, isSolo }: { accent: string; isSolo: boolean }) {
           resizeMode="contain"
         />
       </View>
+    </View>
+  );
+}
+
+/** Pastille de notification posée sur le cœur de « Vos matchs ». */
+function CountBadge({ count }: { count: number }) {
+  return (
+    <View
+      accessibilityLabel={`${count} match${count > 1 ? 's' : ''}`}
+      className="absolute items-center justify-center rounded-full px-1.5"
+      style={{
+        top: 2,
+        left: 70,
+        minWidth: 28,
+        height: 28,
+        backgroundColor: MATCH_BADGE_RED,
+        borderWidth: 2.5,
+        borderColor: '#ffffff',
+        shadowColor: MATCH_BADGE_RED,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+        elevation: 4,
+      }}
+    >
+      <Text className="text-[13px] font-extrabold text-white">
+        {count > 99 ? '99+' : count}
+      </Text>
     </View>
   );
 }
