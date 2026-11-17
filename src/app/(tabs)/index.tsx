@@ -680,6 +680,7 @@ export default function HubScreen() {
             isPregnant,
             isSolo,
             hasPartnerJoined,
+            hasMoodToday: Boolean(summary?.pregnantMood),
             partnerName: partnerName || null,
           })}
           accent={accent}
@@ -702,23 +703,32 @@ function buildHomeTourSteps({
   isPregnant,
   isSolo,
   hasPartnerJoined,
+  hasMoodToday,
   partnerName,
 }: {
   isPregnant: boolean;
   isSolo: boolean;
   hasPartnerJoined: boolean;
+  /** Humeur déjà notée : l'ourson du jour a pris la place du cœur. */
+  hasMoodToday: boolean;
   partnerName: string | null;
 }): TourStep[] {
   const other = partnerName ?? 'votre partenaire';
   const steps: TourStep[] = [];
 
   if (isPregnant) {
+    // Le texte nomme ce qui est à l'écran : le cœur tant que rien n'est
+    // noté, l'ourson de l'humeur ensuite.
     steps.push({
       targetId: 'home-mood',
       title: 'Votre humeur du jour',
-      body: isSolo
-        ? 'Touchez le cœur pour noter comment vous vous sentez aujourd’hui.'
-        : `Touchez le cœur pour partager votre humeur du jour avec ${other}.`,
+      body: hasMoodToday
+        ? isSolo
+          ? 'Touchez votre ourson pour changer votre humeur du jour.'
+          : `Touchez votre ourson pour partager ou changer votre humeur du jour avec ${other}.`
+        : isSolo
+          ? 'Touchez le cœur pour noter comment vous vous sentez aujourd’hui.'
+          : `Touchez le cœur pour partager votre humeur du jour avec ${other}.`,
       radius: 999,
     });
   }
