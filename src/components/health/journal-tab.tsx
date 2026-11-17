@@ -7,6 +7,7 @@ import type {
 } from '@/components/ui/feedback-banner';
 import {
   DashedLoopDoodle,
+  GLASS_BODY_COLOR,
   GLASS_TITLE_COLOR,
   SPARKS_ABOVE,
   SparkLines,
@@ -29,6 +30,7 @@ import {
   useSymptomsForDate,
 } from '@/features/health/hooks';
 import type { Household } from '@/features/household/api';
+import { useHubSummary } from '@/features/hub/hooks';
 import { useThemeAccent } from '@/features/settings/hooks';
 import { getCurrentWeekIsoDates } from '@/features/together/api';
 import { hexToRgba } from '@/lib/color';
@@ -83,6 +85,13 @@ export function JournalTab({
   const { data: savedSymptoms } = useSymptomsForDate(household, selectedDate);
   const { data: markedDates = [] } = useSymptomDates(household, weekDates);
   const saveSymptoms = useSaveSymptoms(household);
+  // Partage avec le co-parent (demande explicite) : il voit ces symptômes
+  // dans « Mon partenaire », on le dit ici plutôt que de le taire.
+  const { data: summary } = useHubSummary(household);
+  const isSharedWithPartner =
+    Boolean(household?.partner_user_id) &&
+    household?.accompaniment_type !== 'seul';
+  const partnerName = summary?.partnerFirstName?.trim() || 'votre partenaire';
 
   const [selected, setSelected] = useState<string[]>([]);
   // Saisie d'un symptôme hors liste (demande explicite).
@@ -309,6 +318,18 @@ export function JournalTab({
         isDisabled={!justSaved && isSaveDisabled}
         onPress={save}
       />
+
+      {isSharedWithPartner ? (
+        <View className="-mt-3 flex-row items-center justify-center gap-1.5 px-4">
+          <Ionicons name="eye-outline" size={15} color={GLASS_BODY_COLOR} />
+          <Text
+            className="text-center text-[12.5px]"
+            style={{ color: GLASS_BODY_COLOR }}
+          >
+            Visibles par {partnerName} dans « Mon partenaire »
+          </Text>
+        </View>
+      ) : null}
 
       <DashedLoopDoodle color={accent} />
     </View>

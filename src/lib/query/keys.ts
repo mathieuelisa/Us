@@ -31,6 +31,11 @@ export const queryKeys = {
     all: ['health'] as const,
     symptoms: (householdId: string, date: string) =>
       ['health', householdId, 'symptoms', date] as const,
+    // Sous le préfixe `['health', householdId, 'symptoms']` : le temps réel
+    // (`useHouseholdRealtime`) la recharge avec les autres requêtes de
+    // symptômes.
+    weekSymptoms: (householdId: string, userId: string, weekStart: string) =>
+      ['health', householdId, 'symptoms', 'week', userId, weekStart] as const,
     symptomDates: (householdId: string, weekStart: string) =>
       ['health', householdId, 'symptom-dates', weekStart] as const,
     appointments: (householdId: string) =>

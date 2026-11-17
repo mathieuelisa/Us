@@ -15,6 +15,7 @@ import {
   fetchExercises,
   fetchSymptomDates,
   fetchSymptomsForDate,
+  fetchWeekSymptoms,
   reorderContacts,
   saveSymptoms,
   updateAppointment,
@@ -104,6 +105,29 @@ export function useSymptomDates(
     queryFn: () =>
       fetchSymptomDates(householdId as string, userId as string, dates),
     enabled: Boolean(householdId && userId && dates.length > 0),
+  });
+}
+
+/**
+ * Symptômes de la semaine en cours d'un membre donné (la personne
+ * enceinte, lue par le co-parent dans « Mon partenaire »).
+ */
+export function useWeekSymptomsFor(
+  household: Household | null | undefined,
+  targetUserId: string | null | undefined,
+  dates: string[],
+) {
+  const householdId = household?.id;
+
+  return useQuery({
+    queryKey: queryKeys.health.weekSymptoms(
+      householdId ?? '',
+      targetUserId ?? '',
+      dates[0] ?? '',
+    ),
+    queryFn: () =>
+      fetchWeekSymptoms(householdId as string, targetUserId as string, dates),
+    enabled: Boolean(householdId && targetUserId && dates.length > 0),
   });
 }
 

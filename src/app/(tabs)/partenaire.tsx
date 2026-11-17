@@ -14,6 +14,7 @@ import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import { withUniwind } from 'uniwind';
 import { useTabBarContentInset } from '@/components/navigation/use-tab-bar-height';
+import { WeekSymptomsCard } from '@/components/partner/week-symptoms-card';
 import { NeedChips } from '@/components/together/need-chips';
 import { WeekMoodDays } from '@/components/together/week-mood-strip';
 import {
@@ -23,7 +24,7 @@ import {
 } from '@/components/ui/glass-card';
 import { usePullToRefresh } from '@/components/ui/use-pull-to-refresh';
 import { getWeeksOfAmenorrhea } from '@/features/health/constants';
-import { useBabySize } from '@/features/health/hooks';
+import { useBabySize, useWeekSymptomsFor } from '@/features/health/hooks';
 import { useMyHousehold } from '@/features/household/hooks';
 import { getPartnerUserId, type HubSummary } from '@/features/hub/api';
 import { MOOD_PRESENTATION } from '@/features/hub/constants';
@@ -354,6 +355,15 @@ export default function PartnerScreen() {
     partnerUserId,
   );
 
+  // Symptômes de la semaine (demande explicite) : seulement côté co-parent,
+  // qui lit ceux de la personne enceinte. Elle a les siens dans le Journal.
+  const canSeeSymptoms = role === 'partner' && Boolean(partnerUserId);
+  const { data: partnerSymptoms = {} } = useWeekSymptomsFor(
+    household,
+    canSeeSymptoms ? partnerUserId : null,
+    weekDates,
+  );
+
   const weeks = getWeeksOfAmenorrhea(household?.due_date ?? null);
   const { data: babySize, isSuccess: isBabySizeLoaded } = useBabySize(weeks);
   // Semaine connue mais sans taille en base : avant la première ligne
@@ -511,6 +521,20 @@ export default function PartnerScreen() {
                 />
               </View>
             </View>
+          </View>
+        ) : null}
+
+        {canSeeSymptoms && !isSolo ? (
+          <View className="gap-3.5">
+            <SectionHeading
+              icon="pulse-outline"
+              label="SES SYMPTÔMES CETTE SEMAINE"
+            />
+            <WeekSymptomsCard
+              weekDates={weekDates}
+              symptomsByDate={partnerSymptoms}
+              partnerName={partnerName ?? null}
+            />
           </View>
         ) : null}
 

@@ -50,6 +50,30 @@ export async function fetchSymptomDates(
     .map((row) => row.log_date);
 }
 
+/**
+ * Symptômes de la semaine d'un membre, par date — « Ses symptômes cette
+ * semaine » du co-parent (demande explicite), en lecture seule. Lecture
+ * permise par `symptoms_log_select_members` ; seule la personne enceinte
+ * en écrit (`symptoms_log_insert_pregnant_only`).
+ */
+export async function fetchWeekSymptoms(
+  householdId: string,
+  userId: string,
+  dates: string[],
+): Promise<Record<string, string[]>> {
+  const { data, error } = await supabase
+    .from('symptoms_log')
+    .select('log_date, symptoms')
+    .eq('household_id', householdId)
+    .eq('user_id', userId)
+    .in('log_date', dates);
+
+  if (error) throw error;
+  return Object.fromEntries(
+    (data ?? []).map((row) => [row.log_date, row.symptoms]),
+  );
+}
+
 export async function saveSymptoms(input: {
   householdId: string;
   userId: string;
