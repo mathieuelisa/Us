@@ -32,6 +32,7 @@ import {
 import { useProcedures } from '@/features/procedures/hooks';
 import { useThemeAccent, useThemeBackground } from '@/features/settings/hooks';
 import { hexToRgba } from '@/lib/color';
+import { todayIso } from '@/lib/date';
 
 const SafeAreaView = withUniwind(RNSafeAreaView);
 
@@ -108,7 +109,11 @@ export default function BirthScreen() {
 
   const declaredBirthDate = household?.birth_date ?? null;
 
-  const [draftDate, setDraftDate] = useState<string | null>(null);
+  // Part d'aujourd'hui (choix validé) : la molette affichait déjà la date
+  // du jour sans la retenir, si bien qu'un bébé né le jour même obligeait à
+  // tourner la molette puis à revenir. La pop-up de confirmation relit la
+  // date avant tout enregistrement.
+  const [draftDate, setDraftDate] = useState<string | null>(() => todayIso());
   const [isCorrecting, setIsCorrecting] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 

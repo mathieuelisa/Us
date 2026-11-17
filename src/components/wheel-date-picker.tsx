@@ -284,6 +284,10 @@ export function WheelColumn({
       style={{ flex, height: wheelHeight }}
       contentContainerStyle={{ paddingVertical: wheelPadding }}
       showsVerticalScrollIndicator={false}
+      // Android : sans lui, une molette posée dans un écran qui défile
+      // laisse le geste à l'écran — la molette ne tournait pas sur « J'ai
+      // accouché » (signalé sur Samsung S26). Sans effet sur iOS et le web.
+      nestedScrollEnabled
       snapToInterval={itemHeight}
       decelerationRate="fast"
       onScroll={scrollHandler}
@@ -311,7 +315,8 @@ export function WheelColumn({
  * Unique sélecteur de date de l'app : onboarding, rendez-vous et informations
  * importantes. Les molettes défilent dans une `ScrollView` imbriquée dans celle
  * de l'écran ou de la modale hôte — même direction, mais c'est bien la molette
- * touchée qui capte le geste.
+ * touchée qui capte le geste (`nestedScrollEnabled`, indispensable sur
+ * Android).
  */
 export function WheelDatePicker({
   value,
