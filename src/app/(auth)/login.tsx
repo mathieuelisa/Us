@@ -1,14 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
-import {
-  Image,
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  ScrollView,
-  Text,
-  View,
-} from 'react-native';
+import { Image, Pressable, ScrollView, Text, View } from 'react-native';
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import Animated, {
   Easing,
   FadeIn,
@@ -222,10 +215,9 @@ export default function LoginScreen() {
 
   return (
     <SafeAreaView className="flex-1" style={{ backgroundColor }}>
-      <KeyboardAvoidingView
-        className="flex-1"
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      >
+      {/* Clavier géré aussi sur Android (bord à bord) : `padding` sur les
+          deux plateformes, via `react-native-keyboard-controller`. */}
+      <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
         <ScrollView
           contentContainerClassName="grow justify-center gap-5 px-7 py-6"
           keyboardShouldPersistTaps="handled"

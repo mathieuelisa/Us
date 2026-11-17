@@ -2,11 +2,10 @@ import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useAtomValue } from 'jotai';
 import { useEffect, useMemo, useState } from 'react';
-import { Image, Pressable, ScrollView, Text, View } from 'react-native';
+import { Image, Pressable, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import { withUniwind } from 'uniwind';
-
 import { AppointmentsTab } from '@/components/health/appointments-tab';
 import { ContactsTab } from '@/components/health/contacts-tab';
 import { ExercisesTab } from '@/components/health/exercises-tab';
@@ -25,6 +24,7 @@ import {
   GLASS_BODY_COLOR,
   GLASS_TITLE_COLOR,
 } from '@/components/ui/glass-card';
+import { KeyboardScrollView } from '@/components/ui/keyboard-scroll-view';
 import { ScreenCornerShapes } from '@/components/ui/screen-corner-shapes';
 import { usePullToRefresh } from '@/components/ui/use-pull-to-refresh';
 import { useMyHousehold } from '@/features/household/hooks';
@@ -141,7 +141,7 @@ export default function HealthScreen() {
     >
       <ScreenCornerShapes />
 
-      <ScrollView
+      <KeyboardScrollView
         refreshControl={refresh}
         contentContainerClassName="gap-5 px-6 pt-4"
         // Sur Contacts, place en plus pour le bouton + flottant.
@@ -280,7 +280,7 @@ export default function HealthScreen() {
             <ExercisesTab household={household} />
           ) : null}
         </View>
-      </ScrollView>
+      </KeyboardScrollView>
 
       {activeTab === 'contacts' && !isAddingContact ? (
         <BlobFab

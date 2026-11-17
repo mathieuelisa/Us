@@ -1,11 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { type ComponentProps, useEffect, useState } from 'react';
-import { Image, Pressable, ScrollView, Text, View } from 'react-native';
+import { Image, Pressable, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import { withUniwind } from 'uniwind';
-
 import { ContractionsIllustration } from '@/components/hub/contractions-illustration';
 import { NameCardsIllustration } from '@/components/hub/name-cards-illustration';
 import { PremiumTeaserCard } from '@/components/hub/premium-teaser-card';
@@ -19,6 +18,7 @@ import {
   GLASS_TITLE_COLOR,
   GlassCard,
 } from '@/components/ui/glass-card';
+import { KeyboardScrollView } from '@/components/ui/keyboard-scroll-view';
 import { ScreenCornerShapes } from '@/components/ui/screen-corner-shapes';
 import { usePullToRefresh } from '@/components/ui/use-pull-to-refresh';
 import { useMyHousehold } from '@/features/household/hooks';
@@ -156,7 +156,7 @@ export default function OrganisationScreen() {
     >
       <ScreenCornerShapes />
 
-      <ScrollView
+      <KeyboardScrollView
         refreshControl={refresh}
         contentContainerClassName="gap-5 px-6 pt-4"
         contentContainerStyle={{ paddingBottom: tabBarInset }}
@@ -334,7 +334,7 @@ export default function OrganisationScreen() {
             </View>
           </>
         )}
-      </ScrollView>
+      </KeyboardScrollView>
     </SafeAreaView>
   );
 }

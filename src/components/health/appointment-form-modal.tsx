@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
 import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import Animated, { SlideInDown, SlideOutDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
@@ -11,6 +12,7 @@ import {
   SparkLines,
 } from '@/components/ui/glass-card';
 import { IconBubble, IconInput } from '@/components/ui/icon-input';
+import { SHEET_BACKDROP } from '@/components/ui/keyboard';
 import { PillButton } from '@/components/ui/pill-button';
 import { ToggleSwitch } from '@/components/ui/toggle-switch';
 import { WheelDatePicker } from '@/components/wheel-date-picker';
@@ -137,7 +139,7 @@ export function AppointmentFormModal({
       navigationBarTranslucent
       onRequestClose={onCancel}
     >
-      <View className="flex-1 justify-end bg-black/40">
+      <KeyboardAvoidingView behavior="padding" style={SHEET_BACKDROP}>
         <Animated.View
           entering={SlideInDown.duration(300)}
           exiting={SlideOutDown.duration(300)}
@@ -354,7 +356,7 @@ export function AppointmentFormModal({
             </View>
           </ScrollView>
         </Animated.View>
-      </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }

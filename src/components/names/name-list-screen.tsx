@@ -5,7 +5,6 @@ import {
   Image,
   type ImageSourcePropType,
   Pressable,
-  ScrollView,
   Text,
   View,
 } from 'react-native';
@@ -29,6 +28,7 @@ import {
   GLASS_TITLE_COLOR,
   SparkLines,
 } from '@/components/ui/glass-card';
+import { KeyboardScrollView } from '@/components/ui/keyboard-scroll-view';
 import { ScreenCornerShapes } from '@/components/ui/screen-corner-shapes';
 import { usePullToRefresh } from '@/components/ui/use-pull-to-refresh';
 import {
@@ -114,7 +114,7 @@ export function NameListScreen({
       style={{ backgroundColor }}
     >
       <ScreenCornerShapes />
-      <ScrollView
+      <KeyboardScrollView
         refreshControl={refresh}
         contentContainerClassName="gap-5 px-5 pt-4"
         contentContainerStyle={{ paddingBottom: tabBarInset }}
@@ -328,7 +328,7 @@ export function NameListScreen({
             </Animated.View>
           </>
         )}
-      </ScrollView>
+      </KeyboardScrollView>
     </SafeAreaView>
   );
 }

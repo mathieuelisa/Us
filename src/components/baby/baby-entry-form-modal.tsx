@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { type ReactNode, useEffect, useState } from 'react';
 import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import Animated, {
   Easing,
   interpolateColor,
@@ -27,6 +28,7 @@ import {
   IconInput,
   type IoniconName,
 } from '@/components/ui/icon-input';
+import { SHEET_BACKDROP } from '@/components/ui/keyboard';
 import { PillButton } from '@/components/ui/pill-button';
 import { WheelDatePicker } from '@/components/wheel-date-picker';
 import type { BabyEntry, BabyModule } from '@/features/baby/constants';
@@ -255,7 +257,7 @@ export function BabyEntryFormModal({
       animationType="none"
       onRequestClose={onCancel}
     >
-      <View className="flex-1 justify-end bg-black/40">
+      <KeyboardAvoidingView behavior="padding" style={SHEET_BACKDROP}>
         <Animated.View
           entering={SlideInDown.duration(300)}
           exiting={SlideOutDown.duration(300)}
@@ -581,7 +583,7 @@ export function BabyEntryFormModal({
             onCancel={() => setPendingSegment(null)}
           />
         ) : null}
-      </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }

@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { type ReactNode, useCallback, useState } from 'react';
-import { BackHandler, Pressable, ScrollView, Text, View } from 'react-native';
+import { BackHandler, Pressable, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import { withUniwind } from 'uniwind';
@@ -11,6 +11,7 @@ import {
   GLASS_BODY_COLOR,
   GLASS_TITLE_COLOR,
 } from '@/components/ui/glass-card';
+import { KeyboardScrollView } from '@/components/ui/keyboard-scroll-view';
 import { PillButton } from '@/components/ui/pill-button';
 import { ScreenCornerShapes } from '@/components/ui/screen-corner-shapes';
 import { ONBOARDING_STEP_COUNT } from '@/features/onboarding/constants';
@@ -254,13 +255,13 @@ export function OnboardingStepShell({
               </SlideInText>
             ) : null}
 
-            <ScrollView
+            <KeyboardScrollView
               className="flex-1"
               contentContainerClassName="gap-3 py-5"
               showsVerticalScrollIndicator={false}
             >
               {children}
-            </ScrollView>
+            </KeyboardScrollView>
           </>
         )}
 

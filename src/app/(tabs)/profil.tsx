@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useAtomValue } from 'jotai';
 import { type ComponentProps, useEffect, useRef, useState } from 'react';
-import { Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { Pressable, Text, TextInput, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import { withUniwind } from 'uniwind';
@@ -17,6 +17,7 @@ import {
   GLASS_TITLE_COLOR,
   SparkLines,
 } from '@/components/ui/glass-card';
+import { KeyboardScrollView } from '@/components/ui/keyboard-scroll-view';
 import { PillButton } from '@/components/ui/pill-button';
 import { ScreenCornerShapes } from '@/components/ui/screen-corner-shapes';
 import { getWeeksOfAmenorrhea } from '@/features/health/constants';
@@ -163,7 +164,7 @@ export default function ProfileScreen() {
     >
       <ScreenCornerShapes />
 
-      <ScrollView
+      <KeyboardScrollView
         contentContainerClassName="gap-7 px-6 pt-4"
         contentContainerStyle={{ paddingBottom: tabBarInset }}
         keyboardShouldPersistTaps="handled"
@@ -340,7 +341,7 @@ export default function ProfileScreen() {
           }
           onPress={save}
         />
-      </ScrollView>
+      </KeyboardScrollView>
 
       <AvatarPickerModal
         visible={isAvatarPickerOpen}

@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { type ReactNode, useEffect, useState } from 'react';
 import { Modal, Pressable, Text, View } from 'react-native';
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import Animated, { SlideInDown, SlideOutDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -9,6 +10,7 @@ import {
   GLASS_TITLE_COLOR,
 } from '@/components/ui/glass-card';
 import { IconInput } from '@/components/ui/icon-input';
+import { SHEET_BACKDROP } from '@/components/ui/keyboard';
 import { PillButton } from '@/components/ui/pill-button';
 import {
   changePassword,
@@ -49,7 +51,7 @@ function Sheet({
       animationType="none"
       onRequestClose={onClose}
     >
-      <View className="flex-1 justify-end bg-black/40">
+      <KeyboardAvoidingView behavior="padding" style={SHEET_BACKDROP}>
         <Animated.View
           entering={SlideInDown.duration(300)}
           exiting={SlideOutDown.duration(300)}
@@ -59,7 +61,7 @@ function Sheet({
           <View className="h-1 w-10 self-center rounded-full bg-[#e0e0e0]" />
           {children}
         </Animated.View>
-      </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }

@@ -10,6 +10,7 @@ import { useAtomValue } from 'jotai';
 import { useEffect, useState } from 'react';
 import { Platform, useColorScheme } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { Uniwind } from 'uniwind';
 
 import { AnimatedSplashOverlay } from '@/components/animated-icon';
@@ -139,16 +140,22 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1, backgroundColor }}>
-      <QueryClientProvider client={queryClient}>
-        <HeroUINativeProvider>
-          <ThemeProvider
-            value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
-          >
-            <AnimatedSplashOverlay />
-            {isSessionReady && fontsLoaded ? <AuthGate /> : null}
-          </ThemeProvider>
-        </HeroUINativeProvider>
-      </QueryClientProvider>
+      {/* Clavier (signalé sur Samsung S26) : Android bord à bord ne
+          redimensionne plus la fenêtre à l'ouverture du clavier. Le
+          fournisseur suit sa hauteur pour `KeyboardAvoidingView` et
+          `KeyboardAwareScrollView` (modales et écrans à champs). */}
+      <KeyboardProvider>
+        <QueryClientProvider client={queryClient}>
+          <HeroUINativeProvider>
+            <ThemeProvider
+              value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
+            >
+              <AnimatedSplashOverlay />
+              {isSessionReady && fontsLoaded ? <AuthGate /> : null}
+            </ThemeProvider>
+          </HeroUINativeProvider>
+        </QueryClientProvider>
+      </KeyboardProvider>
     </GestureHandlerRootView>
   );
 }

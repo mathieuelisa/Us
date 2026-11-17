@@ -9,6 +9,7 @@ import {
   Text,
   View,
 } from 'react-native';
+import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 
 import {
@@ -17,6 +18,7 @@ import {
   SparkLines,
 } from '@/components/ui/glass-card';
 import { IconInput } from '@/components/ui/icon-input';
+import { CENTERED_BACKDROP } from '@/components/ui/keyboard';
 import { PillButton } from '@/components/ui/pill-button';
 import { useThemeAccent } from '@/features/settings/hooks';
 import { NEED_ICONS, NEED_TAGS } from '@/features/together/constants';
@@ -95,7 +97,7 @@ export function NeedNoteOverlay({
       animationType="none"
       onRequestClose={onSkip}
     >
-      <View className="flex-1 justify-center bg-black/40 px-4 py-6">
+      <KeyboardAvoidingView behavior="padding" style={CENTERED_BACKDROP}>
         <Animated.View
           entering={FadeInDown.duration(320)}
           className="max-h-full overflow-hidden rounded-[32px] bg-white"
@@ -216,7 +218,7 @@ export function NeedNoteOverlay({
             </View>
           </ScrollView>
         </Animated.View>
-      </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }
