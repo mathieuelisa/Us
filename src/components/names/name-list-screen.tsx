@@ -22,6 +22,7 @@ import Animated, {
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import { withUniwind } from 'uniwind';
+import { AddNameCard } from '@/components/names/add-name-card';
 import { useTabBarContentInset } from '@/components/navigation/use-tab-bar-height';
 import {
   GLASS_BODY_COLOR,
@@ -56,6 +57,8 @@ const LEAF_IMAGE = require('@/assets/images/Leaf_branch.png');
  * demande explicite d'un design plus soigné). État vide illustré.
  *
  * `onRemove` (favoris) ajoute un cœur qui retire le prénom de la liste.
+ * `onAddName` (favoris) ajoute la carte « Ajouter un prénom » en tête de
+ * liste, dont le choix Fille / Garçon suit le sélecteur de la liste.
  */
 export function NameListScreen({
   title,
@@ -69,6 +72,7 @@ export function NameListScreen({
   itemNoun,
   sectionSubtitle,
   onRemove,
+  onAddName,
 }: {
   title: string;
   subtitle: string;
@@ -84,6 +88,8 @@ export function NameListScreen({
   /** Sous-titre de la section d'un genre, ex. « Vos prénoms filles… ». */
   sectionSubtitle: (gender: NameGender) => string;
   onRemove?: (item: NameListItem) => void;
+  /** Saisie libre d'un prénom ; rejette en cas d'échec. */
+  onAddName?: (gender: NameGender, name: string) => Promise<void>;
 }) {
   // Tirer vers le bas recharge les données affichées.
   const refresh = usePullToRefresh();
@@ -196,6 +202,16 @@ export function NameListScreen({
             {subtitle}
           </Text>
         </View>
+
+        {onAddName && !isLoading ? (
+          <AddNameCard
+            accent={accent}
+            gender={gender}
+            onGenderChange={setChosenGender}
+            existingNames={items}
+            onAdd={onAddName}
+          />
+        ) : null}
 
         {isLoading ? (
           <Text className="text-[13px] text-[#9a9a9a]">Chargement…</Text>
@@ -508,6 +524,25 @@ function NameRow({
         >
           {item.name}
         </Text>
+        {countries.length === 0 ? (
+          // Prénom saisi à la main (absent du catalogue du jeu).
+          <View
+            className="flex-row items-center gap-1 self-start rounded-full px-2 py-0.5"
+            style={{ backgroundColor: '#f4f3f7' }}
+          >
+            <Ionicons
+              name="create-outline"
+              size={12}
+              color={GLASS_BODY_COLOR}
+            />
+            <Text
+              className="text-[12px] font-medium"
+              style={{ color: GLASS_BODY_COLOR }}
+            >
+              Ajouté par vous
+            </Text>
+          </View>
+        ) : null}
         {countries.length > 0 ? (
           <View className="flex-row flex-wrap gap-1.5">
             {countries.map((country) => (
