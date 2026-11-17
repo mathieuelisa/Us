@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { Image, Modal, Pressable, Text, View } from 'react-native';
 import Animated, { SlideInDown, SlideOutDown } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ProgressBar } from '@/components/organisation/progress-bar';
 import {
@@ -39,6 +40,7 @@ export function DepartureModal({
   valise: { checked: number; total: number };
   onClose: () => void;
 }) {
+  const insets = useSafeAreaInsets();
   const accent = useThemeAccent();
   const summary = [
     averageIntervalMs !== null
@@ -59,6 +61,8 @@ export function DepartureModal({
 
   return (
     <Modal
+      statusBarTranslucent
+      navigationBarTranslucent
       visible={visible}
       transparent
       animationType="none"
@@ -68,7 +72,8 @@ export function DepartureModal({
         <Animated.View
           entering={SlideInDown.duration(300)}
           exiting={SlideOutDown.duration(300)}
-          className="overflow-hidden rounded-t-[32px] bg-white px-6 pb-10 pt-3"
+          className="overflow-hidden rounded-t-[32px] bg-white px-6 pt-3"
+          style={{ paddingBottom: 40 + insets.bottom }}
         >
           <View
             pointerEvents="none"

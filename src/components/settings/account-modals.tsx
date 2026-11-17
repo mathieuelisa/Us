@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { type ReactNode, useEffect, useState } from 'react';
 import { Modal, Pressable, Text, View } from 'react-native';
 import Animated, { SlideInDown, SlideOutDown } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import {
   GLASS_BODY_COLOR,
@@ -38,8 +39,11 @@ function Sheet({
   onClose: () => void;
   children: ReactNode;
 }) {
+  const insets = useSafeAreaInsets();
   return (
     <Modal
+      statusBarTranslucent
+      navigationBarTranslucent
       visible={visible}
       transparent
       animationType="none"
@@ -49,7 +53,8 @@ function Sheet({
         <Animated.View
           entering={SlideInDown.duration(300)}
           exiting={SlideOutDown.duration(300)}
-          className="gap-5 rounded-t-[28px] bg-white px-6 pb-8 pt-4"
+          className="gap-5 rounded-t-[28px] bg-white px-6 pt-4"
+          style={{ paddingBottom: 32 + insets.bottom }}
         >
           <View className="h-1 w-10 self-center rounded-full bg-[#e0e0e0]" />
           {children}

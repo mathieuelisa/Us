@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Modal, Pressable, Text, View } from 'react-native';
 import Animated, { SlideInDown, SlideOutDown } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 
 import {
@@ -39,6 +40,7 @@ export function AvatarPickerModal({
   onSelect: (avatar: string | null) => void;
   onClose: () => void;
 }) {
+  const insets = useSafeAreaInsets();
   const options: {
     key: string | null;
     label: string;
@@ -56,6 +58,8 @@ export function AvatarPickerModal({
 
   return (
     <Modal
+      statusBarTranslucent
+      navigationBarTranslucent
       visible={visible}
       transparent
       animationType="none"
@@ -65,7 +69,8 @@ export function AvatarPickerModal({
         <Animated.View
           entering={SlideInDown.duration(300)}
           exiting={SlideOutDown.duration(300)}
-          className="overflow-hidden rounded-t-[32px] bg-white px-6 pb-10 pt-3"
+          className="overflow-hidden rounded-t-[32px] bg-white px-6 pt-3"
+          style={{ paddingBottom: 40 + insets.bottom }}
         >
           <View
             pointerEvents="none"

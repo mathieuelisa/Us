@@ -11,6 +11,7 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { DeleteEntryAlert } from '@/components/baby/delete-entry-alert';
 import {
   MeasureWheelField,
@@ -101,6 +102,7 @@ export function BabyEntryFormModal({
   onSubmit: (entry: Omit<BabyEntry, 'id'>) => void;
   onCancel: () => void;
 }) {
+  const insets = useSafeAreaInsets();
   const accent = useThemeAccent();
   const [date, setDate] = useState(todayIso());
   const [time, setTime] = useState('');
@@ -246,6 +248,8 @@ export function BabyEntryFormModal({
 
   return (
     <Modal
+      statusBarTranslucent
+      navigationBarTranslucent
       visible={visible}
       transparent
       animationType="none"
@@ -282,7 +286,8 @@ export function BabyEntryFormModal({
           <ScrollView
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
-            contentContainerClassName="gap-3.5 px-5 pb-7 pt-2.5"
+            contentContainerClassName="gap-3.5 px-5 pt-2.5"
+            contentContainerStyle={{ paddingBottom: 28 + insets.bottom }}
           >
             <View className="h-1.5 w-11 self-center rounded-full bg-[#e6e6ea]" />
 

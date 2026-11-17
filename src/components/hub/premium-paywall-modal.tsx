@@ -43,6 +43,8 @@ export function PremiumPaywallModal({
 
   return (
     <Modal
+      statusBarTranslucent
+      navigationBarTranslucent
       visible={visible}
       transparent
       animationType="fade"

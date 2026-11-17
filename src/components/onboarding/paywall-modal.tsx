@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAtomValue } from 'jotai';
 import { Image, Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import Animated, { SlideInDown, SlideOutDown } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { onboardingDraftAtom } from '@/lib/atoms/onboarding';
 
@@ -42,12 +43,15 @@ export function PaywallModal({
   visible: boolean;
   onClose: () => void;
 }) {
+  const insets = useSafeAreaInsets();
   // Le foyer n'existe pas encore : c'est le choix de l'étape 1 qui dit s'il
   // y a un partenaire. « Seul·e » : rien à préciser.
   const { accompanimentType } = useAtomValue(onboardingDraftAtom);
   const hasPartner = accompanimentType !== 'seul';
   return (
     <Modal
+      statusBarTranslucent
+      navigationBarTranslucent
       visible={visible}
       transparent
       animationType="none"
@@ -57,7 +61,8 @@ export function PaywallModal({
         <Animated.View
           entering={SlideInDown.duration(300)}
           exiting={SlideOutDown.duration(300)}
-          className="max-h-[92%] rounded-t-3xl bg-[#1f3d3a] px-7 pb-8 pt-4"
+          className="max-h-[92%] rounded-t-3xl bg-[#1f3d3a] px-7 pt-4"
+          style={{ paddingBottom: 32 + insets.bottom }}
         >
           <View className="mb-3 h-1 w-10 self-center rounded-full bg-[#3a3a3a]" />
 

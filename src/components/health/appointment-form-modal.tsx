@@ -1,7 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
-import { Modal, Pressable, ScrollView, Switch, Text, View } from 'react-native';
+import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import Animated, { SlideInDown, SlideOutDown } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 
 import {
@@ -11,6 +12,7 @@ import {
 } from '@/components/ui/glass-card';
 import { IconBubble, IconInput } from '@/components/ui/icon-input';
 import { PillButton } from '@/components/ui/pill-button';
+import { ToggleSwitch } from '@/components/ui/toggle-switch';
 import { WheelDatePicker } from '@/components/wheel-date-picker';
 import { WheelTimePicker } from '@/components/wheel-time-picker';
 import type { Appointment } from '@/features/health/api';
@@ -47,6 +49,14 @@ const DEFAULT_TIME = '09:00';
  * « Enregistrer les modifications » et un lien de suppression. Un
  * rendez-vous déjà passé garde sa date : la molette ne descend alors pas
  * plus bas qu'elle, pour pouvoir corriger son titre sans la déplacer.
+ *
+ * Android bord à bord (Samsung S26, signalé) : sans `statusBarTranslucent`
+ * et `navigationBarTranslucent`, la fenêtre de la modale ne couvre pas tout
+ * l'écran et la feuille s'arrête au-dessus de la barre de navigation — les
+ * liens du bas (« Annuler », « Supprimer ») ne répondaient plus. La modale
+ * couvre désormais tout l'écran (comme la visite guidée), la feuille
+ * descend jusqu'en bas et son contenu garde la marge du geste système
+ * (`insets.bottom`). Les deux liens ont aussi une vraie zone de toucher.
  */
 export function AppointmentFormModal({
   visible,
@@ -80,6 +90,7 @@ export function AppointmentFormModal({
   onCancel: () => void;
 }) {
   const accent = useThemeAccent();
+  const insets = useSafeAreaInsets();
   const [title, setTitle] = useState('');
   const [date, setDate] = useState<string>(todayIso());
   const [time, setTime] = useState(DEFAULT_TIME);
@@ -122,6 +133,8 @@ export function AppointmentFormModal({
       visible={visible}
       transparent
       animationType="none"
+      statusBarTranslucent
+      navigationBarTranslucent
       onRequestClose={onCancel}
     >
       <View className="flex-1 justify-end bg-black/40">
@@ -156,7 +169,8 @@ export function AppointmentFormModal({
           <ScrollView
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
-            contentContainerClassName="gap-3.5 px-5 pb-7 pt-2.5"
+            contentContainerClassName="gap-3.5 px-5 pt-2.5"
+            contentContainerStyle={{ paddingBottom: 20 + insets.bottom }}
           >
             <View className="h-1.5 w-11 self-center rounded-full bg-[#e6e6ea]" />
 
@@ -280,11 +294,7 @@ export function AppointmentFormModal({
                 >
                   Visible par les deux parents
                 </Text>
-                <Switch
-                  value={isShared}
-                  onValueChange={setIsShared}
-                  trackColor={{ true: accent }}
-                />
+                <ToggleSwitch value={isShared} onValueChange={setIsShared} />
               </View>
             ) : null}
 
@@ -312,10 +322,11 @@ export function AppointmentFormModal({
               }
             />
 
-            <View className="flex-row items-center justify-center gap-6">
+            <View className="flex-row items-center justify-center gap-2">
               <Pressable
                 accessibilityRole="button"
-                className="items-center"
+                hitSlop={6}
+                className="items-center px-4 py-2.5"
                 onPress={onCancel}
               >
                 <Text
@@ -331,7 +342,8 @@ export function AppointmentFormModal({
                   accessibilityState={{ disabled: isDeleting || isSaving }}
                   disabled={isDeleting || isSaving}
                   onPress={onDelete}
-                  className="flex-row items-center gap-1.5"
+                  hitSlop={6}
+                  className="flex-row items-center gap-1.5 px-4 py-2.5"
                 >
                   <Ionicons name="trash-outline" size={16} color="#d14b3a" />
                   <Text className="text-[14.5px] font-semibold text-[#d14b3a]">

@@ -87,7 +87,14 @@ export function NameMatchCelebration({
   if (!name) return null;
 
   return (
-    <Modal visible transparent animationType="none" onRequestClose={onContinue}>
+    <Modal
+      statusBarTranslucent
+      navigationBarTranslucent
+      visible
+      transparent
+      animationType="none"
+      onRequestClose={onContinue}
+    >
       <CelebrationContent
         name={name}
         genderColor={genderColor}

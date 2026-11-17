@@ -156,7 +156,14 @@ export function AppointmentDetailModal({
   }
 
   return (
-    <Modal visible transparent animationType="none" onRequestClose={onClose}>
+    <Modal
+      statusBarTranslucent
+      navigationBarTranslucent
+      visible
+      transparent
+      animationType="none"
+      onRequestClose={onClose}
+    >
       <Animated.View
         entering={FadeIn.duration(180)}
         className="flex-1 items-center justify-center bg-black/45 px-5"

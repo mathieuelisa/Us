@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
 import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import Animated, { SlideInDown, SlideOutDown } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 
 import { PlainInput } from '@/components/plain-input';
@@ -80,6 +81,7 @@ export function InfoItemFormModal({
     values: string[];
   }) => void;
 }) {
+  const insets = useSafeAreaInsets();
   const accent = useThemeAccent();
   const [category, setCategory] = useState<InfoCategory | null>(null);
   const [label, setLabel] = useState('');
@@ -193,6 +195,8 @@ export function InfoItemFormModal({
 
   return (
     <Modal
+      statusBarTranslucent
+      navigationBarTranslucent
       visible={visible}
       transparent
       animationType="none"
@@ -225,7 +229,8 @@ export function InfoItemFormModal({
           <ScrollView
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
-            contentContainerClassName="gap-4 px-5 pb-8 pt-2.5"
+            contentContainerClassName="gap-4 px-5 pt-2.5"
+            contentContainerStyle={{ paddingBottom: 32 + insets.bottom }}
           >
             <View className="h-1.5 w-11 self-center rounded-full bg-[#e6e6ea]" />
 

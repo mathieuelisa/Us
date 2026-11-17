@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Modal, Pressable, Share, Text, View } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import Animated, { SlideInDown, SlideOutDown } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 
 import {
@@ -42,6 +43,7 @@ export function InvitePartnerModal({
   partnerName: string | null;
   onClose: () => void;
 }) {
+  const insets = useSafeAreaInsets();
   const [shareError, setShareError] = useState<string | null>(null);
   const createCode = useCreateHouseholdJoinCode();
   const joinCode = createCode.data?.code ?? null;
@@ -94,6 +96,8 @@ export function InvitePartnerModal({
 
   return (
     <Modal
+      statusBarTranslucent
+      navigationBarTranslucent
       visible={visible}
       transparent
       animationType="none"
@@ -103,7 +107,8 @@ export function InvitePartnerModal({
         <Animated.View
           entering={SlideInDown.duration(300)}
           exiting={SlideOutDown.duration(300)}
-          className="overflow-hidden rounded-t-[32px] bg-white px-6 pb-10 pt-3"
+          className="overflow-hidden rounded-t-[32px] bg-white px-6 pt-3"
+          style={{ paddingBottom: 40 + insets.bottom }}
         >
           <View
             pointerEvents="none"

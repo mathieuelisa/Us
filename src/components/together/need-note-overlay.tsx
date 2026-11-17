@@ -88,6 +88,8 @@ export function NeedNoteOverlay({
 
   return (
     <Modal
+      statusBarTranslucent
+      navigationBarTranslucent
       visible={visible}
       transparent
       animationType="none"

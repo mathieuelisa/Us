@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import type { ComponentProps } from 'react';
 import { Modal, Text, View } from 'react-native';
 import Animated, { SlideInDown, SlideOutDown } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 
 import { GLASS_TITLE_COLOR, SparkLines } from '@/components/ui/glass-card';
@@ -199,10 +200,13 @@ export function HowItWorksModal({
   visible: boolean;
   onClose: () => void;
 }) {
+  const insets = useSafeAreaInsets();
   const accent = useThemeAccent();
 
   return (
     <Modal
+      statusBarTranslucent
+      navigationBarTranslucent
       visible={visible}
       transparent
       animationType="none"
@@ -212,7 +216,8 @@ export function HowItWorksModal({
         <Animated.View
           entering={SlideInDown.duration(300)}
           exiting={SlideOutDown.duration(300)}
-          className="gap-6 overflow-hidden rounded-t-[32px] bg-white px-6 pb-10 pt-4"
+          className="gap-6 overflow-hidden rounded-t-[32px] bg-white px-6 pt-4"
+          style={{ paddingBottom: 40 + insets.bottom }}
         >
           {/* Tache pâle en haut à droite, derrière l'illustration. */}
           <View
