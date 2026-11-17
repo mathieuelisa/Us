@@ -35,6 +35,9 @@ import { formatPhoneNumber } from '@/lib/phone';
 const EMERGENCY_RED = '#d64545';
 const DELETE_RED = '#d14b3a';
 
+/** Chiffres minimum d'un numéro : les numéros d'urgence en ont 2 (« 15 »). */
+const MIN_PHONE_DIGITS = 2;
+
 /** Durée de la ligne « en rouge » avant qu'elle ne parte. */
 const DELETE_FLASH_MS = 220;
 
@@ -65,6 +68,12 @@ const ROW_LAYOUT = LinearTransition.springify().damping(18).stiffness(170);
  *
  * Modification (demande explicite) : toucher un contact le remplace sur
  * place par le même formulaire, prérempli (`ContactForm`).
+ *
+ * « Trier A→Z » (demande explicite, « si besoin ») : range la liste une
+ * fois, à la demande, et enregistre ce nouvel ordre pour les deux parents —
+ * les flèches restent pour l'ajuster ensuite. Les numéros d'urgence restent
+ * en tête (choix validé), triés entre eux. Le bouton s'efface en
+ * « Triés de A à Z » tant que la liste l'est déjà.
  */
 export function ContactsTab({
   household,
@@ -135,6 +144,26 @@ export function ContactsTab({
     (contact) => !hiddenIds.includes(contact.id),
   );
 
+  const alphabeticalOrder = sortContactsAlphabetically(contacts);
+  const isAlreadySorted = alphabeticalOrder.every(
+    (contact, index) => contact.id === contacts[index]?.id,
+  );
+
+  const sortAlphabetically = () => {
+    if (isAlreadySorted || reorderContacts.isPending) return;
+    reorderContacts.mutate(
+      alphabeticalOrder.map((contact, sortOrder) => ({
+        id: contact.id,
+        sort_order: sortOrder,
+      })),
+      {
+        onSuccess: () => onFeedback?.('success', 'Contacts triés de A à Z'),
+        onError: () =>
+          onFeedback?.('error', 'Impossible de trier les contacts. Réessayez.'),
+      },
+    );
+  };
+
   const moveContact = (index: number, direction: -1 | 1) => {
     const targetIndex = index + direction;
     if (targetIndex < 0 || targetIndex >= contacts.length) return;
@@ -187,6 +216,15 @@ export function ContactsTab({
             bouton en bas à droite.
           </Text>
         </View>
+      ) : null}
+
+      {visibleContacts.length >= 2 && !isAdding && !editingId ? (
+        <SortButton
+          accent={accent}
+          isSorted={isAlreadySorted}
+          isPending={reorderContacts.isPending}
+          onPress={sortAlphabetically}
+        />
       ) : null}
 
       {visibleContacts.map((contact) => {
@@ -324,8 +362,11 @@ export function ContactsTab({
               isDisabled={index === contacts.length - 1}
               onPress={() => moveContact(index, 1)}
             />
+            {/* Corbeille plutôt qu'une croix (demande explicite : plus
+                clair que « fermer »), en rouge doux. */}
             <RowAction
-              icon="close"
+              icon="trash-outline"
+              tone="danger"
               label={`Supprimer ${contact.name}`}
               onPress={() => removeContact(contact.id, contact.name)}
             />
@@ -336,18 +377,85 @@ export function ContactsTab({
   );
 }
 
+/**
+ * Ordre alphabétique (français, sans tenir compte de la casse ni des
+ * accents), numéros d'urgence d'abord.
+ */
+function sortContactsAlphabetically<
+  T extends { name: string; is_emergency: boolean },
+>(contacts: T[]): T[] {
+  return [...contacts].sort((a, b) => {
+    if (a.is_emergency !== b.is_emergency) return a.is_emergency ? -1 : 1;
+    return a.name.localeCompare(b.name, 'fr', { sensitivity: 'base' });
+  });
+}
+
+/** Gélule « Trier A→Z », alignée à droite au-dessus de la liste. */
+function SortButton({
+  accent,
+  isSorted,
+  isPending,
+  onPress,
+}: {
+  accent: string;
+  isSorted: boolean;
+  isPending: boolean;
+  onPress: () => void;
+}) {
+  const isDisabled = isSorted || isPending;
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={
+        isSorted
+          ? 'Contacts déjà triés de A à Z'
+          : 'Trier les contacts de A à Z'
+      }
+      accessibilityState={{ disabled: isDisabled, busy: isPending }}
+      disabled={isDisabled}
+      onPress={onPress}
+      hitSlop={6}
+      className="flex-row items-center gap-1.5 self-end rounded-full px-3.5 py-2 active:opacity-70"
+      style={{
+        backgroundColor: isSorted
+          ? 'rgba(255, 255, 255, 0.6)'
+          : hexToRgba(accent, 0.1),
+      }}
+    >
+      <Ionicons
+        name={isSorted ? 'checkmark' : 'swap-vertical'}
+        size={15}
+        color={isSorted ? GLASS_BODY_COLOR : accent}
+      />
+      <Text
+        className="text-[13px] font-semibold"
+        style={{ color: isSorted ? GLASS_BODY_COLOR : accent }}
+      >
+        {isPending
+          ? 'Tri en cours…'
+          : isSorted
+            ? 'Triés de A à Z'
+            : 'Trier A→Z'}
+      </Text>
+    </Pressable>
+  );
+}
+
 /** Petit bouton rond d'action sur une ligne de contact. */
 function RowAction({
   icon,
   label,
+  tone = 'neutral',
   isDisabled = false,
   onPress,
 }: {
   icon: IoniconName;
   label: string;
+  tone?: 'neutral' | 'danger';
   isDisabled?: boolean;
   onPress: () => void;
 }) {
+  const isDanger = tone === 'danger';
   return (
     <Pressable
       accessibilityLabel={label}
@@ -356,10 +464,17 @@ function RowAction({
       disabled={isDisabled}
       hitSlop={6}
       onPress={onPress}
-      className="h-8 w-8 items-center justify-center rounded-full bg-[#f4f3f7]"
-      style={{ opacity: isDisabled ? 0.35 : 1 }}
+      className="h-8 w-8 items-center justify-center rounded-full"
+      style={{
+        opacity: isDisabled ? 0.35 : 1,
+        backgroundColor: isDanger ? hexToRgba(DELETE_RED, 0.08) : '#f4f3f7',
+      }}
     >
-      <Ionicons name={icon} size={16} color={GLASS_BODY_COLOR} />
+      <Ionicons
+        name={icon}
+        size={isDanger ? 15 : 16}
+        color={isDanger ? DELETE_RED : GLASS_BODY_COLOR}
+      />
     </Pressable>
   );
 }
@@ -393,7 +508,15 @@ function ContactForm({
   const [phone, setPhone] = useState(initial?.phone ?? '');
   const [isEmergency, setIsEmergency] = useState(initial?.isEmergency ?? false);
   const isSolo = useIsSoloHousehold();
-  const canSubmit = name.trim() !== '' && !isPending;
+  // Téléphone obligatoire (demande explicite : un contact sans numéro n'a
+  // pas de sens ici). Deux chiffres suffisent : les numéros d'urgence sont
+  // courts (15, 112, 3114). Un ancien contact sans numéro en reçoit un à sa
+  // prochaine modification.
+  const phoneDigitCount = phone.replace(/\D/g, '').length;
+  const isPhoneValid = phoneDigitCount >= MIN_PHONE_DIGITS;
+  const canSubmit = name.trim() !== '' && isPhoneValid && !isPending;
+  // Aide affichée seulement quand c'est le numéro qui bloque.
+  const showPhoneHint = name.trim() !== '' && !isPhoneValid;
 
   return (
     <View
@@ -481,15 +604,24 @@ function ContactForm({
       />
       {/* Plus de champ « Rôle » (demande explicite : il débordait de
           sa gélule) — nom, téléphone et urgence suffisent. */}
-      <IconInput
-        icon="call-outline"
-        placeholder="Téléphone"
-        value={phone}
-        // Espaces ajoutés pendant la saisie : « 01 89 87 72 89 ».
-        onChangeText={(text) => setPhone(formatPhoneNumber(text))}
-        accent={accent}
-        keyboardType="phone-pad"
-      />
+      <View className="gap-1.5">
+        <IconInput
+          icon="call-outline"
+          placeholder="Téléphone"
+          value={phone}
+          // Espaces ajoutés pendant la saisie : « 01 89 87 72 89 ».
+          onChangeText={(text) => setPhone(formatPhoneNumber(text))}
+          accent={accent}
+          keyboardType="phone-pad"
+        />
+        {showPhoneHint ? (
+          <Text className="px-4 text-[12.5px] text-[#c9553d]">
+            {phoneDigitCount === 0
+              ? 'Ajoutez un numéro de téléphone pour enregistrer le contact.'
+              : 'Numéro trop court.'}
+          </Text>
+        ) : null}
+      </View>
 
       <View
         className="flex-row items-center gap-2.5 rounded-full py-1.5 pl-1.5 pr-3"
@@ -532,7 +664,7 @@ function ContactForm({
         onPress={() =>
           onSubmit({
             name: name.trim(),
-            phone: phone.trim() || null,
+            phone: phone.trim(),
             isEmergency,
           })
         }
