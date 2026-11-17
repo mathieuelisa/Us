@@ -316,6 +316,17 @@ export function JournalTab({
 }
 
 /**
+ * Rayons écrits en clair plutôt que `rounded-full` (signalé sur Samsung
+ * S26) : Uniwind traduit `rounded-full` en un rayon de 99999, qu'Android
+ * perd quand le style de la vue change après coup — le jour choisi
+ * devenait un rectangle, celui d'avant un carré, les points des carrés.
+ * Un rayon égal à la moitié de la taille donne le même rendu, partout.
+ */
+const PILL_RADIUS = 20; // w-10
+const DAY_CIRCLE_RADIUS = 18; // h-9 w-9
+const DOT_RADIUS = 3; // h-1.5 w-1.5
+
+/**
  * Un jour de la semaine. Au repos : lettre au-dessus d'un rond gris. Choisi :
  * une gélule d'accent qui englobe lettre et numéro, surmontée de petits
  * traits. Un point sous le jour signale des symptômes déjà notés.
@@ -354,10 +365,11 @@ function DayPill({
         />
       ) : null}
       <View
-        className="h-[70px] w-10 items-center justify-center gap-1.5 rounded-full"
+        className="h-[70px] w-10 items-center justify-center gap-1.5"
         style={
           isSelected
             ? {
+                borderRadius: PILL_RADIUS,
                 backgroundColor: accent,
                 shadowColor: accent,
                 shadowOffset: { width: 0, height: 6 },
@@ -365,7 +377,7 @@ function DayPill({
                 shadowRadius: 10,
                 elevation: 6,
               }
-            : undefined
+            : { borderRadius: PILL_RADIUS }
         }
       >
         <Text
@@ -381,8 +393,9 @@ function DayPill({
           {letter}
         </Text>
         <View
-          className="h-9 w-9 items-center justify-center rounded-full"
+          className="h-9 w-9 items-center justify-center"
           style={{
+            borderRadius: DAY_CIRCLE_RADIUS,
             backgroundColor: isSelected
               ? 'transparent'
               : isFuture
@@ -406,8 +419,11 @@ function DayPill({
         </View>
       </View>
       <View
-        className="h-1.5 w-1.5 rounded-full"
-        style={{ backgroundColor: hasSymptoms ? accent : 'transparent' }}
+        className="h-1.5 w-1.5"
+        style={{
+          borderRadius: DOT_RADIUS,
+          backgroundColor: hasSymptoms ? accent : 'transparent',
+        }}
       />
     </Pressable>
   );
