@@ -92,7 +92,31 @@ export function useUpsertMoodCheckin(household: Household | null | undefined) {
         needNote,
       });
     },
-    onSuccess: () => {
+    // Mise à jour optimiste : l'ourson du jour apparaît dans « Cette
+    // semaine » (et le choix reste surligné) dès le tap, sans attendre
+    // l'aller-retour Supabase. Rétabli si l'enregistrement échoue.
+    onMutate: async ({ mood }) => {
+      if (!household || !userId) return undefined;
+      const queryKey = queryKeys.together.weekCheckins(
+        household.id,
+        userId,
+        weekStart,
+      );
+      await queryClient.cancelQueries({ queryKey });
+      const previous =
+        queryClient.getQueryData<Record<string, MoodValue>>(queryKey);
+      queryClient.setQueryData<Record<string, MoodValue>>(queryKey, {
+        ...previous,
+        [todayIso()]: mood,
+      });
+      return { queryKey, previous };
+    },
+    onError: (_error, _variables, context) => {
+      if (context) {
+        queryClient.setQueryData(context.queryKey, context.previous);
+      }
+    },
+    onSettled: () => {
       if (!household || !userId) return;
       queryClient.invalidateQueries({
         queryKey: queryKeys.together.weekCheckins(

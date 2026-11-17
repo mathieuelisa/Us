@@ -44,6 +44,7 @@ import {
   useUpdateAppointment,
 } from '@/features/health/hooks';
 import { useMyHousehold } from '@/features/household/hooks';
+import { getPartnerUserId } from '@/features/hub/api';
 import {
   CARD_SHADOW,
   formatAppointmentDate,
@@ -55,6 +56,10 @@ import {
 import { useHubSummary } from '@/features/hub/hooks';
 import { useMarkHomeTourSeen, useMyProfile } from '@/features/profile/hooks';
 import { useThemeAccent, useThemeBackground } from '@/features/settings/hooks';
+import {
+  useMyWeekCheckins,
+  useWeekCheckinsFor,
+} from '@/features/together/hooks';
 import {
   homeTourReplayAtom,
   measureTourTarget,
@@ -105,6 +110,18 @@ export default function HubScreen() {
   const updateAppointment = useUpdateAppointment(household);
   const deleteAppointment = useDeleteAppointment(household);
   const currentUserId = useAtomValue(sessionAtom)?.user.id ?? null;
+  // Humeurs de la semaine préchargées dès l'accueil : « Cette semaine »
+  // (Ensemble) et « Son humeur cette semaine » (Mon partenaire) s'ouvrent
+  // avec leurs oursons, au lieu de ronds vides le temps de la requête. Les
+  // requêtes restant actives ici, le temps réel (`useHouseholdRealtime`)
+  // les recharge aussi dès que l'autre parent note son humeur.
+  useMyWeekCheckins(household);
+  useWeekCheckinsFor(
+    household,
+    household && currentUserId
+      ? getPartnerUserId(household, currentUserId)
+      : null,
+  );
   // Espace « Seul·e » (demande explicite) : pas d'invitation, et la carte
   // « Mon partenaire » devient « Cette semaine » (taille du bébé, astuces).
   const isSolo = household?.accompaniment_type === 'seul';
