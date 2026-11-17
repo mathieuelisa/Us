@@ -11,6 +11,7 @@ import {
   GLASS_TITLE_COLOR,
   SparkLines,
 } from '@/components/ui/glass-card';
+import { useIsSoloHousehold } from '@/features/household/hooks';
 import { useThemeAccent } from '@/features/settings/hooks';
 import { hexToRgba } from '@/lib/color';
 
@@ -45,6 +46,8 @@ export function PremiumOffer({
 }) {
   const accent = useThemeAccent();
   const size = compact ? COMPACT : REGULAR;
+  // Espace « Seul·e » : pas de partenaire, donc rien à préciser.
+  const isSolo = useIsSoloHousehold();
 
   return (
     <>
@@ -127,41 +130,47 @@ export function PremiumOffer({
       </View>
 
       <View
-        className={`flex-row items-center gap-3.5 rounded-[24px] px-4 ${
-          compact ? 'py-2.5' : 'py-3.5'
-        }`}
+        className={`rounded-[24px] px-4 ${compact ? 'gap-2 py-2.5' : 'gap-3 py-3.5'}`}
         style={{
           backgroundColor: hexToRgba(accent, 0.08),
           borderWidth: 1,
           borderColor: hexToRgba(accent, 0.12),
         }}
       >
-        <View>
-          <Ionicons
-            name="diamond-outline"
-            size={compact ? 26 : 32}
-            color={accent}
-          />
-          <SparkLines
-            color={hexToRgba(accent, 0.55)}
-            style={{
-              right: -18,
-              top: -14,
-              transform: [{ scale: 0.7 }],
-            }}
-          />
+        <View className="flex-row items-center gap-3.5">
+          <View>
+            <Ionicons
+              name="diamond-outline"
+              size={compact ? 26 : 32}
+              color={accent}
+            />
+            <SparkLines
+              color={hexToRgba(accent, 0.55)}
+              style={{
+                right: -18,
+                top: -14,
+                transform: [{ scale: 0.7 }],
+              }}
+            />
+          </View>
+          <View className="flex-1 gap-0.5">
+            <Text
+              className="font-extrabold"
+              style={{
+                color: GLASS_TITLE_COLOR,
+                fontSize: compact ? 15.5 : 17,
+              }}
+            >
+              14,99 € — paiement unique
+            </Text>
+            <Text className="text-[12.5px]" style={{ color: GLASS_BODY_COLOR }}>
+              Pas d’abonnement, pas de renouvellement
+            </Text>
+          </View>
         </View>
-        <View className="flex-1 gap-0.5">
-          <Text
-            className="font-extrabold"
-            style={{ color: GLASS_TITLE_COLOR, fontSize: compact ? 15.5 : 17 }}
-          >
-            14,99 € — paiement unique
-          </Text>
-          <Text className="text-[12.5px]" style={{ color: GLASS_BODY_COLOR }}>
-            Pas d’abonnement, pas de renouvellement
-          </Text>
-        </View>
+        {isSolo ? null : (
+          <SharedPurchaseNote accent={accent} compact={compact} />
+        )}
       </View>
 
       <View className={compact ? 'gap-1.5' : 'gap-2'}>
@@ -212,6 +221,40 @@ export function PremiumOffer({
 
       <PremiumPurchaseButton compact={compact} />
     </>
+  );
+}
+
+/**
+ * « Valable pour vous deux » (demande explicite) : le premium est porté par
+ * le foyer, un seul achat le débloque pour les deux parents. Posé dans
+ * l'encart du prix, au moment où la question se pose.
+ */
+function SharedPurchaseNote({
+  accent,
+  compact,
+}: {
+  accent: string;
+  compact: boolean;
+}) {
+  return (
+    <View
+      className={`flex-row items-center gap-2.5 border-t pt-2 ${compact ? '' : 'pt-3'}`}
+      style={{ borderColor: hexToRgba(accent, 0.12) }}
+    >
+      <View
+        className="items-center justify-center rounded-full bg-white"
+        style={{ width: compact ? 26 : 30, height: compact ? 26 : 30 }}
+      >
+        <Ionicons name="people" size={compact ? 14 : 16} color={accent} />
+      </View>
+      <Text
+        className="flex-1 leading-[17px]"
+        style={{ color: GLASS_TITLE_COLOR, fontSize: compact ? 12.5 : 13 }}
+      >
+        <Text className="font-bold">Valable pour vous deux</Text> : votre
+        partenaire n’a rien à payer.
+      </Text>
+    </View>
   );
 }
 

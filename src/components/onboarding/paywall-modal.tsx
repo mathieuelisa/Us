@@ -1,5 +1,9 @@
+import { Ionicons } from '@expo/vector-icons';
+import { useAtomValue } from 'jotai';
 import { Image, Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import Animated, { SlideInDown, SlideOutDown } from 'react-native-reanimated';
+
+import { onboardingDraftAtom } from '@/lib/atoms/onboarding';
 
 export const PREMIUM_FEATURES = [
   'Match des Prénoms',
@@ -38,6 +42,10 @@ export function PaywallModal({
   visible: boolean;
   onClose: () => void;
 }) {
+  // Le foyer n'existe pas encore : c'est le choix de l'étape 1 qui dit s'il
+  // y a un partenaire. « Seul·e » : rien à préciser.
+  const { accompanimentType } = useAtomValue(onboardingDraftAtom);
+  const hasPartner = accompanimentType !== 'seul';
   return (
     <Modal
       visible={visible}
@@ -79,6 +87,18 @@ export function PaywallModal({
               <Text className="text-[13px] text-[#b0b0b0]">
                 Pas d’abonnement, pas de renouvellement
               </Text>
+              {/* Un seul achat pour le foyer (demande explicite). */}
+              {hasPartner ? (
+                <View className="mt-2.5 flex-row items-center gap-2.5 border-t border-[#e8c874]/30 pt-2.5">
+                  <Ionicons name="people" size={16} color="#e8c874" />
+                  <Text className="flex-1 text-[13px] leading-[18px] text-[#e0e0e0]">
+                    <Text className="font-bold text-[#e8c874]">
+                      Valable pour vous deux
+                    </Text>{' '}
+                    : votre partenaire n’a rien à payer.
+                  </Text>
+                </View>
+              ) : null}
             </View>
 
             {PREMIUM_FEATURES.map((feature) => (
