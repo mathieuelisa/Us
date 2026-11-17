@@ -52,6 +52,19 @@ export type CatalogExercise = {
   imageTopColor?: string;
   /** Fond pastel de la carte et du bandeau, et encre assortie. */
   tint: { bg: string; ink: string };
+  /**
+   * Version partenaire (demande explicite : côté partenaire, l'exercice se
+   * présente comme une façon de l'aider). Même exercice, même fiche — seule
+   * la lecture change.
+   */
+  partner: {
+    /** Une phrase, sur la carte et en tête de « Votre rôle ». */
+    summary: string;
+    /** Se pratique aussi à deux : pastille « À deux » sur la carte. */
+    together: boolean;
+    /** 2 ou 3 gestes concrets, dans l'encadré « Votre rôle ». */
+    roles: string[];
+  };
 };
 
 export const EXERCISE_DISCLAIMER =
@@ -89,6 +102,16 @@ export const EXERCISE_CATALOG: CatalogExercise[] = [
     image: require('@/assets/images/Exercise_respiration_prenatale.png'),
     imageTopColor: '#ebf2fe',
     tint: TINT.souffle,
+    partner: {
+      summary:
+        'Respirez avec elle : à deux, le rythme s’installe plus facilement.',
+      together: true,
+      roles: [
+        'Allongez-vous à côté d’elle et calez votre souffle sur le sien.',
+        'Comptez à voix basse « quatre… six » pour donner le tempo.',
+        'Proposez-le le soir, comme un rituel de fin de journée à deux.',
+      ],
+    },
   },
   {
     slug: 'etirement-du-dos',
@@ -110,6 +133,15 @@ export const EXERCISE_CATALOG: CatalogExercise[] = [
     image: require('@/assets/images/Exercise_etirement_du_dos.png'),
     imageTopColor: '#ebf8f2',
     tint: TINT.dos,
+    partner: {
+      summary: 'Un moment pour dénouer ses épaules — vos mains peuvent aider.',
+      together: false,
+      roles: [
+        'Préparez-lui une chaise stable et un coin calme.',
+        'Après les étirements, proposez un massage léger des épaules et de la nuque.',
+        'Rappelez-lui de faire une pause quand la journée a été longue assise.',
+      ],
+    },
   },
   {
     slug: 'marche-douce',
@@ -131,6 +163,15 @@ export const EXERCISE_CATALOG: CatalogExercise[] = [
     image: require('@/assets/images/Exercise_marche_douce.png'),
     imageTopColor: '#fef6e5',
     tint: TINT.endurance,
+    partner: {
+      summary: 'Le prétexte idéal pour une balade à deux chaque jour.',
+      together: true,
+      roles: [
+        'Proposez la sortie, et choisissez ensemble un parcours plat.',
+        'Calez-vous sur son allure : c’est elle qui donne le rythme.',
+        'Prenez la bouteille d’eau, et prévoyez de quoi s’asseoir en route.',
+      ],
+    },
   },
   {
     slug: 'bascule-du-bassin',
@@ -152,6 +193,15 @@ export const EXERCISE_CATALOG: CatalogExercise[] = [
     image: require('@/assets/images/Exercise_bascule_du_bassin.png'),
     imageTopColor: '#feedf2',
     tint: TINT.bassin,
+    partner: {
+      summary: 'Accompagnez le mouvement, et soulagez le bas du dos ensuite.',
+      together: false,
+      roles: [
+        'Installez un tapis ou une couverture épaisse sous ses genoux.',
+        'Rythmez à voix basse : « dos rond… dos plat ».',
+        'Proposez un massage doux du bas du dos à la fin — un geste qui servira aussi pendant le travail.',
+      ],
+    },
   },
 
   // ------------------------------------------------------- 2e trimestre
@@ -175,6 +225,15 @@ export const EXERCISE_CATALOG: CatalogExercise[] = [
     image: require('@/assets/images/Exercise_yoga_prenatal.png'),
     imageTopColor: '#e9e2f7',
     tint: TINT.mobilite,
+    partner: {
+      summary: 'Faites la séance avec elle : c’est plus motivant à deux.',
+      together: true,
+      roles: [
+        'Déroulez les tapis et faites la séquence à ses côtés.',
+        'Proposez un appui de la main pour les postures debout.',
+        'Gardez un coussin à portée pour qu’elle se repose sur le côté à la fin.',
+      ],
+    },
   },
   {
     slug: 'ouverture-des-hanches',
@@ -196,6 +255,15 @@ export const EXERCISE_CATALOG: CatalogExercise[] = [
     image: require('@/assets/images/Exercise_ouverture_des_hanches.png'),
     imageTopColor: '#fae3d6',
     tint: TINT.hanches,
+    partner: {
+      summary: 'Préparez l’installation et restez près d’elle.',
+      together: false,
+      roles: [
+        'Glissez un coussin sous chacun de ses genoux.',
+        'Asseyez-vous dos à dos pour lui offrir un appui stable.',
+        'Rappelez-lui doucement de grandir le dos plutôt que d’appuyer sur les genoux.',
+      ],
+    },
   },
   {
     slug: 'natation',
@@ -217,6 +285,15 @@ export const EXERCISE_CATALOG: CatalogExercise[] = [
     image: require('@/assets/images/Exercise_natation.png'),
     imageTopColor: '#dcf0ee',
     tint: TINT.eau,
+    partner: {
+      summary: 'Accompagnez-la à la piscine : un vrai moment à deux.',
+      together: true,
+      roles: [
+        'Proposez la séance et vérifiez ensemble les créneaux calmes.',
+        'Nagez à côté d’elle, à son rythme.',
+        'Restez près de l’échelle et tendez-lui la main à la sortie du bassin.',
+      ],
+    },
   },
   {
     slug: 'renfort-des-jambes',
@@ -238,6 +315,15 @@ export const EXERCISE_CATALOG: CatalogExercise[] = [
     image: require('@/assets/images/Exercise_renfort_des_jambes.png'),
     imageTopColor: '#e1f2e4',
     tint: TINT.dos,
+    partner: {
+      summary: 'Comptez pour elle et encouragez-la : c’est court mais intense.',
+      together: false,
+      roles: [
+        'Comptez les secondes à voix haute.',
+        'Restez à côté pour qu’elle puisse se tenir à votre bras en remontant.',
+        'Rappelez la pause entre chaque répétition.',
+      ],
+    },
   },
 
   // ------------------------------------------------------- 3e trimestre
@@ -261,6 +347,15 @@ export const EXERCISE_CATALOG: CatalogExercise[] = [
     image: require('@/assets/images/Exercise_ballon_de_grossesse.png'),
     imageTopColor: '#faf1cc',
     tint: TINT.endurance,
+    partner: {
+      summary: 'Tenez-vous près d’elle pour la sécuriser sur le ballon.',
+      together: false,
+      roles: [
+        'Gonflez le ballon pour que ses hanches soient plus hautes que ses genoux.',
+        'Asseyez-vous ou restez debout à portée de main lors des premières séances.',
+        'Massez le bas de son dos pendant qu’elle fait ses cercles.',
+      ],
+    },
   },
   {
     slug: 'perinee-prise-de-conscience',
@@ -282,6 +377,15 @@ export const EXERCISE_CATALOG: CatalogExercise[] = [
     image: require('@/assets/images/Exercise_perinee.png'),
     imageTopColor: '#f8e0e6',
     tint: TINT.bassin,
+    partner: {
+      summary: 'Un exercice qu’elle fait seule : votre rôle est discret.',
+      together: false,
+      roles: [
+        'Laissez-lui un moment calme, sans interruption.',
+        'Encouragez-la à en parler à la sage-femme si elle a des questions.',
+        'Après la naissance, la rééducation se fait avec un professionnel : aidez-la à prendre le rendez-vous.',
+      ],
+    },
   },
   {
     slug: 'respiration-pour-le-jour-j',
@@ -303,6 +407,16 @@ export const EXERCISE_CATALOG: CatalogExercise[] = [
     image: require('@/assets/images/Exercise_respiration_jour_j.png'),
     imageTopColor: '#e9e2f7',
     tint: TINT.mobilite,
+    partner: {
+      summary:
+        'Entraînez-vous à la guider : le jour J, c’est vous qui donnerez le rythme.',
+      together: true,
+      roles: [
+        'Répétez avec elle : inspirez ensemble, puis expirez longuement à voix haute.',
+        'Chronométrez une « contraction » d’une minute et guidez son souffle jusqu’au bout.',
+        'Notez ce qui l’apaise (une phrase, une main posée) pour le jour J.',
+      ],
+    },
   },
   {
     slug: 'jambes-legeres',
@@ -324,6 +438,15 @@ export const EXERCISE_CATALOG: CatalogExercise[] = [
     image: require('@/assets/images/Exercise_jambes_legeres.png'),
     imageTopColor: '#dcf0ee',
     tint: TINT.eau,
+    partner: {
+      summary: 'Soulagez ses jambes en fin de journée.',
+      together: false,
+      roles: [
+        'Préparez les coussins pour surélever ses jambes.',
+        'Massez doucement ses mollets, toujours du pied vers le genou.',
+        'Apportez-lui un verre d’eau pendant qu’elle se repose.',
+      ],
+    },
   },
 ];
 

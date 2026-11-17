@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
+import { useAtomValue } from 'jotai';
 import { useState } from 'react';
 import { Image, Pressable, Text, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
@@ -21,6 +22,7 @@ import {
 } from '@/features/health/exercise-catalog';
 import type { Household } from '@/features/household/api';
 import { useThemeAccent } from '@/features/settings/hooks';
+import { currentRoleAtom } from '@/lib/atoms/role';
 import { hexToRgba } from '@/lib/color';
 
 const TRIMESTERS: ExerciseTrimester[] = [1, 2, 3];
@@ -63,6 +65,9 @@ export function ExercisesTab({
   household: Household | null | undefined;
 }) {
   const accent = useThemeAccent();
+  // Côté partenaire (demande explicite), les mêmes exercices se lisent comme
+  // une façon de l'aider : intro, pastille « À deux » et accroche dédiées.
+  const isPartner = useAtomValue(currentRoleAtom) === 'partner';
   const weeks = getWeeksOfAmenorrhea(household?.due_date ?? null);
   const currentTrimester = weeks === null ? null : getTrimester(weeks);
 
@@ -79,11 +84,17 @@ export function ExercisesTab({
           className="text-[15.5px] font-bold leading-[21px]"
           style={{ color: GLASS_TITLE_COLOR }}
         >
-          {currentTrimester === null
-            ? 'Des séances courtes, adaptées à chaque trimestre.'
-            : `Vous êtes au ${TRIMESTER_LABELS[currentTrimester].toLowerCase()}${
-                weeks === null ? '' : ` — ${weeks} SA`
-              }. Les autres trimestres restent consultables.`}
+          {isPartner
+            ? currentTrimester === null
+              ? 'Accompagnez-la : des exercices à faire ensemble, ou pour la soutenir.'
+              : `Elle est au ${TRIMESTER_LABELS[currentTrimester].toLowerCase()}${
+                  weeks === null ? '' : ` — ${weeks} SA`
+                }. Accompagnez-la : des exercices à faire ensemble, ou pour la soutenir.`
+            : currentTrimester === null
+              ? 'Des séances courtes, adaptées à chaque trimestre.'
+              : `Vous êtes au ${TRIMESTER_LABELS[currentTrimester].toLowerCase()}${
+                  weeks === null ? '' : ` — ${weeks} SA`
+                }. Les autres trimestres restent consultables.`}
         </Text>
         <Svg width={120} height={10} viewBox="0 0 120 10">
           <Path
@@ -105,7 +116,7 @@ export function ExercisesTab({
               key={trimester}
               accessibilityRole="button"
               accessibilityState={{ selected: isActive }}
-              accessibilityLabel={`${TRIMESTER_LABELS[trimester]}${isCurrent ? ', le vôtre' : ''}`}
+              accessibilityLabel={`${TRIMESTER_LABELS[trimester]}${isCurrent ? (isPartner ? ', en cours' : ', le vôtre') : ''}`}
               onPress={() => setSelectedTrimester(trimester)}
               className="h-12 flex-1 flex-row items-center justify-center gap-1.5 rounded-full"
               style={
@@ -148,7 +159,7 @@ export function ExercisesTab({
                       color: isActive ? 'rgba(255, 255, 255, 0.8)' : '#a3a1b0',
                     }}
                   >
-                    le vôtre
+                    {isPartner ? 'en cours' : 'le vôtre'}
                   </Text>
                 ) : null}
               </View>
@@ -177,6 +188,7 @@ export function ExercisesTab({
               key={exercise.slug}
               exercise={exercise}
               accent={accent}
+              isPartner={isPartner}
             />
           ))}
         </View>
@@ -230,9 +242,11 @@ function splitDurationLabel(label: string): {
 function ExerciseCard({
   exercise,
   accent,
+  isPartner,
 }: {
   exercise: CatalogExercise;
   accent: string;
+  isPartner: boolean;
 }) {
   const { duration, posture } = splitDurationLabel(exercise.durationLabel);
 
@@ -283,6 +297,26 @@ function ExerciseCard({
               <Text style={{ fontSize: 44 }}>{exercise.emoji}</Text>
             </>
           )}
+          {/* Exercice qui se pratique aussi à deux (partenaire). */}
+          {isPartner && exercise.partner.together ? (
+            <View
+              className="absolute left-2.5 top-2.5 flex-row items-center gap-1 rounded-full bg-white px-2 py-1"
+              style={{
+                shadowColor: exercise.tint.ink,
+                shadowOffset: { width: 0, height: 3 },
+                shadowOpacity: 0.2,
+                shadowRadius: 6,
+              }}
+            >
+              <Ionicons name="people" size={12} color={exercise.tint.ink} />
+              <Text
+                className="text-[11px] font-bold"
+                style={{ color: exercise.tint.ink }}
+              >
+                À deux
+              </Text>
+            </View>
+          ) : null}
           <View
             className="absolute right-2.5 top-2.5 h-8 w-8 items-center justify-center rounded-full bg-white"
             style={{
@@ -336,6 +370,15 @@ function ExerciseCard({
               </Text>
             ) : null}
           </View>
+          {isPartner ? (
+            <Text
+              numberOfLines={3}
+              className="text-[12px] leading-[16px]"
+              style={{ color: GLASS_BODY_COLOR }}
+            >
+              {exercise.partner.summary}
+            </Text>
+          ) : null}
         </View>
       </View>
     </Pressable>

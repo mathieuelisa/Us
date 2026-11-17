@@ -57,6 +57,10 @@ const TAB_SUBTITLES: Record<HealthTab, string> = {
   exercises: 'Bouger en douceur, à votre rythme.',
 };
 
+/** Côté partenaire, les exercices se lisent comme une façon de l'aider. */
+const PARTNER_EXERCISES_SUBTITLE =
+  'Bouger en douceur à son rythme — et à deux.';
+
 function isHealthTab(value: string | undefined): value is HealthTab {
   return HEALTH_TABS.includes(value as HealthTab);
 }
@@ -240,7 +244,9 @@ export default function HealthScreen() {
               className="mt-1 text-[14.5px] leading-[21px]"
               style={{ color: GLASS_BODY_COLOR }}
             >
-              {TAB_SUBTITLES[activeTab]}
+              {activeTab === 'exercises' && !isPregnant
+                ? PARTNER_EXERCISES_SUBTITLE
+                : TAB_SUBTITLES[activeTab]}
             </Text>
           </View>
         </View>

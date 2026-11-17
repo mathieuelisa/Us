@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useAtomValue } from 'jotai';
 import { useState } from 'react';
 import { Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
@@ -12,6 +13,7 @@ import {
 } from '@/features/health/exercise-catalog';
 import { CARD_SHADOW } from '@/features/hub/constants';
 import { useThemeBackground } from '@/features/settings/hooks';
+import { currentRoleAtom } from '@/lib/atoms/role';
 
 const SafeAreaView = withUniwind(RNSafeAreaView);
 
@@ -52,6 +54,9 @@ export default function ExerciseScreen() {
   const router = useRouter();
   const { slug } = useLocalSearchParams<{ slug?: string }>();
   const backgroundColor = useThemeBackground();
+  // Côté partenaire : encadré « Votre rôle » et étapes « Ce qu'elle fait »
+  // (demande explicite : les exercices tournés vers l'entraide).
+  const isPartner = useAtomValue(currentRoleAtom) === 'partner';
 
   const exercise = getExerciseBySlug(slug);
 
@@ -105,6 +110,8 @@ export default function ExerciseScreen() {
             </View>
           </View>
 
+          {isPartner ? <PartnerRole exercise={exercise} /> : null}
+
           <Text className="text-[15px] leading-[23px] text-[#3d3d3d]">
             {exercise.description}
           </Text>
@@ -136,7 +143,7 @@ export default function ExerciseScreen() {
 
           <View className="gap-2">
             <Text className="text-[11.5px] font-semibold tracking-wide text-[#8a8a8a]">
-              COMMENT FAIRE
+              {isPartner ? 'CE QU’ELLE FAIT' : 'COMMENT FAIRE'}
             </Text>
 
             <View
@@ -271,6 +278,51 @@ function ExerciseImageHero({
 
 /** Blanc plein, y compris posé sur le bandeau pastel : c'est ce qui lui
  *  garde son contraste quelle que soit la teinte de l'exercice. */
+/**
+ * « Votre rôle », pour le partenaire : l'accroche de l'exercice, puis 2 ou
+ * 3 gestes concrets pour l'aider — sur la teinte de l'exercice.
+ */
+function PartnerRole({ exercise }: { exercise: CatalogExercise }) {
+  const { tint, partner } = exercise;
+  return (
+    <View
+      className="gap-3 overflow-hidden rounded-2xl px-4 py-4"
+      style={{ backgroundColor: tint.bg }}
+    >
+      <View
+        pointerEvents="none"
+        className="absolute -right-8 -top-10 h-28 w-28 rounded-full bg-white/35"
+      />
+      <View className="flex-row items-center gap-2.5">
+        <View className="h-9 w-9 items-center justify-center rounded-full bg-white">
+          <Ionicons name="heart" size={17} color={tint.ink} />
+        </View>
+        <Text
+          className="flex-1 text-[11.5px] font-bold tracking-wide"
+          style={{ color: tint.ink }}
+        >
+          VOTRE RÔLE{partner.together ? ' · À FAIRE À DEUX' : ''}
+        </Text>
+      </View>
+      <Text className="text-[15.5px] font-bold leading-[21px] text-[#1a1a1a]">
+        {partner.summary}
+      </Text>
+      <View className="gap-2">
+        {partner.roles.map((role) => (
+          <View key={role} className="flex-row items-start gap-2.5">
+            <View className="mt-0.5 h-5 w-5 items-center justify-center rounded-full bg-white">
+              <Ionicons name="checkmark" size={13} color={tint.ink} />
+            </View>
+            <Text className="flex-1 text-[14px] leading-[20px] text-[#2a2a2a]">
+              {role}
+            </Text>
+          </View>
+        ))}
+      </View>
+    </View>
+  );
+}
+
 function BackButton({ onPress }: { onPress: () => void }) {
   return (
     <Pressable
