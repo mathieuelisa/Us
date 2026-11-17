@@ -16,6 +16,28 @@ export async function fetchMyHousehold(): Promise<Household | null> {
   return data;
 }
 
+/**
+ * Corrige la date du terme (Profil, demande explicite : en cas d'erreur à
+ * l'onboarding). RLS `households_update_members` : seuls les membres de
+ * l'espace peuvent la modifier ; l'écran ne la propose qu'à la personne
+ * enceinte. Aucune donnée de santé nouvelle : c'est le champ saisi à
+ * l'onboarding.
+ */
+export async function updateDueDate(
+  householdId: string,
+  dueDate: string,
+): Promise<Household> {
+  const { data, error } = await supabase
+    .from('households')
+    .update({ due_date: dueDate })
+    .eq('id', householdId)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
 export async function fetchInfoItems(
   householdId: string,
 ): Promise<HouseholdInfoItem[]> {

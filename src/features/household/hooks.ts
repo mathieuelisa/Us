@@ -15,6 +15,7 @@ import {
   type Household,
   type HouseholdInfoItem,
   joinHouseholdByCode,
+  updateDueDate,
   updateInfoItem,
 } from './api';
 
@@ -172,4 +173,26 @@ export function useCreateHouseholdJoinCode() {
 export function useIsSoloHousehold(): boolean {
   const { data: household } = useMyHousehold();
   return household?.accompaniment_type === 'seul';
+}
+
+/**
+ * Date du terme corrigée depuis le Profil. La ligne renvoyée remplace
+ * directement le foyer en cache (semaines d'aménorrhée, mois de grossesse,
+ * rappels de démarches s'y recalculent) ; le hub et les démarches sont
+ * rechargés. L'autre parent la reçoit en direct (`useHouseholdRealtime`).
+ */
+export function useUpdateDueDate(household: Household | null | undefined) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (dueDate: string) => {
+      if (!household?.id) throw new Error('No household');
+      return updateDueDate(household.id, dueDate);
+    },
+    onSuccess: (updated) => {
+      queryClient.setQueryData(queryKeys.household.mine, updated);
+      queryClient.invalidateQueries({ queryKey: queryKeys.hub.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.procedures.all });
+    },
+  });
 }

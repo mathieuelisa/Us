@@ -9,7 +9,12 @@ import { onboardingDraftAtom } from '@/lib/atoms/onboarding';
 import { todayIso } from '@/lib/date';
 
 /**
- * Écran 1b — Étape 3/6, arrivée du bébé.
+ * Écran 1b — Étape 3/6, date du terme.
+ *
+ * Question tournée vers la date du terme (demande explicite) plutôt que
+ * « Quand votre bébé arrive-t-il ? » : c'est la date que donne le suivi
+ * médical, et celle que l'app utilise (semaines d'aménorrhée, démarches).
+ * Corrigeable ensuite dans Profil (`DueDateSheet`).
  *
  * La date d'arrivée ne peut pas être passée (demande explicite) : la
  * molette part d'aujourd'hui (`minDate`) et un brouillon resté sur une date
@@ -24,7 +29,7 @@ export default function BabyArrivalStep() {
   return (
     <OnboardingStepShell
       step={3}
-      title="Quand votre bébé arrive-t-il ?"
+      title="Quelle est la date prévue du terme ?"
       primaryLabel="Suivant"
       isPrimaryDisabled={
         draft.dueDate === null || isDueDateInPast || draft.isFirstChild === null
@@ -33,7 +38,7 @@ export default function BabyArrivalStep() {
     >
       <View className="gap-2.5">
         <Text className="text-[14px] font-medium text-[#1a1a1a]">
-          Date de naissance prévue
+          Date du terme
         </Text>
         <WheelDatePicker
           value={draft.dueDate}
@@ -44,7 +49,7 @@ export default function BabyArrivalStep() {
         />
         {isDueDateInPast ? (
           <Text className="px-1 text-[12.5px] text-[#c9553d]">
-            La date d’arrivée doit être aujourd’hui ou plus tard.
+            La date du terme doit être aujourd’hui ou plus tard.
           </Text>
         ) : null}
       </View>

@@ -7,6 +7,7 @@ import Svg, { Path } from 'react-native-svg';
 import { withUniwind } from 'uniwind';
 import { useTabBarContentInset } from '@/components/navigation/use-tab-bar-height';
 import { AvatarPickerModal } from '@/components/profile/avatar-picker-modal';
+import { DueDateSheet } from '@/components/profile/due-date-sheet';
 import {
   FeedbackBanner,
   useFeedbackBanner,
@@ -18,6 +19,8 @@ import {
 } from '@/components/ui/glass-card';
 import { PillButton } from '@/components/ui/pill-button';
 import { ScreenCornerShapes } from '@/components/ui/screen-corner-shapes';
+import { getWeeksOfAmenorrhea } from '@/features/health/constants';
+import { useMyHousehold, useUpdateDueDate } from '@/features/household/hooks';
 import { getProfileAvatar } from '@/features/profile/avatars';
 import {
   useMyProfile,
@@ -25,6 +28,7 @@ import {
   useUpdateMyProfile,
 } from '@/features/profile/hooks';
 import { useThemeAccent, useThemeBackground } from '@/features/settings/hooks';
+import { currentRoleAtom } from '@/lib/atoms/role';
 import { sessionAtom } from '@/lib/atoms/session';
 import { hexToRgba, lightenHex } from '@/lib/color';
 import { NO_WEB_FOCUS_OUTLINE } from '@/lib/web-styles';
@@ -52,6 +56,12 @@ type IoniconName = ComponentProps<typeof Ionicons>['name'];
  * Enregistrer confirme visiblement le résultat : bandeau « Prénom mis à
  * jour » et bouton « Enregistré » pendant 2,5 s, ou bandeau d'erreur rouge.
  * Pas de redirection vers l'accueil (choix explicite).
+ *
+ * « Date du terme » (demande explicite) : la personne enceinte peut
+ * corriger celle saisie à l'onboarding, dans une feuille à molette
+ * (`DueDateSheet`). Pas pour le co-parent, qui la voit sans la modifier
+ * ailleurs dans l'app, ni une fois la naissance déclarée (le terme ne sert
+ * plus).
  */
 export default function ProfileScreen() {
   // Place de la barre du bas, qui flotte au-dessus du contenu.
@@ -63,6 +73,28 @@ export default function ProfileScreen() {
   const [isAvatarPickerOpen, setIsAvatarPickerOpen] = useState(false);
   const [lastSaved, setLastSaved] = useState<'name' | 'avatar' | null>(null);
   const avatarKey = profile?.avatar ?? null;
+  const { data: household } = useMyHousehold();
+  const updateDueDate = useUpdateDueDate(household);
+  const role = useAtomValue(currentRoleAtom);
+  const [isDueDateOpen, setIsDueDateOpen] = useState(false);
+  const dueDate = household?.due_date ?? null;
+  const canEditDueDate =
+    role === 'pregnant' && Boolean(household) && !household?.birth_date;
+  const dueDateWeeks = getWeeksOfAmenorrhea(dueDate);
+
+  const saveDueDate = (nextDueDate: string) => {
+    updateDueDate.mutate(nextDueDate, {
+      onSuccess: () => {
+        setIsDueDateOpen(false);
+        showFeedback('success', 'Votre date du terme est à jour.');
+      },
+      onError: () =>
+        showFeedback(
+          'error',
+          'Impossible d’enregistrer la date du terme. Réessayez.',
+        ),
+    });
+  };
 
   const chooseAvatar = (avatar: string | null) => {
     if (avatar === avatarKey) {
@@ -245,6 +277,50 @@ export default function ProfileScreen() {
               </Text>
             </View>
           </View>
+
+          {canEditDueDate ? (
+            <>
+              <View className="mx-4 h-px bg-black/5" />
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={`Modifier la date du terme${dueDate ? `, actuellement le ${formatDueDate(dueDate)}` : ''}`}
+                onPress={() => setIsDueDateOpen(true)}
+                className="flex-row items-center gap-3.5 px-4 py-4 active:opacity-70"
+              >
+                <InfoTile icon="calendar-outline" accent={accent} />
+                <View className="flex-1 gap-0.5">
+                  <Text
+                    className="text-[13px]"
+                    style={{ color: GLASS_BODY_COLOR }}
+                  >
+                    Date du terme
+                  </Text>
+                  <View className="flex-row flex-wrap items-center gap-x-2 gap-y-1">
+                    <Text
+                      className="text-[17px] font-bold"
+                      style={{ color: GLASS_TITLE_COLOR }}
+                    >
+                      {dueDate ? formatDueDate(dueDate) : 'À renseigner'}
+                    </Text>
+                    {dueDateWeeks !== null ? (
+                      <View
+                        className="rounded-full px-2 py-0.5"
+                        style={{ backgroundColor: hexToRgba(accent, 0.1) }}
+                      >
+                        <Text
+                          className="text-[11.5px] font-bold"
+                          style={{ color: accent }}
+                        >
+                          {dueDateWeeks} SA
+                        </Text>
+                      </View>
+                    ) : null}
+                  </View>
+                </View>
+                <Ionicons name="create-outline" size={20} color="#a8a8b3" />
+              </Pressable>
+            </>
+          ) : null}
         </View>
 
         {/* « Enregistré » reste pleinement visible (pas grisé) le temps de
@@ -274,6 +350,15 @@ export default function ProfileScreen() {
         isSaving={updateAvatar.isPending}
         onSelect={chooseAvatar}
         onClose={() => setIsAvatarPickerOpen(false)}
+      />
+
+      <DueDateSheet
+        visible={isDueDateOpen}
+        dueDate={dueDate}
+        accent={accent}
+        isSaving={updateDueDate.isPending}
+        onSave={saveDueDate}
+        onClose={() => setIsDueDateOpen(false)}
       />
 
       <FeedbackBanner
@@ -373,4 +458,14 @@ function InfoTile({ icon, accent }: { icon: IoniconName; accent: string }) {
       <Ionicons name={icon} size={22} color={accent} />
     </View>
   );
+}
+
+/** « 15 juin 2027 ». */
+function formatDueDate(isoDate: string): string {
+  const [year, month, day] = isoDate.split('-').map(Number);
+  return new Date(year, month - 1, day).toLocaleDateString('fr-FR', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
 }
