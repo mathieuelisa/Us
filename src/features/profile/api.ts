@@ -47,6 +47,19 @@ export async function updateMyTheme(
   if (error) throw error;
 }
 
+/**
+ * Visite guidée de l'accueil vue (terminée ou passée) : elle ne se relance
+ * plus d'elle-même. RLS : `profiles_update_own`.
+ */
+export async function markMyHomeTourSeen(userId: string): Promise<void> {
+  const { error } = await supabase
+    .from('profiles')
+    .update({ has_seen_home_tour: true })
+    .eq('id', userId);
+
+  if (error) throw error;
+}
+
 /** `null` revient à l'initiale du prénom. RLS : `profiles_update_own`. */
 export async function updateMyAvatar(
   userId: string,

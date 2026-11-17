@@ -5,6 +5,7 @@ import { sessionAtom } from '@/lib/atoms/session';
 import { queryKeys } from '@/lib/query/keys';
 import {
   fetchMyProfile,
+  markMyHomeTourSeen,
   type Profile,
   type ProfilePronoun,
   updateMyAvatar,
@@ -59,6 +60,32 @@ export function useUpdateMyTheme() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.profile.all });
+    },
+  });
+}
+
+/**
+ * Marque la visite guidée de l'accueil comme vue. Optimiste : le cache du
+ * profil passe tout de suite à `true`, pour qu'elle ne se relance pas
+ * pendant que la requête part. Un échec n'est pas signalé : au pire, elle
+ * repassera une fois.
+ */
+export function useMarkHomeTourSeen() {
+  const session = useAtomValue(sessionAtom);
+  const userId = session?.user.id;
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: () => {
+      if (!userId) throw new Error('No authenticated user');
+      return markMyHomeTourSeen(userId);
+    },
+    onMutate: () => {
+      queryClient.setQueryData<Profile | null>(
+        queryKeys.profile.mine,
+        (current) =>
+          current ? { ...current, has_seen_home_tour: true } : current,
+      );
     },
   });
 }

@@ -1,9 +1,19 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useAtomValue } from 'jotai';
-import { useState } from 'react';
-import { Image, Pressable, ScrollView, Text, View } from 'react-native';
-import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
+import { useEffect, useRef, useState } from 'react';
+import {
+  Image,
+  Pressable,
+  ScrollView,
+  Text,
+  useWindowDimensions,
+  View,
+} from 'react-native';
+import {
+  SafeAreaView as RNSafeAreaView,
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
 import { withUniwind } from 'uniwind';
 
 import { AppointmentDetailModal } from '@/components/health/appointment-detail-modal';
@@ -17,6 +27,7 @@ import { PremiumTeaserCard } from '@/components/hub/premium-teaser-card';
 import { ShareInviteCard } from '@/components/hub/share-invite-card';
 import { useTabBarContentInset } from '@/components/navigation/use-tab-bar-height';
 import { NeedChips } from '@/components/together/need-chips';
+import { HomeTour, type TourStep } from '@/components/tour/home-tour';
 import {
   SparkLines,
   WAVE_LILAC,
@@ -42,8 +53,13 @@ import {
   PARTNER_MOOD_PHRASES,
 } from '@/features/hub/constants';
 import { useHubSummary } from '@/features/hub/hooks';
-import { useMyProfile } from '@/features/profile/hooks';
+import { useMarkHomeTourSeen, useMyProfile } from '@/features/profile/hooks';
 import { useThemeAccent, useThemeBackground } from '@/features/settings/hooks';
+import {
+  homeTourReplayAtom,
+  measureTourTarget,
+  useTourTarget,
+} from '@/features/tour/targets';
 import { currentRoleAtom } from '@/lib/atoms/role';
 import { sessionAtom } from '@/lib/atoms/session';
 import { darkenHex, hexToRgba, lightenHex } from '@/lib/color';
@@ -127,6 +143,74 @@ export default function HubScreen() {
   const [isHowItWorksOpen, setIsHowItWorksOpen] = useState(false);
   const [isInviteOpen, setIsInviteOpen] = useState(false);
 
+  // ---------------------------------------------------- Visite guidée
+  // Première arrivée sur l'accueil (demande explicite) : elle démarre une
+  // fois le profil, le foyer et le résumé chargés — la page a alors sa
+  // mise en page définitive. Vue = `profiles.has_seen_home_tour`, pour ne
+  // pas la rejouer après une réinstallation ; « Revoir la visite guidée »
+  // (Réglages) la relance via `homeTourReplayAtom`.
+  const scrollRef = useRef<ScrollView>(null);
+  const scrollYRef = useRef(0);
+  const { height: windowHeight } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
+  const markHomeTourSeen = useMarkHomeTourSeen();
+  const [isTourOpen, setIsTourOpen] = useState(false);
+  const replayCount = useAtomValue(homeTourReplayAtom);
+  const isReadyForTour =
+    Boolean(profile) && Boolean(household) && summary !== undefined;
+  const shouldAutoStartTour =
+    isReadyForTour && profile?.has_seen_home_tour === false;
+
+  const moodTargetRef = useTourTarget('home-mood');
+  const partnerTargetRef = useTourTarget('home-partner');
+  const sectionsTargetRef = useTourTarget('home-sections');
+  const babyTargetRef = useTourTarget('home-baby');
+  const appointmentsTargetRef = useTourTarget('home-appointments');
+
+  const startTour = () => {
+    scrollRef.current?.scrollTo({ y: 0, animated: false });
+    scrollYRef.current = 0;
+    setIsTourOpen(true);
+  };
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: startTour ne dépend que de références stables.
+  useEffect(() => {
+    if (!shouldAutoStartTour) return;
+    const timer = setTimeout(startTour, 900);
+    return () => clearTimeout(timer);
+  }, [shouldAutoStartTour]);
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: relancé à chaque demande seulement ; startTour ne dépend que de références stables.
+  useEffect(() => {
+    if (replayCount === 0) return;
+    // Laisse le temps de revenir des Réglages sur l'accueil.
+    const timer = setTimeout(startTour, 600);
+    return () => clearTimeout(timer);
+  }, [replayCount]);
+
+  const closeTour = () => {
+    setIsTourOpen(false);
+    scrollRef.current?.scrollTo({ y: 0, animated: true });
+    if (profile && !profile.has_seen_home_tour) markHomeTourSeen.mutate();
+  };
+
+  // Fait défiler l'accueil pour que l'élément présenté laisse la place à
+  // la bulle : en haut de l'écran s'il est grand, au premier quart sinon.
+  const ensureTourTargetVisible = async (targetId: string) => {
+    const rect = await measureTourTarget(targetId);
+    if (!rect) return;
+    const desiredTop =
+      rect.height > windowHeight * 0.4
+        ? insets.top + 16
+        : Math.max(insets.top + 16, windowHeight * 0.18);
+    const delta = rect.y - desiredTop;
+    if (Math.abs(delta) < 8) return;
+    const nextY = Math.max(0, scrollYRef.current + delta);
+    scrollRef.current?.scrollTo({ y: nextY, animated: true });
+    scrollYRef.current = nextY;
+    await new Promise((resolve) => setTimeout(resolve, 450));
+  };
+
   // Fiche d'un rendez-vous (demande explicite) : retrouvée par son id dans
   // la liste, pour refléter une modification dès le retour du formulaire.
   // Fiche et formulaire ne sont jamais ouverts ensemble (un seul `Modal`).
@@ -197,6 +281,11 @@ export default function HubScreen() {
       <ScreenCornerShapes />
 
       <ScrollView
+        ref={scrollRef}
+        onScroll={(event) => {
+          scrollYRef.current = event.nativeEvent.contentOffset.y;
+        }}
+        scrollEventThrottle={16}
         contentContainerClassName="gap-6 px-6 pt-4"
         contentContainerStyle={{ paddingBottom: tabBarInset }}
         showsVerticalScrollIndicator={false}
@@ -273,6 +362,7 @@ export default function HubScreen() {
         {/* État de santé du jour + astuce, juste avant les sections
             (demande explicite) — visible des deux parents. */}
         <HealthTodayCard
+          moodTargetRef={moodTargetRef}
           household={household}
           role={role}
           partnerName={partnerName ?? null}
@@ -291,6 +381,7 @@ export default function HubScreen() {
             {isSolo ? 'CETTE SEMAINE' : 'MON PARTENAIRE'}
           </Text>
           <Pressable
+            ref={partnerTargetRef}
             accessibilityRole="button"
             onPress={() => router.push('/partenaire')}
             style={CARD_SHADOW}
@@ -369,61 +460,64 @@ export default function HubScreen() {
           <Text className="text-[11.5px] font-semibold tracking-wide text-[#8a8a8a]">
             VOS SECTIONS
           </Text>
-          <View className="gap-3">
-            <PillarCard
-              id="demarches"
-              emoji="📋"
-              image={DEMARCHES_ICON}
-              imageFillsTile
-              title="Démarches"
-              state={proceduresState}
-              waveColor={WAVE_PEACH}
-              onPress={() => router.push('/demarches')}
-            />
-            <PillarCard
-              id="ensemble"
-              emoji="💬"
-              image={ENSEMBLE_ICON}
-              imageFillsTile
-              title="Ensemble"
-              state={togetherState}
-              waveColor={WAVE_PINK}
-              onPress={() => router.push('/ensemble')}
-            />
-            <PillarCard
-              id="sante"
-              emoji="🩺"
-              image={SANTE_ICON}
-              imageFillsTile
-              title="Suivi santé"
-              state={healthState}
-              isStateUrgent={isAppointmentSoon}
-              waveColor={WAVE_MINT}
-              onPress={() => router.push('/sante')}
-            />
-          </View>
+          {/* Les 4 sections, présentées ensemble par la visite guidée. */}
+          <View ref={sectionsTargetRef} collapsable={false} className="gap-2">
+            <View className="gap-3">
+              <PillarCard
+                id="demarches"
+                emoji="📋"
+                image={DEMARCHES_ICON}
+                imageFillsTile
+                title="Démarches"
+                state={proceduresState}
+                waveColor={WAVE_PEACH}
+                onPress={() => router.push('/demarches')}
+              />
+              <PillarCard
+                id="ensemble"
+                emoji="💬"
+                image={ENSEMBLE_ICON}
+                imageFillsTile
+                title="Ensemble"
+                state={togetherState}
+                waveColor={WAVE_PINK}
+                onPress={() => router.push('/ensemble')}
+              />
+              <PillarCard
+                id="sante"
+                emoji="🩺"
+                image={SANTE_ICON}
+                imageFillsTile
+                title="Suivi santé"
+                state={healthState}
+                isStateUrgent={isAppointmentSoon}
+                waveColor={WAVE_MINT}
+                onPress={() => router.push('/sante')}
+              />
+            </View>
 
-          {/* Hors du bloc des 3 piliers (CONCEPT.md : poids visuel égal
+            {/* Hors du bloc des 3 piliers (CONCEPT.md : poids visuel égal
               réservé à Démarches/Ensemble/Suivi santé) — nouvelle section,
               pas un 4e pilier, demande explicite placée juste en dessous. */}
-          <View className="mt-1">
-            <PillarCard
-              id="organisation"
-              emoji="🧳"
-              image={ORGANISATION_ICON}
-              imageFillsTile
-              title="Organisation & Préparation"
-              state={organisationState}
-              waveColor={WAVE_LILAC}
-              onPress={() => router.push('/organisation')}
-            />
+            <View className="mt-1">
+              <PillarCard
+                id="organisation"
+                emoji="🧳"
+                image={ORGANISATION_ICON}
+                imageFillsTile
+                title="Organisation & Préparation"
+                state={organisationState}
+                waveColor={WAVE_LILAC}
+                onPress={() => router.push('/organisation')}
+              />
+            </View>
           </View>
 
           {/* Traitement visuel distinct : « Votre bébé » n'est pas un 4e
               pilier, c'est le module premium, verrouillé hors MVP — même
               carte teaser sobre que « Le match des prénoms »
               (PremiumTeaserCard), pour un langage visuel cohérent. */}
-          <View className="mt-1">
+          <View ref={babyTargetRef} collapsable={false} className="mt-1">
             <PremiumTeaserCard
               icon={
                 <Image
@@ -439,7 +533,7 @@ export default function HubScreen() {
           </View>
         </View>
 
-        <View className="gap-2">
+        <View ref={appointmentsTargetRef} collapsable={false} className="gap-2">
           {/* Seul intitulé de section aligné à droite (demande explicite),
               pour détacher les rendez-vous des sections qui le précèdent. */}
           <Text className="text-right text-[11.5px] font-semibold tracking-wide text-[#8a8a8a]">
@@ -579,8 +673,122 @@ export default function HubScreen() {
       {/* Rappel d'humeur du jour (demande explicite) : dernier enfant, posé
           en absolu au-dessus du contenu. */}
       <MoodNudgeToast household={household} />
+
+      {isTourOpen ? (
+        <HomeTour
+          steps={buildHomeTourSteps({
+            isPregnant,
+            isSolo,
+            hasPartnerJoined,
+            partnerName: partnerName || null,
+          })}
+          accent={accent}
+          onEnsureVisible={ensureTourTargetVisible}
+          onClose={closeTour}
+        />
+      ) : null}
     </SafeAreaView>
   );
+}
+
+/**
+ * Étapes de la visite guidée de l'accueil (demande explicite, regroupée de
+ * 9 à 6 étapes) : le cœur de l'humeur (personne enceinte seulement — côté
+ * partenaire il n'est pas cliquable, étape sautée), « Mon partenaire » (pas
+ * en « Seul·e »), les 4 sections ensemble, « Votre bébé », les rendez-vous,
+ * puis l'onglet « Infos ».
+ */
+function buildHomeTourSteps({
+  isPregnant,
+  isSolo,
+  hasPartnerJoined,
+  partnerName,
+}: {
+  isPregnant: boolean;
+  isSolo: boolean;
+  hasPartnerJoined: boolean;
+  partnerName: string | null;
+}): TourStep[] {
+  const other = partnerName ?? 'votre partenaire';
+  const steps: TourStep[] = [];
+
+  if (isPregnant) {
+    steps.push({
+      targetId: 'home-mood',
+      title: 'Votre humeur du jour',
+      body: isSolo
+        ? 'Touchez le cœur pour noter comment vous vous sentez aujourd’hui.'
+        : `Touchez le cœur pour partager votre humeur du jour avec ${other}.`,
+      radius: 999,
+    });
+  }
+
+  if (!isSolo) {
+    steps.push({
+      targetId: 'home-partner',
+      title: 'Mon partenaire',
+      body: hasPartnerJoined
+        ? `Voyez comment ${other} se sent aujourd’hui et au fil de la semaine, et ce qui pourrait l’aider.`
+        : 'Taille de bébé et astuces du jour — puis, dès que votre partenaire vous aura rejoint, son humeur de la journée et de la semaine.',
+      radius: 20,
+    });
+  }
+
+  steps.push({
+    targetId: 'home-sections',
+    title: 'Vos sections',
+    body: 'L’essentiel de la grossesse, rangé en quatre espaces.',
+    radius: 24,
+    items: [
+      {
+        image: DEMARCHES_ICON,
+        label: 'Démarches',
+        text: 'toutes vos démarches, mois par mois de grossesse',
+      },
+      {
+        image: ENSEMBLE_ICON,
+        label: 'Ensemble',
+        text: isSolo
+          ? 'votre humeur du jour et votre semaine'
+          : 'votre humeur du jour et la semaine de chacun',
+      },
+      {
+        image: SANTE_ICON,
+        label: 'Suivi santé',
+        text: 'rendez-vous, numéros utiles et exercices',
+      },
+      {
+        image: ORGANISATION_ICON,
+        label: 'Organisation',
+        text: 'valises, assistant contractions et match des prénoms',
+      },
+    ],
+  });
+
+  steps.push({
+    targetId: 'home-baby',
+    title: 'Votre bébé',
+    body: 'Biberons, allaitement, sommeil, croissance, vaccins… toutes les données de bébé au même endroit, pour vous simplifier le quotidien.',
+    badge: 'Premium',
+    radius: 20,
+  });
+
+  steps.push({
+    targetId: 'home-appointments',
+    title: 'Vos prochains rendez-vous',
+    body: 'Ils s’affichent ici. Touchez-en un pour voir le détail ; un rappel vous prévient la veille.',
+    radius: 20,
+  });
+
+  steps.push({
+    targetId: 'tab-informations',
+    title: 'Infos',
+    body: 'Les informations importantes de la grossesse : allergies, n° de sécurité sociale, groupe sanguin, points de vigilance…',
+    radius: 24,
+    scroll: false,
+  });
+
+  return steps;
 }
 
 /** « lun. » → « Lun. » */

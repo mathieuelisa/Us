@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { useAtomValue } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { type ComponentProps, useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
@@ -30,6 +30,7 @@ import {
   type ThemeId,
 } from '@/features/settings/constants';
 import { useThemeAccent, useThemeBackground } from '@/features/settings/hooks';
+import { homeTourReplayAtom } from '@/features/tour/targets';
 import { currentRoleAtom } from '@/lib/atoms/role';
 import { sessionAtom } from '@/lib/atoms/session';
 import { hexToRgba, lightenHex } from '@/lib/color';
@@ -86,6 +87,7 @@ const LEGAL_LINKS: { doc: string; label: string; icon: IoniconName }[] = [
  * Pas de bouton retour malgré la capture : c'est un onglet racine.
  */
 export default function SettingsScreen() {
+  const requestHomeTour = useSetAtom(homeTourReplayAtom);
   // Place de la barre du bas, qui flotte au-dessus du contenu.
   const tabBarInset = useTabBarContentInset();
   const session = useAtomValue(sessionAtom);
@@ -318,6 +320,40 @@ export default function SettingsScreen() {
             langue.
           </Text>
         </View>
+
+        {/* Relance la visite guidée de l'accueil (demande explicite). */}
+        <GlassCard
+          accessibilityLabel="Revoir la visite guidée de l’accueil"
+          accent={accent}
+          onPress={() => {
+            router.navigate('/');
+            requestHomeTour((count) => count + 1);
+          }}
+        >
+          <View className="flex-row items-center gap-3.5 px-3.5 py-3">
+            <View
+              className="h-11 w-11 items-center justify-center rounded-2xl"
+              style={{ backgroundColor: hexToRgba(accent, 0.1) }}
+            >
+              <Ionicons name="compass-outline" size={22} color={accent} />
+            </View>
+            <View className="flex-1 gap-0.5">
+              <Text
+                className="text-[15.5px] font-medium"
+                style={{ color: GLASS_TITLE_COLOR }}
+              >
+                Revoir la visite guidée
+              </Text>
+              <Text
+                className="text-[12.5px]"
+                style={{ color: GLASS_BODY_COLOR }}
+              >
+                Redécouvrez l’accueil en quelques étapes
+              </Text>
+            </View>
+            <Ionicons name="chevron-forward" size={18} color="#a8a8b3" />
+          </View>
+        </GlassCard>
 
         <ShareAppCard
           accent={accent}

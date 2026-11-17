@@ -10,6 +10,9 @@ import Animated, {
   useAnimatedStyle,
   useReducedMotion,
   useSharedValue,
+  withDelay,
+  withRepeat,
+  withSequence,
   withTiming,
 } from 'react-native-reanimated';
 
@@ -67,6 +70,7 @@ export function HealthTodayCard({
   role,
   partnerName,
   pregnantMood = null,
+  moodTargetRef,
 }: {
   household: Household | null | undefined;
   role: HouseholdRole;
@@ -74,6 +78,8 @@ export function HealthTodayCard({
   pregnantMood?: MoodValue | null;
   /** Prénom de l'autre parent, pour le titre côté co-parent. */
   partnerName: string | null;
+  /** Pastille cœur / ourson, mise en surbrillance par la visite guidée. */
+  moodTargetRef?: (node: View | null) => void;
 }) {
   const accent = useThemeAccent();
   const isPregnant = role === 'pregnant';
@@ -131,6 +137,7 @@ export function HealthTodayCard({
             jour dans Ensemble (demande explicite). Côté partenaire, c'est
             l'humeur de l'autre : simple image, pas de lien. */}
         <Pressable
+          ref={moodTargetRef}
           disabled={!isPregnant}
           onPress={() => router.push('/ensemble')}
           accessibilityRole={
@@ -160,7 +167,10 @@ export function HealthTodayCard({
               resizeMode="contain"
             />
           ) : (
-            <Ionicons name="heart" size={21} color="#e8739a" />
+            // Bat chez la personne enceinte (demande explicite) : invite à
+            // toucher pour noter son humeur. Immobile côté partenaire, où
+            // il n'est pas cliquable.
+            <BeatingHeart isBeating={isPregnant} />
           )}
         </Pressable>
         <View className="flex-1 gap-0.5">
@@ -273,6 +283,52 @@ export function HealthTodayCard({
         </View>
       ) : null}
     </View>
+  );
+}
+
+/** Ampleur des deux battements (« lub-dub ») : visibles sans être gros. */
+const BEAT_SCALE_FIRST = 1.16;
+const BEAT_SCALE_SECOND = 1.1;
+/** Pause entre deux battements, en ms. */
+const BEAT_REST_MS = 1100;
+
+/**
+ * Cœur de la pastille « Votre forme aujourd'hui » qui bat doucement, comme
+ * un vrai cœur (demande explicite : visible, mais pas trop gros) : deux
+ * pulsations rapprochées, puis une pause, sans fin. Mouvement réduit : pas
+ * d'animation.
+ */
+function BeatingHeart({ isBeating }: { isBeating: boolean }) {
+  const scale = useSharedValue(1);
+  const reduceMotion = useReducedMotion();
+
+  useEffect(() => {
+    if (!isBeating || reduceMotion) {
+      scale.value = 1;
+      return;
+    }
+    const up = { duration: 130, easing: Easing.out(Easing.quad) };
+    const down = { duration: 170, easing: Easing.inOut(Easing.quad) };
+    scale.value = withRepeat(
+      withSequence(
+        withTiming(BEAT_SCALE_FIRST, up),
+        withTiming(1, down),
+        withTiming(BEAT_SCALE_SECOND, up),
+        withTiming(1, { ...down, duration: 260 }),
+        withDelay(BEAT_REST_MS, withTiming(1, { duration: 0 })),
+      ),
+      -1,
+    );
+  }, [isBeating, reduceMotion, scale]);
+
+  const style = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
+  return (
+    <Animated.View style={style}>
+      <Ionicons name="heart" size={21} color="#e8739a" />
+    </Animated.View>
   );
 }
 

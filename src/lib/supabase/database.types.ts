@@ -175,7 +175,7 @@ export type Database = {
           week: number;
         };
         Insert: {
-          emoji: string | null;
+          emoji?: string | null;
           fruit_label: string;
           length_cm?: number | null;
           week: number;
@@ -211,48 +211,6 @@ export type Database = {
           sort_order?: number;
         };
         Relationships: [];
-      };
-      contraction_sessions: {
-        Row: {
-          created_at: string;
-          created_by: string | null;
-          ended_at: string | null;
-          household_id: string;
-          id: string;
-          started_at: string;
-        };
-        Insert: {
-          created_at?: string;
-          created_by?: string | null;
-          ended_at?: string | null;
-          household_id: string;
-          id?: string;
-          started_at?: string;
-        };
-        Update: {
-          created_at?: string;
-          created_by?: string | null;
-          ended_at?: string | null;
-          household_id?: string;
-          id?: string;
-          started_at?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: 'contraction_sessions_created_by_fkey';
-            columns: ['created_by'];
-            isOneToOne: false;
-            referencedRelation: 'profiles';
-            referencedColumns: ['id'];
-          },
-          {
-            foreignKeyName: 'contraction_sessions_household_id_fkey';
-            columns: ['household_id'];
-            isOneToOne: false;
-            referencedRelation: 'households';
-            referencedColumns: ['id'];
-          },
-        ];
       };
       contacts: {
         Row: {
@@ -291,6 +249,48 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: 'contacts_household_id_fkey';
+            columns: ['household_id'];
+            isOneToOne: false;
+            referencedRelation: 'households';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      contraction_sessions: {
+        Row: {
+          created_at: string;
+          created_by: string | null;
+          ended_at: string | null;
+          household_id: string;
+          id: string;
+          started_at: string;
+        };
+        Insert: {
+          created_at?: string;
+          created_by?: string | null;
+          ended_at?: string | null;
+          household_id: string;
+          id?: string;
+          started_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          created_by?: string | null;
+          ended_at?: string | null;
+          household_id?: string;
+          id?: string;
+          started_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'contraction_sessions_created_by_fkey';
+            columns: ['created_by'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'contraction_sessions_household_id_fkey';
             columns: ['household_id'];
             isOneToOne: false;
             referencedRelation: 'households';
@@ -843,6 +843,45 @@ export type Database = {
           },
         ];
       };
+      notification_outbox: {
+        Row: {
+          body: string;
+          created_at: string;
+          data: Json;
+          dedupe_key: string;
+          error: string | null;
+          id: string;
+          kind: string;
+          sent_at: string | null;
+          title: string;
+          user_id: string;
+        };
+        Insert: {
+          body: string;
+          created_at?: string;
+          data?: Json;
+          dedupe_key: string;
+          error?: string | null;
+          id?: string;
+          kind: string;
+          sent_at?: string | null;
+          title: string;
+          user_id: string;
+        };
+        Update: {
+          body?: string;
+          created_at?: string;
+          data?: Json;
+          dedupe_key?: string;
+          error?: string | null;
+          id?: string;
+          kind?: string;
+          sent_at?: string | null;
+          title?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
       procedure_templates: {
         Row: {
           deadline_days_after_birth: number | null;
@@ -884,13 +923,14 @@ export type Database = {
           avatar: string | null;
           created_at: string;
           first_name: string | null;
+          has_seen_home_tour: boolean;
           id: string;
           is_partner: boolean;
           notify_appointments: boolean;
           notify_mood_reminder: boolean;
           notify_partner: boolean;
-          notify_vaccines: boolean;
           notify_procedures: boolean;
+          notify_vaccines: boolean;
           pronoun: string | null;
           theme: string;
         };
@@ -898,13 +938,14 @@ export type Database = {
           avatar?: string | null;
           created_at?: string;
           first_name?: string | null;
+          has_seen_home_tour?: boolean;
           id: string;
           is_partner?: boolean;
           notify_appointments?: boolean;
           notify_mood_reminder?: boolean;
           notify_partner?: boolean;
-          notify_vaccines?: boolean;
           notify_procedures?: boolean;
+          notify_vaccines?: boolean;
           pronoun?: string | null;
           theme?: string;
         };
@@ -912,13 +953,14 @@ export type Database = {
           avatar?: string | null;
           created_at?: string;
           first_name?: string | null;
+          has_seen_home_tour?: boolean;
           id?: string;
           is_partner?: boolean;
           notify_appointments?: boolean;
           notify_mood_reminder?: boolean;
           notify_partner?: boolean;
-          notify_vaccines?: boolean;
           notify_procedures?: boolean;
+          notify_vaccines?: boolean;
           pronoun?: string | null;
           theme?: string;
         };
@@ -993,21 +1035,57 @@ export type Database = {
     };
     Functions: {
       accept_household_invite: { Args: never; Returns: string };
-      household_role: { Args: { hh_id: string }; Returns: string };
-      has_premium: { Args: { p_household_id: string }; Returns: boolean };
-      is_household_member: { Args: { hh_id: string }; Returns: boolean };
-      join_household_by_code: { Args: { p_code: string }; Returns: string };
       create_household_join_code: {
         Args: never;
-        Returns: { code: string; expires_at: string }[];
+        Returns: {
+          code: string;
+          expires_at: string;
+        }[];
       };
-      mark_household_partner_profile: { Args: never; Returns: unknown };
+      display_name: { Args: { p_user_id: string }; Returns: string };
+      enqueue_partner_notification: {
+        Args: {
+          p_actor: string;
+          p_body: string;
+          p_data: Json;
+          p_dedupe_key: string;
+          p_household_id: string;
+          p_kind: string;
+          p_title: string;
+        };
+        Returns: undefined;
+      };
+      format_fr_datetime: {
+        Args: { p_date: string; p_time: string };
+        Returns: string;
+      };
       generate_household_join_code: { Args: never; Returns: string };
+      has_premium: { Args: { p_household_id: string }; Returns: boolean };
+      household_role: { Args: { hh_id: string }; Returns: string };
+      is_household_member: { Args: { hh_id: string }; Returns: boolean };
+      join_household_by_code: { Args: { p_code: string }; Returns: string };
+      partner_notification_recipient: {
+        Args: { p_actor: string; p_household_id: string };
+        Returns: string;
+      };
       register_push_token: {
-        Args: { p_token: string; p_platform: string };
+        Args: { p_platform: string; p_token: string };
         Returns: undefined;
       };
       unregister_push_token: { Args: { p_token: string }; Returns: undefined };
+      upsert_partner_notification: {
+        Args: {
+          p_actor: string;
+          p_body: string;
+          p_data: Json;
+          p_dedupe_key: string;
+          p_delay_seconds: number;
+          p_household_id: string;
+          p_kind: string;
+          p_title: string;
+        };
+        Returns: undefined;
+      };
     };
     Enums: {
       [_ in never]: never;

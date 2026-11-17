@@ -22,6 +22,7 @@ import Svg, {
 import { PARTNER_PINK } from '@/features/partner/constants';
 import { useIsPremium } from '@/features/premium/hooks';
 import { useThemeAccent, useThemeBackground } from '@/features/settings/hooks';
+import { useTourTarget } from '@/features/tour/targets';
 import { darkenHex, hexToRgba, lightenHex } from '@/lib/color';
 
 type IoniconName = ComponentProps<typeof Ionicons>['name'];
@@ -205,6 +206,8 @@ export function AppTabBar({
   // `_layout.tsx`, marquées `href: null`) ne doivent pas apparaître dans la
   // barre — sauf `premium`, ajoutée à part en 5ᵉ colonne juste après.
   const routes = state.routes.filter((route) => route.name in TAB_ICONS);
+  // L'onglet « Infos » est la dernière étape de la visite guidée.
+  const infosTargetRef = useTourTarget('tab-informations');
   const premiumRoute = state.routes.find((route) => route.name === 'premium');
 
   const focusedRouteName = state.routes[state.index]?.name;
@@ -385,6 +388,9 @@ export function AppTabBar({
                 icon={isFocused ? icons.filled : icons.outline}
                 restColor={INACTIVE_COLOR}
                 isFocused={isFocused}
+                targetRef={
+                  route.name === 'informations' ? infosTargetRef : undefined
+                }
                 onPress={() => {
                   const event = navigation.emit({
                     type: 'tabPress',
@@ -455,12 +461,15 @@ function TabItem({
   restColor,
   isFocused,
   onPress,
+  targetRef,
 }: {
   label: string;
   icon: IoniconName;
   restColor: string;
   isFocused: boolean;
   onPress: () => void;
+  /** Cible de la visite guidée de l'accueil (onglet « Infos »). */
+  targetRef?: (node: View | null) => void;
 }) {
   const lift = useSharedValue(isFocused ? -ACTIVE_LIFT : 0);
   const whiteness = useSharedValue(isFocused ? 1 : 0);
@@ -484,6 +493,7 @@ function TabItem({
 
   return (
     <Pressable
+      ref={targetRef}
       accessibilityRole="button"
       accessibilityState={isFocused ? { selected: true } : {}}
       accessibilityLabel={label}
