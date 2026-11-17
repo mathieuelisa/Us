@@ -1,10 +1,11 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
-import type { ReactNode } from 'react';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { useFocusEffect, useRouter } from 'expo-router';
+import { type ReactNode, useCallback, useState } from 'react';
+import { BackHandler, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import { withUniwind } from 'uniwind';
+import { LeaveOnboardingModal } from '@/components/onboarding/leave-onboarding-modal';
 import { SlideInText } from '@/components/onboarding/slide-in-text';
 import {
   GLASS_BODY_COLOR,
@@ -54,6 +55,13 @@ const ONBOARDING_TITLE_FONT = 'Provicali';
  * en fond, action principale en `PillButton`. `illustration` (facultatif)
  * se pose en haut à droite, à côté du titre — qui se resserre alors pour
  * lui laisser la place.
+ *
+ * Bouton retour **toujours** présent (demande explicite : on doit pouvoir
+ * annuler l'onboarding) : il revient à l'écran précédent s'il y en a un,
+ * sinon — étape ouverte directement après la connexion ou un rechargement —
+ * il propose de revenir à la connexion (`LeaveOnboardingModal`, comme la
+ * première slide de présentation). Même règle pour le retour système
+ * Android, qui sinon fermait l'app.
  */
 export function OnboardingStepShell({
   step,
@@ -89,6 +97,27 @@ export function OnboardingStepShell({
   const router = useRouter();
   const backgroundColor = useThemeBackground();
   const accent = useThemeAccent();
+  const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false);
+
+  const goBack = () => {
+    if (router.canGoBack()) router.back();
+    else setIsLeaveModalOpen(true);
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      const subscription = BackHandler.addEventListener(
+        'hardwareBackPress',
+        () => {
+          // Avec un écran précédent, la pile gère le retour elle-même.
+          if (router.canGoBack()) return false;
+          setIsLeaveModalOpen(true);
+          return true;
+        },
+      );
+      return () => subscription.remove();
+    }, [router]),
+  );
 
   const underline = (
     <Svg width={120} height={10} viewBox="0 0 120 10">
@@ -122,24 +151,26 @@ export function OnboardingStepShell({
         {/* Aligné à gauche : c'est la convention iOS/Android, et surtout le
             côté d'où part le swipe de retour — bouton et geste désignent
             ainsi la même direction. */}
-        {router.canGoBack() ? (
-          <Pressable
-            accessibilityLabel="Revenir à l’étape précédente"
-            accessibilityRole="button"
-            hitSlop={12}
-            onPress={() => router.back()}
-            className="mb-3 h-11 w-11 items-center justify-center rounded-full bg-white"
-            style={{
-              shadowColor: accent,
-              shadowOffset: { width: 0, height: 6 },
-              shadowOpacity: 0.12,
-              shadowRadius: 12,
-              elevation: 4,
-            }}
-          >
-            <Ionicons name="chevron-back" size={21} color={GLASS_TITLE_COLOR} />
-          </Pressable>
-        ) : null}
+        <Pressable
+          accessibilityLabel={
+            router.canGoBack()
+              ? 'Revenir à l’étape précédente'
+              : 'Quitter l’onboarding et revenir à la connexion'
+          }
+          accessibilityRole="button"
+          hitSlop={12}
+          onPress={goBack}
+          className="mb-3 h-11 w-11 items-center justify-center rounded-full bg-white"
+          style={{
+            shadowColor: accent,
+            shadowOffset: { width: 0, height: 6 },
+            shadowOpacity: 0.12,
+            shadowRadius: 12,
+            elevation: 4,
+          }}
+        >
+          <Ionicons name="chevron-back" size={21} color={GLASS_TITLE_COLOR} />
+        </Pressable>
 
         {step === null ? null : (
           <View
@@ -256,6 +287,12 @@ export function OnboardingStepShell({
           ) : null}
         </View>
       </View>
+
+      <LeaveOnboardingModal
+        visible={isLeaveModalOpen}
+        accent={accent}
+        onClose={() => setIsLeaveModalOpen(false)}
+      />
     </SafeAreaView>
   );
 }
