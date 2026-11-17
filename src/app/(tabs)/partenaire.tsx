@@ -355,7 +355,11 @@ export default function PartnerScreen() {
   );
 
   const weeks = getWeeksOfAmenorrhea(household?.due_date ?? null);
-  const { data: babySize } = useBabySize(weeks);
+  const { data: babySize, isSuccess: isBabySizeLoaded } = useBabySize(weeks);
+  // Semaine connue mais sans taille en base : avant la première ligne
+  // (8 SA, la framboise).
+  const isBeforeFirstSize =
+    weeks !== null && isBabySizeLoaded && babySize === null;
 
   const partnerName = summary?.partnerFirstName?.trim();
   const myTip = getSelfTipOfTheDay(role);
@@ -517,9 +521,13 @@ export default function PartnerScreen() {
           />
           <PinkCard>
             {/* Fruit ou légume de la semaine (demande explicite) : la taille
-                se lit d'un coup d'œil. Biberon en repli si la semaine n'a
-                pas encore d'émoji en base. */}
-            <IllustrationTile emoji={babySize?.emoji ?? '🍼'} />
+                se lit d'un coup d'œil. Avant 8 SA, la table des tailles n'a
+                pas de ligne (la première est la framboise) : une pousse et
+                « Plus petit qu'une framboise » plutôt que « Taille bientôt
+                disponible » (demande explicite d'un meilleur message). */}
+            <IllustrationTile
+              emoji={babySize?.emoji ?? (isBeforeFirstSize ? '🌱' : '🍼')}
+            />
             <View className="flex-1 gap-1">
               {babySize?.length_cm ? (
                 <View
@@ -538,7 +546,10 @@ export default function PartnerScreen() {
                 className="text-[16px] font-bold"
                 style={{ color: GLASS_TITLE_COLOR }}
               >
-                {babySize?.fruit_label ?? 'Taille bientôt disponible'}
+                {babySize?.fruit_label ??
+                  (isBeforeFirstSize
+                    ? 'Plus petit qu’une framboise'
+                    : 'Taille bientôt disponible')}
               </Text>
               <Text
                 className="text-[13px] leading-[18px]"
@@ -546,7 +557,9 @@ export default function PartnerScreen() {
               >
                 {weeks === null
                   ? 'Renseignez la date de terme pour suivre la croissance.'
-                  : `${weeks} semaines d’aménorrhée`}
+                  : isBeforeFirstSize
+                    ? `${formatWeeks(weeks)} · la comparaison commence à 8 SA`
+                    : formatWeeks(weeks)}
               </Text>
             </View>
           </PinkCard>
@@ -576,4 +589,9 @@ export default function PartnerScreen() {
       </ScrollView>
     </SafeAreaView>
   );
+}
+
+/** « 1 semaine d'aménorrhée », « 12 semaines d'aménorrhée ». */
+function formatWeeks(weeks: number): string {
+  return `${weeks} semaine${weeks > 1 ? 's' : ''} d’aménorrhée`;
 }
