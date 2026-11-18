@@ -15,12 +15,16 @@ export const FALLBACK_LANGUAGE: AppLanguage = 'fr';
 /**
  * Nom de chaque langue dans sa propre langue : le sélecteur de Réglages ne
  * les traduit pas, pour qu'on retrouve la sienne même dans une interface
- * qu'on ne lit pas.
+ * qu'on ne lit pas. Même règle pour le petit salut affiché sous le nom.
  */
-export const LANGUAGE_OPTIONS: { id: AppLanguage; label: string }[] = [
-  { id: 'fr', label: 'Français' },
-  { id: 'en', label: 'English' },
-  { id: 'es', label: 'Español' },
+export const LANGUAGE_OPTIONS: {
+  id: AppLanguage;
+  label: string;
+  greeting: string;
+}[] = [
+  { id: 'fr', label: 'Français', greeting: 'Bonjour !' },
+  { id: 'en', label: 'English', greeting: 'Hello!' },
+  { id: 'es', label: 'Español', greeting: '¡Hola!' },
 ];
 
 /**
