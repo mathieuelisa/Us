@@ -51,9 +51,9 @@ export function PremiumPaywallModal({
       animationType="fade"
       onRequestClose={onClose}
     >
-      <View className="flex-1 items-center justify-center bg-black/50 px-5">
+      <View className="flex-1 items-center justify-center bg-black/50 px-4">
         <View
-          className="max-h-[88%] w-full overflow-hidden rounded-[32px] bg-white"
+          className="max-h-[92%] w-full overflow-hidden rounded-[32px] bg-white"
           style={{
             shadowColor: '#000',
             shadowOffset: { width: 0, height: 20 },
@@ -112,12 +112,13 @@ export function PremiumPaywallModal({
 
           <ScrollView
             showsVerticalScrollIndicator={false}
-            contentContainerClassName="gap-4 px-5 pb-6 pt-5"
+            contentContainerClassName="gap-3 px-4 pb-5 pt-4"
           >
             <PremiumOffer
               title={title}
               image={image}
               illustration={illustration}
+              compact
             />
           </ScrollView>
         </View>
