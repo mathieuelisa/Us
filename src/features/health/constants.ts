@@ -116,7 +116,7 @@ export function resolveSymptomInput(text: string): string | null {
 }
 
 /** Durée de référence d'une grossesse, comptée depuis les dernières règles. */
-const PREGNANCY_DAYS = 280;
+export const PREGNANCY_DAYS = 280;
 
 /**
  * Semaine d'aménorrhée (SA) courante, déduite de la date de terme — la seule
