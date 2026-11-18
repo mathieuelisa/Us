@@ -1,6 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import type { TFunction } from 'i18next';
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Image,
   Linking,
@@ -46,6 +48,7 @@ import {
   getProcedurePregnancyMonth,
   getStatusLabel,
   PREGNANCY_MONTHS,
+  type PregnancyMonth,
 } from '@/features/procedures/constants';
 import {
   useProcedures,
@@ -53,6 +56,7 @@ import {
   useUpdateProcedureStatus,
 } from '@/features/procedures/hooks';
 import { useThemeAccent, useThemeBackground } from '@/features/settings/hooks';
+import { useLocale } from '@/i18n/hooks';
 import { hexToRgba } from '@/lib/color';
 
 const SafeAreaView = withUniwind(RNSafeAreaView);
@@ -76,6 +80,8 @@ const SafeAreaView = withUniwind(RNSafeAreaView);
  * translucides à grande pastille d'icône, statut et chevron.
  */
 export default function ProceduresScreen() {
+  const { t } = useTranslation();
+  const locale = useLocale();
   // Tirer vers le bas recharge les données affichées.
   const refresh = usePullToRefresh();
   // Place de la barre du bas, qui flotte au-dessus du contenu.
@@ -228,7 +234,7 @@ export default function ProceduresScreen() {
             }}
           />
           <Pressable
-            accessibilityLabel="Revenir en arrière"
+            accessibilityLabel={t('common.goBack')}
             accessibilityRole="button"
             hitSlop={12}
             onPress={() => (selected ? setSelectedId(null) : router.back())}
@@ -258,7 +264,7 @@ export default function ProceduresScreen() {
                 className="text-[32px] font-extrabold leading-10"
                 style={{ color: GLASS_TITLE_COLOR, letterSpacing: -0.7 }}
               >
-                Démarches
+                {t('procedures.title')}
               </Text>
               <Svg width={130} height={12} viewBox="0 0 130 12">
                 <Path
@@ -274,7 +280,10 @@ export default function ProceduresScreen() {
                   className="text-[15px]"
                   style={{ color: GLASS_BODY_COLOR }}
                 >
-                  {completedCount} sur {totalCount} complétées
+                  {t('procedures.completed', {
+                    completed: completedCount,
+                    total: totalCount,
+                  })}
                 </Text>
                 {/* Ajout à la capture : rend l'avancement lisible d'un coup
                     d'œil (demande « facile de compréhension »). */}
@@ -287,13 +296,13 @@ export default function ProceduresScreen() {
                 className="text-[12.5px] font-bold"
                 style={{ color: '#5b5470', letterSpacing: 1.1 }}
               >
-                PAR MOIS DE GROSSESSE
+                {t('procedures.byMonth')}
               </Text>
               <Text
                 className="-mt-1.5 text-[13px]"
                 style={{ color: GLASS_BODY_COLOR }}
               >
-                Sélectionnez un mois pour voir les démarches à prévoir.
+                {t('procedures.selectMonth')}
               </Text>
               <View className="flex-row items-center gap-1.5">
                 <MonthArrow
@@ -359,12 +368,14 @@ export default function ProceduresScreen() {
                 const deadline = formatDeadlineLabel(
                   procedure.deadline_days_after_birth,
                   household?.birth_date ?? null,
+                  t,
+                  locale,
                 );
                 const iconStyle = getProcedureIconStyle(procedure.slug);
                 return (
                   <GlassCard
                     key={procedure.householdProcedureId}
-                    accessibilityLabel={`${procedure.title}, ${getStatusLabel(procedure.status)}`}
+                    accessibilityLabel={`${procedure.title}, ${getStatusLabel(procedure.status, t)}`}
                     accent={accent}
                     onPress={() =>
                       setSelectedId(procedure.householdProcedureId)
@@ -391,7 +402,7 @@ export default function ProceduresScreen() {
                           </Text>
                           {procedure.reminderEnabled ? (
                             <View
-                              accessibilityLabel="Rappel activé avant l’échéance"
+                              accessibilityLabel={t('procedures.reminderOn')}
                               className="h-[18px] w-[18px] items-center justify-center rounded-full"
                               style={{
                                 backgroundColor: hexToRgba(accent, 0.14),
@@ -445,8 +456,8 @@ const tintedShadow = (accent: string) =>
   }) as const;
 
 /** « 1er mois », « 3e mois »… */
-function shortMonthLabel(month: number): string {
-  return month === 1 ? '1er mois' : `${month}e mois`;
+function shortMonthLabel(month: number, t: TFunction): string {
+  return t(`procedures.months.short.m${month as PregnancyMonth}`);
 }
 
 /**
@@ -465,6 +476,7 @@ function EmptyMonthCard({
   nextStepTitle: string | null;
   onSeeNextStep: () => void;
 }) {
+  const { t } = useTranslation();
   return (
     <View
       className="gap-3.5 rounded-[28px] px-4 py-4"
@@ -478,14 +490,17 @@ function EmptyMonthCard({
           className="flex-1 text-[15px] font-bold"
           style={{ color: GLASS_TITLE_COLOR }}
         >
-          Aucune démarche ce mois-ci.
+          {t('procedures.emptyMonth')}
         </Text>
       </View>
 
       {nextStepMonth !== null && nextStepTitle ? (
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={`Voir la prochaine étape : ${nextStepTitle}, ${shortMonthLabel(nextStepMonth)}`}
+          accessibilityLabel={t('procedures.nextStepA11y', {
+            title: nextStepTitle,
+            month: shortMonthLabel(nextStepMonth, t),
+          })}
           onPress={onSeeNextStep}
           className="flex-row items-center gap-3 rounded-[22px] bg-white py-3 pl-4 pr-3 active:opacity-80"
           style={tintedShadow(accent)}
@@ -495,7 +510,9 @@ function EmptyMonthCard({
               className="text-[12px] font-semibold"
               style={{ color: accent }}
             >
-              Prochaine étape · {shortMonthLabel(nextStepMonth)}
+              {t('procedures.nextStep', {
+                month: shortMonthLabel(nextStepMonth, t),
+              })}
             </Text>
             <Text
               className="text-[14.5px] font-bold"
@@ -508,7 +525,9 @@ function EmptyMonthCard({
             className="flex-row items-center gap-1 rounded-full px-3 py-1.5"
             style={{ backgroundColor: accent }}
           >
-            <Text className="text-[13px] font-bold text-white">Voir</Text>
+            <Text className="text-[13px] font-bold text-white">
+              {t('procedures.see')}
+            </Text>
             <Ionicons name="arrow-forward" size={14} color="#ffffff" />
           </View>
         </Pressable>
@@ -517,7 +536,7 @@ function EmptyMonthCard({
           className="px-1 text-[13.5px] leading-5"
           style={{ color: GLASS_BODY_COLOR }}
         >
-          Toutes vos démarches sont faites — bravo.
+          {t('procedures.allDone')}
         </Text>
       )}
     </View>
@@ -536,11 +555,14 @@ function MonthArrow({
   accent: string;
   onPress: () => void;
 }) {
+  const { t } = useTranslation();
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={
-        direction === 'back' ? 'Mois précédent' : 'Mois suivant'
+        direction === 'back'
+          ? t('procedures.previousMonth')
+          : t('procedures.nextMonth')
       }
       accessibilityState={{ disabled: isDisabled }}
       disabled={isDisabled}
@@ -595,6 +617,7 @@ function MonthPill({
   onPress: () => void;
   onLayout: (x: number, width: number) => void;
 }) {
+  const { t } = useTranslation();
   const activeness = useSharedValue(isActive ? 1 : 0);
   const pop = useSharedValue(1);
   const sparks = useSharedValue(isActive ? 1 : 0);
@@ -652,13 +675,13 @@ function MonthPill({
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`${getPregnancyMonthLabel(month)}${
-        isCurrent ? ', mois en cours' : ''
+      accessibilityLabel={`${getPregnancyMonthLabel(month, t)}${
+        isCurrent ? t('procedures.monthCurrent') : ''
       }${
         remaining > 0
-          ? `, ${remaining} démarche${remaining > 1 ? 's' : ''} à faire`
+          ? t('procedures.monthRemaining', { count: remaining })
           : total > 0
-            ? ', démarches faites'
+            ? t('procedures.monthDone')
             : ''
       }`}
       accessibilityState={{ selected: isActive }}
@@ -696,7 +719,7 @@ function MonthPill({
           {month}
         </Animated.Text>
         <Animated.Text className="text-[11.5px]" style={unitStyle}>
-          mois
+          {t('procedures.monthUnit')}
         </Animated.Text>
       </Animated.View>
 
@@ -776,18 +799,26 @@ function ProcedureDetail({
   onChangeStatus: (status: 'a_faire' | 'en_cours' | 'fait') => void;
   onToggleReminder: (reminderEnabled: boolean) => void;
 }) {
+  const { t } = useTranslation();
+  const locale = useLocale();
   const deadline = formatDeadlineLabel(
     procedure.deadline_days_after_birth,
     birthDate,
+    t,
+    locale,
   );
   const iconStyle = getProcedureIconStyle(procedure.slug);
   // Repère de calendrier en pied de carte : le délai après la naissance
   // s'il y en a un, sinon le mois de grossesse où la prévoir.
   const timing =
     procedure.deadline_days_after_birth !== null
-      ? `À faire après la naissance, dans les ${procedure.deadline_days_after_birth} jours.`
+      ? t('procedures.afterBirth', {
+          count: procedure.deadline_days_after_birth,
+        })
       : procedure.pregnancy_month !== null
-        ? `À prévoir pendant le ${getPregnancyMonthLabel(procedure.pregnancy_month)}.`
+        ? t('procedures.duringMonth', {
+            month: getPregnancyMonthLabel(procedure.pregnancy_month, t),
+          })
         : null;
 
   return (
@@ -887,7 +918,7 @@ function ProcedureDetail({
             className="text-[16px] font-bold"
             style={{ color: GLASS_TITLE_COLOR }}
           >
-            Statut
+            {t('procedures.status')}
           </Text>
         </View>
         <StatusSelector status={procedure.status} onChange={onChangeStatus} />
@@ -906,14 +937,14 @@ function ProcedureDetail({
               className="text-[15px] font-bold"
               style={{ color: GLASS_TITLE_COLOR }}
             >
-              Me rappeler avant l’échéance
+              {t('procedures.remindMe')}
             </Text>
             <Text className="text-[12.5px]" style={{ color: GLASS_BODY_COLOR }}>
-              Pour ne pas laisser passer cette démarche.
+              {t('procedures.remindMeHint')}
             </Text>
           </View>
           <ToggleSwitch
-            accessibilityLabel="Me rappeler avant l’échéance"
+            accessibilityLabel={t('procedures.remindMe')}
             value={procedure.reminderEnabled}
             onValueChange={onToggleReminder}
           />
@@ -960,7 +991,7 @@ function ProcedureDetail({
               className="text-[16px] font-bold"
               style={{ color: GLASS_TITLE_COLOR }}
             >
-              Documents à fournir
+              {t('procedures.documents')}
             </Text>
           </View>
           {procedure.documents.map((document) => (
@@ -985,7 +1016,7 @@ function ProcedureDetail({
           lien vers le téléservice officiel, quand il en existe un. */}
       {procedure.official_link ? (
         <PillButton
-          label="Accéder au téléservice officiel"
+          label={t('procedures.officialService')}
           icon="open-outline"
           onPress={() => Linking.openURL(procedure.official_link as string)}
         />

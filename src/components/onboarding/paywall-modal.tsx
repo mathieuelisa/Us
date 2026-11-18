@@ -1,20 +1,20 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useAtomValue } from 'jotai';
+import { useTranslation } from 'react-i18next';
 import { Image, Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import Animated, { SlideInDown, SlideOutDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
 import { onboardingDraftAtom } from '@/lib/atoms/onboarding';
 
 export const PREMIUM_FEATURES = [
-  'Match des Prénoms',
-  'Assistant Contractions & Départ Maternité',
-  "Suivi Nutrition & Rythmes (Journal d'allaitement, biberons & statistiques)",
-  'Suivi du rythme de sommeil de bébé',
-  'Carnet de Croissance (Courbes poids/taille)',
-  'Journal de Sommeil, Bain & Soins du quotidien',
-  'Espace Santé & Calendrier des Rappels Vaccinaux',
-];
+  'premium.features.names',
+  'premium.features.contractions',
+  'premium.features.feeding',
+  'premium.features.sleepRhythm',
+  'premium.features.growth',
+  'premium.features.dailyCare',
+  'premium.features.vaccines',
+] as const;
 
 /**
  * Écran 1g — paywall, en pop-up (demande explicite) plutôt qu'en route à
@@ -43,6 +43,7 @@ export function PaywallModal({
   visible: boolean;
   onClose: () => void;
 }) {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   // Le foyer n'existe pas encore : c'est le choix de l'étape 1 qui dit s'il
   // y a un partenaire. « Seul·e » : rien à préciser.
@@ -73,10 +74,10 @@ export function PaywallModal({
               resizeMode="contain"
             />
             <Text className="text-[24px] font-bold leading-7 text-white">
-              Débloquez le suivi complet de bébé
+              {t('premium.paywall.title')}
             </Text>
             <Text className="text-[14px] text-[#b0b0b0]">
-              Un seul paiement, accès à vie
+              {t('premium.paywall.oneTime')}
             </Text>
           </View>
 
@@ -87,10 +88,10 @@ export function PaywallModal({
           >
             <View className="gap-1 rounded-[14px] border border-[#e8c874] px-4 py-4">
               <Text className="text-[18px] font-bold text-[#e8c874]">
-                14,99 € — paiement unique
+                {t('premium.paywall.price')}
               </Text>
               <Text className="text-[13px] text-[#b0b0b0]">
-                Pas d’abonnement, pas de renouvellement
+                {t('premium.paywall.noSubscription')}
               </Text>
               {/* Un seul achat pour le foyer (demande explicite). */}
               {hasPartner ? (
@@ -98,9 +99,9 @@ export function PaywallModal({
                   <Ionicons name="people" size={16} color="#e8c874" />
                   <Text className="flex-1 text-[13px] leading-[18px] text-[#e0e0e0]">
                     <Text className="font-bold text-[#e8c874]">
-                      Valable pour vous deux
-                    </Text>{' '}
-                    : votre partenaire n’a rien à payer.
+                      {t('premium.paywall.forBoth')}
+                    </Text>
+                    {t('premium.paywall.partnerFree')}
                   </Text>
                 </View>
               ) : null}
@@ -110,7 +111,7 @@ export function PaywallModal({
               <View key={feature} className="flex-row gap-2.5">
                 <Text className="text-[14px] text-[#e8c874]">✓</Text>
                 <Text className="flex-1 text-[14px] leading-5 text-[#e0e0e0]">
-                  {feature}
+                  {t(feature)}
                 </Text>
               </View>
             ))}
@@ -119,7 +120,7 @@ export function PaywallModal({
           <View className="gap-3 pt-2">
             <View className="items-center rounded-full bg-[#191818] py-3.5">
               <Text className="text-[15px] font-medium text-[#e8c874]">
-                Débloquable depuis votre espace
+                {t('premium.paywall.unlockLater')}
               </Text>
             </View>
 
@@ -129,7 +130,7 @@ export function PaywallModal({
               onPress={onClose}
             >
               <Text className="text-[15px] font-medium text-white">
-                Plus tard
+                {t('premium.paywall.later')}
               </Text>
             </Pressable>
           </View>

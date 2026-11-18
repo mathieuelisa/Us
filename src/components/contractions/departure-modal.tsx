@@ -1,9 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { Image, Modal, Pressable, Text, View } from 'react-native';
 import Animated, { SlideInDown, SlideOutDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
 import { ProgressBar } from '@/components/organisation/progress-bar';
 import {
   ChevronBubble,
@@ -40,15 +40,22 @@ export function DepartureModal({
   valise: { checked: number; total: number };
   onClose: () => void;
 }) {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const accent = useThemeAccent();
   const summary = [
     averageIntervalMs !== null
-      ? `Vos contractions reviennent toutes les ${formatDuration(averageIntervalMs)} environ`
-      : 'Vos contractions sont régulières',
-    `depuis ${formatDuration(regularForMs)}`,
+      ? t('contractions.departure.every', {
+          duration: formatDuration(averageIntervalMs),
+        })
+      : t('contractions.departure.regular'),
+    t('contractions.departure.since', {
+      duration: formatDuration(regularForMs),
+    }),
     averageDurationMs !== null
-      ? `et durent ${formatDuration(averageDurationMs)} en moyenne.`
+      ? t('contractions.departure.lasting', {
+          duration: formatDuration(averageDurationMs),
+        })
       : '',
   ]
     .filter(Boolean)
@@ -111,20 +118,22 @@ export function DepartureModal({
               className="text-center text-[22px] font-extrabold leading-[28px]"
               style={{ color: GLASS_TITLE_COLOR, letterSpacing: -0.4 }}
             >
-              Il est temps de partir{'\n'}à la maternité
+              {t('contractions.departure.title', { br: '\n' })}
             </Text>
             <Text
               className="text-center text-[14.5px] leading-[21px]"
               style={{ color: GLASS_BODY_COLOR }}
             >
-              {summary} Prenez la route calmement et prévenez la maternité si on
-              vous l’a demandé.
+              {summary} {t('contractions.departure.advice')}
             </Text>
           </View>
 
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel={`Valise de maternité, ${valise.checked} sur ${valise.total} prêts`}
+            accessibilityLabel={t('contractions.departure.bagA11y', {
+              checked: valise.checked,
+              total: valise.total,
+            })}
             onPress={openValise}
             className="mt-5 flex-row items-center gap-3 rounded-[22px] px-4 py-3.5 active:opacity-80"
             style={{ backgroundColor: hexToRgba(accent, 0.08) }}
@@ -135,15 +144,18 @@ export function DepartureModal({
                 className="text-[15px] font-bold"
                 style={{ color: GLASS_TITLE_COLOR }}
               >
-                Valise de maternité
+                {t('contractions.departure.bag')}
               </Text>
               <Text
                 className="text-[12.5px]"
                 style={{ color: GLASS_BODY_COLOR }}
               >
                 {valise.total === 0
-                  ? 'Vérifiez que rien ne manque'
-                  : `${valise.checked} sur ${valise.total} prêts`}
+                  ? t('contractions.departure.checkBag')
+                  : t('contractions.departure.bagProgress', {
+                      checked: valise.checked,
+                      total: valise.total,
+                    })}
               </Text>
               {valise.total > 0 ? (
                 <ProgressBar progress={valise.checked / valise.total} />
@@ -154,7 +166,7 @@ export function DepartureModal({
 
           <View className="mt-5 gap-3">
             <PillButton
-              label="J’ai compris"
+              label={t('contractions.departure.understood')}
               icon="checkmark-circle-outline"
               onPress={onClose}
             />
@@ -168,8 +180,7 @@ export function DepartureModal({
                 className="flex-1 text-center text-[11.5px] leading-4"
                 style={{ color: GLASS_BODY_COLOR }}
               >
-                Repère indicatif : il ne remplace pas l’avis de votre sage-femme
-                ou de la maternité.
+                {t('contractions.departure.disclaimer')}
               </Text>
             </View>
           </View>

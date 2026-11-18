@@ -1,5 +1,6 @@
+import { useTranslation } from 'react-i18next';
 import { NameListScreen } from '@/components/names/name-list-screen';
-import { GENDER_META, type NameGender } from '@/features/names/catalog';
+import type { NameGender } from '@/features/names/catalog';
 import {
   useNameFavorites,
   useToggleNameFavorite,
@@ -11,26 +12,25 @@ import {
  * ne les voit pas.
  */
 export default function NameFavoritesScreen() {
+  const { t } = useTranslation();
   const { data: favorites = [], isLoading } = useNameFavorites();
   const toggleFavorite = useToggleNameFavorite();
 
   return (
     <NameListScreen
-      title="Favoris"
-      subtitle="Vos coups de cœur, rien que pour vous."
+      title={t('names.modules.favorites')}
+      subtitle={t('names.favorites.subtitle')}
       icon="heart-outline"
       items={favorites.map((favorite) => ({
         gender: favorite.gender as NameGender,
         name: favorite.name,
       }))}
       isLoading={isLoading}
-      emptyTitle="Aucun favori pour l’instant"
-      emptyText="Pendant le jeu, touchez une carte pour garder un prénom ici, ou ajoutez-en un vous-même ci-dessus."
+      emptyTitle={t('names.favorites.empty')}
+      emptyText={t('names.favorites.emptyText')}
       image={require('@/assets/images/Prenoms_favoris.png')}
-      itemNoun={{ singular: 'favori', plural: 'favoris' }}
-      sectionSubtitle={(gender) =>
-        `Vos prénoms ${GENDER_META[gender].label}s préférés.`
-      }
+      formatCount={(count) => t('names.favoriteCount', { count })}
+      sectionSubtitle={(gender) => t(`names.favorites.section.${gender}`)}
       // Saisie libre (demande explicite) : même enregistrement qu'un cœur
       // touché pendant le jeu.
       onAddName={async (gender, name) => {

@@ -1,23 +1,24 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Pressable, Text, View } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
-
 import { GLASS_TITLE_COLOR } from '@/components/ui/glass-card';
 import { formatMonthTitle } from '@/features/health/constants';
+import { formatDayMonth, getWeekdayLetters } from '@/i18n/format';
+import { useLocale } from '@/i18n/hooks';
 import { hexToRgba } from '@/lib/color';
 import { todayIso, toLocalIsoDate } from '@/lib/date';
 
-const WEEK_DAYS = [
-  { key: 'lundi', letter: 'L' },
-  { key: 'mardi', letter: 'M' },
-  { key: 'mercredi', letter: 'M' },
-  { key: 'jeudi', letter: 'J' },
-  { key: 'vendredi', letter: 'V' },
-  { key: 'samedi', letter: 'S' },
-  { key: 'dimanche', letter: 'D' },
-];
-const MONTH_NAMES = new Intl.DateTimeFormat('fr-FR', { month: 'long' });
+const WEEK_DAY_KEYS = [
+  'lundi',
+  'mardi',
+  'mercredi',
+  'jeudi',
+  'vendredi',
+  'samedi',
+  'dimanche',
+] as const;
 
 const DAY_SIZE = 42;
 /*
@@ -55,6 +56,8 @@ export function DatePickerCalendar({
   minDate?: string;
   maxDate?: string;
 }) {
+  const locale = useLocale();
+  const weekdayLetters = getWeekdayLetters(locale);
   const today = todayIso();
   // Mois affiché : celui de la date choisie, à défaut le mois en cours
   // (ramené dans les bornes).
@@ -98,7 +101,7 @@ export function DatePickerCalendar({
           className="text-[17px] font-bold"
           style={{ color: GLASS_TITLE_COLOR, letterSpacing: -0.2 }}
         >
-          {capitalize(formatMonthTitle(shown.year, shown.month))}
+          {formatMonthTitle(shown.year, shown.month, locale)}
         </Text>
         <MonthArrow
           direction="next"
@@ -109,10 +112,10 @@ export function DatePickerCalendar({
       </View>
 
       <View className="flex-row">
-        {WEEK_DAYS.map((day) => (
-          <View key={day.key} className="flex-1 items-center">
+        {WEEK_DAY_KEYS.map((dayKey, index) => (
+          <View key={dayKey} className="flex-1 items-center">
             <Text className="text-[12px] font-medium text-[#9a9aa3]">
-              {day.letter}
+              {weekdayLetters[index]}
             </Text>
           </View>
         ))}
@@ -168,9 +171,11 @@ function DayCell({
   isDisabled: boolean;
   onPress: () => void;
 }) {
-  const [year, month, day] = isoDate.split('-').map(Number);
-  const label = `${day} ${MONTH_NAMES.format(new Date(year, month - 1, day))}${
-    isToday ? ', aujourd’hui' : ''
+  const { t } = useTranslation();
+  const locale = useLocale();
+  const [, , day] = isoDate.split('-').map(Number);
+  const label = `${formatDayMonth(isoDate, locale)}${
+    isToday ? `, ${t('health.calendar.today')}` : ''
   }`;
 
   return (
@@ -244,10 +249,13 @@ function MonthArrow({
   isDisabled: boolean;
   onPress: () => void;
 }) {
+  const { t } = useTranslation();
   return (
     <Pressable
       accessibilityLabel={
-        direction === 'previous' ? 'Mois précédent' : 'Mois suivant'
+        direction === 'previous'
+          ? t('health.calendar.previousMonth')
+          : t('health.calendar.nextMonth')
       }
       accessibilityRole="button"
       accessibilityState={{ disabled: isDisabled }}
@@ -323,8 +331,4 @@ function clampMonth(ref: MonthRef, minDate?: string, maxDate?: string) {
     return toMonth(maxDate);
   }
   return ref;
-}
-
-function capitalize(text: string): string {
-  return text.charAt(0).toLocaleUpperCase('fr') + text.slice(1);
 }

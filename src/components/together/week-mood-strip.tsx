@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { Image, Text, View } from 'react-native';
-
 import {
   GLASS_BODY_COLOR,
   GLASS_TITLE_COLOR,
@@ -9,10 +9,11 @@ import {
 } from '@/components/ui/glass-card';
 import type { MoodValue } from '@/features/hub/api';
 import { MOOD_PRESENTATION } from '@/features/hub/constants';
+import { getWeekdayLetters } from '@/i18n/format';
+import { useLocale } from '@/i18n/hooks';
 import { hexToRgba } from '@/lib/color';
 import { todayIso } from '@/lib/date';
 
-const DAY_LETTERS = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
 const MUTED = '#8f8f99';
 const FUTURE = '#c9c9cf';
 
@@ -41,6 +42,7 @@ export function WeekMoodStrip({
   checkinsByDate: Record<string, MoodValue>;
   accent: string;
 }) {
+  const { t } = useTranslation();
   const notedDays = weekDates.filter((date) => checkinsByDate[date]).length;
 
   return (
@@ -69,7 +71,7 @@ export function WeekMoodStrip({
             className="text-[17px] font-bold"
             style={{ color: GLASS_TITLE_COLOR }}
           >
-            Cette semaine
+            {t('together.week.title')}
           </Text>
         </View>
         <View
@@ -77,7 +79,7 @@ export function WeekMoodStrip({
           style={{ backgroundColor: hexToRgba(accent, 0.1) }}
         >
           <Text className="text-[12px] font-bold" style={{ color: accent }}>
-            {notedDays} / 7 jours notés
+            {t('together.week.noted', { count: notedDays })}
           </Text>
         </View>
       </View>
@@ -107,6 +109,7 @@ export function WeekMoodDays({
   checkinsByDate: Record<string, MoodValue>;
   accent: string;
 }) {
+  const weekdayLetters = getWeekdayLetters(useLocale());
   const today = todayIso();
 
   return (
@@ -114,7 +117,7 @@ export function WeekMoodDays({
       {weekDates.map((date, index) => (
         <DayColumn
           key={date}
-          letter={DAY_LETTERS[index]}
+          letter={weekdayLetters[index]}
           dayNumber={Number(date.slice(-2))}
           mood={checkinsByDate[date]}
           isToday={date === today}
@@ -141,9 +144,13 @@ function DayColumn({
   isFuture: boolean;
   accent: string;
 }) {
+  const { t } = useTranslation();
   const label = mood
-    ? `${letter} ${dayNumber} : ${MOOD_PRESENTATION[mood].label}`
-    : `${letter} ${dayNumber} : pas de check-in`;
+    ? t('together.week.dayMood', {
+        day: `${letter} ${dayNumber}`,
+        mood: t(MOOD_PRESENTATION[mood].labelKey),
+      })
+    : t('together.week.noCheckIn', { day: `${letter} ${dayNumber}` });
 
   return (
     <View accessible accessibilityLabel={label} className="items-center">

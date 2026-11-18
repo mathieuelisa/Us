@@ -2,8 +2,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useAtom } from 'jotai';
 import type { ComponentProps } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Image, Text, View } from 'react-native';
-
 import { ChoiceCard } from '@/components/onboarding/choice-card';
 import { OnboardingStepShell } from '@/components/onboarding/step-shell';
 import { YesNoChoice } from '@/components/onboarding/yes-no-choice';
@@ -86,6 +86,7 @@ function StepIllustration() {
 
 /** Écran 1d — Étape 1/6, mode d'accompagnement. */
 export default function AccompanimentStep() {
+  const { t } = useTranslation();
   const [draft, setDraft] = useAtom(onboardingDraftAtom);
   const accent = useThemeAccent();
 
@@ -95,8 +96,8 @@ export default function AccompanimentStep() {
   return (
     <OnboardingStepShell
       step={1}
-      title="Qui vous accompagne dans cette aventure ?"
-      primaryLabel="Suivant"
+      title={t('onboarding.accompaniment.title')}
+      primaryLabel={t('onboarding.next')}
       isPrimaryDisabled={draft.accompanimentType === null}
       onPrimaryPress={() => router.push('/prenoms')}
       illustration={<StepIllustration />}
@@ -104,7 +105,7 @@ export default function AccompanimentStep() {
       {ACCOMPANIMENT_OPTIONS.map((option) => (
         <ChoiceCard
           key={option.value}
-          label={option.label}
+          label={t(option.label)}
           icon={ACCOMPANIMENT_ICONS[option.value]}
           isSelected={draft.accompanimentType === option.value}
           onPress={() => selectAccompaniment(option.value)}
@@ -129,7 +130,7 @@ export default function AccompanimentStep() {
               className="flex-1 text-[14.5px] font-medium"
               style={{ color: GLASS_TITLE_COLOR }}
             >
-              Votre partenaire utilisera-t-il aussi l’app ?
+              {t('onboarding.accompaniment.partnerUsesApp')}
             </Text>
           </View>
           <YesNoChoice

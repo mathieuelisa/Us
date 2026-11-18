@@ -1,3 +1,4 @@
+import type { TranslationKey } from '@/i18n/types';
 import type { HouseholdRole } from '@/lib/atoms/role';
 import { pickForToday } from '@/lib/date';
 
@@ -152,9 +153,9 @@ const RELATION_TIPS_BY_ROLE: Record<HouseholdRole, RelationTip[]> = {
 export function relationTipLabel(
   tip: RelationTip,
   role: HouseholdRole,
-): string {
-  if (tip.kind === 'couple') return 'Pour votre couple';
-  return role === 'pregnant' ? 'Pour votre compagnon' : 'Pour votre compagne';
+): TranslationKey {
+  if (tip.kind === 'couple') return 'partner.forCouple';
+  return role === 'pregnant' ? 'partner.forHim' : 'partner.forHer';
 }
 
 export function getSelfTipOfTheDay(role: HouseholdRole): string | null {

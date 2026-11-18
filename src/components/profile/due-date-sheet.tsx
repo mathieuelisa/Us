@@ -1,10 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import Animated, { SlideInDown, SlideOutDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
-
 import {
   GLASS_BODY_COLOR,
   GLASS_TITLE_COLOR,
@@ -45,6 +45,7 @@ export function DueDateSheet({
   onSave: (dueDate: string) => void;
   onClose: () => void;
 }) {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const [draft, setDraft] = useState<string | null>(dueDate);
 
@@ -102,7 +103,7 @@ export function DueDateSheet({
                   className="text-[22px] font-extrabold leading-7"
                   style={{ color: GLASS_TITLE_COLOR, letterSpacing: -0.4 }}
                 >
-                  Date du terme
+                  {t('profile.dueDate')}
                 </Text>
                 <Svg width={92} height={10} viewBox="0 0 92 10">
                   <Path
@@ -117,13 +118,12 @@ export function DueDateSheet({
                   className="text-[13px] leading-[18px]"
                   style={{ color: GLASS_BODY_COLOR }}
                 >
-                  Corrigez-la si besoin : semaines, mois de grossesse et
-                  démarches se recalculent pour vous deux.
+                  {t('profile.dueDateSheet.hint')}
                 </Text>
               </View>
               <View>
                 <Pressable
-                  accessibilityLabel="Fermer"
+                  accessibilityLabel={t('common.close')}
                   accessibilityRole="button"
                   hitSlop={8}
                   onPress={onClose}
@@ -165,13 +165,15 @@ export function DueDateSheet({
                 style={{ color: GLASS_TITLE_COLOR }}
               >
                 {weeks === null
-                  ? 'Cette date est trop lointaine pour une grossesse en cours.'
-                  : `Soit ${weeks} semaine${weeks > 1 ? 's' : ''} d’aménorrhée aujourd’hui.`}
+                  ? t('profile.dueDateSheet.tooFar')
+                  : t('profile.dueDateSheet.weeks', { count: weeks })}
               </Text>
             </View>
 
             <PillButton
-              label={isSaving ? 'Enregistrement…' : 'Enregistrer la date'}
+              label={
+                isSaving ? t('profile.saving') : t('profile.dueDateSheet.save')
+              }
               icon="save-outline"
               size="compact"
               isDisabled={!canSave || weeks === null}
@@ -190,7 +192,7 @@ export function DueDateSheet({
                 className="text-[14.5px] font-semibold"
                 style={{ color: GLASS_TITLE_COLOR }}
               >
-                Annuler
+                {t('common.cancel')}
               </Text>
             </Pressable>
           </ScrollView>

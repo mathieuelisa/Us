@@ -1,4 +1,5 @@
 import '@/global.css';
+import '@/i18n';
 
 import { QueryClientProvider } from '@tanstack/react-query';
 import { useFonts } from 'expo-font';
@@ -23,6 +24,8 @@ import {
   resolveThemeId,
 } from '@/features/settings/constants';
 import { useThemeBackground } from '@/features/settings/hooks';
+import { languageRestored, setAppLanguage } from '@/i18n';
+import { isAppLanguage } from '@/i18n/languages';
 import { sessionAtom } from '@/lib/atoms/session';
 import { queryClient } from '@/lib/query/query-client';
 import {
@@ -55,6 +58,16 @@ function AuthGate() {
       Uniwind.setTheme(resolveThemeId(profile.theme));
     }
   }, [profile?.theme]);
+
+  // Même principe pour la langue (`profiles.language`) : une fois connecté,
+  // le profil fait foi, y compris sur un nouveau téléphone. `null` = langue
+  // du téléphone. La copie locale suit, pour l'écran de connexion.
+  const profileLanguage = profile?.language;
+  const isProfileLoaded = profile !== undefined;
+  useEffect(() => {
+    if (!isProfileLoaded) return;
+    setAppLanguage(isAppLanguage(profileLanguage) ? profileLanguage : null);
+  }, [isProfileLoaded, profileLanguage]);
 
   // Tant que le profil n'est pas chargé (tout l'onboarding, avant la
   // création du foyer), Uniwind retombe sur le thème système — `dark` sur un
@@ -122,7 +135,9 @@ export default function RootLayout() {
   useAuthRedirectListener();
 
   useEffect(() => {
-    initialSessionRecovery.finally(() => {
+    // La langue retenue sur le téléphone est appliquée avant le premier
+    // écran, pour ne pas l'afficher un instant dans une autre langue.
+    Promise.all([initialSessionRecovery, languageRestored]).finally(() => {
       supabase.auth.getSession().then(({ data }) => {
         setSession(data.session);
         setIsSessionReady(true);

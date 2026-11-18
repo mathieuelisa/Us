@@ -1,12 +1,12 @@
 import { Ionicons } from '@expo/vector-icons';
 import * as Linking from 'expo-linking';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Modal, Pressable, Share, Text, View } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import Animated, { SlideInDown, SlideOutDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
-
 import {
   GLASS_BODY_COLOR,
   GLASS_TITLE_COLOR,
@@ -18,10 +18,10 @@ import { useCreateHouseholdJoinCode } from '@/features/household/hooks';
 import { hexToRgba, lightenHex } from '@/lib/color';
 
 const STEPS = [
-  'Votre partenaire installe US et crée son compte.',
-  'À l’inscription, il ou elle choisit « Je suis partenaire ».',
-  'Il ou elle saisit ce code, ou scanne le QR code.',
-];
+  'hub.invite.steps.install',
+  'hub.invite.steps.choose',
+  'hub.invite.steps.enter',
+] as const;
 
 /**
  * « Ajouter votre partenaire » (demande explicite) : un code **temporaire**
@@ -43,6 +43,7 @@ export function InvitePartnerModal({
   partnerName: string | null;
   onClose: () => void;
 }) {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const [shareError, setShareError] = useState<string | null>(null);
   const createCode = useCreateHouseholdJoinCode();
@@ -85,12 +86,10 @@ export function InvitePartnerModal({
     setShareError(null);
     try {
       await Share.share({
-        message: `Rejoins-moi sur US : à l’inscription, choisis « Je suis partenaire » puis saisis le code ${joinCode} (valable 30 minutes).`,
+        message: t('hub.invite.shareMessage', { code: joinCode }),
       });
     } catch {
-      setShareError(
-        'Le partage n’est pas disponible ici : transmettez le code tel quel.',
-      );
+      setShareError(t('hub.invite.shareUnavailable'));
     }
   };
 
@@ -131,9 +130,7 @@ export function InvitePartnerModal({
                 className="text-[22px] font-extrabold leading-7"
                 style={{ color: GLASS_TITLE_COLOR, letterSpacing: -0.4 }}
               >
-                {partnerName
-                  ? `Inviter ${partnerName}`
-                  : 'Inviter votre partenaire'}
+                {partnerName ? `Inviter ${partnerName}` : t('hub.invite.title')}
               </Text>
               <Svg width={92} height={10} viewBox="0 0 92 10">
                 <Path
@@ -148,13 +145,12 @@ export function InvitePartnerModal({
                 className="text-[13px] leading-[18px]"
                 style={{ color: GLASS_BODY_COLOR }}
               >
-                Partagez ce code ou faites scanner le QR code pour rejoindre
-                votre espace.
+                {t('hub.invite.subtitle')}
               </Text>
             </View>
             <View>
               <Pressable
-                accessibilityLabel="Fermer"
+                accessibilityLabel={t('common.close')}
                 accessibilityRole="button"
                 hitSlop={8}
                 onPress={onClose}
@@ -209,7 +205,7 @@ export function InvitePartnerModal({
                   className="text-[11.5px] font-bold"
                   style={{ color: GLASS_BODY_COLOR, letterSpacing: 1.2 }}
                 >
-                  CODE DE L’ESPACE
+                  {t('hub.invite.codeTitle')}
                 </Text>
                 <View
                   className="items-center rounded-[18px] px-3 py-3"
@@ -234,7 +230,7 @@ export function InvitePartnerModal({
             >
               {createCode.isError
                 ? getJoinErrorMessage(createCode.error)
-                : 'Création d’un code sécurisé…'}
+                : t('hub.invite.creating')}
             </Text>
           )}
 
@@ -250,8 +246,8 @@ export function InvitePartnerModal({
                 style={{ color: isExpired ? '#c9553d' : GLASS_BODY_COLOR }}
               >
                 {isExpired
-                  ? 'Ce code a expiré.'
-                  : `Code temporaire à usage unique · expire dans ${countdown}`}
+                  ? t('hub.invite.expired')
+                  : t('hub.invite.expiresIn', { countdown })}
               </Text>
             </View>
           ) : null}
@@ -274,7 +270,7 @@ export function InvitePartnerModal({
                   className="flex-1 text-[13.5px] leading-[19px]"
                   style={{ color: GLASS_TITLE_COLOR }}
                 >
-                  {step}
+                  {t(step)}
                 </Text>
               </View>
             ))}
@@ -284,7 +280,9 @@ export function InvitePartnerModal({
             {isExpired ? (
               <PillButton
                 label={
-                  createCode.isPending ? 'Création…' : 'Générer un nouveau code'
+                  createCode.isPending
+                    ? t('hub.invite.creatingShort')
+                    : t('hub.invite.newCode')
                 }
                 icon="refresh-outline"
                 isDisabled={createCode.isPending}
@@ -292,7 +290,7 @@ export function InvitePartnerModal({
               />
             ) : (
               <PillButton
-                label="Partager le code"
+                label={t('hub.invite.shareCode')}
                 icon="share-social-outline"
                 isDisabled={!joinCode}
                 onPress={share}

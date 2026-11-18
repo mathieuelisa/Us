@@ -3,6 +3,7 @@ import { BlurView } from 'expo-blur';
 import { router, useFocusEffect } from 'expo-router';
 import type { ReactNode } from 'react';
 import { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { ImageSourcePropType } from 'react-native';
 import {
   Image,
@@ -14,7 +15,6 @@ import {
 } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import { withUniwind } from 'uniwind';
-
 import { PremiumPaywallModal } from '@/components/hub/premium-paywall-modal';
 import { useTabBarContentInset } from '@/components/navigation/use-tab-bar-height';
 import { GLASS_TITLE_COLOR } from '@/components/ui/glass-card';
@@ -83,6 +83,7 @@ export function PremiumLockedScreen({
   /** Illustration du paywall à la place de `image` (voir `PremiumOffer`). */
   paywallIllustration?: ReactNode;
 }) {
+  const { t } = useTranslation();
   // Place de la barre du bas, qui flotte au-dessus du contenu.
   const tabBarInset = useTabBarContentInset();
   const backgroundColor = useThemeBackground();
@@ -109,7 +110,7 @@ export function PremiumLockedScreen({
         showsVerticalScrollIndicator={false}
       >
         <Pressable
-          accessibilityLabel="Revenir en arrière"
+          accessibilityLabel={t('common.goBack')}
           accessibilityRole="button"
           hitSlop={12}
           onPress={() => router.back()}
@@ -178,7 +179,7 @@ export function PremiumLockedScreen({
           {isLocked ? (
             <Pressable
               accessibilityRole="button"
-              accessibilityLabel="Débloquer avec le premium"
+              accessibilityLabel={t('premium.locked.unlockA11y')}
               onPress={() => setIsPaywallRequested(true)}
               className="absolute inset-0"
             />

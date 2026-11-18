@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import type { ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Pressable, Text, View } from 'react-native';
-
 import { CARD_SHADOW } from '@/features/hub/constants';
 import { useIsPremium } from '@/features/premium/hooks';
 
@@ -38,6 +38,7 @@ export function PremiumTeaserCard({
    */
   illustration?: ReactNode;
 }) {
+  const { t } = useTranslation();
   const Container = onPress ? Pressable : View;
   // Cadenas ouvert une fois le premium acheté par le foyer (demande explicite).
   const { isPremium } = useIsPremium();
@@ -103,7 +104,7 @@ export function PremiumTeaserCard({
           color="#e8c874"
         />
         <Text className="text-[10px] font-semibold uppercase tracking-wide text-[#e8c874]">
-          Premium
+          {t('premium.teaser.badge')}
         </Text>
       </View>
     </Container>

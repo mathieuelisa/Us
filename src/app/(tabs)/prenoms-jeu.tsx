@@ -2,12 +2,12 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Image, Pressable, ScrollView, Text, View } from 'react-native';
 import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import { withUniwind } from 'uniwind';
-
 import { CountryPicker } from '@/components/names/country-picker';
 import { NameMatchCelebration } from '@/components/names/name-match-celebration';
 import {
@@ -66,6 +66,7 @@ const GENDER_IMAGES = {
  *    (`name_swipes`), le paquet avance sans attendre la requête.
  */
 export default function NameGameScreen() {
+  const { t } = useTranslation();
   // Place de la barre du bas, qui flotte au-dessus du contenu.
   const tabBarInset = useTabBarContentInset();
   const router = useRouter();
@@ -129,8 +130,7 @@ export default function NameGameScreen() {
         onSuccess: ({ isMatch }) => {
           if (isMatch && !isSolo) setMatchedName(card.name);
         },
-        onError: () =>
-          showFeedback('error', 'Ce choix n’a pas pu être enregistré.'),
+        onError: () => showFeedback('error', t('names.game.saveError')),
       },
     );
   };
@@ -144,11 +144,10 @@ export default function NameGameScreen() {
           showFeedback(
             'success',
             willBeFavorite
-              ? `${card.name} est dans vos favoris`
-              : `${card.name} n’est plus dans vos favoris`,
+              ? t('names.game.addedToFavorites', { name: card.name })
+              : t('names.game.removedFromFavorites', { name: card.name }),
           ),
-        onError: () =>
-          showFeedback('error', 'Le favori n’a pas pu être enregistré.'),
+        onError: () => showFeedback('error', t('names.game.favoriteError')),
       },
     );
   };
@@ -184,7 +183,9 @@ export default function NameGameScreen() {
         // utile sur un petit téléphone où tout ne tient pas.
       >
         <Pressable
-          accessibilityLabel={deck ? 'Revenir au choix des pays' : 'Revenir'}
+          accessibilityLabel={
+            deck ? t('names.game.backToCountries') : t('names.game.back')
+          }
           accessibilityRole="button"
           hitSlop={12}
           onPress={goBack}
@@ -206,7 +207,7 @@ export default function NameGameScreen() {
               className="text-[28px] font-extrabold leading-[34px]"
               style={{ color: GLASS_TITLE_COLOR, letterSpacing: -0.6 }}
             >
-              {meta.title}
+              {t(`names.genderTitles.${gender}`)}
             </Text>
             <Svg width={120} height={10} viewBox="0 0 120 10">
               <Path
@@ -221,7 +222,7 @@ export default function NameGameScreen() {
               className="text-[14.5px] leading-5"
               style={{ color: GLASS_BODY_COLOR }}
             >
-              Glissez à droite pour garder, à gauche pour écarter.
+              {t('names.game.swipeHint')}
             </Text>
           </View>
         ) : (
@@ -275,7 +276,7 @@ export default function NameGameScreen() {
                 className="text-[32px] font-extrabold leading-[38px]"
                 style={{ color: GLASS_TITLE_COLOR, letterSpacing: -0.8 }}
               >
-                {meta.title}
+                {t(`names.genderTitles.${gender}`)}
               </Text>
               <Svg width={130} height={10} viewBox="0 0 130 10">
                 <Path
@@ -290,8 +291,9 @@ export default function NameGameScreen() {
                 className="text-[14.5px] leading-[21px]"
                 style={{ color: GLASS_BODY_COLOR }}
               >
-                Choisissez jusqu’à {MAX_SELECTED_COUNTRIES} pays d’origine pour
-                découvrir des prénoms.
+                {t('names.countries.chooseUpTo', {
+                  max: MAX_SELECTED_COUNTRIES,
+                })}
               </Text>
             </View>
           </View>
@@ -370,6 +372,7 @@ function DeckStep({
   isSolo: boolean;
   onSeeMatches: () => void;
 }) {
+  const { t } = useTranslation();
   // Hauteur disponible pour le paquet, mesurée (voir le rendu).
   const [deckSpace, setDeckSpace] = useState(DEFAULT_CARD_HEIGHT + 20);
   const meta = GENDER_META[gender];
@@ -391,19 +394,17 @@ function DeckStep({
           className="text-center text-[19px] font-extrabold"
           style={{ color: GLASS_TITLE_COLOR }}
         >
-          Vous avez vu tous les prénoms
+          {t('names.game.allSeen')}
         </Text>
         <Text
           className="text-center text-[14px] leading-5"
           style={{ color: GLASS_BODY_COLOR }}
         >
-          {isSolo
-            ? 'Choisissez d’autres pays pour en découvrir de nouveaux, ou retrouvez vos favoris.'
-            : 'Choisissez d’autres pays pour en découvrir de nouveaux, ou regardez les prénoms sur lesquels vous êtes d’accord.'}
+          {isSolo ? t('names.game.allSeenSolo') : t('names.game.allSeenCouple')}
         </Text>
         <View className="mt-2 w-full gap-2.5">
           <PillButton
-            label="Choisir d’autres pays"
+            label={t('names.game.otherCountries')}
             icon="earth-outline"
             onPress={onChangeCountries}
           />
@@ -417,7 +418,9 @@ function DeckStep({
               className="text-[15px] font-bold"
               style={{ color: meta.color }}
             >
-              {isSolo ? 'Voir vos favoris' : 'Voir vos matchs'}
+              {isSolo
+                ? t('names.game.seeFavorites')
+                : t('names.game.seeMatches')}
             </Text>
           </Pressable>
         </View>
@@ -437,7 +440,7 @@ function DeckStep({
           className="text-[13px] font-semibold"
           style={{ color: meta.color }}
         >
-          {deck.length} prénom{deck.length > 1 ? 's' : ''} à découvrir
+          {t('names.game.toDiscover', { count: deck.length })}
         </Text>
       </View>
 

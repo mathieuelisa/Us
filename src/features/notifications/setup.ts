@@ -3,6 +3,7 @@ import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
 
+import i18n from '@/i18n';
 import { supabase } from '@/lib/supabase/client';
 
 /** Pas de notifications dans l'aperçu web : tout est ignoré sans erreur. */
@@ -37,16 +38,16 @@ export async function configureNotifications(): Promise<void> {
     await Notifications.setNotificationChannelAsync(
       NOTIFICATION_CHANNELS.reminders,
       {
-        name: 'Rappels',
-        description: 'Rendez-vous et démarches',
+        name: i18n.t('notifications.channels.reminders'),
+        description: i18n.t('notifications.channels.remindersHint'),
         importance: Notifications.AndroidImportance.HIGH,
       },
     );
     await Notifications.setNotificationChannelAsync(
       NOTIFICATION_CHANNELS.partner,
       {
-        name: 'Votre partenaire',
-        description: 'Ce que partage l’autre parent',
+        name: i18n.t('notifications.channels.partner'),
+        description: i18n.t('notifications.channels.partnerHint'),
         importance: Notifications.AndroidImportance.HIGH,
       },
     );

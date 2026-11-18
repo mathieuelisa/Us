@@ -48,6 +48,22 @@ export async function updateMyTheme(
 }
 
 /**
+ * Langue de l'interface (`profiles.language`), `null` = langue du
+ * téléphone. RLS : `profiles_update_own`.
+ */
+export async function updateMyLanguage(
+  userId: string,
+  language: string | null,
+): Promise<void> {
+  const { error } = await supabase
+    .from('profiles')
+    .update({ language })
+    .eq('id', userId);
+
+  if (error) throw error;
+}
+
+/**
  * Visite guidée de l'accueil vue (terminée ou passée) : elle ne se relance
  * plus d'elle-même. RLS : `profiles_update_own`.
  */

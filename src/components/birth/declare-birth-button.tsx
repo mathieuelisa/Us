@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { Pressable, Text, View } from 'react-native';
 import Animated, {
   interpolate,
@@ -6,7 +7,6 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-
 import { useThemeAccent } from '@/features/settings/hooks';
 
 /**
@@ -35,6 +35,7 @@ export function DeclareBirthButton({
   isDisabled?: boolean;
   isLoading?: boolean;
 }) {
+  const { t } = useTranslation();
   const accent = useThemeAccent();
   const isInactive = isDisabled || isLoading;
 
@@ -74,7 +75,7 @@ export function DeclareBirthButton({
         >
           <Ionicons name="checkmark-circle" size={21} color="#ffffff" />
           <Text className="text-[17px] font-bold text-accent-foreground">
-            {isLoading ? 'Enregistrement…' : label}
+            {isLoading ? t('birth.saving') : label}
           </Text>
         </Pressable>
       </Animated.View>

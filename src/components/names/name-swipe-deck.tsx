@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Pressable, Text, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
@@ -130,6 +131,7 @@ function TopCard({
   onSwipe: (card: NameCard, liked: boolean) => void;
   onToggleFavorite: (card: NameCard) => void;
 }) {
+  const { t } = useTranslation();
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(0);
 
@@ -222,9 +224,10 @@ function TopCard({
     <GestureDetector gesture={Gesture.Race(pan, tap)}>
       <Animated.View
         accessibilityRole="button"
-        accessibilityLabel={`${card.name}. Glissez à droite pour garder, à gauche pour écarter ; touchez pour ${
-          isFavorite ? 'retirer des' : 'ajouter aux'
-        } favoris.`}
+        accessibilityLabel={t(
+          isFavorite ? 'names.deck.cardA11yRemove' : 'names.deck.cardA11yAdd',
+          { name: card.name },
+        )}
         style={[{ position: 'absolute', left: 0, right: 0 }, cardStyle]}
       >
         <CardFace
@@ -247,7 +250,7 @@ function TopCard({
             keepStyle,
           ]}
         >
-          <Stamp label="GARDÉ" color="#2f9e6e" />
+          <Stamp label={t('names.deck.kept')} color="#2f9e6e" />
         </Animated.View>
         <Animated.View
           pointerEvents="none"
@@ -261,7 +264,7 @@ function TopCard({
             passStyle,
           ]}
         >
-          <Stamp label="ÉCARTÉ" color="#d14b3a" />
+          <Stamp label={t('names.deck.passed')} color="#d14b3a" />
         </Animated.View>
       </Animated.View>
     </GestureDetector>
@@ -300,6 +303,7 @@ function CardFace({
   gender: NameGender;
   isFavorite: boolean;
 }) {
+  const { t } = useTranslation();
   const meta = GENDER_META[gender];
   const countries = getNameCountries(card.countryIds);
 
@@ -354,7 +358,7 @@ function CardFace({
         style={{ backgroundColor: hexToRgba(meta.color, 0.1) }}
       >
         <Text className="text-[12.5px] font-bold" style={{ color: meta.color }}>
-          Prénom {meta.label}
+          {t(`names.cardTag.${gender}`)}
         </Text>
       </View>
 
@@ -394,8 +398,7 @@ function CardFace({
         className="absolute bottom-5 text-center text-[12.5px]"
         style={{ color: GLASS_BODY_COLOR }}
       >
-        Touchez la carte pour {isFavorite ? 'la retirer des' : 'l’ajouter aux'}{' '}
-        favoris
+        {isFavorite ? t('names.deck.tapToRemove') : t('names.deck.tapToAdd')}
       </Text>
     </View>
   );
@@ -411,19 +414,20 @@ export function SwipeButtons({
   onKeep: () => void;
   disabled: boolean;
 }) {
+  const { t } = useTranslation();
   return (
     <View className="flex-row items-center justify-center gap-8">
       <RoundButton
         icon="close"
         color="#d14b3a"
-        label="Écarter ce prénom"
+        label={t('names.deck.pass')}
         onPress={onPass}
         disabled={disabled}
       />
       <RoundButton
         icon="checkmark"
         color="#2f9e6e"
-        label="Garder ce prénom"
+        label={t('names.deck.keep')}
         onPress={onKeep}
         disabled={disabled}
       />

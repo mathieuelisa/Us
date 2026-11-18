@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Modal,
   Platform,
@@ -20,7 +21,6 @@ import Animated, {
   withTiming,
   ZoomIn,
 } from 'react-native-reanimated';
-
 import {
   GLASS_BODY_COLOR,
   GLASS_TITLE_COLOR,
@@ -119,6 +119,7 @@ function CelebrationContent({
   onContinue: () => void;
   onSeeMatches: () => void;
 }) {
+  const { t } = useTranslation();
   const { width, height } = useWindowDimensions();
   const progress = useSharedValue(0);
   // Tirées une fois par célébration : chaque match a sa propre gerbe.
@@ -200,7 +201,7 @@ function CelebrationContent({
           className="mt-4 text-[13px] font-bold uppercase tracking-[2px]"
           style={{ color: genderColor }}
         >
-          C’est un match !
+          {t('names.celebration.title')}
         </Text>
         <Text
           numberOfLines={1}
@@ -214,12 +215,12 @@ function CelebrationContent({
           className="mt-1 text-center text-[14.5px] leading-5"
           style={{ color: GLASS_BODY_COLOR }}
         >
-          Vous l’avez choisi tous les deux.
+          {t('names.celebration.body')}
         </Text>
 
         <View className="mt-6 w-full gap-2">
           <PillButton
-            label="Continuer à jouer"
+            label={t('names.celebration.keepPlaying')}
             icon="play-outline"
             onPress={onContinue}
           />
@@ -233,7 +234,7 @@ function CelebrationContent({
               className="text-[14.5px] font-semibold"
               style={{ color: GLASS_TITLE_COLOR }}
             >
-              Voir nos matchs
+              {t('names.celebration.seeMatches')}
             </Text>
           </Pressable>
         </View>

@@ -1,20 +1,6 @@
 import type { ImageSourcePropType } from 'react-native';
+import type { TranslationKey } from '@/i18n/types';
 import type { MoodValue } from './api';
-
-/**
- * Humeur de l'autre parent en phrase (carte « Mon partenaire » de
- * l'accueil, demande explicite d'un texte plus humain et « tourné vers
- * l'action ») : complète le prénom, sans accord de genre — les libellés de
- * `MOOD_PRESENTATION` sont au féminin, faux quand c'est le co-parent qui
- * les note.
- */
-export const PARTNER_MOOD_PHRASES: Record<MoodValue, string> = {
-  great: 'est en pleine forme',
-  good: 'va bien',
-  neutral: 'va à peu près',
-  bad: 'a besoin d’un peu de douceur',
-  terrible: 'a besoin de vous aujourd’hui',
-};
 
 /**
  * Rendu **qualitatif** de l'humeur : un emoji et une phrase, jamais un
@@ -24,39 +10,47 @@ export const PARTNER_MOOD_PHRASES: Record<MoodValue, string> = {
  */
 export const MOOD_PRESENTATION: Record<
   MoodValue,
-  { emoji: string; phrase: string; label: string; imgUrl: ImageSourcePropType }
+  {
+    emoji: string;
+    phraseKey: TranslationKey;
+    labelKey: TranslationKey;
+    imgUrl: ImageSourcePropType;
+  }
 > = {
   great: {
     emoji: '😄',
     imgUrl: require('@/assets/images/Mother_happy.png'),
-    phrase: 'semble au top',
-    label: 'Épanouie',
+    phraseKey: 'mood.phrases.great',
+    labelKey: 'mood.labels.great',
   },
   good: {
     emoji: '🙂',
     imgUrl: require('@/assets/images/Mother_smile.png'),
-    phrase: 'semble se sentir bien',
-    label: 'Contente',
+    phraseKey: 'mood.phrases.good',
+    labelKey: 'mood.labels.good',
   },
   neutral: {
     emoji: '😐',
     imgUrl: require('@/assets/images/Mother_neutral.png'),
-    phrase: 'passe une journée ordinaire',
-    label: 'Neutre',
+    phraseKey: 'mood.phrases.neutral',
+    labelKey: 'mood.labels.neutral',
   },
   bad: {
     emoji: '😩',
     imgUrl: require('@/assets/images/Mother_sad.png'),
-    phrase: 'traverse une journée difficile',
-    label: 'Triste',
+    phraseKey: 'mood.phrases.bad',
+    labelKey: 'mood.labels.bad',
   },
   terrible: {
     emoji: '😢',
     imgUrl: require('@/assets/images/Mother_cry.png'),
-    phrase: 'traverse une journée très difficile',
-    label: 'Malheureuse',
+    phraseKey: 'mood.phrases.terrible',
+    labelKey: 'mood.labels.terrible',
   },
 };
+
+/** Les 5 niveaux d'humeur (la colonne en base est un simple `text`). */
+export type MoodLevel = 'great' | 'good' | 'neutral' | 'bad' | 'terrible';
 
 /** Ordre d'affichage des 5 humeurs (écrans 3a/3g) — great en tête. */
 export const MOOD_ORDER: MoodValue[] = [
@@ -91,9 +85,9 @@ export const CARD_SHADOW = {
  */
 export const PREMIUM_GOLD_ON_LIGHT = '#b8860b';
 
-export function formatAppointmentDate(isoDate: string): string {
+export function formatAppointmentDate(isoDate: string, locale: string): string {
   const [year, month, day] = isoDate.split('-').map(Number);
-  return new Date(year, month - 1, day).toLocaleDateString('fr-FR', {
+  return new Date(year, month - 1, day).toLocaleDateString(locale, {
     day: 'numeric',
     month: 'long',
   });
@@ -103,7 +97,10 @@ export function formatAppointmentDate(isoDate: string): string {
  * Jour de la semaine abrégé (« mer. »), jour et mois séparés, pour le pavé
  * date des cartes de rendez-vous.
  */
-export function formatAppointmentDayMonth(isoDate: string): {
+export function formatAppointmentDayMonth(
+  isoDate: string,
+  locale: string,
+): {
   weekday: string;
   day: string;
   month: string;
@@ -111,15 +108,23 @@ export function formatAppointmentDayMonth(isoDate: string): {
   const [year, month, day] = isoDate.split('-').map(Number);
   const date = new Date(year, month - 1, day);
   return {
-    weekday: date.toLocaleDateString('fr-FR', { weekday: 'short' }),
+    weekday: date.toLocaleDateString(locale, { weekday: 'short' }),
     day: String(date.getDate()),
-    month: date.toLocaleDateString('fr-FR', { month: 'short' }),
+    month: date.toLocaleDateString(locale, { month: 'short' }),
   };
 }
 
-/** "10:30" → "10h30" ; `null` si l'heure n'est pas renseignée. */
-export function formatAppointmentTime(time: string | null): string | null {
+/**
+ * "10:30" → "10h30" en français, "10:30" ailleurs ; `null` si l'heure
+ * n'est pas renseignée.
+ */
+export function formatAppointmentTime(
+  time: string | null,
+  locale: string,
+): string | null {
   if (!time) return null;
   const [hours, minutes] = time.split(':');
-  return `${hours}h${minutes}`;
+  return locale.startsWith('fr')
+    ? `${hours}h${minutes}`
+    : `${hours}:${minutes}`;
 }

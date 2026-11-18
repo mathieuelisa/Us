@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Image,
   type ImageSourcePropType,
@@ -24,7 +25,6 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
 import {
   GLASS_BODY_COLOR,
   GLASS_TITLE_COLOR,
@@ -408,6 +408,7 @@ function Bubble({
   onPrevious: () => void;
   onSkip: () => void;
 }) {
+  const { t } = useTranslation();
   return (
     <View>
       {arrow ? (
@@ -481,7 +482,7 @@ function Bubble({
           {isLast ? null : (
             <Pressable
               accessibilityRole="button"
-              accessibilityLabel="Passer la visite guidée"
+              accessibilityLabel={t('hub.tour.skip')}
               hitSlop={10}
               onPress={onSkip}
             >
@@ -489,7 +490,7 @@ function Bubble({
                 className="text-[13px] font-semibold"
                 style={{ color: GLASS_BODY_COLOR }}
               >
-                Passer
+                {t('common.skip')}
               </Text>
             </Pressable>
           )}
@@ -540,7 +541,7 @@ function Bubble({
           {index > 0 ? (
             <Pressable
               accessibilityRole="button"
-              accessibilityLabel="Étape précédente"
+              accessibilityLabel={t('hub.tour.previous')}
               hitSlop={6}
               onPress={onPrevious}
               className="h-11 w-11 items-center justify-center rounded-full"
@@ -564,7 +565,7 @@ function Bubble({
               }}
             >
               <Text className="text-[15px] font-bold text-white">
-                {isLast ? 'C’est parti !' : 'Suivant'}
+                {isLast ? t('hub.tour.go') : t('hub.tour.next')}
               </Text>
               <Ionicons
                 name={isLast ? 'checkmark' : 'arrow-forward'}

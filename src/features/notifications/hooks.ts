@@ -3,6 +3,7 @@ import * as Notifications from 'expo-notifications';
 import { type Href, useRouter } from 'expo-router';
 import { useAtomValue } from 'jotai';
 import { useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { AppState } from 'react-native';
 
 import { useBabyEntries } from '@/features/baby/hooks';
@@ -14,6 +15,7 @@ import {
   updateMyNotificationPreferences,
 } from '@/features/profile/api';
 import { useMyProfile } from '@/features/profile/hooks';
+import { useLocale } from '@/i18n/hooks';
 import { sessionAtom } from '@/lib/atoms/session';
 import { queryKeys } from '@/lib/query/keys';
 
@@ -58,6 +60,8 @@ function openNotificationUrl(
  *  - toucher une notification ouvre l'écran concerné.
  */
 export function useNotifications() {
+  const { t } = useTranslation();
+  const locale = useLocale();
   const router = useRouter();
   const userId = useAtomValue(sessionAtom)?.user.id;
   const { data: profile } = useMyProfile();
@@ -110,13 +114,13 @@ export function useNotifications() {
     if (!isDataReady || !profile || !household) return [];
     return [
       ...(profile.notify_appointments
-        ? buildAppointmentReminders(appointmentsQuery.data ?? [])
+        ? buildAppointmentReminders(appointmentsQuery.data ?? [], t, locale)
         : []),
       ...(profile.notify_procedures
-        ? buildProcedureReminders(proceduresQuery.data ?? [], household)
+        ? buildProcedureReminders(proceduresQuery.data ?? [], household, t)
         : []),
       ...(profile.notify_vaccines
-        ? buildVaccineReminders(vaccinesQuery.data ?? [])
+        ? buildVaccineReminders(vaccinesQuery.data ?? [], t, locale)
         : []),
     ];
   }, [
@@ -126,6 +130,8 @@ export function useNotifications() {
     appointmentsQuery.data,
     proceduresQuery.data,
     vaccinesQuery.data,
+    t,
+    locale,
   ]);
 
   const signature = reminders

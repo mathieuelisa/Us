@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import type { ComponentProps } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Pressable, Text, View } from 'react-native';
-
 import { GLASS_BODY_COLOR } from '@/components/ui/glass-card';
 import { STATUS_OPTIONS } from '@/features/procedures/constants';
 import { useThemeAccent } from '@/features/settings/hooks';
@@ -28,6 +28,7 @@ export function StatusSelector({
   status: string;
   onChange: (status: 'a_faire' | 'en_cours' | 'fait') => void;
 }) {
+  const { t } = useTranslation();
   const accent = useThemeAccent();
 
   return (
@@ -70,7 +71,7 @@ export function StatusSelector({
               className="text-[14px]"
               style={{ color, fontWeight: isSelected ? '700' : '600' }}
             >
-              {option.label}
+              {t(`procedures.statuses.${option.value}`)}
             </Text>
           </Pressable>
         );

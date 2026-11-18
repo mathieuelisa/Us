@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
 import Animated, {
   cancelAnimation,
@@ -11,7 +12,6 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import Svg, { Circle, Defs, LinearGradient, Stop } from 'react-native-svg';
-
 import {
   GLASS_BODY_COLOR,
   GLASS_TITLE_COLOR,
@@ -36,6 +36,7 @@ const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
  * réglage du système.
  */
 export function LoadingScreen() {
+  const { t } = useTranslation();
   const accent = useThemeAccent();
   const backgroundColor = useThemeBackground();
   const rotation = useSharedValue(0);
@@ -68,7 +69,7 @@ export function LoadingScreen() {
   return (
     <View
       accessibilityRole="progressbar"
-      accessibilityLabel="Chargement en cours"
+      accessibilityLabel={t('hub.loading.a11y')}
       className="flex-1 items-center justify-center overflow-hidden"
       style={{ backgroundColor }}
     >
@@ -151,13 +152,13 @@ export function LoadingScreen() {
             className="text-[30px] font-extrabold"
             style={{ color: GLASS_TITLE_COLOR, letterSpacing: -0.6 }}
           >
-            Chargement…
+            {t('hub.loading.title')}
           </Text>
           <Text
             className="text-center text-[15px]"
             style={{ color: GLASS_BODY_COLOR }}
           >
-            Veuillez patienter quelques instants
+            {t('hub.loading.subtitle')}
           </Text>
         </View>
       </Animated.View>

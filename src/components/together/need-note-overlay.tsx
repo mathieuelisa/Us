@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { type ComponentProps, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Image,
   type ImageSourcePropType,
@@ -11,7 +12,6 @@ import {
 } from 'react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import Animated, { FadeInDown } from 'react-native-reanimated';
-
 import {
   GLASS_BODY_COLOR,
   GLASS_TITLE_COLOR,
@@ -56,6 +56,7 @@ export function NeedNoteOverlay({
   onSubmit: (note: string) => void;
   onSkip: () => void;
 }) {
+  const { t } = useTranslation();
   const accent = useThemeAccent();
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [freeText, setFreeText] = useState('');
@@ -141,7 +142,7 @@ export function NeedNoteOverlay({
             contentContainerClassName="items-stretch gap-5 px-5 pb-6 pt-5"
           >
             <Pressable
-              accessibilityLabel="Fermer"
+              accessibilityLabel={t('common.close')}
               accessibilityRole="button"
               hitSlop={8}
               onPress={onSkip}
@@ -158,14 +159,13 @@ export function NeedNoteOverlay({
                   className="text-center text-[24px] font-extrabold"
                   style={{ color: GLASS_TITLE_COLOR, letterSpacing: -0.5 }}
                 >
-                  Une envie particulière ?
+                  {t('together.need.title')}
                 </Text>
                 <Text
                   className="text-center text-[14px] leading-5"
                   style={{ color: GLASS_BODY_COLOR }}
                 >
-                  Dites-nous ce dont vous avez besoin,{'\n'}on est là pour vous
-                  ✨
+                  {t('together.need.prompt', { br: '\n' })}
                 </Text>
               </View>
             </View>
@@ -174,7 +174,7 @@ export function NeedNoteOverlay({
               {NEED_TAGS.map((tag) => (
                 <NeedTile
                   key={tag.value}
-                  label={tag.label}
+                  label={t(`together.needs.${tag.value}`)}
                   icon={NEED_ICONS[tag.value] ?? 'ellipse-outline'}
                   isSelected={selectedTags.includes(tag.value)}
                   accent={accent}
@@ -185,7 +185,7 @@ export function NeedNoteOverlay({
 
             <IconInput
               icon="create-outline"
-              placeholder="Ou écrivez votre propre besoin…"
+              placeholder={t('together.need.placeholder')}
               value={freeText}
               onChangeText={(text) => {
                 setFreeText(text);
@@ -198,7 +198,7 @@ export function NeedNoteOverlay({
 
             <View className="gap-1">
               <PillButton
-                label="Envoyer"
+                label={t('common.send')}
                 icon="paper-plane-outline"
                 isDisabled={!canSubmit}
                 onPress={submit}
@@ -212,7 +212,7 @@ export function NeedNoteOverlay({
                   className="text-[14.5px] font-medium"
                   style={{ color: GLASS_BODY_COLOR }}
                 >
-                  Passer
+                  {t('common.skip')}
                 </Text>
               </Pressable>
             </View>

@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Pressable, Text, View } from 'react-native';
-
 import { GLASS_BODY_COLOR, SparkLines } from '@/components/ui/glass-card';
 import {
   getPremiumPaymentErrorMessage,
@@ -14,12 +14,12 @@ import {
 } from '@/features/premium/hooks';
 import { isPaymentSheetSupported } from '@/features/premium/payment-sheet';
 import { useThemeAccent } from '@/features/settings/hooks';
+import type { TranslationKey } from '@/i18n/types';
 import { hexToRgba, lightenHex } from '@/lib/color';
 
-const OUTCOME_MESSAGES: Partial<Record<PurchaseOutcome, string>> = {
-  pending:
-    'Paiement reçu. Le premium s’active dans quelques instants pour vous deux.',
-  canceled: 'Paiement annulé. Vous pouvez réessayer quand vous voulez.',
+const OUTCOME_MESSAGES: Partial<Record<PurchaseOutcome, TranslationKey>> = {
+  pending: 'premium.purchase.pending',
+  canceled: 'premium.purchase.canceled',
 };
 
 /**
@@ -42,6 +42,7 @@ export function PremiumPurchaseButton({
 }: {
   compact?: boolean;
 }) {
+  const { t } = useTranslation();
   const accent = useThemeAccent();
   const { isPremium } = useIsPremium();
   const purchase = usePremiumPurchase();
@@ -56,18 +57,21 @@ export function PremiumPurchaseButton({
     !purchase.isPending;
 
   const label = isPremium
-    ? 'Premium actif'
+    ? t('premium.purchase.active')
     : !isPaymentSheetSupported
-      ? 'Achat disponible sur l’app mobile'
+      ? t('premium.purchase.mobileOnly')
       : purchase.isPending
-        ? 'Paiement en cours…'
-        : 'Débloquer — 14,99 €';
+        ? t('premium.purchase.processing')
+        : t('premium.purchase.unlock');
   const icon = isPremium ? 'checkmark-circle' : 'lock-open-outline';
 
   const onPress = () => {
     setMessage(null);
     purchase.mutate(undefined, {
-      onSuccess: (outcome) => setMessage(OUTCOME_MESSAGES[outcome] ?? null),
+      onSuccess: (outcome) => {
+        const key = OUTCOME_MESSAGES[outcome];
+        setMessage(key ? t(key) : null);
+      },
       onError: (error) => setMessage(getPremiumPaymentErrorMessage(error)),
     });
   };

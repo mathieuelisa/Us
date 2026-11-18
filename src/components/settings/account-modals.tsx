@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { type ReactNode, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Modal, Pressable, Text, View } from 'react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import Animated, { SlideInDown, SlideOutDown } from 'react-native-reanimated';
@@ -81,6 +82,7 @@ export function ChangePasswordModal({
   visible: boolean;
   onClose: () => void;
 }) {
+  const { t } = useTranslation();
   const accent = useThemeAccent();
   const [currentPassword, setCurrentPassword] = useState('');
   const [password, setPassword] = useState('');
@@ -145,11 +147,11 @@ export function ChangePasswordModal({
 
   const hint =
     password.length > 0 && !isLongEnough
-      ? `${PASSWORD_MIN_LENGTH} caractères minimum.`
+      ? t('settings.password.minLength', { count: PASSWORD_MIN_LENGTH })
       : isSameAsCurrent
-        ? 'Le nouveau mot de passe doit être différent de l’actuel.'
+        ? t('settings.password.sameAsCurrent')
         : confirmation.length > 0 && !doMatch
-          ? 'Les deux mots de passe ne correspondent pas.'
+          ? t('settings.password.mismatch')
           : null;
 
   return (
@@ -159,12 +161,12 @@ export function ChangePasswordModal({
           className="text-[20px] font-extrabold"
           style={{ color: GLASS_TITLE_COLOR }}
         >
-          Changer le mot de passe
+          {t('settings.password.title')}
         </Text>
         <Text className="text-[13.5px]" style={{ color: GLASS_BODY_COLOR }}>
           {requiresCurrent
-            ? 'Pour votre sécurité, confirmez d’abord votre mot de passe actuel.'
-            : 'Vous arrivez d’un lien de réinitialisation : choisissez directement votre nouveau mot de passe.'}
+            ? t('settings.password.confirmCurrent')
+            : t('settings.password.fromResetLink')}
         </Text>
       </View>
 
@@ -179,10 +181,14 @@ export function ChangePasswordModal({
               className="flex-1 text-[14px]"
               style={{ color: GLASS_TITLE_COLOR }}
             >
-              Mot de passe mis à jour.
+              {t('settings.password.updated')}
             </Text>
           </View>
-          <PillButton label="Fermer" size="compact" onPress={onClose} />
+          <PillButton
+            label={t('common.close')}
+            size="compact"
+            onPress={onClose}
+          />
         </View>
       ) : (
         <View className="gap-3">
@@ -190,7 +196,7 @@ export function ChangePasswordModal({
             <View className="gap-1.5">
               <IconInput
                 icon="key-outline"
-                placeholder="Mot de passe actuel"
+                placeholder={t('settings.password.current')}
                 value={currentPassword}
                 onChangeText={setCurrentPassword}
                 accent={accent}
@@ -204,7 +210,7 @@ export function ChangePasswordModal({
                   className="px-2 text-[12.5px]"
                   style={{ color: GLASS_BODY_COLOR }}
                 >
-                  Un lien de réinitialisation a été envoyé à {resetSentTo}.
+                  {t('settings.password.resetSent', { email: resetSentTo })}
                 </Text>
               ) : (
                 <Pressable
@@ -218,7 +224,9 @@ export function ChangePasswordModal({
                     className="text-[12.5px] font-semibold"
                     style={{ color: accent }}
                   >
-                    {isSendingReset ? 'Envoi…' : 'Mot de passe oublié ?'}
+                    {isSendingReset
+                      ? t('common.sending')
+                      : t('settings.password.forgot')}
                   </Text>
                 </Pressable>
               )}
@@ -226,7 +234,7 @@ export function ChangePasswordModal({
           ) : null}
           <IconInput
             icon="lock-closed-outline"
-            placeholder="Nouveau mot de passe"
+            placeholder={t('settings.password.new')}
             value={password}
             onChangeText={setPassword}
             accent={accent}
@@ -237,7 +245,7 @@ export function ChangePasswordModal({
           />
           <IconInput
             icon="shield-checkmark-outline"
-            placeholder="Confirmer le mot de passe"
+            placeholder={t('settings.password.confirm')}
             value={confirmation}
             onChangeText={setConfirmation}
             accent={accent}
@@ -259,7 +267,7 @@ export function ChangePasswordModal({
 
           <View className="mt-1 gap-2">
             <PillButton
-              label={isSaving ? 'Enregistrement…' : 'Enregistrer'}
+              label={isSaving ? t('common.saving') : t('common.save')}
               icon="save-outline"
               size="compact"
               isDisabled={!canSave}
@@ -271,7 +279,7 @@ export function ChangePasswordModal({
               className="items-center py-2"
             >
               <Text className="text-[14px]" style={{ color: GLASS_BODY_COLOR }}>
-                Annuler
+                {t('common.cancel')}
               </Text>
             </Pressable>
           </View>
@@ -297,6 +305,7 @@ export function DeleteAccountModal({
   isPregnant: boolean;
   onClose: () => void;
 }) {
+  const { t } = useTranslation();
   const [isDeleting, setIsDeleting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -311,9 +320,7 @@ export function DeleteAccountModal({
       // La session tombe : le layout racine renvoie vers la connexion.
       await deleteMyAccount();
     } catch {
-      setErrorMessage(
-        'La suppression a échoué. Vérifiez votre connexion et réessayez.',
-      );
+      setErrorMessage(t('settings.deleteAccount.failed'));
       setIsDeleting(false);
     }
   };
@@ -331,7 +338,7 @@ export function DeleteAccountModal({
           className="flex-1 text-[20px] font-extrabold"
           style={{ color: GLASS_TITLE_COLOR }}
         >
-          Supprimer votre compte ?
+          {t('settings.deleteAccount.title')}
         </Text>
       </View>
 
@@ -344,14 +351,14 @@ export function DeleteAccountModal({
           style={{ color: GLASS_TITLE_COLOR }}
         >
           {isPregnant
-            ? 'Votre espace partagé sera supprimé avec toutes ses données — journal, rendez-vous, démarches, valises, informations — y compris pour votre partenaire.'
-            : 'Vos humeurs, vos rendez-vous et votre accès à l’espace partagé seront supprimés. L’espace et ses données restent à l’autre parent.'}
+            ? t('settings.deleteAccount.pregnant')
+            : t('settings.deleteAccount.partner')}
         </Text>
         <Text
           className="text-[13px] font-semibold"
           style={{ color: DANGER_RED }}
         >
-          C’est définitif : rien ne pourra être récupéré.
+          {t('settings.deleteAccount.final')}
         </Text>
       </View>
 
@@ -369,7 +376,9 @@ export function DeleteAccountModal({
           style={{ backgroundColor: DANGER_RED, opacity: isDeleting ? 0.6 : 1 }}
         >
           <Text className="text-[15px] font-bold text-white">
-            {isDeleting ? 'Suppression…' : 'Supprimer définitivement'}
+            {isDeleting
+              ? t('common.deleting')
+              : t('settings.deleteAccount.confirm')}
           </Text>
         </Pressable>
         <Pressable
@@ -379,7 +388,7 @@ export function DeleteAccountModal({
           className="items-center py-2"
         >
           <Text className="text-[14px]" style={{ color: GLASS_BODY_COLOR }}>
-            Annuler
+            {t('common.cancel')}
           </Text>
         </Pressable>
       </View>

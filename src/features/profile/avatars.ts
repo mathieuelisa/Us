@@ -8,12 +8,22 @@
  * colonne (migration `profiles_avatar`).
  */
 export const PROFILE_AVATARS = [
-  { key: 'ourson', emoji: '🐻', label: 'Ourson', bg: '#F6E3D3' },
-  { key: 'lapin', emoji: '🐰', label: 'Lapin', bg: '#FBE1EA' },
-  { key: 'renard', emoji: '🦊', label: 'Renard', bg: '#FDE7D2' },
-  { key: 'panda', emoji: '🐼', label: 'Panda', bg: '#E4EEF2' },
-  { key: 'koala', emoji: '🐨', label: 'Koala', bg: '#E5E8F6' },
-  { key: 'lion', emoji: '🦁', label: 'Lion', bg: '#FCF0C9' },
+  {
+    key: 'ourson',
+    emoji: '🐻',
+    label: 'profile.avatars.ourson',
+    bg: '#F6E3D3',
+  },
+  { key: 'lapin', emoji: '🐰', label: 'profile.avatars.lapin', bg: '#FBE1EA' },
+  {
+    key: 'renard',
+    emoji: '🦊',
+    label: 'profile.avatars.renard',
+    bg: '#FDE7D2',
+  },
+  { key: 'panda', emoji: '🐼', label: 'profile.avatars.panda', bg: '#E4EEF2' },
+  { key: 'koala', emoji: '🐨', label: 'profile.avatars.koala', bg: '#E5E8F6' },
+  { key: 'lion', emoji: '🦁', label: 'profile.avatars.lion', bg: '#FCF0C9' },
 ] as const;
 
 export type ProfileAvatarKey = (typeof PROFILE_AVATARS)[number]['key'];

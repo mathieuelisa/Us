@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { type ComponentProps, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Image, Text, View } from 'react-native';
 import { PaywallModal } from '@/components/onboarding/paywall-modal';
 import { OnboardingStepShell } from '@/components/onboarding/step-shell';
@@ -18,6 +19,7 @@ type IoniconName = ComponentProps<typeof Ionicons>['name'];
  * terminée » teinté, chiffres clés en cartes à pastille d'icône.
  */
 export default function ReassuranceStep() {
+  const { t } = useTranslation();
   const accent = useThemeAccent();
   const [isPaywallOpen, setIsPaywallOpen] = useState(false);
 
@@ -35,9 +37,9 @@ export default function ReassuranceStep() {
       <OnboardingStepShell
         step={null}
         centered
-        title="Vous avez fait le bon choix"
-        subtitle="Des milliers de parents utilisent déjà US pour vivre cette étape sereinement"
-        primaryLabel="Suivant"
+        title={t('onboarding.reassurance.title')}
+        subtitle={t('onboarding.reassurance.subtitle')}
+        primaryLabel={t('onboarding.next')}
         onPrimaryPress={() => setIsPaywallOpen(true)}
         hero={<PartyIllustration />}
       >
@@ -48,7 +50,7 @@ export default function ReassuranceStep() {
           >
             <Ionicons name="checkmark-circle" size={20} color={accent} />
             <Text className="text-[14px] font-bold" style={{ color: accent }}>
-              Configuration terminée
+              {t('onboarding.reassurance.done')}
             </Text>
           </View>
 
@@ -57,16 +59,16 @@ export default function ReassuranceStep() {
               icon="download-outline"
               iconColor={accent}
               iconTint={hexToRgba(accent, 0.12)}
-              value="50 000 +"
-              label="Téléchargements"
+              value={t('onboarding.reassurance.downloadsValue')}
+              label={t('onboarding.reassurance.downloads')}
               accent={accent}
             />
             <StatCard
               icon="star"
               iconColor="#f2b84b"
               iconTint="#fdf3dc"
-              value="4,8"
-              label="Note moyenne"
+              value={t('onboarding.reassurance.ratingValue')}
+              label={t('onboarding.reassurance.rating')}
               accent={accent}
             />
           </View>

@@ -1,8 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Pressable, Text, View } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
-
 import {
   GLASS_BODY_COLOR,
   GLASS_TITLE_COLOR,
@@ -17,34 +17,12 @@ import {
 } from '@/features/health/constants';
 import { getSymptomTips } from '@/features/health/symptom-tips';
 import { PARTNER_PINK } from '@/features/partner/constants';
+import { capitalizeFirst, getWeekdayLetters } from '@/i18n/format';
+import { useLocale } from '@/i18n/hooks';
 import { hexToRgba } from '@/lib/color';
 import { todayIso } from '@/lib/date';
 
 const PINK = PARTNER_PINK;
-const DAY_LETTERS = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
-const WEEKDAYS = [
-  'Dimanche',
-  'Lundi',
-  'Mardi',
-  'Mercredi',
-  'Jeudi',
-  'Vendredi',
-  'Samedi',
-];
-const MONTHS = [
-  'janvier',
-  'février',
-  'mars',
-  'avril',
-  'mai',
-  'juin',
-  'juillet',
-  'août',
-  'septembre',
-  'octobre',
-  'novembre',
-  'décembre',
-];
 const MUTED = '#8f8f99';
 const FUTURE = '#c9c9cf';
 /** À partir de combien de jours un symptôme « revient souvent ». */
@@ -92,10 +70,13 @@ export function WeekSymptomsCard({
   /** Prénom de la personne enceinte, s'il est connu. */
   partnerName: string | null;
 }) {
+  const { t } = useTranslation();
+  const locale = useLocale();
+  const weekdayLetters = getWeekdayLetters(locale);
   const today = todayIso();
   const [selectedDate, setSelectedDate] = useState(today);
   const recurring = getRecurringSymptom(weekDates, symptomsByDate);
-  const who = partnerName || 'Elle';
+  const who = partnerName || t('partner.she');
 
   return (
     <View
@@ -116,7 +97,7 @@ export function WeekSymptomsCard({
         {weekDates.map((date, index) => (
           <DayColumn
             key={date}
-            letter={DAY_LETTERS[index]}
+            letter={weekdayLetters[index]}
             dayNumber={Number(date.slice(-2))}
             symptoms={symptomsByDate[date]}
             isSelected={date === selectedDate}
@@ -154,14 +135,18 @@ function DayColumn({
   isFuture: boolean;
   onPress: () => void;
 }) {
+  const { t } = useTranslation();
   const realSymptoms = symptoms ? withoutNoSymptom(symptoms) : [];
   const isSymptomFree = Boolean(symptoms?.includes(NO_SYMPTOM));
   const label =
     realSymptoms.length > 0
-      ? `${letter} ${dayNumber} : ${realSymptoms.map(getSymptomLabel).join(', ')}`
+      ? t('partner.daySymptoms', {
+          day: `${letter} ${dayNumber}`,
+          symptoms: realSymptoms.map((s) => getSymptomLabel(s, t)).join(', '),
+        })
       : isSymptomFree
-        ? `${letter} ${dayNumber} : pas de symptômes`
-        : `${letter} ${dayNumber} : rien de noté`;
+        ? t('partner.dayNone', { day: `${letter} ${dayNumber}` })
+        : t('partner.dayNothing', { day: `${letter} ${dayNumber}` });
 
   return (
     <Pressable
@@ -313,6 +298,8 @@ function DayDetail({
   symptoms: string[] | undefined;
   who: string;
 }) {
+  const { t } = useTranslation();
+  const locale = useLocale();
   const realSymptoms = symptoms ? withoutNoSymptom(symptoms) : [];
   const isSymptomFree = Boolean(symptoms?.includes(NO_SYMPTOM));
   const tips = getSymptomTips(realSymptoms, 'partner');
@@ -324,7 +311,7 @@ function DayDetail({
           className="text-[16px] font-bold"
           style={{ color: GLASS_TITLE_COLOR }}
         >
-          {formatDayTitle(date)}
+          {formatDayTitle(date, locale)}
         </Text>
         {realSymptoms.length > 0 ? (
           <View
@@ -335,8 +322,7 @@ function DayDetail({
               className="text-[12px] font-bold"
               style={{ color: PINK.tagText }}
             >
-              {realSymptoms.length} symptôme
-              {realSymptoms.length > 1 ? 's' : ''}
+              {t('partner.symptomCount', { count: realSymptoms.length })}
             </Text>
           </View>
         ) : null}
@@ -368,7 +354,7 @@ function DayDetail({
                     className="text-[13.5px] font-semibold"
                     style={{ color: GLASS_TITLE_COLOR }}
                   >
-                    {getSymptomLabel(symptom)}
+                    {getSymptomLabel(symptom, t)}
                   </Text>
                 </View>
               );
@@ -395,7 +381,9 @@ function DayDetail({
                   className="text-[11px] font-bold"
                   style={{ color: PINK.tagText, letterSpacing: 1 }}
                 >
-                  POUR L’AIDER · {getSymptomLabel(tip.symptom).toUpperCase()}
+                  {t('partner.toHelp', {
+                    symptom: getSymptomLabel(tip.symptom, t).toUpperCase(),
+                  })}
                 </Text>
                 <Text
                   className="text-[13.5px] leading-[19px]"
@@ -423,8 +411,8 @@ function DayDetail({
             style={{ color: GLASS_BODY_COLOR }}
           >
             {isSymptomFree
-              ? `${who} a noté une journée sans symptôme.`
-              : `${who} n’a rien noté ce jour-là.`}
+              ? t('partner.symptomFreeDay', { name: who })
+              : t('partner.nothingThatDay', { name: who })}
           </Text>
         </View>
       )}
@@ -434,6 +422,7 @@ function DayDetail({
 
 /** « Revient souvent : 😴 Fatigue · 4 jours », en tête de carte. */
 function RecurringPill({ symptom, days }: { symptom: string; days: number }) {
+  const { t } = useTranslation();
   const visual = getSymptomVisual(symptom);
   return (
     <View
@@ -442,11 +431,11 @@ function RecurringPill({ symptom, days }: { symptom: string; days: number }) {
     >
       <Ionicons name="repeat" size={14} color={PINK.tagText} />
       <Text className="text-[12.5px]" style={{ color: PINK.tagText }}>
-        Revient souvent :{' '}
+        {t('partner.recurring')}
         <Text className="font-bold">
-          {visual.emoji} {getSymptomLabel(symptom)}
-        </Text>{' '}
-        · {days} jours
+          {visual.emoji} {getSymptomLabel(symptom, t)}
+        </Text>
+        {t('partner.recurringDays', { count: days })}
       </Text>
     </View>
   );
@@ -472,9 +461,15 @@ function getRecurringSymptom(
   return best;
 }
 
-/** « Mardi 17 novembre ». */
-function formatDayTitle(isoDate: string): string {
+/** « Mardi 17 novembre », « Tuesday 17 November », « Martes, 17 de noviembre ». */
+function formatDayTitle(isoDate: string, locale: string): string {
   const [year, month, day] = isoDate.split('-').map(Number);
-  const weekday = WEEKDAYS[new Date(year, month - 1, day).getDay()];
-  return `${weekday} ${day} ${MONTHS[month - 1]}`;
+  return capitalizeFirst(
+    new Date(year, month - 1, day).toLocaleDateString(locale, {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+    }),
+    locale,
+  );
 }

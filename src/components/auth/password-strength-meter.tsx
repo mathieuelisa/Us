@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
 import Animated, {
   Easing,
@@ -9,7 +10,6 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-
 import { PASSWORD_MIN_LENGTH } from '@/features/auth/api';
 
 /**
@@ -19,18 +19,16 @@ import { PASSWORD_MIN_LENGTH } from '@/features/auth/api';
 const LEVEL_COLORS = ['#e3998b', '#e6bf7a', '#a3d39c', '#78bf79'] as const;
 /** Teinte du libellé, un ton plus soutenu que les barres pour se lire. */
 const LABEL_COLORS = ['#b8695c', '#ad8540', '#5f9a64', '#4f7c66'] as const;
-const LEVEL_LABELS = [
-  'Mot de passe faible',
-  'Mot de passe moyen',
-  'Bon mot de passe',
-  'Mot de passe robuste',
-] as const;
+const LEVEL_LABELS = ['weak', 'fair', 'good', 'strong'] as const;
 const SEGMENTS = [0, 1, 2, 3] as const;
 const TRACK_COLOR = '#e9e8ee';
 const CRITERION_MET = '#6b7a72';
 const CRITERION_PENDING = '#aeacb8';
 
-type Criterion = { key: string; label: string; isMet: boolean };
+type Criterion = {
+  key: 'length' | 'case' | 'digit' | 'symbol';
+  isMet: boolean;
+};
 
 /**
  * Solidité d'un mot de passe, de 0 (trop court) à 4 (fort). La longueur
@@ -45,18 +43,15 @@ export function evaluatePassword(password: string): {
   const criteria: Criterion[] = [
     {
       key: 'length',
-      label: `${PASSWORD_MIN_LENGTH} caractères min.`,
       isMet: password.length >= PASSWORD_MIN_LENGTH,
     },
     {
       key: 'case',
-      label: 'Majuscule et minuscule',
       isMet: /[a-zà-ÿ]/.test(password) && /[A-ZÀ-Ý]/.test(password),
     },
-    { key: 'digit', label: 'Chiffre', isMet: /\d/.test(password) },
+    { key: 'digit', isMet: /\d/.test(password) },
     {
       key: 'symbol',
-      label: 'Symbole',
       isMet: /[^\p{L}\p{N}]/u.test(password),
     },
   ];
@@ -77,6 +72,7 @@ export function evaluatePassword(password: string): {
  * s'inscrire.
  */
 export function PasswordStrengthMeter({ password }: { password: string }) {
+  const { t } = useTranslation();
   const { level, criteria } = evaluatePassword(password);
   // Trop court : un premier segment à moitié, en rouge, pour montrer que
   // la jauge vit dès la première lettre.
@@ -91,13 +87,16 @@ export function PasswordStrengthMeter({ password }: { password: string }) {
     });
   }, [target, progress]);
 
-  const label = level === 0 ? 'Trop court' : LEVEL_LABELS[level - 1];
+  const label =
+    level === 0
+      ? t('auth.strength.tooShort')
+      : t(`auth.strength.${LEVEL_LABELS[level - 1]}`);
   const color = LABEL_COLORS[Math.max(0, level - 1)];
 
   return (
     <View
       accessible
-      accessibilityLabel={`Solidité du mot de passe : ${label}`}
+      accessibilityLabel={t('auth.strength.a11y', { label })}
       className="gap-2 px-1"
     >
       <View className="flex-row items-center gap-3">
@@ -125,7 +124,9 @@ export function PasswordStrengthMeter({ password }: { password: string }) {
                 color: criterion.isMet ? CRITERION_MET : CRITERION_PENDING,
               }}
             >
-              {criterion.label}
+              {t(`auth.strength.criteria.${criterion.key}`, {
+                count: PASSWORD_MIN_LENGTH,
+              })}
             </Text>
           </View>
         ))}

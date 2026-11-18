@@ -1,11 +1,11 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import Animated, { SlideInDown, SlideOutDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
-
 import {
   GLASS_BODY_COLOR,
   GLASS_TITLE_COLOR,
@@ -91,6 +91,7 @@ export function AppointmentFormModal({
   }) => void;
   onCancel: () => void;
 }) {
+  const { t } = useTranslation();
   const accent = useThemeAccent();
   const insets = useSafeAreaInsets();
   const [title, setTitle] = useState('');
@@ -183,8 +184,8 @@ export function AppointmentFormModal({
                   style={{ color: GLASS_TITLE_COLOR, letterSpacing: -0.4 }}
                 >
                   {isEditing
-                    ? 'Modifier le rendez-vous'
-                    : 'Nouveau rendez-vous'}
+                    ? t('health.appointment.edit')
+                    : t('health.appointment.new')}
                 </Text>
                 <Svg width={92} height={10} viewBox="0 0 92 10">
                   <Path
@@ -200,13 +201,13 @@ export function AppointmentFormModal({
                   style={{ color: GLASS_BODY_COLOR }}
                 >
                   {isEditing
-                    ? 'Mettez à jour les informations de votre rendez-vous.'
-                    : 'Ajoutez les informations de votre rendez-vous.'}
+                    ? t('health.appointment.editHint')
+                    : t('health.appointment.newHint')}
                 </Text>
               </View>
               <View>
                 <Pressable
-                  accessibilityLabel="Fermer"
+                  accessibilityLabel={t('common.close')}
                   accessibilityRole="button"
                   hitSlop={8}
                   onPress={onCancel}
@@ -234,7 +235,7 @@ export function AppointmentFormModal({
 
             <IconInput
               icon="calendar-clear-outline"
-              placeholder="Titre — ex. Écho T2"
+              placeholder={t('health.appointment.titlePlaceholder')}
               value={title}
               onChangeText={setTitle}
               accent={accent}
@@ -247,7 +248,7 @@ export function AppointmentFormModal({
                   className="text-[14px] font-semibold"
                   style={{ color: GLASS_TITLE_COLOR }}
                 >
-                  Date
+                  {t('health.appointment.date')}
                 </Text>
               </View>
               <WheelDatePicker
@@ -268,7 +269,7 @@ export function AppointmentFormModal({
                   className="text-[14px] font-semibold"
                   style={{ color: GLASS_TITLE_COLOR }}
                 >
-                  Heure
+                  {t('health.appointment.time')}
                 </Text>
               </View>
               <WheelTimePicker value={time} onChange={setTime} compact />
@@ -276,7 +277,7 @@ export function AppointmentFormModal({
 
             <IconInput
               icon="document-text-outline"
-              placeholder="Adresse, notes… (facultatif)"
+              placeholder={t('health.appointment.addressPlaceholder')}
               value={address}
               onChangeText={setAddress}
               accent={accent}
@@ -294,7 +295,7 @@ export function AppointmentFormModal({
                   className="flex-1 text-[14px]"
                   style={{ color: GLASS_TITLE_COLOR }}
                 >
-                  Visible par les deux parents
+                  {t('health.appointment.visibleToParents')}
                 </Text>
                 <ToggleSwitch value={isShared} onValueChange={setIsShared} />
               </View>
@@ -304,11 +305,11 @@ export function AppointmentFormModal({
               label={
                 isEditing
                   ? isSaving
-                    ? 'Enregistrement…'
-                    : 'Enregistrer les modifications'
+                    ? t('common.saving')
+                    : t('health.appointment.saveChanges')
                   : isSaving
-                    ? 'Ajout en cours…'
-                    : 'Ajouter au calendrier'
+                    ? t('health.appointment.adding')
+                    : t('health.appointment.addToCalendar')
               }
               icon={isEditing ? 'save-outline' : 'calendar-outline'}
               size="compact"
@@ -335,7 +336,7 @@ export function AppointmentFormModal({
                   className="text-[14.5px] font-semibold"
                   style={{ color: GLASS_TITLE_COLOR }}
                 >
-                  Annuler
+                  {t('common.cancel')}
                 </Text>
               </Pressable>
               {isEditing && onDelete ? (
@@ -349,7 +350,7 @@ export function AppointmentFormModal({
                 >
                   <Ionicons name="trash-outline" size={16} color="#d14b3a" />
                   <Text className="text-[14.5px] font-semibold text-[#d14b3a]">
-                    {isDeleting ? 'Suppression…' : 'Supprimer'}
+                    {isDeleting ? t('common.deleting') : t('common.delete')}
                   </Text>
                 </Pressable>
               ) : null}

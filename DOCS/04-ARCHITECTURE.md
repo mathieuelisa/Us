@@ -62,6 +62,43 @@ projet — il fonctionne et reste trivial à remplacer.
 
 Règle simple : si la donnée doit survivre à un redémarrage de l'app ou être partagée entre utilisateurs → Supabase + TanStack Query. Sinon → Jotai.
 
+## Langues (i18n)
+
+Depuis le 2026-11-18 (demande explicite, en avance sur la V2), l'interface
+existe en **français** (référence), **anglais** et **espagnol** (« tú »).
+`i18next` + `react-i18next`, langue du téléphone par `expo-localization`
+(module natif : un nouveau build est nécessaire).
+
+- **Fichiers** : `src/i18n/locales/{fr,en,es}/<domaine>.ts`, un domaine par
+  pilier/écran (`hub`, `health`, `procedures`…). Le français fixe la forme :
+  `en` et `es` sont typés `Messages['<domaine>']`, une clé manquante ou en
+  trop ne compile pas. `i18next.d.ts` type les clés de `t()`.
+- **Dans un composant** : `const { t } = useTranslation()` puis
+  `t('hub.greeting')`. Pluriels i18next (`_one` / `_other`, avec `count`).
+- **Constantes hors composant** : elles stockent la **clé** (type
+  `TranslationKey`, `src/i18n/types.ts`) et l'écran la traduit au rendu —
+  jamais `i18n.t()` au chargement du module, qui figerait la langue.
+- **Messages calculés hors rendu** (erreurs d'Auth, de paiement, de code
+  d'invitation) : `i18n.t()` global, au moment de l'erreur.
+- **Dates** : `useLocale()` donne l'étiquette `Intl` (`fr-FR`, `en-GB`,
+  `es-ES`, ou celle du téléphone s'il parle déjà la langue) ; les fonctions
+  de formatage la reçoivent **en paramètre**. Avec le React Compiler, une
+  fonction qui lirait la langue en global garderait un résultat mémorisé
+  après un changement de langue. Helpers communs : `src/i18n/format.ts`
+  (initiales des jours, noms des mois, « 16 novembre »).
+- **Choix de la langue** : Réglages → « Langue » (feuille basse). Appliqué
+  tout de suite (`setAppLanguage`), copié en local (AsyncStorage, pour
+  l'écran de connexion) et enregistré dans `profiles.language` (`null` =
+  langue du téléphone, repli sur le français). Personnel : chaque parent a
+  la sienne. Le profil fait foi à la connexion (`AuthGate`).
+- **Données partagées** : une valeur **enregistrée** reste en français
+  (besoins rapides de `need_note`, segments du suivi bébé, suggestions des
+  Infos importantes) — seul son affichage est traduit, pour que l'autre
+  parent la relise quelle que soit sa langue.
+- **Restent en français** : contenus en base, astuces et conseils de santé,
+  textes légaux, push serveur, module « Votre bébé » — voir
+  [dette n°63–66](./05-DETTE-ET-POINTS-OUVERTS.md).
+
 ## Thématisation
 
 Le design distinguait le fond « vue personne enceinte » (`#EAF5F0`) du fond

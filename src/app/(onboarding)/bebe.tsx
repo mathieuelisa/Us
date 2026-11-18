@@ -1,8 +1,8 @@
 import { router } from 'expo-router';
 import { useAtom } from 'jotai';
+import { useTranslation } from 'react-i18next';
 import { Image, Text, View } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
-
 import { DatePickerCalendar } from '@/components/date-picker-calendar';
 import { OnboardingStepShell } from '@/components/onboarding/step-shell';
 import { YesNoChoice } from '@/components/onboarding/yes-no-choice';
@@ -38,6 +38,7 @@ const COUNTDOWN_BEAR = require('@/assets/images/Baby_said_hi.png');
  * bloque « Suivant » avec une explication.
  */
 export default function BabyArrivalStep() {
+  const { t } = useTranslation();
   const [draft, setDraft] = useAtom(onboardingDraftAtom);
   const accent = useThemeAccent();
   const today = todayIso();
@@ -47,8 +48,8 @@ export default function BabyArrivalStep() {
   return (
     <OnboardingStepShell
       step={3}
-      title={'Quelle est la date prévue du\u00a0terme\u00a0?'}
-      primaryLabel="Suivant"
+      title={t('onboarding.dueDate.title')}
+      primaryLabel={t('onboarding.next')}
       isPrimaryDisabled={
         draft.dueDate === null || isDueDateInPast || draft.isFirstChild === null
       }
@@ -66,7 +67,7 @@ export default function BabyArrivalStep() {
         />
         {isDueDateInPast ? (
           <Text className="px-1 text-[12.5px] text-[#c9553d]">
-            La date du terme doit être aujourd’hui ou plus tard.
+            {t('onboarding.dueDate.mustBeFuture')}
           </Text>
         ) : draft.dueDate ? (
           <CountdownCard
@@ -80,7 +81,7 @@ export default function BabyArrivalStep() {
 
       <View className="gap-2.5 pt-4">
         <Text className="text-[14px] font-medium text-[#1a1a1a]">
-          Est-ce votre premier enfant ?
+          {t('onboarding.dueDate.firstChild')}
         </Text>
         <YesNoChoice
           value={draft.isFirstChild}
@@ -106,14 +107,13 @@ function CountdownCard({
   today: string;
   accent: string;
 }) {
+  const { t } = useTranslation();
   const days = daysBetween(today, dueDate);
   const weeks = getWeeksOfAmenorrhea(dueDate, today);
   const title =
     days === 0
-      ? 'C’est pour aujourd’hui 💗'
-      : days === 1
-        ? 'Plus qu’un jour avant la rencontre 💗'
-        : `Plus que ${days} jours avant la rencontre 💗`;
+      ? t('onboarding.dueDate.today')
+      : t('onboarding.dueDate.daysLeft', { count: days });
 
   return (
     <Animated.View
@@ -135,7 +135,7 @@ function CountdownCard({
         </Text>
         {weeks !== null ? (
           <Text className="text-[13px]" style={{ color: GLASS_BODY_COLOR }}>
-            Vous êtes à {weeks} semaine{weeks > 1 ? 's' : ''} d’aménorrhée.
+            {t('onboarding.dueDate.weeks', { count: weeks })}
           </Text>
         ) : null}
       </View>

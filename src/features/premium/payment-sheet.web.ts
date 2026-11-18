@@ -1,3 +1,5 @@
+import i18n from '@/i18n';
+
 /**
  * Le SDK Stripe React Native n'existe pas sur le web : le formulaire natif
  * n'est proposé que sur iOS et Android. Ce fichier évite que le bundle web
@@ -8,5 +10,5 @@ export const isPaymentSheetSupported = false;
 export async function payWithPaymentSheet(
   _clientSecret: string,
 ): Promise<'paid' | 'canceled'> {
-  throw new Error('Le paiement dans l’app n’est disponible que sur mobile.');
+  throw new Error(i18n.t('payment.errors.mobileOnly'));
 }

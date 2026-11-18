@@ -1,6 +1,6 @@
+import { useTranslation } from 'react-i18next';
 import { Image, Text, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
-
 import { ContractionAssistant } from '@/components/contractions/contraction-assistant';
 import { PremiumLockedScreen } from '@/components/hub/premium-locked-screen';
 import {
@@ -13,11 +13,9 @@ import { hexToRgba } from '@/lib/color';
 
 const VALISE_IMAGE = require('@/assets/images/Valise_maternite.png');
 
-const DESCRIPTION =
-  'Chronométrez vos contractions à deux, suivez leur rythme et sachez quand prendre la route de la maternité.';
+const DESCRIPTION = 'contractions.description';
 /** Espace « Seul·e » (demande explicite) : sans « à deux ». */
-const SOLO_DESCRIPTION =
-  'Chronométrez vos contractions, suivez leur rythme et sachez quand prendre la route de la maternité.';
+const SOLO_DESCRIPTION = 'contractions.descriptionSolo';
 
 /**
  * « Assistant Contractions & Départ Maternité » (demande explicite),
@@ -27,15 +25,16 @@ const SOLO_DESCRIPTION =
  * arrivée, le fermer révèle l'assistant.
  */
 export default function ContractionsScreen() {
+  const { t } = useTranslation();
   const accent = useThemeAccent();
-  const description = useIsSoloHousehold() ? SOLO_DESCRIPTION : DESCRIPTION;
+  const description = t(useIsSoloHousehold() ? SOLO_DESCRIPTION : DESCRIPTION);
 
   return (
     <PremiumLockedScreen
-      title="Assistant contractions"
+      title={t('contractions.lockedTitle')}
       image={VALISE_IMAGE}
       description={description}
-      paywallTitle="Débloquez l’assistant contractions"
+      paywallTitle={t('contractions.unlock')}
       header={<ContractionsHeader accent={accent} description={description} />}
       gridContent={({ isPaywallVisible }) => (
         <ContractionAssistant canShowDeparture={!isPaywallVisible} />
@@ -52,6 +51,7 @@ function ContractionsHeader({
   accent: string;
   description: string;
 }) {
+  const { t } = useTranslation();
   return (
     <View className="gap-4">
       <View className="min-h-[118px] justify-center">
@@ -72,7 +72,7 @@ function ContractionsHeader({
             className="text-[29px] font-extrabold leading-[35px]"
             style={{ color: GLASS_TITLE_COLOR, letterSpacing: -0.7 }}
           >
-            Contractions & départ
+            {t('contractions.title')}
           </Text>
           <Svg width={120} height={10} viewBox="0 0 120 10">
             <Path

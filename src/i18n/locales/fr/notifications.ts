@@ -1,0 +1,26 @@
+/** Rappels locaux (programmés sur le téléphone) et canaux Android. */
+export const notifications = {
+  channels: {
+    reminders: 'Rappels',
+    remindersHint: 'Rendez-vous et démarches',
+    partner: 'Votre partenaire',
+    partnerHint: 'Ce que partage l’autre parent',
+  },
+  appointmentTomorrow: 'Rendez-vous demain',
+  appointmentInHour: 'Rendez-vous dans 1 heure',
+  andOthers_one: '{{first}} et {{count}} autre',
+  andOthers_other: '{{first}} et {{count}} autres',
+  procedureEve: 'Plus qu’un jour',
+  procedureEveBody: 'Pensez à : {{title}}',
+  procedureDay: 'Dernier jour',
+  procedureDayBody: 'C’est aujourd’hui l’échéance : {{title}}',
+  monthProcedures_one: 'Une démarche à prévoir ce mois-ci',
+  monthProcedures_other: '{{count}} démarches à prévoir ce mois-ci',
+  pendingProcedures_one: 'Une démarche reste à faire',
+  pendingProcedures_other: '{{count}} démarches restent à faire',
+  vaccineBooster: 'Rappel {{name}}',
+  vaccineIn7Days: 'Vaccin de bébé dans 7 jours',
+  vaccineIn7DaysBody: '{{what}}, le {{date}}. Pensez à prendre rendez-vous.',
+  vaccineToday: 'Vaccin de bébé aujourd’hui',
+  vaccineTodayBody: '{{what}} est prévu aujourd’hui.',
+};

@@ -2,9 +2,9 @@ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { type Href, router } from 'expo-router';
 import type { ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Image, Text, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
-
 import { ContractionsIllustration } from '@/components/hub/contractions-illustration';
 import { NameCardsIllustration } from '@/components/hub/name-cards-illustration';
 import {
@@ -48,6 +48,7 @@ export function PremiumBenefits({
   accent: string;
   isSolo: boolean;
 }) {
+  const { t } = useTranslation();
   return (
     <View className="gap-4">
       <View className="gap-2 px-1 pt-1">
@@ -55,7 +56,7 @@ export function PremiumBenefits({
           className="text-[26px] font-extrabold leading-[32px]"
           style={{ color: GLASS_TITLE_COLOR, letterSpacing: -0.7 }}
         >
-          Vos avantages Premium
+          {t('premium.benefits.title')}
         </Text>
         <Svg width={92} height={10} viewBox="0 0 92 10">
           <Path
@@ -67,7 +68,7 @@ export function PremiumBenefits({
           />
         </Svg>
         <Text className="text-[15px]" style={{ color: GLASS_BODY_COLOR }}>
-          Profitez de toutes les fonctionnalités exclusives.
+          {t('premium.benefits.subtitle')}
         </Text>
       </View>
 
@@ -77,8 +78,8 @@ export function PremiumBenefits({
         id="bebe"
         accent={accent}
         waveColor={WAVE_PEACH}
-        title="Votre bébé"
-        subtitle="Croissance, biberons, allaitement, sommeil"
+        title={t('premium.benefits.baby')}
+        subtitle={t('premium.benefits.babySubtitle')}
         href="/bebe"
         illustration={<BearIllustration />}
       />
@@ -86,11 +87,11 @@ export function PremiumBenefits({
         id="prenoms"
         accent={accent}
         waveColor={WAVE_PINK}
-        title="Le match des prénoms"
+        title={t('premium.benefits.names')}
         subtitle={
           isSolo
-            ? 'Trouvez le prénom parfait'
-            : 'Trouvez le prénom parfait à deux'
+            ? t('premium.benefits.namesSubtitleSolo')
+            : t('premium.benefits.namesSubtitle')
         }
         href="/prenoms"
         illustration={<NameCardsIllustration />}
@@ -99,8 +100,8 @@ export function PremiumBenefits({
         id="contractions"
         accent={accent}
         waveColor={WAVE_MINT}
-        title="Assistant Contractions & Départ Maternité"
-        subtitle="Chronométrez, on vous dit quand partir"
+        title={t('premium.benefits.contractions')}
+        subtitle={t('premium.benefits.contractionsSubtitle')}
         href="/contractions"
         illustration={<ContractionsIllustration />}
       />
@@ -117,6 +118,7 @@ const CROWN_IMAGE = require('@/assets/images/Premium_crown.png');
  * posée sur la colline de devant.
  */
 function HeroBanner() {
+  const { t } = useTranslation();
   return (
     <View
       className="overflow-hidden rounded-[30px]"
@@ -193,12 +195,11 @@ function HeroBanner() {
               className="text-[12px] font-extrabold"
               style={{ color: PREMIUM_GREEN, letterSpacing: 0.8 }}
             >
-              ACTIF
+              {t('premium.benefits.active')}
             </Text>
           </View>
           <Text className="text-[17px] leading-[24px] text-white">
-            Accès illimité à toutes les fonctionnalités essentielles de votre
-            grossesse.
+            {t('premium.benefits.hero')}
           </Text>
         </View>
       </LinearGradient>
@@ -231,9 +232,10 @@ function BenefitCard({
   waveColor: string;
   accent: string;
 }) {
+  const { t } = useTranslation();
   return (
     <GlassCard
-      accessibilityLabel={`Ouvrir ${title}, inclus dans votre Premium`}
+      accessibilityLabel={t('premium.benefits.openA11y', { title })}
       accent={accent}
       onPress={() => router.push(href)}
     >
@@ -283,7 +285,9 @@ function BenefitCard({
             style={{ backgroundColor: PREMIUM_GREEN }}
           >
             <Ionicons name="lock-open" size={11} color={PREMIUM_GOLD} />
-            <Text className="text-[11.5px] font-bold text-white">Inclus</Text>
+            <Text className="text-[11.5px] font-bold text-white">
+              {t('premium.benefits.included')}
+            </Text>
           </View>
           <ChevronBubble accent={accent} />
         </View>

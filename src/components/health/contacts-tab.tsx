@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Pressable, Text, View } from 'react-native';
 import Animated, {
   FadeInDown,
@@ -86,6 +87,7 @@ export function ContactsTab({
   /** Bandeau de l'écran (`useFeedbackBanner` de `sante.tsx`). */
   onFeedback?: (tone: FeedbackBannerTone, message: string) => void;
 }) {
+  const { t } = useTranslation();
   const accent = useThemeAccent();
   const { data: contacts = [] } = useContacts(household);
   const createContact = useCreateContact(household);
@@ -126,13 +128,11 @@ export function ContactsTab({
       setFlashingId(null);
       setHiddenIds((current) => [...current, id]);
       deleteContact.mutate(id, {
-        onSuccess: () => onFeedback?.('success', `${name} supprimé`),
+        onSuccess: () =>
+          onFeedback?.('success', t('health.contacts.deleted', { name })),
         onError: () => {
           setHiddenIds((current) => current.filter((hidden) => hidden !== id));
-          onFeedback?.(
-            'error',
-            'Impossible de supprimer ce contact. Réessayez.',
-          );
+          onFeedback?.('error', t('health.contacts.deleteError'));
         },
       });
     }, DELETE_FLASH_MS);
@@ -174,8 +174,7 @@ export function ContactsTab({
             className="text-center text-[14px] leading-5"
             style={{ color: GLASS_BODY_COLOR }}
           >
-            Aucun contact pour l’instant. Ajoutez vos numéros utiles avec le
-            bouton en bas à droite.
+            {t('health.contacts.empty')}
           </Text>
         </View>
       ) : null}
@@ -204,13 +203,13 @@ export function ContactsTab({
                     {
                       onSuccess: () => {
                         setEditingId(null);
-                        onFeedback?.('success', `${values.name} modifié`);
+                        onFeedback?.(
+                          'success',
+                          t('health.contacts.updated', { name: values.name }),
+                        );
                       },
                       onError: () =>
-                        onFeedback?.(
-                          'error',
-                          'Impossible de modifier ce contact. Réessayez.',
-                        ),
+                        onFeedback?.('error', t('health.contacts.updateError')),
                     },
                   )
                 }
@@ -249,7 +248,9 @@ export function ContactsTab({
           >
             <Pressable
               accessibilityRole="button"
-              accessibilityLabel={`Modifier ${contact.name}`}
+              accessibilityLabel={t('health.contacts.editNamed', {
+                name: contact.name,
+              })}
               onPress={() => startEditing(contact.id)}
               className="flex-1 flex-row items-center gap-3 active:opacity-70"
             >
@@ -281,7 +282,7 @@ export function ContactsTab({
                         className="text-[10.5px] font-bold"
                         style={{ color: EMERGENCY_RED }}
                       >
-                        Urgence
+                        {t('health.contacts.emergency')}
                       </Text>
                     </View>
                   ) : null}
@@ -393,6 +394,7 @@ function ContactForm({
   onCancel: () => void;
   onSubmit: (values: ContactFormValues) => void;
 }) {
+  const { t } = useTranslation();
   const [name, setName] = useState(initial?.name ?? '');
   const [phone, setPhone] = useState(initial?.phone ?? '');
   const [isEmergency, setIsEmergency] = useState(initial?.isEmergency ?? false);
@@ -441,7 +443,7 @@ function ContactForm({
             className="text-[20px] font-extrabold leading-[26px]"
             style={{ color: GLASS_TITLE_COLOR, letterSpacing: -0.4 }}
           >
-            {isEditing ? 'Modifier le contact' : 'Nouveau contact'}
+            {isEditing ? t('health.contacts.edit') : t('health.contacts.new')}
           </Text>
           <Svg width={80} height={10} viewBox="0 0 80 10">
             <Path
@@ -458,15 +460,15 @@ function ContactForm({
           >
             {isSolo
               ? isEditing
-                ? 'Vos changements sont enregistrés.'
-                : 'Un numéro utile, toujours à portée de main.'
+                ? t('health.contacts.savedHint')
+                : t('health.contacts.newHint')
               : isEditing
-                ? 'Les changements sont partagés avec votre partenaire.'
-                : 'Un numéro utile, partagé avec votre partenaire.'}
+                ? t('health.contacts.sharedSavedHint')
+                : t('health.contacts.sharedNewHint')}
           </Text>
         </View>
         <Pressable
-          accessibilityLabel="Fermer"
+          accessibilityLabel={t('common.close')}
           accessibilityRole="button"
           hitSlop={8}
           onPress={onCancel}
@@ -485,7 +487,7 @@ function ContactForm({
 
       <IconInput
         icon="person-outline"
-        placeholder="Nom — ex. Dr Martin"
+        placeholder={t('health.contacts.namePlaceholder')}
         value={name}
         onChangeText={setName}
         accent={accent}
@@ -496,7 +498,7 @@ function ContactForm({
       <View className="gap-1.5">
         <IconInput
           icon="call-outline"
-          placeholder="Téléphone"
+          placeholder={t('health.contacts.phone')}
           value={phone}
           // Espaces ajoutés pendant la saisie : « 01 89 87 72 89 ».
           onChangeText={(text) => setPhone(formatPhoneNumber(text))}
@@ -506,8 +508,8 @@ function ContactForm({
         {showPhoneHint ? (
           <Text className="px-4 text-[12.5px] text-[#c9553d]">
             {phoneDigitCount === 0
-              ? 'Ajoutez un numéro de téléphone pour enregistrer le contact.'
-              : 'Numéro trop court.'}
+              ? t('health.contacts.phoneRequired')
+              : t('health.contacts.phoneTooShort')}
           </Text>
         ) : null}
       </View>
@@ -527,10 +529,10 @@ function ContactForm({
           className="flex-1 text-[14px]"
           style={{ color: GLASS_TITLE_COLOR }}
         >
-          Numéro d’urgence
+          {t('health.contacts.emergencyNumber')}
         </Text>
         <ToggleSwitch
-          accessibilityLabel="Numéro d’urgence"
+          accessibilityLabel={t('health.contacts.emergencyNumber')}
           value={isEmergency}
           onValueChange={setIsEmergency}
           onColor={EMERGENCY_RED}
@@ -541,11 +543,11 @@ function ContactForm({
         label={
           isEditing
             ? isPending
-              ? 'Enregistrement…'
-              : 'Enregistrer'
+              ? t('common.saving')
+              : t('common.save')
             : isPending
-              ? 'Ajout en cours…'
-              : 'Ajouter le contact'
+              ? t('health.appointment.adding')
+              : t('health.contacts.add')
         }
         icon={isEditing ? 'save-outline' : 'person-add-outline'}
         size="compact"
@@ -568,7 +570,7 @@ function ContactForm({
           className="text-[14.5px] font-semibold"
           style={{ color: GLASS_TITLE_COLOR }}
         >
-          Annuler
+          {t('common.cancel')}
         </Text>
       </Pressable>
     </View>

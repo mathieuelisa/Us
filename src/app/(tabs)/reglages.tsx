@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { type ComponentProps, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
@@ -11,6 +12,7 @@ import {
   ChangePasswordModal,
   DeleteAccountModal,
 } from '@/components/settings/account-modals';
+import { LanguageSheet } from '@/components/settings/language-sheet';
 import { NotificationSettings } from '@/components/settings/notification-settings';
 import { ShareAppCard } from '@/components/settings/share-app-card';
 import {
@@ -23,7 +25,10 @@ import {
 import { ScreenCornerShapes } from '@/components/ui/screen-corner-shapes';
 import { signOut } from '@/features/auth/api';
 import { useIsSoloHousehold } from '@/features/household/hooks';
-import { useUpdateMyTheme } from '@/features/profile/hooks';
+import {
+  useUpdateMyLanguage,
+  useUpdateMyTheme,
+} from '@/features/profile/hooks';
 import {
   resolveThemeId,
   THEME_OPTIONS,
@@ -31,6 +36,9 @@ import {
 } from '@/features/settings/constants';
 import { useThemeAccent, useThemeBackground } from '@/features/settings/hooks';
 import { homeTourReplayAtom } from '@/features/tour/targets';
+import { setAppLanguage } from '@/i18n';
+import { useAppLanguage } from '@/i18n/hooks';
+import { type AppLanguage, LANGUAGE_OPTIONS } from '@/i18n/languages';
 import { currentRoleAtom } from '@/lib/atoms/role';
 import { sessionAtom } from '@/lib/atoms/session';
 import { hexToRgba, lightenHex } from '@/lib/color';
@@ -45,28 +53,36 @@ type IoniconName = ComponentProps<typeof Ionicons>['name'];
  * DOCS/05-DETTE-ET-POINTS-OUVERTS.md) ; ces liens ouvrent un écran qui le
  * dit franchement plutôt qu'un contenu inventé.
  */
-const LEGAL_LINKS: { doc: string; label: string; icon: IoniconName }[] = [
+const LEGAL_LINKS = [
   {
     doc: 'privacy',
-    label: 'Politique de confidentialité',
+    labelKey: 'settings.privacy.privacyPolicy',
     icon: 'lock-closed-outline',
   },
   {
     doc: 'terms',
-    label: "Conditions d'utilisation",
+    labelKey: 'settings.privacy.terms',
     icon: 'document-text-outline',
   },
   {
     doc: 'legal-notice',
-    label: 'Mentions légales',
+    labelKey: 'settings.privacy.legalNotice',
     icon: 'chatbubbles-outline',
   },
-];
+] as const satisfies readonly {
+  doc: string;
+  labelKey: string;
+  icon: IoniconName;
+}[];
 
 /**
  * Écran 10a — Réglages. Périmètre strict du plan d'action §1.7 : personnels
  * et non partagés (déjà garanti par la RLS `profiles_update_own`, juste
- * rappelé ici), 3-4 thèmes visuels prédéfinis, pas de sélecteur de langue.
+ * rappelé ici), 3-4 thèmes visuels prédéfinis.
+ *
+ * **Langue** (2026-11-18, demande explicite, en avance sur la V2) :
+ * français, anglais ou espagnol, dans une feuille basse. Appliquée tout
+ * de suite (`setAppLanguage`), puis enregistrée dans le profil.
  *
  * Section **Compte** (ajout du 2026-11-11, avec le passage à la connexion
  * par mot de passe) : email de connexion et moyen utilisé, changement de mot
@@ -87,6 +103,10 @@ const LEGAL_LINKS: { doc: string; label: string; icon: IoniconName }[] = [
  * Pas de bouton retour malgré la capture : c'est un onglet racine.
  */
 export default function SettingsScreen() {
+  const { t } = useTranslation();
+  const language = useAppLanguage();
+  const updateLanguage = useUpdateMyLanguage();
+  const [isLanguageSheetOpen, setIsLanguageSheetOpen] = useState(false);
   const requestHomeTour = useSetAtom(homeTourReplayAtom);
   // Place de la barre du bas, qui flotte au-dessus du contenu.
   const tabBarInset = useTabBarContentInset();
@@ -124,6 +144,16 @@ export default function SettingsScreen() {
     }
   };
 
+  const selectLanguage = (next: AppLanguage) => {
+    setIsLanguageSheetOpen(false);
+    setAppLanguage(next);
+    if (session?.user.id) {
+      updateLanguage.mutate(next);
+    }
+  };
+  const languageLabel =
+    LANGUAGE_OPTIONS.find((option) => option.id === language)?.label ?? '';
+
   // Hors ligne, `signOut()` se rabat sur une déconnexion locale. Le
   // nettoyage du cache suit le changement de compte (`useApplySession`,
   // layout racine).
@@ -156,15 +186,13 @@ export default function SettingsScreen() {
               className="text-[30px] font-extrabold leading-9"
               style={{ color: GLASS_TITLE_COLOR, letterSpacing: -0.6 }}
             >
-              Réglages
+              {t('settings.title')}
             </Text>
             <Text
               className="text-[14px] leading-5"
               style={{ color: GLASS_BODY_COLOR }}
             >
-              {isSolo
-                ? 'Personnels.'
-                : 'Personnels — non partagés avec votre partenaire.'}
+              {isSolo ? t('settings.subtitleSolo') : t('settings.subtitle')}
             </Text>
             <Svg width={110} height={12} viewBox="0 0 110 12">
               <Path
@@ -181,7 +209,7 @@ export default function SettingsScreen() {
         <View className="gap-3.5">
           <SectionTitle
             icon="person-circle-outline"
-            label="Compte"
+            label={t('settings.account.section')}
             accent={accent}
           />
           <View
@@ -214,19 +242,19 @@ export default function SettingsScreen() {
                   style={{ color: GLASS_TITLE_COLOR }}
                   numberOfLines={1}
                 >
-                  {user?.email ?? 'Mode DEV — aucun compte connecté'}
+                  {user?.email ?? t('settings.account.noAccount')}
                 </Text>
                 <Text
                   className="text-[12.5px]"
                   style={{ color: GLASS_BODY_COLOR }}
                 >
                   {!user
-                    ? 'Connectez-vous pour gérer votre compte.'
+                    ? t('settings.account.signInToManage')
                     : isGoogle && hasPassword
-                      ? 'Connexion par Google ou mot de passe'
+                      ? t('settings.account.viaGoogleOrPassword')
                       : isGoogle
-                        ? 'Connexion avec Google'
-                        : 'Connexion par email et mot de passe'}
+                        ? t('settings.account.viaGoogle')
+                        : t('settings.account.viaPassword')}
                 </Text>
               </View>
             </View>
@@ -234,7 +262,7 @@ export default function SettingsScreen() {
             {user && hasPassword ? (
               <AccountRow
                 icon="key-outline"
-                label="Changer le mot de passe"
+                label={t('settings.account.changePassword')}
                 accent={accent}
                 onPress={() => setIsPasswordModalOpen(true)}
               />
@@ -245,7 +273,7 @@ export default function SettingsScreen() {
         <View className="gap-3.5">
           <SectionTitle
             icon="notifications-outline"
-            label="Notifications"
+            label={t('settings.notifications.section')}
             accent={accent}
           />
           <NotificationSettings
@@ -288,7 +316,7 @@ export default function SettingsScreen() {
           />
           <SectionTitle
             icon="color-palette-outline"
-            label="Apparence"
+            label={t('settings.appearance.section')}
             accent={accent}
           />
 
@@ -296,7 +324,7 @@ export default function SettingsScreen() {
             {THEME_OPTIONS.map((option) => (
               <ThemeSwatch
                 key={option.id}
-                label={option.label}
+                label={t(`settings.appearance.themes.${option.id}`)}
                 color={option.accent}
                 isSelected={option.id === selectedThemeId}
                 onPress={() => selectTheme(option.id)}
@@ -305,25 +333,41 @@ export default function SettingsScreen() {
           </View>
         </View>
 
-        <View
-          className="flex-row items-center gap-3.5 rounded-[24px] px-3.5 py-3"
-          style={{ backgroundColor: hexToRgba(accent, 0.08) }}
+        <GlassCard
+          accessibilityLabel={t('settings.language.a11y', {
+            value: languageLabel,
+          })}
+          accent={accent}
+          onPress={() => setIsLanguageSheetOpen(true)}
         >
-          <View className="h-10 w-10 items-center justify-center rounded-full bg-white">
-            <Ionicons name="globe-outline" size={20} color={accent} />
+          <View className="flex-row items-center gap-3.5 px-3.5 py-3">
+            <View
+              className="h-11 w-11 items-center justify-center rounded-2xl"
+              style={{ backgroundColor: hexToRgba(accent, 0.1) }}
+            >
+              <Ionicons name="globe-outline" size={22} color={accent} />
+            </View>
+            <View className="flex-1 gap-0.5">
+              <Text
+                className="text-[15.5px] font-medium"
+                style={{ color: GLASS_TITLE_COLOR }}
+              >
+                {t('settings.language.label')}
+              </Text>
+              <Text
+                className="text-[12.5px]"
+                style={{ color: GLASS_BODY_COLOR }}
+              >
+                {languageLabel}
+              </Text>
+            </View>
+            <Ionicons name="chevron-forward" size={18} color="#a8a8b3" />
           </View>
-          <Text
-            className="flex-1 text-[13px] leading-[18px]"
-            style={{ color: GLASS_BODY_COLOR }}
-          >
-            L’application reste en français pour l’instant — pas de sélecteur de
-            langue.
-          </Text>
-        </View>
+        </GlassCard>
 
         {/* Relance la visite guidée de l'accueil (demande explicite). */}
         <GlassCard
-          accessibilityLabel="Revoir la visite guidée de l’accueil"
+          accessibilityLabel={t('settings.tour.a11y')}
           accent={accent}
           onPress={() => {
             router.navigate('/');
@@ -342,13 +386,13 @@ export default function SettingsScreen() {
                 className="text-[15.5px] font-medium"
                 style={{ color: GLASS_TITLE_COLOR }}
               >
-                Revoir la visite guidée
+                {t('settings.tour.label')}
               </Text>
               <Text
                 className="text-[12.5px]"
                 style={{ color: GLASS_BODY_COLOR }}
               >
-                Redécouvrez l’accueil en quelques étapes
+                {t('settings.tour.hint')}
               </Text>
             </View>
             <Ionicons name="chevron-forward" size={18} color="#a8a8b3" />
@@ -370,14 +414,14 @@ export default function SettingsScreen() {
         <View className="gap-3.5">
           <SectionTitle
             icon="shield-checkmark"
-            label="Confidentialité"
+            label={t('settings.privacy.section')}
             accent={accent}
           />
           <View className="gap-3">
             {LEGAL_LINKS.map((link) => (
               <GlassCard
                 key={link.doc}
-                accessibilityLabel={link.label}
+                accessibilityLabel={t(link.labelKey)}
                 accent={accent}
                 onPress={() => router.push(`/legal?doc=${link.doc}`)}
               >
@@ -392,7 +436,7 @@ export default function SettingsScreen() {
                     className="flex-1 text-[15.5px] font-medium"
                     style={{ color: GLASS_TITLE_COLOR }}
                   >
-                    {link.label}
+                    {t(link.labelKey)}
                   </Text>
                   <Ionicons name="chevron-forward" size={18} color="#a8a8b3" />
                 </View>
@@ -419,7 +463,9 @@ export default function SettingsScreen() {
             className="text-[16.5px] font-semibold"
             style={{ color: accent }}
           >
-            {isSigningOut ? 'Déconnexion…' : 'Se déconnecter'}
+            {isSigningOut
+              ? t('settings.account.signingOut')
+              : t('settings.account.signOut')}
           </Text>
         </Pressable>
 
@@ -431,7 +477,7 @@ export default function SettingsScreen() {
           >
             <Ionicons name="trash-outline" size={17} color="#d14b3a" />
             <Text className="text-[14.5px] font-semibold text-[#d14b3a]">
-              Supprimer mon compte
+              {t('settings.account.deleteAccount')}
             </Text>
           </Pressable>
         ) : null}
@@ -439,6 +485,13 @@ export default function SettingsScreen() {
         <DashedLoopDoodle color={accent} />
       </ScrollView>
 
+      <LanguageSheet
+        visible={isLanguageSheetOpen}
+        selected={language}
+        accent={accent}
+        onSelect={selectLanguage}
+        onClose={() => setIsLanguageSheetOpen(false)}
+      />
       <ChangePasswordModal
         visible={isPasswordModalOpen}
         onClose={() => setIsPasswordModalOpen(false)}
@@ -541,10 +594,11 @@ function ThemeSwatch({
   isSelected: boolean;
   onPress: () => void;
 }) {
+  const { t } = useTranslation();
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`Thème ${label}`}
+      accessibilityLabel={t('settings.appearance.themeLabel', { label })}
       accessibilityState={{ selected: isSelected }}
       onPress={onPress}
       className="items-center gap-2"

@@ -1,8 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useAtomValue } from 'jotai';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Pressable, Text, View } from 'react-native';
-
 import { AppointmentFormModal } from '@/components/health/appointment-form-modal';
 import { MonthCalendar } from '@/components/health/month-calendar';
 import { PillButton } from '@/components/ui/pill-button';
@@ -15,6 +15,7 @@ import {
   useUpdateAppointment,
 } from '@/features/health/hooks';
 import type { Household } from '@/features/household/api';
+import { useLocale } from '@/i18n/hooks';
 import { sessionAtom } from '@/lib/atoms/session';
 import { todayIso } from '@/lib/date';
 
@@ -35,6 +36,8 @@ export function AppointmentsTab({
 }: {
   household: Household | null | undefined;
 }) {
+  const { t } = useTranslation();
+  const locale = useLocale();
   const currentUserId = useAtomValue(sessionAtom)?.user.id ?? null;
   const { data: appointments = [] } = useAppointments(household);
   const createAppointment = useCreateAppointment(household);
@@ -96,12 +99,12 @@ export function AppointmentsTab({
 
       <View className="gap-2.5">
         <Text className="text-[11.5px] font-semibold tracking-wide text-[#8a8a8a]">
-          VOS PROCHAINS RENDEZ-VOUS
+          {t('health.appointment.upcoming')}
         </Text>
 
         {upcoming.length === 0 ? (
           <Text className="text-[13px] text-[#9a9a9a]">
-            Aucun rendez-vous à venir.
+            {t('health.appointment.none')}
           </Text>
         ) : (
           upcoming.map((appointment) => {
@@ -111,7 +114,11 @@ export function AppointmentsTab({
                 key={appointment.id}
                 accessibilityRole={isMine ? 'button' : undefined}
                 accessibilityLabel={
-                  isMine ? `Modifier ${appointment.title}` : undefined
+                  isMine
+                    ? t('health.appointment.editNamed', {
+                        title: appointment.title,
+                      })
+                    : undefined
                 }
                 disabled={!isMine}
                 onPress={() => openEditor(appointment)}
@@ -138,13 +145,15 @@ export function AppointmentsTab({
                             : 'text-[#6b6b6b]'
                         }`}
                       >
-                        {appointment.is_shared ? 'Partagé' : 'Non partagé'}
+                        {appointment.is_shared
+                          ? t('health.appointment.shared')
+                          : t('health.appointment.notShared')}
                       </Text>
                     </View>
                   ) : (
                     <View className="rounded-full bg-accent/10 px-2 py-0.5">
                       <Text className="text-[10.5px] font-medium text-accent">
-                        De votre partenaire
+                        {t('health.appointment.fromPartner')}
                       </Text>
                     </View>
                   )}
@@ -158,6 +167,7 @@ export function AppointmentsTab({
                   {formatAppointmentSummary(
                     appointment.appointment_date,
                     appointment.appointment_time,
+                    locale,
                   )}
                   {appointment.address ? ` — ${appointment.address}` : ''}
                 </Text>
@@ -168,7 +178,7 @@ export function AppointmentsTab({
 
         <View className="mt-2">
           <PillButton
-            label="Ajouter un rendez-vous"
+            label={t('health.appointment.add')}
             icon="add-circle-outline"
             onPress={() => openFormFor(null)}
           />

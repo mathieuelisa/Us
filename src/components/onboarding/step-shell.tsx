@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { type ReactNode, useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { BackHandler, Pressable, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
@@ -95,6 +96,7 @@ export function OnboardingStepShell({
    */
   hero?: ReactNode;
 }) {
+  const { t } = useTranslation();
   const router = useRouter();
   const backgroundColor = useThemeBackground();
   const accent = useThemeAccent();
@@ -155,8 +157,8 @@ export function OnboardingStepShell({
         <Pressable
           accessibilityLabel={
             router.canGoBack()
-              ? 'Revenir à l’étape précédente'
-              : 'Quitter l’onboarding et revenir à la connexion'
+              ? t('onboarding.backToPreviousStep')
+              : t('onboarding.quitToLogin')
           }
           accessibilityRole="button"
           hitSlop={12}
@@ -191,7 +193,10 @@ export function OnboardingStepShell({
               ))}
             </View>
             <Text className="text-[13px]" style={{ color: GLASS_BODY_COLOR }}>
-              Étape {step} sur {ONBOARDING_STEP_COUNT}
+              {t('onboarding.stepOf', {
+                step,
+                total: ONBOARDING_STEP_COUNT,
+              })}
             </Text>
           </View>
         )}

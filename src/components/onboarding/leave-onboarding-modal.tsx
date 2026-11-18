@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Modal, Pressable, Text, View } from 'react-native';
 import Animated, {
   FadeIn,
@@ -7,7 +8,6 @@ import Animated, {
   SlideOutDown,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
 import {
   GLASS_BODY_COLOR,
   GLASS_TITLE_COLOR,
@@ -54,6 +54,7 @@ export function LeaveOnboardingModal({
   accent: string;
   onClose: () => void;
 }) {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const { data: household } = useMyHousehold();
   // `null` = résolu, sans foyer ; `undefined` = pas encore chargé.
@@ -78,7 +79,7 @@ export function LeaveOnboardingModal({
     try {
       await signOut();
     } catch {
-      setErrorMessage('Impossible de vous déconnecter. Réessayez.');
+      setErrorMessage(t('onboarding.leave.signOutError'));
       setIsBusy(false);
     }
   };
@@ -90,9 +91,7 @@ export function LeaveOnboardingModal({
       // La session tombe : le layout racine renvoie vers la connexion.
       await deleteMyAccount();
     } catch {
-      setErrorMessage(
-        'La suppression a échoué. Vérifiez votre connexion et réessayez.',
-      );
+      setErrorMessage(t('onboarding.leave.deleteFailed'));
       setIsBusy(false);
     }
   };
@@ -143,7 +142,7 @@ export function LeaveOnboardingModal({
                   className="flex-1 text-[20px] font-extrabold"
                   style={{ color: GLASS_TITLE_COLOR }}
                 >
-                  Revenir à la connexion ?
+                  {t('onboarding.leave.title')}
                 </Text>
               </View>
 
@@ -151,8 +150,7 @@ export function LeaveOnboardingModal({
                 className="text-[14px] leading-5"
                 style={{ color: GLASS_BODY_COLOR }}
               >
-                Vous serez déconnecté. Votre compte est conservé : en vous
-                reconnectant, vous reprendrez l’inscription depuis le début.
+                {t('onboarding.leave.body')}
               </Text>
 
               {errorMessage ? (
@@ -163,7 +161,7 @@ export function LeaveOnboardingModal({
 
               <View className="gap-1">
                 <PillButton
-                  label="Rester"
+                  label={t('onboarding.leave.stay')}
                   onPress={onClose}
                   isDisabled={isBusy}
                 />
@@ -178,7 +176,9 @@ export function LeaveOnboardingModal({
                     className="text-[14px] font-semibold"
                     style={{ color: GLASS_TITLE_COLOR }}
                   >
-                    {isBusy ? 'Déconnexion…' : 'Revenir à la connexion'}
+                    {isBusy
+                      ? t('onboarding.leave.signingOut')
+                      : t('onboarding.backToLogin')}
                   </Text>
                 </Pressable>
                 {canDeleteAccount ? (
@@ -197,7 +197,7 @@ export function LeaveOnboardingModal({
                       className="text-[13px] font-semibold"
                       style={{ color: DANGER_RED }}
                     >
-                      Supprimer mon compte
+                      {t('onboarding.leave.deleteAccount')}
                     </Text>
                   </Pressable>
                 ) : null}
@@ -220,7 +220,7 @@ export function LeaveOnboardingModal({
                   className="flex-1 text-[20px] font-extrabold"
                   style={{ color: GLASS_TITLE_COLOR }}
                 >
-                  Supprimer votre compte ?
+                  {t('onboarding.leave.deleteTitle')}
                 </Text>
               </View>
 
@@ -232,14 +232,13 @@ export function LeaveOnboardingModal({
                   className="text-[14px] leading-5"
                   style={{ color: GLASS_TITLE_COLOR }}
                 >
-                  Votre compte et votre profil seront effacés. Vous pourrez
-                  recréer un compte plus tard avec la même adresse email.
+                  {t('onboarding.leave.deleteBody')}
                 </Text>
                 <Text
                   className="text-[13px] font-semibold"
                   style={{ color: DANGER_RED }}
                 >
-                  C’est définitif : rien ne pourra être récupéré.
+                  {t('onboarding.leave.final')}
                 </Text>
               </View>
 
@@ -262,7 +261,9 @@ export function LeaveOnboardingModal({
                   }}
                 >
                   <Text className="text-[15px] font-bold text-white">
-                    {isBusy ? 'Suppression…' : 'Supprimer définitivement'}
+                    {isBusy
+                      ? t('onboarding.leave.deleting')
+                      : t('onboarding.leave.deleteConfirm')}
                   </Text>
                 </Pressable>
                 <Pressable
@@ -275,7 +276,7 @@ export function LeaveOnboardingModal({
                     className="text-[14px] font-semibold"
                     style={{ color: GLASS_TITLE_COLOR }}
                   >
-                    Annuler
+                    {t('common.cancel')}
                   </Text>
                 </Pressable>
               </View>

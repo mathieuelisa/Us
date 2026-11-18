@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { type ComponentProps, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Image,
   type ImageSourcePropType,
@@ -69,7 +70,7 @@ export function NameListScreen({
   emptyTitle,
   emptyText,
   image,
-  itemNoun,
+  formatCount,
   sectionSubtitle,
   onRemove,
   onAddName,
@@ -84,13 +85,14 @@ export function NameListScreen({
   /** Illustration 3D de la liste (celle de l'entrée du jeu). */
   image: ImageSourcePropType;
   /** Nom d'un élément pour le compteur : « 1 favori », « 2 favoris ». */
-  itemNoun: { singular: string; plural: string };
+  formatCount: (count: number) => string;
   /** Sous-titre de la section d'un genre, ex. « Vos prénoms filles… ». */
   sectionSubtitle: (gender: NameGender) => string;
   onRemove?: (item: NameListItem) => void;
   /** Saisie libre d'un prénom ; rejette en cas d'échec. */
   onAddName?: (gender: NameGender, name: string) => Promise<void>;
 }) {
+  const { t } = useTranslation();
   // Tirer vers le bas recharge les données affichées.
   const refresh = usePullToRefresh();
   // Place de la barre du bas, qui flotte au-dessus du contenu.
@@ -159,7 +161,7 @@ export function NameListScreen({
           ) : null}
 
           <Pressable
-            accessibilityLabel="Revenir au match des prénoms"
+            accessibilityLabel={t('names.list.back')}
             accessibilityRole="button"
             hitSlop={12}
             onPress={() => router.navigate('/prenoms')}
@@ -214,7 +216,9 @@ export function NameListScreen({
         ) : null}
 
         {isLoading ? (
-          <Text className="text-[13px] text-[#9a9a9a]">Chargement…</Text>
+          <Text className="text-[13px] text-[#9a9a9a]">
+            {t('names.list.loading')}
+          </Text>
         ) : items.length === 0 ? (
           <Animated.View
             entering={FadeInDown.duration(320)}
@@ -273,7 +277,7 @@ export function NameListScreen({
                       className="text-[22px] font-extrabold"
                       style={{ color: GLASS_TITLE_COLOR, letterSpacing: -0.4 }}
                     >
-                      {meta.title}
+                      {t(`names.genderTitles.${gender}`)}
                     </Text>
                   </View>
                   <View
@@ -284,10 +288,7 @@ export function NameListScreen({
                       className="text-[12.5px] font-bold"
                       style={{ color: meta.color }}
                     >
-                      {genderItems.length}{' '}
-                      {genderItems.length > 1
-                        ? itemNoun.plural
-                        : itemNoun.singular}
+                      {formatCount(genderItems.length)}
                     </Text>
                   </View>
                 </View>
@@ -313,7 +314,7 @@ export function NameListScreen({
                     className="text-center text-[14px]"
                     style={{ color: GLASS_BODY_COLOR }}
                   >
-                    Rien côté {meta.label}s pour l’instant.
+                    {t(`names.list.nothing.${gender}`)}
                   </Text>
                 </View>
               ) : (
@@ -336,11 +337,10 @@ export function NameListScreen({
 const TOGGLE_PADDING = 5;
 const GENDER_OPTIONS: {
   value: NameGender;
-  label: string;
   icon: IoniconName;
 }[] = [
-  { value: 'boy', label: 'Garçons', icon: 'male' },
-  { value: 'girl', label: 'Filles', icon: 'female' },
+  { value: 'boy', icon: 'male' },
+  { value: 'girl', icon: 'female' },
 ];
 
 /**
@@ -359,6 +359,7 @@ function GenderToggle({
   counts: Record<NameGender, number>;
   onChange: (gender: NameGender) => void;
 }) {
+  const { t } = useTranslation();
   const [trackWidth, setTrackWidth] = useState(0);
   const selectedIndex = gender === 'boy' ? 0 : 1;
   const position = useSharedValue(selectedIndex);
@@ -425,7 +426,7 @@ function GenderToggle({
             key={option.value}
             accessibilityRole="tab"
             accessibilityState={{ selected: isActive }}
-            accessibilityLabel={`${option.label}, ${counts[option.value]}`}
+            accessibilityLabel={`${t(`names.gendersPlural.${option.value}`)}, ${counts[option.value]}`}
             onPress={() => onChange(option.value)}
             className="h-12 flex-1 flex-row items-center justify-center gap-2 rounded-full"
           >
@@ -434,7 +435,7 @@ function GenderToggle({
               className="text-[15.5px]"
               style={{ color, fontWeight: isActive ? '700' : '600' }}
             >
-              {option.label}
+              {t(`names.gendersPlural.${option.value}`)}
             </Text>
             {counts[option.value] > 0 ? (
               <View
@@ -472,6 +473,7 @@ function NameRow({
   item: NameListItem;
   onRemove?: (item: NameListItem) => void;
 }) {
+  const { t } = useTranslation();
   const meta = GENDER_META[item.gender];
   const countries = getNameCountries(
     findNameCountryIds(item.name, item.gender),
@@ -539,7 +541,7 @@ function NameRow({
               className="text-[12px] font-medium"
               style={{ color: GLASS_BODY_COLOR }}
             >
-              Ajouté par vous
+              {t('names.list.addedByYou')}
             </Text>
           </View>
         ) : null}
@@ -566,7 +568,7 @@ function NameRow({
       {onRemove ? (
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={`Retirer ${item.name} des favoris`}
+          accessibilityLabel={t('names.list.remove', { name: item.name })}
           hitSlop={8}
           onPress={() => onRemove(item)}
           className="h-11 w-11 items-center justify-center rounded-full active:opacity-60"

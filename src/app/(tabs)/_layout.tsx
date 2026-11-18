@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-
+import { useTranslation } from 'react-i18next';
 import { AppTabBar } from '@/components/navigation/tab-bar';
 import { useHouseholdRealtime } from '@/features/household/realtime';
 import { useNotifications } from '@/features/notifications/hooks';
@@ -71,6 +71,7 @@ const FOOTER_DESTINATIONS = ['premium'] as const;
  * change.
  */
 export default function TabsLayout() {
+  const { t } = useTranslation();
   // Mises à jour en direct des données de l'espace, tant que l'app est
   // ouverte (voir `useHouseholdRealtime`).
   useHouseholdRealtime();
@@ -82,10 +83,16 @@ export default function TabsLayout() {
       tabBar={(props) => <AppTabBar {...props} />}
       screenOptions={{ headerShown: false }}
     >
-      <Tabs.Screen name="index" options={{ title: 'Accueil' }} />
-      <Tabs.Screen name="profil" options={{ title: 'Profil' }} />
-      <Tabs.Screen name="informations" options={{ title: 'Infos' }} />
-      <Tabs.Screen name="reglages" options={{ title: 'Réglage' }} />
+      <Tabs.Screen name="index" options={{ title: t('hub.tabs.home') }} />
+      <Tabs.Screen name="profil" options={{ title: t('hub.tabs.profile') }} />
+      <Tabs.Screen
+        name="informations"
+        options={{ title: t('hub.tabs.info') }}
+      />
+      <Tabs.Screen
+        name="reglages"
+        options={{ title: t('hub.tabs.settings') }}
+      />
 
       {/* Destinations ouvertes depuis le hub, pas des onglets : la barre
           reste à 4 entrées fixes (CONCEPT.md). `href: null` les retire de

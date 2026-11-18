@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import Animated, { SlideInDown, SlideOutDown } from 'react-native-reanimated';
@@ -82,6 +83,7 @@ export function InfoItemFormModal({
     values: string[];
   }) => void;
 }) {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const accent = useThemeAccent();
   const [category, setCategory] = useState<InfoCategory | null>(null);
@@ -250,7 +252,7 @@ export function InfoItemFormModal({
                       className="text-[22px] font-extrabold leading-7"
                       style={{ color: GLASS_TITLE_COLOR, letterSpacing: -0.4 }}
                     >
-                      Que voulez-vous ajouter ?
+                      {t('household.form.whatToAdd')}
                     </Text>
                     <Svg width={96} height={10} viewBox="0 0 96 10">
                       <Path
@@ -269,8 +271,7 @@ export function InfoItemFormModal({
                   className="text-[13.5px] leading-[19px]"
                   style={{ color: GLASS_BODY_COLOR }}
                 >
-                  Sélectionnez la catégorie à laquelle vous souhaitez ajouter
-                  une information.
+                  {t('household.form.selectCategory')}
                 </Text>
 
                 <View className="flex-row flex-wrap justify-between gap-y-2.5">
@@ -280,7 +281,7 @@ export function InfoItemFormModal({
                       <Pressable
                         key={option}
                         accessibilityRole="button"
-                        accessibilityLabel={optionMeta.pickerLabel}
+                        accessibilityLabel={t(optionMeta.pickerLabel)}
                         onPress={() => selectCategory(option)}
                         className="w-[48.5%] flex-row items-center gap-2.5 rounded-[22px] py-2.5 pl-2.5 pr-2"
                         style={({ pressed }) => ({
@@ -313,7 +314,7 @@ export function InfoItemFormModal({
                           className="flex-1 text-[13.5px] font-semibold leading-[17px]"
                           style={{ color: GLASS_TITLE_COLOR }}
                         >
-                          {optionMeta.pickerLabel}
+                          {t(optionMeta.pickerLabel)}
                         </Text>
                         <Ionicons
                           name="chevron-forward"
@@ -334,7 +335,7 @@ export function InfoItemFormModal({
                     className="text-[14.5px] font-semibold"
                     style={{ color: GLASS_TITLE_COLOR }}
                   >
-                    Annuler
+                    {t('common.cancel')}
                   </Text>
                 </Pressable>
               </>
@@ -343,7 +344,7 @@ export function InfoItemFormModal({
                 <View className="flex-row items-center gap-3">
                   {isEditing ? null : (
                     <Pressable
-                      accessibilityLabel="Changer de catégorie"
+                      accessibilityLabel={t('household.form.changeCategory')}
                       accessibilityRole="button"
                       hitSlop={8}
                       onPress={() => setCategory(null)}
@@ -366,7 +367,14 @@ export function InfoItemFormModal({
                     className="flex-1 text-[18px] font-extrabold"
                     style={{ color: GLASS_TITLE_COLOR, letterSpacing: -0.3 }}
                   >
-                    {isEditing ? 'Modifier' : 'Ajouter'} — {meta?.pickerLabel}
+                    {meta
+                      ? t(
+                          isEditing
+                            ? 'household.form.editTitle'
+                            : 'household.form.addTitle',
+                          { category: t(meta.pickerLabel) },
+                        )
+                      : null}
                   </Text>
                   <CloseButton accent={accent} onPress={onCancel} />
                 </View>
@@ -374,14 +382,17 @@ export function InfoItemFormModal({
                 {meta?.needsLabel ? (
                   <View className="gap-2">
                     <PlainInput
-                      placeholder={meta.labelPlaceholder}
+                      placeholder={
+                        meta.labelPlaceholder ? t(meta.labelPlaceholder) : ''
+                      }
                       value={label}
                       onChangeText={setLabel}
                     />
                     {isLabelTaken ? (
                       <Text className="text-[12.5px] text-[#B91C1C]">
-                        « {label.trim()} » est déjà renseigné : modifiez
-                        l'élément existant plutôt que d'en ajouter un autre.
+                        {t('household.form.labelTaken', {
+                          label: label.trim(),
+                        })}
                       </Text>
                     ) : null}
                     {availableLabelSuggestions.length > 0 ? (
@@ -417,7 +428,7 @@ export function InfoItemFormModal({
                   <View className="gap-2.5">
                     <IconInput
                       icon="home-outline"
-                      placeholder="Rue et numéro"
+                      placeholder={t('household.form.street')}
                       value={address.street}
                       onChangeText={(street) =>
                         setAddress((current) => ({ ...current, street }))
@@ -430,7 +441,7 @@ export function InfoItemFormModal({
                       <View style={{ flex: 1.6 }}>
                         <IconInput
                           icon="business-outline"
-                          placeholder="Ville"
+                          placeholder={t('household.form.city')}
                           value={address.city}
                           onChangeText={(city) =>
                             setAddress((current) => ({ ...current, city }))
@@ -442,7 +453,7 @@ export function InfoItemFormModal({
                       <View style={{ flex: 1 }}>
                         <IconInput
                           icon="mail-outline"
-                          placeholder="Code postal"
+                          placeholder={t('household.form.postalCode')}
                           value={address.postalCode}
                           // Chiffres seulement, 5 au plus.
                           onChangeText={(text) =>
@@ -488,7 +499,9 @@ export function InfoItemFormModal({
                   </View>
                 ) : (
                   <PlainInput
-                    placeholder={meta?.valuePlaceholder}
+                    placeholder={
+                      meta?.valuePlaceholder ? t(meta.valuePlaceholder) : ''
+                    }
                     value={value}
                     onChangeText={(text) =>
                       setValue(
@@ -559,18 +572,19 @@ export function InfoItemFormModal({
                 <PillButton
                   label={
                     isSaving
-                      ? 'Enregistrement…'
+                      ? t('common.saving')
                       : isEditing
-                        ? 'Enregistrer'
+                        ? t('common.save')
                         : submittedValues.length > 1
-                          ? `Ajouter ${submittedValues.length} ${
+                          ? t(
                               category === 'allergy'
-                                ? 'allergies'
+                                ? 'household.form.addAllergies'
                                 : category === 'vigilance'
-                                  ? 'points'
-                                  : 'éléments'
-                            }`
-                          : 'Ajouter'
+                                  ? 'household.form.addPoints'
+                                  : 'household.form.addItems',
+                              { count: submittedValues.length },
+                            )
+                          : t('household.form.add')
                   }
                   icon={isEditing ? 'save-outline' : 'add-circle-outline'}
                   size="compact"
@@ -586,7 +600,7 @@ export function InfoItemFormModal({
                     className="text-[14.5px] font-semibold"
                     style={{ color: GLASS_TITLE_COLOR }}
                   >
-                    Annuler
+                    {t('common.cancel')}
                   </Text>
                 </Pressable>
               </>
@@ -606,9 +620,10 @@ function CloseButton({
   accent: string;
   onPress: () => void;
 }) {
+  const { t } = useTranslation();
   return (
     <Pressable
-      accessibilityLabel="Fermer"
+      accessibilityLabel={t('common.close')}
       accessibilityRole="button"
       hitSlop={8}
       onPress={onPress}

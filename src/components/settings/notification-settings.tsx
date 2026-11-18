@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import type { ComponentProps } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Linking,
   Pressable,
@@ -32,40 +33,33 @@ type IoniconName = ComponentProps<typeof Ionicons>['name'];
 const ROWS: {
   key: keyof NotificationPreferences;
   icon: IoniconName;
-  label: string;
-  description: string;
+  label: 'appointments' | 'procedures' | 'vaccines' | 'mood' | 'partner';
   isPartnerOnly?: boolean;
 }[] = [
   {
     key: 'notify_appointments',
     icon: 'calendar-outline',
-    label: 'Rendez-vous',
-    description: 'La veille à 19h, puis 1h avant',
+    label: 'appointments',
   },
   {
     key: 'notify_procedures',
     icon: 'document-text-outline',
-    label: 'Démarches',
-    description: 'Celles où « Me rappeler » est activé',
+    label: 'procedures',
   },
   {
     key: 'notify_vaccines',
     icon: 'medkit-outline',
-    label: 'Vaccins de bébé',
-    description: '7 jours avant et le jour J, à 9h',
+    label: 'vaccines',
   },
   {
     key: 'notify_mood_reminder',
     icon: 'happy-outline',
-    label: 'Humeur du jour',
-    description:
-      'Petit rappel dans l’app à 9h, 14h et 19h si elle n’est pas remplie',
+    label: 'mood',
   },
   {
     key: 'notify_partner',
     icon: 'heart-outline',
-    label: 'Votre partenaire',
-    description: 'Humeur, symptômes, rendez-vous partagé, naissance',
+    label: 'partner',
     isPartnerOnly: true,
   },
 ];
@@ -86,6 +80,7 @@ export function NotificationSettings({
   isSolo: boolean;
   cardStyle: StyleProp<ViewStyle>;
 }) {
+  const { t } = useTranslation();
   const { data: profile } = useMyProfile();
   const updatePreferences = useUpdateNotificationPreferences();
   const permissionQuery = useNotificationPermission();
@@ -105,22 +100,22 @@ export function NotificationSettings({
         <Notice
           accent={accent}
           icon="phone-portrait-outline"
-          text="Les notifications ne fonctionnent que sur téléphone."
+          text={t('settings.notifications.webOnly')}
         />
       ) : permission === 'denied' ? (
         <Notice
           accent={accent}
           icon="notifications-off-outline"
-          text="Les notifications sont bloquées sur ce téléphone."
-          actionLabel="Ouvrir les réglages"
+          text={t('settings.notifications.blocked')}
+          actionLabel={t('settings.notifications.openSettings')}
           onAction={() => Linking.openSettings()}
         />
       ) : permission === 'undetermined' ? (
         <Notice
           accent={accent}
           icon="notifications-outline"
-          text="Recevez vos rappels et les nouvelles de l’autre parent."
-          actionLabel="Activer"
+          text={t('settings.notifications.enablePrompt')}
+          actionLabel={t('settings.notifications.enable')}
           onAction={enableNotifications}
         />
       ) : null}
@@ -144,17 +139,19 @@ export function NotificationSettings({
                 className="text-[15.5px] font-medium"
                 style={{ color: GLASS_TITLE_COLOR }}
               >
-                {row.label}
+                {t(`settings.notifications.${row.label}`)}
               </Text>
               <Text
                 className="text-[12.5px]"
                 style={{ color: GLASS_BODY_COLOR }}
               >
-                {row.description}
+                {t(`settings.notifications.${row.label}Hint`)}
               </Text>
             </View>
             <ToggleSwitch
-              accessibilityLabel={`Notifications : ${row.label}`}
+              accessibilityLabel={t('settings.notifications.toggleLabel', {
+                label: t(`settings.notifications.${row.label}`),
+              })}
               value={profile?.[row.key] ?? true}
               disabled={!profile}
               onValueChange={(value) =>

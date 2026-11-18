@@ -1,7 +1,7 @@
 import { router } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { Image, Pressable, Text, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
-
 import { NameCardsIllustration } from '@/components/hub/name-cards-illustration';
 import { PremiumLockedScreen } from '@/components/hub/premium-locked-screen';
 import {
@@ -20,11 +20,9 @@ const LEAF_IMAGE = require('@/assets/images/Leaf_branch.png');
 /** Rouge-rose des pastilles de compte, celui des cœurs du jeu. */
 const MATCH_BADGE_RED = '#e5384f';
 const HEADER_HEART_IMAGE = require('@/assets/images/Prenoms_heart_header.png');
-const DESCRIPTION =
-  "Swipez chacun de votre côté et découvrez les prénoms sur lesquels vous êtes tombés d'accord.";
+const DESCRIPTION = 'names.description';
 /** Espace « Seul·e » (demande explicite) : pas de matchs à deux. */
-const SOLO_DESCRIPTION =
-  'Swipez les prénoms qui vous plaisent et retrouvez-les dans vos favoris.';
+const SOLO_DESCRIPTION = 'names.descriptionSolo';
 
 /**
  * Les 4 entrées du jeu, chacune avec son illustration (fournie par
@@ -35,22 +33,22 @@ const SOLO_DESCRIPTION =
  */
 const PRENOMS_MODULES = [
   {
-    label: 'Prénoms filles',
+    label: 'names.modules.girls',
     image: require('@/assets/images/Prenoms_filles.png'),
     href: '/prenoms-jeu?gender=girl',
   },
   {
-    label: 'Prénoms garçons',
+    label: 'names.modules.boys',
     image: require('@/assets/images/Prenoms_garcons.png'),
     href: '/prenoms-jeu?gender=boy',
   },
   {
-    label: 'Vos matchs',
+    label: 'names.modules.matches',
     image: require('@/assets/images/Prenoms_matchs.png'),
     href: '/prenoms-matchs',
   },
   {
-    label: 'Favoris',
+    label: 'names.modules.favorites',
     image: require('@/assets/images/Prenoms_favoris.png'),
     href: '/prenoms-favoris',
   },
@@ -68,6 +66,7 @@ function PrenomsHeader({
   accent: string;
   description: string;
 }) {
+  const { t } = useTranslation();
   return (
     <View className="gap-4">
       <View className="min-h-[124px] justify-center">
@@ -91,7 +90,7 @@ function PrenomsHeader({
             className="text-[32px] font-extrabold leading-[38px]"
             style={{ color: GLASS_TITLE_COLOR, letterSpacing: -0.7 }}
           >
-            Le match des prénoms
+            {t('names.title')}
           </Text>
           <Svg width={120} height={10} viewBox="0 0 120 10">
             <Path
@@ -123,6 +122,7 @@ function PrenomsHeader({
  * l'utilisateur, à titre décoratif.
  */
 function PrenomsGrid({ accent, isSolo }: { accent: string; isSolo: boolean }) {
+  const { t } = useTranslation();
   // « Vos matchs » n'a pas de sens sans partenaire (espace « Seul·e »).
   const modules = isSolo
     ? PRENOMS_MODULES.filter((module) => module.href !== '/prenoms-matchs')
@@ -140,13 +140,13 @@ function PrenomsGrid({ accent, isSolo }: { accent: string; isSolo: boolean }) {
     '/prenoms-matchs': areMatchesLoading
       ? null
       : matchCount === 0
-        ? 'Pas encore de match'
-        : `${matchCount} prénom${matchCount > 1 ? 's' : ''} en commun`,
+        ? t('names.noMatchYet')
+        : t('names.inCommon', { count: matchCount }),
     '/prenoms-favoris': areFavoritesLoading
       ? null
       : favorites.length === 0
-        ? 'Aucun pour l’instant'
-        : `${favorites.length} prénom${favorites.length > 1 ? 's' : ''}`,
+        ? t('names.noneYet')
+        : t('names.nameCount', { count: favorites.length }),
   };
   return (
     <View className="gap-4">
@@ -155,7 +155,7 @@ function PrenomsGrid({ accent, isSolo }: { accent: string; isSolo: boolean }) {
           <Pressable
             key={module.label}
             accessibilityRole="button"
-            accessibilityLabel={module.label}
+            accessibilityLabel={t(module.label)}
             onPress={() => router.push(module.href)}
             className="w-[48%] gap-3 rounded-[28px] p-4 active:opacity-80"
             style={{
@@ -190,7 +190,7 @@ function PrenomsGrid({ accent, isSolo }: { accent: string; isSolo: boolean }) {
                   className="text-[15.5px] font-bold"
                   style={{ color: GLASS_TITLE_COLOR }}
                 >
-                  {module.label}
+                  {t(module.label)}
                 </Text>
                 {module.href in subtitles ? (
                   <Text
@@ -234,9 +234,10 @@ function PrenomsGrid({ accent, isSolo }: { accent: string; isSolo: boolean }) {
 
 /** Pastille de notification posée sur le cœur de « Vos matchs ». */
 function CountBadge({ count }: { count: number }) {
+  const { t } = useTranslation();
   return (
     <View
-      accessibilityLabel={`${count} match${count > 1 ? 's' : ''}`}
+      accessibilityLabel={t('names.matchCount', { count })}
       className="absolute items-center justify-center rounded-full px-1.5"
       style={{
         top: 2,
@@ -268,16 +269,17 @@ function CountBadge({ count }: { count: number }) {
  * capture de référence (demande explicite).
  */
 export default function PrenomsScreen() {
+  const { t } = useTranslation();
   const accent = useThemeAccent();
   const isSolo = useIsSoloHousehold();
-  const description = isSolo ? SOLO_DESCRIPTION : DESCRIPTION;
+  const description = t(isSolo ? SOLO_DESCRIPTION : DESCRIPTION);
 
   return (
     <PremiumLockedScreen
-      title="Le match des prénoms"
+      title={t('names.title')}
       image={HEART_IMAGE}
       description={description}
-      paywallTitle="Débloquez le match des prénoms"
+      paywallTitle={t('names.unlock')}
       // Les deux cartes de l'entrée « Le match des prénoms »
       // d'Organisation, pour que le paywall soit raccord (demande
       // explicite).

@@ -1,8 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Pressable, Text, TextInput, View } from 'react-native';
-
 import { QrScannerModal } from '@/components/onboarding/qr-scanner-modal';
 import { OnboardingStepShell } from '@/components/onboarding/step-shell';
 import {
@@ -32,6 +32,7 @@ import { NO_WEB_FOCUS_OUTLINE } from '@/lib/web-styles';
  * `?code=` préremplit le code (lien encodé dans le QR code).
  */
 export default function JoinHouseholdScreen() {
+  const { t } = useTranslation();
   const accent = useThemeAccent();
   const params = useLocalSearchParams<{ code?: string }>();
   const [code, setCode] = useState('');
@@ -62,21 +63,24 @@ export default function JoinHouseholdScreen() {
     updateIsPartner.mutate(false, {
       // La présentation a déjà été vue : droit à l'onboarding.
       onSuccess: () => router.replace('/'),
-      onError: () =>
-        setErrorMessage('Impossible de changer de parcours. Réessayez.'),
+      onError: () => setErrorMessage(t('onboarding.join.switchError')),
     });
 
   return (
     <>
       <OnboardingStepShell
         step={null}
-        title="Rejoindre l’espace de votre partenaire"
-        subtitle="Saisissez le code à 6 caractères affiché dans son application, ou scannez son QR code."
+        title={t('onboarding.join.title')}
+        subtitle={t('onboarding.join.subtitle')}
         illustration={<JoinIllustration accent={accent} />}
-        primaryLabel={joinHousehold.isPending ? 'Connexion…' : 'Rejoindre'}
+        primaryLabel={
+          joinHousehold.isPending
+            ? t('onboarding.join.joining')
+            : t('onboarding.join.join')
+        }
         onPrimaryPress={() => join()}
         isPrimaryDisabled={!isComplete || joinHousehold.isPending}
-        secondaryLabel="J’attends un bébé : je crée mon espace"
+        secondaryLabel={t('onboarding.join.createOwn')}
         onSecondaryPress={createOwnSpace}
       >
         <View className="gap-4">
@@ -96,10 +100,10 @@ export default function JoinHouseholdScreen() {
               className="text-[12px] font-bold"
               style={{ color: GLASS_BODY_COLOR, letterSpacing: 1.2 }}
             >
-              CODE DE L’ESPACE
+              {t('onboarding.join.codeTitle')}
             </Text>
             <TextInput
-              accessibilityLabel="Code de l’espace"
+              accessibilityLabel={t('onboarding.join.codeLabel')}
               value={normalized}
               onChangeText={(text) => {
                 setErrorMessage(null);
@@ -160,7 +164,7 @@ export default function JoinHouseholdScreen() {
               className="text-[15.5px] font-semibold"
               style={{ color: GLASS_TITLE_COLOR }}
             >
-              Scanner un QR code
+              {t('onboarding.join.scanQr')}
             </Text>
           </Pressable>
 
@@ -170,7 +174,7 @@ export default function JoinHouseholdScreen() {
             className="items-center py-1"
           >
             <Text className="text-[13px]" style={{ color: GLASS_BODY_COLOR }}>
-              Se déconnecter
+              {t('onboarding.signOut')}
             </Text>
           </Pressable>
         </View>

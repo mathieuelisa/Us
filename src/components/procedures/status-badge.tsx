@@ -1,5 +1,5 @@
+import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
-
 import { getStatusLabel } from '@/features/procedures/constants';
 
 const STATUS_STYLES: Record<string, { bg: string; text: string }> = {
@@ -15,6 +15,7 @@ export function StatusBadge({
   /** Fond/texte assortis au logo de la démarche, pour le statut « à faire » uniquement. */
   todoColor?: { bg: string; text: string };
 }) {
+  const { t } = useTranslation();
   // "fait" suit la couleur d'accent active (`bg-accent/10`, teinte
   // dynamique) plutôt qu'un vert codé en dur — les deux autres statuts
   // n'ont pas de lien avec l'accent, ils gardent leurs couleurs fixes.
@@ -22,7 +23,7 @@ export function StatusBadge({
     return (
       <View className="rounded-full bg-accent/10 px-3 py-1.5">
         <Text className="text-[12.5px] font-semibold text-accent">
-          {getStatusLabel(status)}
+          {getStatusLabel(status, t)}
         </Text>
       </View>
     );
@@ -38,7 +39,7 @@ export function StatusBadge({
           className="text-[12.5px] font-semibold"
           style={{ color: todoColor.text }}
         >
-          {getStatusLabel(status)}
+          {getStatusLabel(status, t)}
         </Text>
       </View>
     );
@@ -54,7 +55,7 @@ export function StatusBadge({
         className="text-[12.5px] font-semibold"
         style={{ color: style.text }}
       >
-        {getStatusLabel(status)}
+        {getStatusLabel(status, t)}
       </Text>
     </View>
   );

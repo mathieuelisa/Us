@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { LinearGradient as FadeGradient } from 'expo-linear-gradient';
 import { type ComponentProps, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
@@ -18,7 +19,6 @@ import Svg, {
   Path,
   Stop,
 } from 'react-native-svg';
-
 import { PARTNER_PINK } from '@/features/partner/constants';
 import { useIsPremium } from '@/features/premium/hooks';
 import { useThemeAccent, useThemeBackground } from '@/features/settings/hooks';
@@ -195,6 +195,7 @@ export function AppTabBar({
   navigation: rawNavigation,
   insets,
 }: AppTabBarProps) {
+  const { t } = useTranslation();
   const navigation = rawNavigation as AppTabBarNavigation;
   const accent = useThemeAccent();
   const pastelBackground = useThemeBackground();
@@ -407,7 +408,7 @@ export function AppTabBar({
 
           {premiumRoute ? (
             <TabItem
-              label="Premium"
+              label={t('hub.tabs.premium')}
               icon={
                 isPremiumFocused ? premiumIcons.filled : premiumIcons.outline
               }

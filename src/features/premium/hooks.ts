@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { useMyHousehold } from '@/features/household/hooks';
+import i18n from '@/i18n';
 import { queryKeys } from '@/lib/query/keys';
 import { createPaymentSheetIntent, fetchEntitlement } from './api';
 import { payWithPaymentSheet } from './payment-sheet';
@@ -78,7 +79,9 @@ export function usePremiumPurchase() {
 
   return useMutation({
     mutationFn: async (): Promise<PurchaseOutcome> => {
-      if (!household) throw new Error('Aucun foyer trouvé pour ce compte.');
+      if (!household) {
+        throw new Error(i18n.t('payment.errors.no_household'));
+      }
       const { clientSecret } = await createPaymentSheetIntent();
       const outcome = await payWithPaymentSheet(clientSecret);
       if (outcome === 'canceled') return 'canceled';

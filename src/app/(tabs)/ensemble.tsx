@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useAtomValue } from 'jotai';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
@@ -51,6 +52,7 @@ const SafeAreaView = withUniwind(RNSafeAreaView);
  * jour en carte illustrée (`GestureOfTheDayCard`).
  */
 export default function TogetherScreen() {
+  const { t } = useTranslation();
   // Tirer vers le bas recharge les données affichées.
   const refresh = usePullToRefresh();
   // Place de la barre du bas, qui flotte au-dessus du contenu.
@@ -115,7 +117,7 @@ export default function TogetherScreen() {
         showsVerticalScrollIndicator={false}
       >
         <Pressable
-          accessibilityLabel="Revenir en arrière"
+          accessibilityLabel={t('common.goBack')}
           accessibilityRole="button"
           hitSlop={12}
           onPress={() => router.back()}
@@ -136,7 +138,7 @@ export default function TogetherScreen() {
             className="text-[32px] font-extrabold leading-[38px]"
             style={{ color: GLASS_TITLE_COLOR, letterSpacing: -0.7 }}
           >
-            Ensemble
+            {t('together.title')}
           </Text>
           <Svg width={96} height={10} viewBox="0 0 96 10">
             <Path
@@ -148,9 +150,7 @@ export default function TogetherScreen() {
             />
           </Svg>
           <Text className="text-[14.5px]" style={{ color: GLASS_BODY_COLOR }}>
-            {isSolo
-              ? 'Prenez le pouls de votre journée.'
-              : 'Prenez le pouls de votre journée, à deux.'}
+            {isSolo ? t('together.subtitleSolo') : t('together.subtitle')}
           </Text>
         </View>
 
@@ -161,7 +161,7 @@ export default function TogetherScreen() {
               className="text-[18px] font-bold"
               style={{ color: GLASS_TITLE_COLOR }}
             >
-              Comment vous sentez-vous aujourd’hui ?
+              {t('together.howDoYouFeel')}
             </Text>
           </View>
           <MoodPicker selectedMood={todayMood} onSelect={handleSelectMood} />
@@ -209,6 +209,7 @@ function GestureOfTheDayCard({
   body: string;
   accent: string;
 }) {
+  const { t } = useTranslation();
   return (
     <View
       className="gap-4 overflow-hidden rounded-[32px] px-5 pb-5 pt-5"
@@ -271,11 +272,11 @@ function GestureOfTheDayCard({
               className="text-[11.5px] font-bold"
               style={{ color: accent, letterSpacing: 0.8 }}
             >
-              GESTE DU JOUR
+              {t('together.gesture.badge')}
             </Text>
           </View>
           <Text className="text-[12.5px]" style={{ color: GLASS_BODY_COLOR }}>
-            Une petite attention à offrir aujourd’hui
+            {t('together.gesture.subtitle')}
           </Text>
         </View>
       </View>
@@ -290,7 +291,7 @@ function GestureOfTheDayCard({
       <View className="flex-row items-center gap-1.5">
         <Ionicons name="refresh" size={13} color="#a3a1b0" />
         <Text className="text-[12px]" style={{ color: '#a3a1b0' }}>
-          Un nouveau geste vous attend demain.
+          {t('together.gesture.tomorrow')}
         </Text>
       </View>
     </View>

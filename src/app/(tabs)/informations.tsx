@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
@@ -33,6 +34,7 @@ import {
   useUpdateInfoItem,
 } from '@/features/household/hooks';
 import { useThemeAccent, useThemeBackground } from '@/features/settings/hooks';
+import { useLocale } from '@/i18n/hooks';
 import { hexToRgba } from '@/lib/color';
 import { formatPhoneNumber } from '@/lib/phone';
 
@@ -40,16 +42,21 @@ const SafeAreaView = withUniwind(RNSafeAreaView);
 
 const HEADER_IMAGE = require('@/assets/images/Baby_said_hi.png');
 
-function displayValue(item: HouseholdInfoItem, category: InfoCategory) {
+function displayValue(
+  item: HouseholdInfoItem,
+  category: InfoCategory,
+  locale: string,
+) {
   if (!item.value) return '';
-  if (INFO_CATEGORY_META[category].isDate) return formatInfoDate(item.value);
+  if (INFO_CATEGORY_META[category].isDate)
+    return formatInfoDate(item.value, locale);
   // Groupé par paires même pour un numéro saisi avant le formatage auto.
   if (category === 'phone') return formatPhoneNumber(item.value);
   return item.value;
 }
 
 /**
- * Écran "Informations importantes" — visuel rapide, groupé par catégorie
+ * Écran t('household.title') — visuel rapide, groupé par catégorie
  * (points de vigilance et allergies en tête, demande explicite : ce sont
  * les infos les plus utiles dans l'urgence), plutôt qu'une liste plate
  * libellé/valeur. Chaque entrée porte une catégorie typée
@@ -61,6 +68,8 @@ function displayValue(item: HouseholdInfoItem, category: InfoCategory) {
  * ligne : la création choisit d'abord une catégorie parmi 6.
  */
 export default function InformationsScreen() {
+  const { t } = useTranslation();
+  const locale = useLocale();
   // Tirer vers le bas recharge les données affichées.
   const refresh = usePullToRefresh();
   // Place de la barre du bas, qui flotte au-dessus du contenu.
@@ -225,15 +234,15 @@ export default function InformationsScreen() {
               className="text-[28px] font-extrabold leading-[34px]"
               style={{ color: GLASS_TITLE_COLOR, letterSpacing: -0.6 }}
             >
-              Informations importantes
+              {t('household.title')}
             </Text>
             <Text
               className="text-[14px] leading-5"
               style={{ color: GLASS_BODY_COLOR }}
             >
               {household?.accompaniment_type === 'seul'
-                ? 'Vos informations importantes, à portée de main.'
-                : 'Partagées et modifiables par vous deux.'}
+                ? t('household.subtitleSolo')
+                : t('household.subtitle')}
             </Text>
             <Svg width={120} height={10} viewBox="0 0 120 10">
               <Path
@@ -248,7 +257,9 @@ export default function InformationsScreen() {
         </View>
 
         {isHouseholdLoading || areItemsLoading ? (
-          <Text className="text-[13px] text-[#9a9a9a]">Chargement…</Text>
+          <Text className="text-[13px] text-[#9a9a9a]">
+            {t('household.loading')}
+          </Text>
         ) : (
           <View className="flex-1 gap-5">
             {items.length === 0 ? (
@@ -266,7 +277,7 @@ export default function InformationsScreen() {
                   <View className="flex-row items-center gap-1.5">
                     <Ionicons name={meta.icon} size={13} color={meta.color} />
                     <Text className="text-[11.5px] font-semibold uppercase tracking-wide text-[#8a8a8a]">
-                      {meta.sectionTitle}
+                      {t(meta.sectionTitle)}
                     </Text>
                   </View>
 
@@ -331,7 +342,7 @@ export default function InformationsScreen() {
                               {item.label}
                             </Text>
                             <Text className="text-[13px] text-[#6b6b6b]">
-                              {displayValue(item, category)}
+                              {displayValue(item, category, locale)}
                             </Text>
                           </Pressable>
 
@@ -356,7 +367,7 @@ export default function InformationsScreen() {
             {legacyItems.length > 0 ? (
               <View className="gap-2">
                 <Text className="text-[11.5px] font-semibold uppercase tracking-wide text-[#8a8a8a]">
-                  Autres
+                  {t('household.others')}
                 </Text>
                 <View className="gap-2">
                   {legacyItems.map((item) => (
@@ -395,7 +406,7 @@ export default function InformationsScreen() {
           qu'aucune information n'est saisie (demande explicite) — pas
           pendant le chargement, où la liste est vide sans l'être vraiment. */}
       <BlobFab
-        accessibilityLabel="Ajouter une information"
+        accessibilityLabel={t('household.addInfo')}
         onPress={() => openCreate()}
         className="absolute right-6"
         // Juste au-dessus de la barre du bas, qui flotte sur le contenu.

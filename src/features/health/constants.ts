@@ -1,3 +1,7 @@
+import type { TFunction } from 'i18next';
+
+import i18n from '@/i18n';
+import { SUPPORTED_LANGUAGES } from '@/i18n/languages';
 import { daysBetween, todayIso } from '@/lib/date';
 
 /**
@@ -10,7 +14,21 @@ import { daysBetween, todayIso } from '@/lib/date';
  * l'interface (des cases à cocher), pas d'un contenu éditorial appelé à
  * s'enrichir. À déplacer en base le jour où elle devient configurable.
  */
-export const SYMPTOM_OPTIONS: { value: string; label: string }[] = [
+export type SymptomValue =
+  | 'vomissements'
+  | 'vertiges'
+  | 'mal_de_dos'
+  | 'fatigue'
+  | 'reflux_gastrique'
+  | 'bouffees_de_chaleur'
+  | 'insomnies'
+  | 'nausees';
+
+/**
+ * `label` : libellé français, gardé pour reconnaître une saisie libre
+ * (« fatigue ») ; l'affichage passe par `getSymptomLabel`.
+ */
+export const SYMPTOM_OPTIONS: { value: SymptomValue; label: string }[] = [
   { value: 'vomissements', label: 'Vomissements' },
   { value: 'vertiges', label: 'Vertiges' },
   { value: 'mal_de_dos', label: 'Mal de dos' },
@@ -29,7 +47,8 @@ export const SYMPTOM_OPTIONS: { value: string; label: string }[] = [
  * symptôme la retire. Jamais comptée comme un symptôme (`withoutNoSymptom`).
  */
 export const NO_SYMPTOM = 'aucun';
-export const NO_SYMPTOM_LABEL = 'Pas de symptômes';
+/** Libellé français de « Pas de symptômes », reconnu à la saisie. */
+const NO_SYMPTOM_LABEL = 'Pas de symptômes';
 
 /** Les symptômes réels d'une liste, sans la valeur « Pas de symptômes ». */
 export function withoutNoSymptom(symptoms: string[]): string[] {
@@ -64,11 +83,20 @@ export function getSymptomVisual(value: string): {
   return SYMPTOM_VISUALS[value] ?? FALLBACK_SYMPTOM_VISUAL;
 }
 
-export function getSymptomLabel(value: string): string {
-  if (value === NO_SYMPTOM) return NO_SYMPTOM_LABEL;
-  return (
-    SYMPTOM_OPTIONS.find((option) => option.value === value)?.label ?? value
-  );
+/**
+ * Libellé affiché d'un symptôme, dans la langue de l'interface ; un
+ * symptôme saisi à la main s'affiche tel quel (`t` est passé par l'écran
+ * pour que le libellé suive un changement de langue).
+ */
+export function getSymptomLabel(value: string, t: TFunction): string {
+  if (value === NO_SYMPTOM || isPresetSymptom(value)) {
+    return t(`health.symptoms.${value}`);
+  }
+  return value;
+}
+
+function isPresetSymptom(value: string): value is SymptomValue {
+  return SYMPTOM_OPTIONS.some((option) => option.value === value);
 }
 
 /** Longueur maximale d'un symptôme saisi à la main. */
@@ -104,13 +132,25 @@ export function resolveSymptomInput(text: string): string | null {
     .slice(0, CUSTOM_SYMPTOM_MAX_LENGTH);
   if (!label) return null;
   const needle = normalizeSymptom(label);
-  if (needle === normalizeSymptom(NO_SYMPTOM_LABEL) || needle === NO_SYMPTOM) {
+  // Reconnu dans les trois langues : « fatigue », « Fatigue », « Cansancio ».
+  const labelsOf = (value: string) =>
+    SUPPORTED_LANGUAGES.map((lng) =>
+      normalizeSymptom(
+        i18n.getFixedT(lng)(`health.symptoms.${value as SymptomValue}`),
+      ),
+    );
+  if (
+    needle === normalizeSymptom(NO_SYMPTOM_LABEL) ||
+    needle === NO_SYMPTOM ||
+    labelsOf(NO_SYMPTOM).includes(needle)
+  ) {
     return null;
   }
   const preset = SYMPTOM_OPTIONS.find(
     (option) =>
       normalizeSymptom(option.label) === needle ||
-      normalizeSymptom(option.value) === needle,
+      normalizeSymptom(option.value) === needle ||
+      labelsOf(option.value).includes(needle),
   );
   return preset ? preset.value : label.charAt(0).toUpperCase() + label.slice(1);
 }
@@ -163,44 +203,41 @@ export function getTrimester(weeksOfAmenorrhea: number): 1 | 2 | 3 {
   return 3;
 }
 
-export const TRIMESTER_LABELS: Record<1 | 2 | 3, string> = {
-  1: '1er trimestre',
-  2: '2ème trimestre',
-  3: '3ème trimestre',
-};
+export const TRIMESTER_LABELS = {
+  1: 'health.trimesters.t1',
+  2: 'health.trimesters.t2',
+  3: 'health.trimesters.t3',
+} as const satisfies Record<1 | 2 | 3, string>;
 
-const MONTH_NAMES = [
-  'Janvier',
-  'Février',
-  'Mars',
-  'Avril',
-  'Mai',
-  'Juin',
-  'Juillet',
-  'Août',
-  'Septembre',
-  'Octobre',
-  'Novembre',
-  'Décembre',
-];
-
-export function formatMonthTitle(year: number, month: number): string {
-  return `${MONTH_NAMES[month - 1]} ${year}`;
+/** « Novembre 2026 », « November 2026 », « Noviembre de 2026 ». */
+export function formatMonthTitle(
+  year: number,
+  month: number,
+  locale: string,
+): string {
+  const text = new Date(year, month - 1, 1).toLocaleDateString(locale, {
+    month: 'long',
+    year: 'numeric',
+  });
+  return text.charAt(0).toLocaleUpperCase(locale) + text.slice(1);
 }
 
 export function formatAppointmentSummary(
   isoDate: string,
   time: string | null,
+  locale: string,
 ): string {
   const [year, month, day] = isoDate.split('-').map(Number);
-  const datePart = new Date(year, month - 1, day).toLocaleDateString('fr-FR', {
+  const datePart = new Date(year, month - 1, day).toLocaleDateString(locale, {
     day: 'numeric',
     month: 'short',
   });
   if (!time) return datePart;
 
   const [hours, minutes] = time.split(':');
-  return `${datePart} · ${hours}h${minutes}`;
+  return locale.startsWith('fr')
+    ? `${datePart} · ${hours}h${minutes}`
+    : `${datePart} · ${hours}:${minutes}`;
 }
 
 /**

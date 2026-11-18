@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import Animated, {
@@ -58,17 +59,6 @@ const BLOCK_LAYOUT = LinearTransition.duration(SWITCH_DURATION).easing(
   Easing.out(Easing.cubic),
 );
 
-const MODE_COPY: Record<Mode, { title: string; subtitle: string }> = {
-  signIn: {
-    title: 'Bon retour parmi nous',
-    subtitle: 'Connectez-vous pour retrouver votre espace à deux.',
-  },
-  signUp: {
-    title: 'Bienvenue sur US',
-    subtitle: 'Créez votre compte en quelques secondes.',
-  },
-};
-
 /**
  * Écran 1a — connexion et inscription (décision du 2026-11-11) : email +
  * mot de passe, ou Google. Remplace le lien magique, abandonné.
@@ -88,6 +78,7 @@ const MODE_COPY: Record<Mode, { title: string; subtitle: string }> = {
  * email confirmé (`accept_household_invite()`).
  */
 export default function LoginScreen() {
+  const { t } = useTranslation();
   const accent = useThemeAccent();
   const backgroundColor = useThemeBackground();
 
@@ -141,9 +132,7 @@ export default function LoginScreen() {
           setMode('signIn');
           setPassword('');
           setPasswordConfirmation('');
-          setInfoMessage(
-            'Compte créé ! Confirmez votre adresse avec le lien reçu par email, puis connectez-vous.',
-          );
+          setInfoMessage(t('auth.accountCreated'));
         }
       } else {
         await signInWithPassword(trimmedEmail, password);
@@ -159,16 +148,12 @@ export default function LoginScreen() {
     setErrorMessage(null);
     setInfoMessage(null);
     if (!isEmailValid) {
-      setErrorMessage(
-        'Saisissez d’abord votre email ci-dessus pour recevoir le lien.',
-      );
+      setErrorMessage(t('auth.enterEmailFirst'));
       return;
     }
     try {
       await sendPasswordReset(trimmedEmail);
-      setInfoMessage(
-        'Si un compte existe pour cet email, un lien de réinitialisation vient de partir. Il vous connecte : choisissez ensuite un nouveau mot de passe dans Réglages.',
-      );
+      setInfoMessage(t('auth.resetSent'));
     } catch (error) {
       setErrorMessage(getAuthErrorMessage(error));
     }
@@ -191,16 +176,14 @@ export default function LoginScreen() {
   // ici que l'écart entre les deux saisies.
   const passwordHint =
     isSignUp && passwordConfirmation.length > 0 && !doPasswordsMatch
-      ? 'Les deux mots de passe ne correspondent pas.'
+      ? t('auth.passwordMismatch')
       : null;
 
   const eyeToggle = (
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={
-        isPasswordVisible
-          ? 'Masquer le mot de passe'
-          : 'Afficher le mot de passe'
+        isPasswordVisible ? t('auth.hidePassword') : t('auth.showPassword')
       }
       hitSlop={10}
       onPress={() => setIsPasswordVisible((visible) => !visible)}
@@ -233,7 +216,7 @@ export default function LoginScreen() {
               className="max-w-64 text-center text-[15px] leading-5"
               style={{ color: GLASS_BODY_COLOR }}
             >
-              Votre bébé a son carnet de santé. Vous, vous avez US.
+              {t('auth.tagline')}
             </Text>
           </View>
 
@@ -255,10 +238,10 @@ export default function LoginScreen() {
               className="text-[21px] font-extrabold"
               style={{ color: GLASS_TITLE_COLOR, letterSpacing: -0.4 }}
             >
-              {MODE_COPY[mode].title}
+              {t(`auth.mode.${mode}.title`)}
             </Text>
             <Text className="text-[14px]" style={{ color: GLASS_BODY_COLOR }}>
-              {MODE_COPY[mode].subtitle}
+              {t(`auth.mode.${mode}.subtitle`)}
             </Text>
           </Animated.View>
 
@@ -273,21 +256,21 @@ export default function LoginScreen() {
                 className="px-1 text-[13px] font-semibold"
                 style={{ color: GLASS_TITLE_COLOR }}
               >
-                Vous êtes…
+                {t('auth.youAre')}
               </Text>
               <View className="flex-row gap-2.5">
                 <SignupRoleCard
                   kind="pregnant"
-                  title="J’attends un bébé"
-                  subtitle="Je crée notre espace"
+                  title={t('auth.role.pregnantTitle')}
+                  subtitle={t('auth.role.pregnantSubtitle')}
                   isSelected={signupRole === 'pregnant'}
                   accent={accent}
                   onPress={() => setSignupRole('pregnant')}
                 />
                 <SignupRoleCard
                   kind="partner"
-                  title="Je suis partenaire"
-                  subtitle="Je rejoins avec un code"
+                  title={t('auth.role.partnerTitle')}
+                  subtitle={t('auth.role.partnerSubtitle')}
                   isSelected={signupRole === 'partner'}
                   accent={accent}
                   onPress={() => setSignupRole('partner')}
@@ -299,7 +282,7 @@ export default function LoginScreen() {
           <Animated.View layout={BLOCK_LAYOUT} className="gap-3">
             <IconInput
               icon="mail-outline"
-              placeholder="votre@email.com"
+              placeholder={t('auth.emailPlaceholder')}
               value={email}
               onChangeText={setEmail}
               accent={accent}
@@ -312,7 +295,7 @@ export default function LoginScreen() {
             />
             <IconInput
               icon="lock-closed-outline"
-              placeholder="Mot de passe"
+              placeholder={t('auth.password')}
               value={password}
               onChangeText={setPassword}
               accent={accent}
@@ -341,7 +324,7 @@ export default function LoginScreen() {
               >
                 <IconInput
                   icon="shield-checkmark-outline"
-                  placeholder="Confirmer le mot de passe"
+                  placeholder={t('auth.confirmPassword')}
                   value={passwordConfirmation}
                   onChangeText={setPasswordConfirmation}
                   accent={accent}
@@ -382,7 +365,7 @@ export default function LoginScreen() {
                     className="text-[13px] font-semibold"
                     style={{ color: accent }}
                   >
-                    Mot de passe oublié ?
+                    {t('auth.forgotPassword')}
                   </Text>
                 </Pressable>
               </Animated.View>
@@ -398,11 +381,11 @@ export default function LoginScreen() {
                 label={
                   isSubmitting
                     ? isSignUp
-                      ? 'Création…'
-                      : 'Connexion…'
+                      ? t('auth.creating')
+                      : t('auth.signingIn')
                     : isSignUp
-                      ? 'Créer mon compte'
-                      : 'Se connecter'
+                      ? t('auth.createAccount')
+                      : t('auth.signIn')
                 }
                 icon={isSignUp ? 'person-add-outline' : 'log-in-outline'}
                 isDisabled={!canSubmit}
@@ -437,7 +420,7 @@ export default function LoginScreen() {
           >
             <View className="h-px flex-1 bg-black/10" />
             <Text className="text-[12.5px]" style={{ color: GLASS_BODY_COLOR }}>
-              ou
+              {t('auth.or')}
             </Text>
             <View className="h-px flex-1 bg-black/10" />
           </Animated.View>
@@ -473,8 +456,8 @@ export default function LoginScreen() {
                 style={{ color: GLASS_TITLE_COLOR }}
               >
                 {isGooglePending
-                  ? 'Ouverture de Google…'
-                  : 'Continuer avec Google'}
+                  ? t('auth.openingGoogle')
+                  : t('auth.continueWithGoogle')}
               </Text>
             </Pressable>
           </Animated.View>
@@ -504,9 +487,10 @@ function ModeToggle({
   accent: string;
   onChange: (mode: Mode) => void;
 }) {
+  const { t } = useTranslation();
   const options: { value: Mode; label: string }[] = [
-    { value: 'signIn', label: 'Connexion' },
-    { value: 'signUp', label: 'Inscription' },
+    { value: 'signIn', label: t('auth.toggle.signIn') },
+    { value: 'signUp', label: t('auth.toggle.signUp') },
   ];
   const [trackWidth, setTrackWidth] = useState(0);
   const selectedIndex = mode === 'signIn' ? 0 : 1;

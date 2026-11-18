@@ -1,9 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import { withUniwind } from 'uniwind';
-
 import { PremiumBenefits } from '@/components/hub/premium-benefits';
 import { PremiumOffer } from '@/components/hub/premium-offer';
 import { useTabBarContentInset } from '@/components/navigation/use-tab-bar-height';
@@ -33,6 +33,7 @@ const SafeAreaView = withUniwind(RNSafeAreaView);
  * (`PremiumBenefits`, d'après une maquette).
  */
 export default function PremiumScreen() {
+  const { t } = useTranslation();
   // Place de la barre du bas, qui flotte au-dessus du contenu.
   const tabBarInset = useTabBarContentInset();
   const router = useRouter();
@@ -54,7 +55,7 @@ export default function PremiumScreen() {
         showsVerticalScrollIndicator={false}
       >
         <Pressable
-          accessibilityLabel="Revenir en arrière"
+          accessibilityLabel={t('common.goBack')}
           accessibilityRole="button"
           hitSlop={12}
           onPress={() => router.back()}
@@ -87,7 +88,7 @@ export default function PremiumScreen() {
             }}
           >
             <PremiumOffer
-              title="Débloquez le suivi complet de bébé"
+              title={t('premium.paywall.title')}
               image={require('@/assets/images/Baby_said_hi.png')}
               compact
             />

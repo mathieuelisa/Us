@@ -1,9 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { Modal, Pressable, Text, View } from 'react-native';
 import Animated, { SlideInDown, SlideOutDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
-
 import {
   GLASS_BODY_COLOR,
   GLASS_TITLE_COLOR,
@@ -40,6 +40,7 @@ export function AvatarPickerModal({
   onSelect: (avatar: string | null) => void;
   onClose: () => void;
 }) {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const options: {
     key: string | null;
@@ -47,10 +48,15 @@ export function AvatarPickerModal({
     bg: string;
     content: string;
   }[] = [
-    { key: null, label: 'Initiale', bg: accent, content: initials },
+    {
+      key: null,
+      label: t('profile.avatarPicker.initial'),
+      bg: accent,
+      content: initials,
+    },
     ...PROFILE_AVATARS.map((avatar) => ({
       key: avatar.key,
-      label: avatar.label,
+      label: t(avatar.label),
       bg: avatar.bg,
       content: avatar.emoji,
     })),
@@ -93,7 +99,7 @@ export function AvatarPickerModal({
                 className="text-[22px] font-extrabold leading-7"
                 style={{ color: GLASS_TITLE_COLOR, letterSpacing: -0.4 }}
               >
-                Choisir un avatar
+                {t('profile.avatarPicker.title')}
               </Text>
               <Svg width={92} height={10} viewBox="0 0 92 10">
                 <Path
@@ -108,12 +114,12 @@ export function AvatarPickerModal({
                 className="text-[13px] leading-[18px]"
                 style={{ color: GLASS_BODY_COLOR }}
               >
-                Il s’affiche sur votre profil.
+                {t('profile.avatarPicker.hint')}
               </Text>
             </View>
             <View>
               <Pressable
-                accessibilityLabel="Fermer"
+                accessibilityLabel={t('common.close')}
                 accessibilityRole="button"
                 hitSlop={8}
                 onPress={onClose}

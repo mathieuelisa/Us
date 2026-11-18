@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useAtomValue } from 'jotai';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import { withUniwind } from 'uniwind';
@@ -49,6 +50,7 @@ const HERO_IMAGE_TOP_INSET = 44;
  * bon onglet, sans quoi on retomberait sur le Journal.
  */
 export default function ExerciseScreen() {
+  const { t } = useTranslation();
   // Place de la barre du bas, qui flotte au-dessus du contenu.
   const tabBarInset = useTabBarContentInset();
   const router = useRouter();
@@ -72,10 +74,10 @@ export default function ExerciseScreen() {
         <View className="flex-1 gap-3 px-6 pt-4">
           <BackButton onPress={goBack} />
           <Text className="text-[20px] font-bold text-[#1a1a1a]">
-            Exercice introuvable
+            {t('health.exercise.notFound')}
           </Text>
           <Text className="text-[14px] leading-5 text-[#6b6b6b]">
-            Cet exercice n’existe plus dans le catalogue.
+            {t('health.exercise.notFoundHint')}
           </Text>
         </View>
       </SafeAreaView>
@@ -118,7 +120,7 @@ export default function ExerciseScreen() {
 
           <View className="gap-2">
             <Text className="text-[11.5px] font-semibold tracking-wide text-[#8a8a8a]">
-              VIDÉO EXPLICATIVE
+              {t('health.exercise.video')}
             </Text>
 
             {/* Cadre en attente du lien vidéo (demande explicite) — pas de
@@ -136,14 +138,16 @@ export default function ExerciseScreen() {
                 <Ionicons name="play" size={20} color={exercise.tint.ink} />
               </View>
               <Text className="text-[12.5px] text-[#9a9a9a]">
-                Vidéo à venir
+                {t('health.exercise.videoSoon')}
               </Text>
             </View>
           </View>
 
           <View className="gap-2">
             <Text className="text-[11.5px] font-semibold tracking-wide text-[#8a8a8a]">
-              {isPartner ? 'CE QU’ELLE FAIT' : 'COMMENT FAIRE'}
+              {isPartner
+                ? t('health.exercise.whatSheDoes')
+                : t('health.exercise.howTo')}
             </Text>
 
             <View
@@ -283,6 +287,7 @@ function ExerciseImageHero({
  * 3 gestes concrets pour l'aider — sur la teinte de l'exercice.
  */
 function PartnerRole({ exercise }: { exercise: CatalogExercise }) {
+  const { t } = useTranslation();
   const { tint, partner } = exercise;
   return (
     <View
@@ -301,7 +306,8 @@ function PartnerRole({ exercise }: { exercise: CatalogExercise }) {
           className="flex-1 text-[11.5px] font-bold tracking-wide"
           style={{ color: tint.ink }}
         >
-          VOTRE RÔLE{partner.together ? ' · À FAIRE À DEUX' : ''}
+          {t('health.exercise.yourRole')}
+          {partner.together ? t('health.exercise.together') : ''}
         </Text>
       </View>
       <Text className="text-[15.5px] font-bold leading-[21px] text-[#1a1a1a]">
@@ -324,9 +330,10 @@ function PartnerRole({ exercise }: { exercise: CatalogExercise }) {
 }
 
 function BackButton({ onPress }: { onPress: () => void }) {
+  const { t } = useTranslation();
   return (
     <Pressable
-      accessibilityLabel="Revenir aux exercices"
+      accessibilityLabel={t('health.exercise.back')}
       accessibilityRole="button"
       hitSlop={12}
       style={CARD_SHADOW}

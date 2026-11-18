@@ -1,5 +1,6 @@
 import { FunctionsHttpError } from '@supabase/supabase-js';
 
+import i18n from '@/i18n';
 import { supabase } from '@/lib/supabase/client';
 import type { Database } from '@/lib/supabase/database.types';
 
@@ -56,18 +57,22 @@ export async function createPaymentSheetIntent(): Promise<{
   return data as { clientSecret: string };
 }
 
-const ERROR_MESSAGES: Record<string, string> = {
-  already_premium: 'Votre foyer a déjà le premium.',
-  no_household: 'Aucun foyer trouvé pour ce compte.',
-  not_authenticated: 'Reconnectez-vous puis réessayez.',
-  server_misconfigured: 'Le paiement est momentanément indisponible.',
-  stripe_error: 'Le paiement n’a pas pu démarrer. Réessayez.',
-};
+const ERROR_CODES = [
+  'already_premium',
+  'no_household',
+  'not_authenticated',
+  'server_misconfigured',
+  'stripe_error',
+] as const;
+
+type PaymentErrorCode = (typeof ERROR_CODES)[number];
 
 export function getPremiumPaymentErrorMessage(error: unknown): string {
   if (error instanceof PremiumPaymentError) {
-    return ERROR_MESSAGES[error.code] ?? 'Le paiement n’a pas pu démarrer.';
+    return (ERROR_CODES as readonly string[]).includes(error.code)
+      ? i18n.t(`payment.errors.${error.code as PaymentErrorCode}`)
+      : i18n.t('payment.errors.couldNotStart');
   }
   if (error instanceof Error && error.message) return error.message;
-  return 'Le paiement n’a pas abouti.';
+  return i18n.t('payment.errors.failed');
 }

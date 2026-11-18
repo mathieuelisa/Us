@@ -1,18 +1,19 @@
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
-
 import { ChoiceCard } from '@/components/onboarding/choice-card';
 import { OnboardingStepShell } from '@/components/onboarding/step-shell';
 import { PlainInput } from '@/components/plain-input';
 import { GLASS_TITLE_COLOR } from '@/components/ui/glass-card';
 import type { ProfilePronoun } from '@/features/profile/api';
 import { useMyProfile, useSavePartnerIntro } from '@/features/profile/hooks';
+import type { TranslationKey } from '@/i18n/types';
 
 const PRONOUN_OPTIONS: {
   value: ProfilePronoun;
-  label: string;
-  description: string;
+  label: TranslationKey;
+  description: TranslationKey;
   icon: {
     name: 'man-outline' | 'woman-outline' | 'person-outline';
     color: string;
@@ -21,20 +22,20 @@ const PRONOUN_OPTIONS: {
 }[] = [
   {
     value: 'il',
-    label: 'Il',
-    description: 'Ex. « Bram est en pleine forme, il… »',
+    label: 'onboarding.intro.pronouns.il.label',
+    description: 'onboarding.intro.pronouns.il.description',
     icon: { name: 'man-outline', color: '#3b82c4', tint: '#e0eefb' },
   },
   {
     value: 'elle',
-    label: 'Elle',
-    description: 'Ex. « Camille est en pleine forme, elle… »',
+    label: 'onboarding.intro.pronouns.elle.label',
+    description: 'onboarding.intro.pronouns.elle.description',
     icon: { name: 'woman-outline', color: '#d6457f', tint: '#fde4ee' },
   },
   {
     value: 'neutre',
-    label: 'Avec mon prénom seulement',
-    description: 'Sans « il » ni « elle »',
+    label: 'onboarding.intro.pronouns.neutre.label',
+    description: 'onboarding.intro.pronouns.neutre.description',
     icon: { name: 'person-outline', color: '#8a63c9', tint: '#eae1f8' },
   },
 ];
@@ -48,6 +49,7 @@ const PRONOUN_OPTIONS: {
  * `pronoun`), avec `is_partner` confirmé.
  */
 export default function PartnerIntroStep() {
+  const { t } = useTranslation();
   const { data: profile } = useMyProfile();
   const saveIntro = useSavePartnerIntro();
   const [firstName, setFirstName] = useState('');
@@ -82,16 +84,18 @@ export default function PartnerIntroStep() {
   return (
     <OnboardingStepShell
       step={null}
-      title="Faisons connaissance"
-      subtitle="Votre prénom et la façon de parler de vous : ils servent seulement à personnaliser l’app pour vous deux."
-      primaryLabel={saveIntro.isPending ? 'Enregistrement…' : 'Continuer'}
+      title={t('onboarding.intro.title')}
+      subtitle={t('onboarding.intro.subtitle')}
+      primaryLabel={
+        saveIntro.isPending ? t('common.saving') : t('common.continue')
+      }
       isPrimaryDisabled={!canContinue}
       onPrimaryPress={next}
     >
       <View className="gap-1.5">
         <PlainInput
           isInvalid={isFirstNameTouched && isFirstNameMissing}
-          placeholder="Votre prénom"
+          placeholder={t('onboarding.firstName')}
           value={firstName}
           onChangeText={setFirstName}
           onBlur={() => setIsFirstNameTouched(true)}
@@ -99,7 +103,7 @@ export default function PartnerIntroStep() {
         />
         {isFirstNameTouched && isFirstNameMissing ? (
           <Text className="text-[12.5px] text-red-600">
-            Votre prénom est nécessaire.
+            {t('onboarding.firstNameRequired')}
           </Text>
         ) : null}
       </View>
@@ -109,13 +113,13 @@ export default function PartnerIntroStep() {
           className="text-[15px] font-bold"
           style={{ color: GLASS_TITLE_COLOR }}
         >
-          Comment parler de vous ?
+          {t('onboarding.intro.howToRefer')}
         </Text>
         {PRONOUN_OPTIONS.map((option) => (
           <ChoiceCard
             key={option.value}
-            label={option.label}
-            description={option.description}
+            label={t(option.label)}
+            description={t(option.description)}
             icon={option.icon}
             isSelected={pronoun === option.value}
             onPress={() => setPronoun(option.value)}
@@ -125,8 +129,7 @@ export default function PartnerIntroStep() {
 
       {saveIntro.isError ? (
         <Text className="text-[12.5px] text-red-600">
-          Impossible d’enregistrer pour le moment. Vérifiez votre connexion,
-          puis réessayez.
+          {t('onboarding.intro.saveError')}
         </Text>
       ) : null}
     </OnboardingStepShell>

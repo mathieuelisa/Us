@@ -1,17 +1,20 @@
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import type { TFunction } from 'i18next';
 import type { ComponentProps } from 'react';
 import { Fragment } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Image, Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import Animated, { FadeIn, ZoomIn } from 'react-native-reanimated';
 import Svg, { Path } from 'react-native-svg';
-
 import {
   GLASS_BODY_COLOR,
   GLASS_TITLE_COLOR,
 } from '@/components/ui/glass-card';
 import type { Appointment } from '@/features/health/api';
+import { formatAppointmentTime } from '@/features/hub/constants';
 import { useThemeBackground } from '@/features/settings/hooks';
+import { useLocale } from '@/i18n/hooks';
 import { darkenHex, deepenPastel, hexToRgba, lightenHex } from '@/lib/color';
 import { daysBetween, todayIso } from '@/lib/date';
 
@@ -90,29 +93,31 @@ export function AppointmentDetailModal({
   onOpenAgenda: () => void;
   onClose: () => void;
 }) {
+  const { t } = useTranslation();
+  const locale = useLocale();
   if (!appointment) {
     return null;
   }
 
-  const relativeDay = formatRelativeDay(appointment.appointment_date);
-  const partnerLabel = partnerName || 'votre partenaire';
+  const relativeDay = formatRelativeDay(appointment.appointment_date, t);
+  const partnerLabel = partnerName || t('health.yourPartner');
 
   const infos: InfoItem[] = [
     {
       key: 'date',
       icon: 'calendar-outline',
       tone: 'accent',
-      label: 'Date',
-      value: capitalize(formatLongDate(appointment.appointment_date)),
+      label: t('health.appointment.date'),
+      value: capitalize(formatLongDate(appointment.appointment_date, locale)),
     },
     {
       key: 'time',
       icon: 'time-outline',
       tone: 'amber',
-      label: 'Heure',
+      label: t('health.appointment.time'),
       value: appointment.appointment_time
-        ? formatTime(appointment.appointment_time)
-        : 'Non précisée',
+        ? (formatAppointmentTime(appointment.appointment_time, locale) ?? '')
+        : t('health.appointment.timeUnset'),
     },
   ];
   if (appointment.address) {
@@ -120,7 +125,7 @@ export function AppointmentDetailModal({
       key: 'address',
       icon: 'location-outline',
       tone: 'pink',
-      label: 'Adresse, notes',
+      label: t('health.appointment.addressNotes'),
       value: appointment.address,
     });
   }
@@ -129,7 +134,7 @@ export function AppointmentDetailModal({
       key: 'notes',
       icon: 'document-text-outline',
       tone: 'pink',
-      label: 'Notes',
+      label: t('health.appointment.notes'),
       value: appointment.notes,
     });
   }
@@ -140,16 +145,18 @@ export function AppointmentDetailModal({
             key: 'sharing',
             icon: appointment.is_shared ? 'people-outline' : 'eye-off-outline',
             tone: 'lavender',
-            label: appointment.is_shared ? 'Partagé' : 'Non partagé',
+            label: appointment.is_shared
+              ? t('health.appointment.shared')
+              : t('health.appointment.notShared'),
             value: appointment.is_shared
-              ? `Visible par vous et ${partnerLabel}`
-              : 'Visible par vous seul·e',
+              ? t('health.appointment.visibleToBoth', { name: partnerLabel })
+              : t('health.appointment.visibleToYou'),
           }
         : {
             key: 'author',
             icon: 'person-outline',
             tone: 'lavender',
-            label: 'Ajouté par',
+            label: t('health.appointment.addedBy'),
             value: capitalize(partnerLabel),
           },
     );
@@ -170,7 +177,7 @@ export function AppointmentDetailModal({
       >
         {/* Toucher le voile ferme la fiche. */}
         <Pressable
-          accessibilityLabel="Fermer"
+          accessibilityLabel={t('common.close')}
           accessibilityRole="button"
           onPress={onClose}
           className="absolute inset-0"
@@ -240,7 +247,7 @@ export function AppointmentDetailModal({
               {isMine ? (
                 <>
                   <GradientPill
-                    label="Modifier le rendez-vous"
+                    label={t('health.appointment.edit')}
                     icon="create-outline"
                     accent={accent}
                     onPress={onEdit}
@@ -254,7 +261,7 @@ export function AppointmentDetailModal({
                       className="text-[14px] font-semibold"
                       style={{ color: GLASS_TITLE_COLOR }}
                     >
-                      Voir tout l’agenda
+                      {t('health.appointment.seeAll')}
                     </Text>
                     <Ionicons
                       name="arrow-forward"
@@ -265,7 +272,7 @@ export function AppointmentDetailModal({
                 </>
               ) : (
                 <GradientPill
-                  label="Voir tout l’agenda"
+                  label={t('health.appointment.seeAll')}
                   icon="calendar-clear-outline"
                   hasArrow
                   accent={accent}
@@ -276,7 +283,7 @@ export function AppointmentDetailModal({
           </ScrollView>
 
           <Pressable
-            accessibilityLabel="Fermer"
+            accessibilityLabel={t('common.close')}
             accessibilityRole="button"
             hitSlop={8}
             onPress={onClose}
@@ -505,9 +512,9 @@ function GradientPill({
 }
 
 /** « 2026-11-18 » → « mercredi 18 novembre 2026 ». */
-function formatLongDate(isoDate: string): string {
+function formatLongDate(isoDate: string, locale: string): string {
   const [year, month, day] = isoDate.split('-').map(Number);
-  return new Date(year, month - 1, day).toLocaleDateString('fr-FR', {
+  return new Date(year, month - 1, day).toLocaleDateString(locale, {
     weekday: 'long',
     day: 'numeric',
     month: 'long',
@@ -515,19 +522,13 @@ function formatLongDate(isoDate: string): string {
   });
 }
 
-/** « 10:30:00 » → « 10h30 ». */
-function formatTime(time: string): string {
-  const [hours, minutes] = time.split(':');
-  return `${hours}h${minutes}`;
-}
-
 /** Aujourd'hui, demain, dans N jours ; rien pour un rendez-vous passé. */
-function formatRelativeDay(isoDate: string): string | null {
+function formatRelativeDay(isoDate: string, t: TFunction): string | null {
   const days = daysBetween(todayIso(), isoDate);
   if (days < 0) return null;
-  if (days === 0) return 'Aujourd’hui';
-  if (days === 1) return 'Demain';
-  return `Dans ${days} jours`;
+  if (days === 0) return t('health.appointment.today');
+  if (days === 1) return t('health.appointment.tomorrow');
+  return t('health.appointment.inDays', { count: days });
 }
 
 function capitalize(text: string): string {

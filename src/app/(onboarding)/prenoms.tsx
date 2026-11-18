@@ -1,8 +1,8 @@
 import { router } from 'expo-router';
 import { useAtom } from 'jotai';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
-
 import { OnboardingStepShell } from '@/components/onboarding/step-shell';
 import { PlainInput } from '@/components/plain-input';
 import { shouldInvitePartner } from '@/features/onboarding/constants';
@@ -26,6 +26,7 @@ import { onboardingDraftAtom } from '@/lib/atoms/onboarding';
  * combinaison Expo/React 19 — voir la note dans l'architecture.
  */
 export default function FirstNamesStep() {
+  const { t } = useTranslation();
   const [draft, setDraft] = useAtom(onboardingDraftAtom);
   const [touchedField, setTouchedField] = useState<Record<string, boolean>>({});
 
@@ -60,16 +61,16 @@ export default function FirstNamesStep() {
   return (
     <OnboardingStepShell
       step={2}
-      title="Petit à petit, faisons connaissance"
-      subtitle="Ces prénoms nous servent uniquement à personnaliser votre espace — jamais utilisés pour vous identifier."
-      primaryLabel="Suivant"
+      title={t('onboarding.names.title')}
+      subtitle={t('onboarding.names.subtitle')}
+      primaryLabel={t('onboarding.next')}
       isPrimaryDisabled={!isValid}
       onPrimaryPress={goToNextStep}
     >
       <View className="gap-1.5">
         <PlainInput
           isInvalid={touchedField.firstName && isFirstNameMissing}
-          placeholder="Votre prénom"
+          placeholder={t('onboarding.firstName')}
           value={firstName}
           onChangeText={setFirstName}
           onBlur={() =>
@@ -79,7 +80,7 @@ export default function FirstNamesStep() {
         />
         {touchedField.firstName && isFirstNameMissing ? (
           <Text className="text-[12.5px] text-red-600">
-            Votre prénom est nécessaire.
+            {t('onboarding.firstNameRequired')}
           </Text>
         ) : null}
       </View>
@@ -90,7 +91,7 @@ export default function FirstNamesStep() {
             isInvalid={
               touchedField.partnerFirstName && isPartnerFirstNameMissing
             }
-            placeholder="Prénom de votre partenaire"
+            placeholder={t('onboarding.names.partnerFirstName')}
             value={partnerFirstName}
             onChangeText={setPartnerFirstName}
             onBlur={() =>
@@ -103,7 +104,7 @@ export default function FirstNamesStep() {
           />
           {touchedField.partnerFirstName && isPartnerFirstNameMissing ? (
             <Text className="text-[12.5px] text-red-600">
-              Le prénom de votre partenaire est nécessaire.
+              {t('onboarding.names.partnerFirstNameRequired')}
             </Text>
           ) : null}
         </View>

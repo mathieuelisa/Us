@@ -1,8 +1,25 @@
 import type { Ionicons } from '@expo/vector-icons';
 import type { ComponentProps } from 'react';
 
-/** Tags rapides de l'overlay "besoin de…" (écran 3b), plus texte libre. */
-export const NEED_TAGS: { value: string; label: string }[] = [
+export type NeedValue =
+  | 'sommeil'
+  | 'calin'
+  | 'parler'
+  | 'massage'
+  | 'coup_de_main'
+  | 'calme'
+  | 'rassurée'
+  | 'attention'
+  | 'moment_a_deux';
+
+/**
+ * Tags rapides de l'overlay "besoin de…" (écran 3b), plus texte libre.
+ * `label` est le texte **enregistré** (`mood_checkins.need_note`) et relu
+ * par `parseNeedNote` : il reste en français quelle que soit la langue,
+ * pour que l'autre parent le retrouve. L'affichage passe par
+ * `together.needs.<value>`.
+ */
+export const NEED_TAGS: { value: NeedValue; label: string }[] = [
   { value: 'sommeil', label: 'Sommeil' },
   { value: 'calin', label: 'Câlin' },
   { value: 'parler', label: 'Juste parler' },
@@ -51,7 +68,7 @@ export const NEED_ICONS: Record<
  * entier que d'en deviner une partie.
  */
 export function parseNeedNote(note: string | null | undefined): {
-  needs: { value: string; label: string }[];
+  needs: { value: NeedValue; label: string }[];
   freeText: string | null;
 } {
   const trimmed = note?.trim();
@@ -63,7 +80,7 @@ export function parseNeedNote(note: string | null | undefined): {
   );
   if (needs.every((need) => need !== undefined)) {
     return {
-      needs: needs as { value: string; label: string }[],
+      needs: needs as { value: NeedValue; label: string }[],
       freeText: null,
     };
   }

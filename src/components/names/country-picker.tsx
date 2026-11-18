@@ -1,8 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useTranslation } from 'react-i18next';
 import { Pressable, Text, View } from 'react-native';
 import Animated, { FadeIn, LinearTransition } from 'react-native-reanimated';
-
 import { GLASS_TITLE_COLOR } from '@/components/ui/glass-card';
 import {
   GENDER_META,
@@ -37,6 +37,7 @@ export function CountryPicker({
   onStart: () => void;
   isLoading: boolean;
 }) {
+  const { t } = useTranslation();
   const meta = GENDER_META[gender];
   const isFull = selected.length >= MAX_SELECTED_COUNTRIES;
 
@@ -55,7 +56,11 @@ export function CountryPicker({
   return (
     <Animated.View entering={FadeIn.duration(220)} className="gap-6">
       <View className="gap-3">
-        <SectionTitle icon="flame" color={meta.color} label="Pays populaires" />
+        <SectionTitle
+          icon="flame"
+          color={meta.color}
+          label={t('names.countries.popular')}
+        />
         <View className="flex-row gap-2.5">
           {popular.map((country) => (
             <PopularTile
@@ -74,7 +79,7 @@ export function CountryPicker({
         <SectionTitle
           icon="earth-outline"
           color={meta.color}
-          label="Tous les pays"
+          label={t('names.countries.all')}
           selectedCount={selected.length}
         />
         <CountryRows
@@ -88,7 +93,7 @@ export function CountryPicker({
 
       <GradientButton
         color={meta.color}
-        label={isLoading ? 'Chargement…' : 'Découvrir les prénoms'}
+        label={isLoading ? t('common.loading') : t('names.countries.discover')}
         isDisabled={selected.length === 0 || isLoading}
         onPress={onStart}
       />
@@ -108,6 +113,7 @@ function SectionTitle({
   /** Affiche la gélule « n / 3 sélectionné(s) » à droite. */
   selectedCount?: number;
 }) {
+  const { t } = useTranslation();
   return (
     <View className="flex-row items-center gap-2 px-0.5">
       <Ionicons
@@ -127,8 +133,10 @@ function SectionTitle({
           style={{ backgroundColor: hexToRgba(color, 0.12) }}
         >
           <Text className="text-[12.5px] font-bold" style={{ color }}>
-            {selectedCount} / {MAX_SELECTED_COUNTRIES} sélectionné
-            {selectedCount > 1 ? 's' : ''}
+            {t('names.countries.selected', {
+              count: selectedCount,
+              max: MAX_SELECTED_COUNTRIES,
+            })}
           </Text>
         </View>
       ) : null}

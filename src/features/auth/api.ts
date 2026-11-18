@@ -2,6 +2,7 @@ import type { AuthError } from '@supabase/supabase-js';
 import * as WebBrowser from 'expo-web-browser';
 import { Platform } from 'react-native';
 import { unregisterPushToken } from '@/features/notifications/setup';
+import i18n from '@/i18n';
 import {
   createSessionFromUrl,
   getAuthRedirectTo,
@@ -195,38 +196,40 @@ export function getAuthErrorMessage(error: unknown): string {
 
   switch (code) {
     case 'invalid_credentials':
-      return 'Email ou mot de passe incorrect.';
+      return i18n.t('auth.errors.invalidCredentials');
     case 'email_not_confirmed':
-      return 'Confirmez d’abord votre adresse : un lien vous a été envoyé par email.';
+      return i18n.t('auth.errors.emailNotConfirmed');
     case 'user_already_exists':
     case 'email_exists':
-      return 'Un compte existe déjà avec cet email. Connectez-vous plutôt.';
+      return i18n.t('auth.errors.userExists');
     case 'weak_password':
-      return `Mot de passe trop faible : ${PASSWORD_MIN_LENGTH} caractères minimum, mélangez lettres et chiffres.`;
+      return i18n.t('auth.errors.weakPassword', {
+        count: PASSWORD_MIN_LENGTH,
+      });
     case INVALID_CURRENT_PASSWORD:
-      return 'Mot de passe actuel incorrect.';
+      return i18n.t('auth.errors.wrongCurrentPassword');
     case 'same_password':
-      return 'Le nouveau mot de passe doit être différent de l’actuel.';
+      return i18n.t('auth.errors.samePassword');
     case 'email_address_invalid':
     case 'validation_failed':
       if (/provider is not enabled/i.test(message)) {
-        return 'La connexion avec Google n’est pas encore activée.';
+        return i18n.t('auth.errors.googleDisabled');
       }
-      return 'Cette adresse email n’est pas valide.';
+      return i18n.t('auth.errors.invalidEmail');
     case 'over_email_send_rate_limit':
     case 'over_request_rate_limit':
-      return 'Trop de tentatives. Réessayez dans quelques minutes.';
+      return i18n.t('auth.errors.rateLimit');
     case 'signup_disabled':
-      return 'Les inscriptions sont fermées pour le moment.';
+      return i18n.t('auth.errors.signupDisabled');
     case 'reauthentication_needed':
-      return 'Reconnectez-vous avant de changer votre mot de passe.';
+      return i18n.t('auth.errors.reauthNeeded');
     default:
       if (/provider is not enabled/i.test(message)) {
-        return 'La connexion avec Google n’est pas encore activée.';
+        return i18n.t('auth.errors.googleDisabled');
       }
       if (/network|fetch/i.test(message)) {
-        return 'Connexion impossible. Vérifiez votre réseau.';
+        return i18n.t('auth.errors.network');
       }
-      return 'Une erreur est survenue. Réessayez.';
+      return i18n.t('auth.errors.unknown');
   }
 }

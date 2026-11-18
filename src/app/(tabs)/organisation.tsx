@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { type ComponentProps, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Image, Pressable, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
@@ -92,6 +93,7 @@ const CATEGORY_IMAGES: Record<string, number> = {
  * d'emoji, avancement coché, barre de progression, chevron en pastille).
  */
 export default function OrganisationScreen() {
+  const { t } = useTranslation();
   // Tirer vers le bas recharge les données affichées.
   const refresh = usePullToRefresh();
   // Place de la barre du bas, qui flotte au-dessus du contenu.
@@ -165,7 +167,7 @@ export default function OrganisationScreen() {
         <View>
           {selectedSlug ? null : <HeaderIllustration accent={accent} />}
           <Pressable
-            accessibilityLabel="Revenir en arrière"
+            accessibilityLabel={t('common.goBack')}
             accessibilityRole="button"
             hitSlop={12}
             onPress={() =>
@@ -201,7 +203,7 @@ export default function OrganisationScreen() {
                   className="text-[28px] font-extrabold leading-[34px]"
                   style={{ color: GLASS_TITLE_COLOR, letterSpacing: -0.6 }}
                 >
-                  Organisation & Préparation
+                  {t('organisation.title')}
                 </Text>
                 <Svg width={130} height={10} viewBox="0 0 130 10">
                   <Path
@@ -217,15 +219,14 @@ export default function OrganisationScreen() {
                 className="text-[14px] leading-5"
                 style={{ color: GLASS_BODY_COLOR }}
               >
-                L'organisation pratique... et les décisions plus légères, comme
-                le prénom.
+                {t('organisation.subtitle')}
               </Text>
             </View>
 
             <View className="gap-3">
               <SectionHeading
                 icon="clipboard-outline"
-                label="LES CHECKLISTS DES VALISES"
+                label={t('organisation.checklistsSection')}
                 accent={accent}
               />
               <View className="gap-3">
@@ -243,7 +244,11 @@ export default function OrganisationScreen() {
                   return (
                     <GlassCard
                       key={slug}
-                      accessibilityLabel={`${meta.title}, ${checkedCount} sur ${slugItems.length} complétés`}
+                      accessibilityLabel={t('organisation.progressA11y', {
+                        title: t(meta.titleKey),
+                        checked: checkedCount,
+                        total: slugItems.length,
+                      })}
                       accent={accent}
                       onPress={() => setSelectedSlug(slug)}
                     >
@@ -259,7 +264,7 @@ export default function OrganisationScreen() {
                             className="text-[16px] font-bold"
                             style={{ color: GLASS_TITLE_COLOR }}
                           >
-                            {meta.title}
+                            {t(meta.titleKey)}
                           </Text>
                           <View className="flex-row items-center gap-1.5">
                             <Ionicons
@@ -271,7 +276,10 @@ export default function OrganisationScreen() {
                               className="text-[13px]"
                               style={{ color: GLASS_BODY_COLOR }}
                             >
-                              {checkedCount} sur {slugItems.length} complétés
+                              {t('organisation.progress', {
+                                checked: checkedCount,
+                                total: slugItems.length,
+                              })}
                             </Text>
                           </View>
                           <ProgressBar progress={progress} />
@@ -290,15 +298,15 @@ export default function OrganisationScreen() {
             <View className="gap-3">
               <SectionHeading
                 icon="timer-outline"
-                label="LE JOUR J"
+                label={t('organisation.dDaySection')}
                 accent={accent}
               />
               <PremiumTeaserCard
                 icon={
                   <Ionicons name="timer-outline" size={22} color="#e8c874" />
                 }
-                title="Assistant Contractions & Départ Maternité"
-                subtitle="Chronométrez, on vous dit quand partir"
+                title={t('organisation.contractions.title')}
+                subtitle={t('organisation.contractions.subtitle')}
                 onPress={() => router.push('/contractions')}
                 illustration={<ContractionsIllustration />}
               />
@@ -311,7 +319,7 @@ export default function OrganisationScreen() {
             <View className="gap-3">
               <SectionHeading
                 icon="game-controller-outline"
-                label="JEUX"
+                label={t('organisation.gamesSection')}
                 accent={accent}
               />
               <PremiumTeaserCard
@@ -322,11 +330,11 @@ export default function OrganisationScreen() {
                     resizeMode="contain"
                   />
                 }
-                title="Le match des prénoms"
+                title={t('organisation.names.title')}
                 subtitle={
                   hideCoParent
-                    ? 'Trouvez le prénom parfait'
-                    : 'Trouvez le prénom parfait à deux'
+                    ? t('organisation.names.subtitleSolo')
+                    : t('organisation.names.subtitle')
                 }
                 onPress={() => router.push('/prenoms')}
                 illustration={<NameCardsIllustration />}
@@ -434,6 +442,7 @@ function ChecklistDetail({
   }) => void;
   onRemoveItem: (item: ChecklistItem) => void;
 }) {
+  const { t } = useTranslation();
   const accent = useThemeAccent();
   const meta = CHECKLIST_META[slug];
   const checkedCount = items.filter((item) => item.checked).length;
@@ -469,12 +478,15 @@ function ChecklistDetail({
             className="text-[26px] font-extrabold leading-[31px]"
             style={{ color: GLASS_TITLE_COLOR, letterSpacing: -0.5 }}
           >
-            {meta.title}
+            {t(meta.titleKey)}
           </Text>
           {/* Le total suit les ajouts : un article personnalisé compte comme
               les autres, au numérateur comme au dénominateur. */}
           <Text className="text-[14px] font-bold" style={{ color: accent }}>
-            {checkedCount} sur {items.length} complétés
+            {t('organisation.progress', {
+              checked: checkedCount,
+              total: items.length,
+            })}
           </Text>
         </View>
 
@@ -498,9 +510,9 @@ function ChecklistDetail({
 
                 {canAddCustomItem(slug, group.category) ? (
                   <AddChecklistItemRow
-                    categoryTitle={
-                      CHECKLIST_CATEGORY_META[group.category].title
-                    }
+                    categoryTitle={t(
+                      CHECKLIST_CATEGORY_META[group.category].titleKey,
+                    )}
                     onAdd={(label) =>
                       onAddItem({
                         checklistSlug: slug,
@@ -545,6 +557,7 @@ function AddChecklistItemRow({
   categoryTitle: string;
   onAdd: (label: string) => void;
 }) {
+  const { t } = useTranslation();
   const accent = useThemeAccent();
   const [isEditing, setIsEditing] = useState(false);
   const [label, setLabel] = useState('');
@@ -554,7 +567,9 @@ function AddChecklistItemRow({
     return (
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel={`Ajouter un élément à la sous-section ${categoryTitle}`}
+        accessibilityLabel={t('organisation.addItemA11y', {
+          category: categoryTitle,
+        })}
         onPress={() => setIsEditing(true)}
         className="mt-1 h-12 flex-row items-center justify-center gap-2.5 rounded-full active:opacity-70"
         style={{
@@ -565,7 +580,7 @@ function AddChecklistItemRow({
       >
         <Ionicons name="add-circle" size={24} color={accent} />
         <Text className="text-[15px] font-bold" style={{ color: accent }}>
-          Ajouter un élément
+          {t('organisation.addItem')}
         </Text>
       </Pressable>
     );
@@ -584,7 +599,9 @@ function AddChecklistItemRow({
     >
       <PlainInput
         autoFocus
-        placeholder={`À ajouter dans « ${categoryTitle} »`}
+        placeholder={t('organisation.addInPlaceholder', {
+          category: categoryTitle,
+        })}
         value={label}
         onChangeText={setLabel}
         maxLength={120}
@@ -601,7 +618,9 @@ function AddChecklistItemRow({
             setIsEditing(false);
           }}
         >
-          <Text className="text-[13.5px] text-[#6b6b6b]">Annuler</Text>
+          <Text className="text-[13.5px] text-[#6b6b6b]">
+            {t('common.cancel')}
+          </Text>
         </Pressable>
 
         <Pressable
@@ -616,7 +635,7 @@ function AddChecklistItemRow({
           }}
         >
           <Text className="text-[13.5px] font-semibold text-white">
-            Ajouter
+            {t('organisation.add')}
           </Text>
         </Pressable>
       </View>
@@ -633,6 +652,7 @@ function ChecklistItemRow({
   onToggle: (item: ChecklistItem) => void;
   onRemove: (item: ChecklistItem) => void;
 }) {
+  const { t } = useTranslation();
   const accent = useThemeAccent();
 
   return (
@@ -677,7 +697,9 @@ function ChecklistItemRow({
       {item.isCustom ? (
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={`Supprimer « ${item.label} »`}
+          accessibilityLabel={t('organisation.removeItem', {
+            label: item.label,
+          })}
           hitSlop={10}
           onPress={() => onRemove(item)}
           className="h-8 w-8 items-center justify-center rounded-full bg-[#f4f3f7]"
@@ -702,6 +724,7 @@ function CategoryHeader({
   category: string;
   accent: string;
 }) {
+  const { t } = useTranslation();
   const image = CATEGORY_IMAGES[category];
 
   return (
@@ -726,7 +749,7 @@ function CategoryHeader({
         className="text-[16px] font-bold"
         style={{ color: GLASS_TITLE_COLOR }}
       >
-        {CHECKLIST_CATEGORY_META[category].title}
+        {t(CHECKLIST_CATEGORY_META[category].titleKey)}
       </Text>
     </View>
   );

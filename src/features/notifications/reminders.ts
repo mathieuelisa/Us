@@ -1,13 +1,11 @@
 import * as Notifications from 'expo-notifications';
-import {
-  type BabyEntry,
-  formatShortDate,
-  getVaccinesDue,
-} from '@/features/baby/constants';
+import type { TFunction } from 'i18next';
+import { type BabyEntry, getVaccinesDue } from '@/features/baby/constants';
 import type { Appointment } from '@/features/health/api';
 import type { Household } from '@/features/household/api';
 import { formatAppointmentTime } from '@/features/hub/constants';
 import type { ProcedureWithStatus } from '@/features/procedures/api';
+import { formatDayMonth } from '@/i18n/format';
 import { daysBetween, shiftIsoDate, todayIso } from '@/lib/date';
 
 import { NOTIFICATION_CHANNELS } from './setup';
@@ -45,13 +43,15 @@ function atLocalTime(iso: string, hours: number, minutes = 0): Date {
  */
 export function buildAppointmentReminders(
   appointments: Appointment[],
+  t: TFunction,
+  locale: string,
   now: Date = new Date(),
 ): LocalReminder[] {
   const reminders: LocalReminder[] = [];
   const url = '/sante?tab=appointments';
 
   for (const appointment of appointments) {
-    const time = formatAppointmentTime(appointment.appointment_time);
+    const time = formatAppointmentTime(appointment.appointment_time, locale);
 
     const eve = atLocalTime(
       shiftIsoDate(appointment.appointment_date, -1),
@@ -61,7 +61,7 @@ export function buildAppointmentReminders(
       reminders.push({
         id: `appointment-eve:${appointment.id}`,
         date: eve,
-        title: 'Rendez-vous demain',
+        title: t('notifications.appointmentTomorrow'),
         body: time ? `${time} · ${appointment.title}` : appointment.title,
         url,
       });
@@ -77,7 +77,7 @@ export function buildAppointmentReminders(
         reminders.push({
           id: `appointment-hour:${appointment.id}`,
           date: hourBefore,
-          title: 'Rendez-vous dans 1 heure',
+          title: t('notifications.appointmentInHour'),
           body: appointment.address
             ? `${appointment.title} · ${appointment.address}`
             : appointment.title,
@@ -111,9 +111,12 @@ function nextMondayMorning(now: Date): Date {
   return date;
 }
 
-function describeProcedures(titles: string[]): string {
+function describeProcedures(titles: string[], t: TFunction): string {
   if (titles.length === 1) return titles[0];
-  return `${titles[0]} et ${titles.length - 1} autre${titles.length > 2 ? 's' : ''}`;
+  return t('notifications.andOthers', {
+    first: titles[0],
+    count: titles.length - 1,
+  });
 }
 
 /**
@@ -129,6 +132,7 @@ function describeProcedures(titles: string[]): string {
 export function buildProcedureReminders(
   procedures: ProcedureWithStatus[],
   household: Pick<Household, 'due_date' | 'birth_date'>,
+  t: TFunction,
   now: Date = new Date(),
 ): LocalReminder[] {
   const reminders: LocalReminder[] = [];
@@ -155,8 +159,8 @@ export function buildProcedureReminders(
         reminders.push({
           id: `procedure-eve:${procedure.householdProcedureId}`,
           date: dayBefore,
-          title: 'Plus qu’un jour',
-          body: `Pensez à : ${procedure.title}`,
+          title: t('notifications.procedureEve'),
+          body: t('notifications.procedureEveBody', { title: procedure.title }),
           url,
         });
       }
@@ -164,8 +168,8 @@ export function buildProcedureReminders(
         reminders.push({
           id: `procedure-deadline:${procedure.householdProcedureId}`,
           date: deadlineDay,
-          title: 'Dernier jour',
-          body: `C’est aujourd’hui l’échéance : ${procedure.title}`,
+          title: t('notifications.procedureDay'),
+          body: t('notifications.procedureDayBody', { title: procedure.title }),
           url,
         });
       } else if (daysBetween(today, deadline) < 0) {
@@ -195,11 +199,8 @@ export function buildProcedureReminders(
     reminders.push({
       id: `procedure-month:${start}`,
       date: atLocalTime(start, PROCEDURE_REMINDER_HOUR),
-      title:
-        titles.length === 1
-          ? 'Une démarche à prévoir ce mois-ci'
-          : `${titles.length} démarches à prévoir ce mois-ci`,
-      body: describeProcedures(titles),
+      title: t('notifications.monthProcedures', { count: titles.length }),
+      body: describeProcedures(titles, t),
       url,
     });
   }
@@ -210,9 +211,9 @@ export function buildProcedureReminders(
       date: nextMondayMorning(now),
       title:
         pending.length === 1
-          ? 'Une démarche reste à faire'
-          : `${pending.length} démarches restent à faire`,
-      body: describeProcedures(pending),
+          ? t('notifications.pendingProcedures', { count: 1 })
+          : t('notifications.pendingProcedures', { count: pending.length }),
+      body: describeProcedures(pending, t),
       url,
     });
   }
@@ -229,13 +230,18 @@ export function buildProcedureReminders(
  */
 export function buildVaccineReminders(
   entries: BabyEntry[],
+  t: TFunction,
+  locale: string,
   now: Date = new Date(),
 ): LocalReminder[] {
   const reminders: LocalReminder[] = [];
   const url = '/bebe-vaccin';
 
   for (const due of getVaccinesDue(entries, todayIso())) {
-    const what = due.kind === 'booster' ? `Rappel ${due.name}` : due.name;
+    const what =
+      due.kind === 'booster'
+        ? t('notifications.vaccineBooster', { name: due.name })
+        : due.name;
     const dueDay = atLocalTime(due.date, VACCINE_REMINDER_HOUR);
     const earlyDay = atLocalTime(
       shiftIsoDate(due.date, -VACCINE_EARLY_DAYS),
@@ -247,8 +253,11 @@ export function buildVaccineReminders(
       reminders.push({
         id: `${id}-early`,
         date: earlyDay,
-        title: 'Vaccin de bébé dans 7 jours',
-        body: `${what}, le ${formatShortDate(due.date)}. Pensez à prendre rendez-vous.`,
+        title: t('notifications.vaccineIn7Days'),
+        body: t('notifications.vaccineIn7DaysBody', {
+          what,
+          date: formatDayMonth(due.date, locale),
+        }),
         url,
       });
     }
@@ -256,8 +265,8 @@ export function buildVaccineReminders(
       reminders.push({
         id: `${id}-day`,
         date: dueDay,
-        title: 'Vaccin de bébé aujourd’hui',
-        body: `${what} est prévu aujourd’hui.`,
+        title: t('notifications.vaccineToday'),
+        body: t('notifications.vaccineTodayBody', { what }),
         url,
       });
     }

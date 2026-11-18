@@ -1,6 +1,7 @@
 import { router, useFocusEffect } from 'expo-router';
 import { Button } from 'heroui-native';
 import { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { BackHandler, Image, Pressable, Text, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
@@ -34,29 +35,25 @@ const SafeAreaView = withUniwind(RNSafeAreaView);
 const SLIDES = [
   {
     imgUrl: require('@/assets/images/Family.png'),
-    title: 'Bienvenue sur US',
-    description:
-      'L’application pensée pour les couples qui attendent un enfant. Simplifiez votre quotidien, à deux, du premier trimestre aux premiers mois.',
+    title: 'onboarding.slides.welcome.title',
+    description: 'onboarding.slides.welcome.description',
   },
   {
     imgUrl: require('@/assets/images/Father_feelings_mother.png'),
-    title: 'Partagez vos émotions',
-    description:
-      'Grâce à US, vous saurez ce que ressent votre partenaire au quotidien — d’un simple geste, restez connectés malgré la fatigue et le stress.',
+    title: 'onboarding.slides.feelings.title',
+    description: 'onboarding.slides.feelings.description',
   },
   {
     imgUrl: require('@/assets/images/Father_speak_with_mother.png'),
-    title: 'Suivez la grossesse ensemble',
-    description:
-      'Rendez-vous, symptômes, taille du bébé semaine après semaine : toutes les infos essentielles centralisées et partagées à deux.',
+    title: 'onboarding.slides.together.title',
+    description: 'onboarding.slides.together.description',
   },
   {
     imgUrl: require('@/assets/images/Mother_with_calendar.png'),
-    title: 'Ne ratez aucune démarche',
-    description:
-      'CAF, sécurité sociale, déclaration de naissance… US vous rappelle quoi faire et quand, pour ne rien oublier après l’arrivée de bébé.',
+    title: 'onboarding.slides.paperwork.title',
+    description: 'onboarding.slides.paperwork.description',
   },
-];
+] as const;
 
 /** Glissement minimal (pt) ou vitesse (pt/s) pour changer de slide. */
 const SWIPE_DISTANCE = 60;
@@ -81,6 +78,7 @@ const DRAG_RESISTANCE = 0.35;
  * explicite). Le glissement vers la droite, lui, ne sort jamais.
  */
 export default function WelcomeCarousel() {
+  const { t } = useTranslation();
   const [index, setIndex] = useState(0);
   const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false);
   const backgroundColor = useThemeBackground();
@@ -169,7 +167,9 @@ export default function WelcomeCarousel() {
           <View className="h-9 flex-row items-center justify-between">
             <Pressable
               accessibilityLabel={
-                index === 0 ? 'Revenir à la connexion' : 'Étape précédente'
+                index === 0
+                  ? t('onboarding.backToLogin')
+                  : t('onboarding.previousStep')
               }
               accessibilityRole="button"
               hitSlop={12}
@@ -186,7 +186,7 @@ export default function WelcomeCarousel() {
               hitSlop={8}
             >
               <Text className="text-[14px] font-medium text-[#6b6b6b]">
-                Passer
+                {t('common.skip')}
               </Text>
             </Pressable>
           </View>
@@ -207,12 +207,12 @@ export default function WelcomeCarousel() {
                 style={{ fontFamily: 'Tondu' }}
                 className="text-center text-[36px] leading-8 text-[#1a1a1a]"
               >
-                {slide.title}
+                {t(slide.title)}
               </Text>
             </SlideInText>
             <SlideInText direction="right" resetKey={index}>
               <Text className="px-2 text-center text-[14px] leading-5 text-[#6b6b6b]">
-                {slide.description}
+                {t(slide.description)}
               </Text>
             </SlideInText>
           </Animated.View>
@@ -230,7 +230,9 @@ export default function WelcomeCarousel() {
             </View>
 
             <Button onPress={goNext} className="w-52 self-center">
-              <Button.Label>{isLast ? 'Commencer' : 'Suivant'}</Button.Label>
+              <Button.Label>
+                {isLast ? t('onboarding.start') : t('onboarding.next')}
+              </Button.Label>
             </Button>
           </View>
         </View>

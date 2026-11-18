@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Image, Pressable, Text, View } from 'react-native';
 import Animated, {
   Easing,
@@ -15,7 +16,6 @@ import Animated, {
   withSequence,
   withTiming,
 } from 'react-native-reanimated';
-
 import {
   GLASS_BODY_COLOR,
   GLASS_TITLE_COLOR,
@@ -81,6 +81,7 @@ export function HealthTodayCard({
   /** Pastille cœur / ourson, mise en surbrillance par la visite guidée. */
   moodTargetRef?: (node: View | null) => void;
 }) {
+  const { t } = useTranslation();
   const accent = useThemeAccent();
   const isPregnant = role === 'pregnant';
   const { data: symptoms = [] } = usePregnantSymptomsForDate(
@@ -96,26 +97,24 @@ export function HealthTodayCard({
 
   // Côté partenaire, une formulation plus humaine (demande explicite) :
   // « La journée de Vina », puis ce qu'elle a partagé.
-  const otherName = partnerName ?? 'votre partenaire';
+  const otherName = partnerName ?? t('hub.yourPartnerLower');
   const title = isPregnant
-    ? 'Votre forme aujourd’hui'
-    : `La journée de ${otherName}`;
+    ? t('hub.today.titlePregnant')
+    : t('hub.today.titlePartner', { name: otherName });
   const count = realSymptoms.length;
   const subtitle = isPregnant
     ? hasDeclaredNoSymptom
-      ? 'Pas de symptôme aujourd’hui'
+      ? t('hub.today.noSymptomDeclared')
       : count === 0
-        ? 'Aucun symptôme noté aujourd’hui'
-        : `${count} symptôme${count > 1 ? 's' : ''} noté${
-            count > 1 ? 's' : ''
-          } aujourd’hui`
+        ? t('hub.today.noneNoted')
+        : t('hub.today.noted', { count })
     : hasDeclaredNoSymptom
-      ? 'Une journée sans symptôme 🌿'
+      ? t('hub.today.partnerSymptomFree')
       : count === 0
-        ? `${otherName.charAt(0).toUpperCase()}${otherName.slice(1)} n’a encore rien partagé aujourd’hui`
-        : `${count} petit${count > 1 ? 's' : ''} ma${
-            count > 1 ? 'ux' : 'l'
-          } à surveiller aujourd’hui`;
+        ? t('hub.today.partnerNothingYet', {
+            name: `${otherName.charAt(0).toUpperCase()}${otherName.slice(1)}`,
+          })
+        : t('hub.today.toWatch', { count });
 
   return (
     <View
@@ -146,10 +145,14 @@ export function HealthTodayCard({
           accessibilityLabel={
             isPregnant
               ? pregnantMood
-                ? `Humeur du jour : ${MOOD_PRESENTATION[pregnantMood].label}. Modifier dans Ensemble`
-                : 'Noter mon humeur du jour dans Ensemble'
+                ? t('hub.today.moodA11yEdit', {
+                    mood: t(MOOD_PRESENTATION[pregnantMood].labelKey),
+                  })
+                : t('hub.today.moodA11yNote')
               : pregnantMood
-                ? `Humeur du jour : ${MOOD_PRESENTATION[pregnantMood].label}`
+                ? t('hub.today.moodA11y', {
+                    mood: t(MOOD_PRESENTATION[pregnantMood].labelKey),
+                  })
                 : undefined
           }
           hitSlop={6}
@@ -187,14 +190,16 @@ export function HealthTodayCard({
         {isPregnant ? (
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="Noter mes symptômes du jour"
+            accessibilityLabel={t('hub.today.noteSymptoms')}
             hitSlop={8}
             onPress={() => router.push('/sante?tab=journal')}
             className="flex-row items-center gap-0.5 rounded-full px-3 py-1.5"
             style={{ backgroundColor: hexToRgba(accent, 0.1) }}
           >
             <Text className="text-[12.5px] font-bold" style={{ color: accent }}>
-              {symptoms.length === 0 ? 'Noter' : 'Modifier'}
+              {symptoms.length === 0
+                ? t('hub.today.note')
+                : t('hub.today.edit')}
             </Text>
             <Ionicons name="chevron-forward" size={13} color={accent} />
           </Pressable>
@@ -218,7 +223,7 @@ export function HealthTodayCard({
                   className="text-[13px] font-medium"
                   style={{ color: GLASS_TITLE_COLOR }}
                 >
-                  {getSymptomLabel(symptom)}
+                  {getSymptomLabel(symptom, t)}
                 </Text>
               </View>
             );
@@ -236,11 +241,11 @@ export function HealthTodayCard({
           >
             {hasDeclaredNoSymptom
               ? isPregnant
-                ? 'Journée sans symptôme, notée dans votre Journal. 🌿'
-                : 'Rien à surveiller pour l’instant.'
+                ? t('hub.today.symptomFreeNoted')
+                : t('hub.today.nothingToWatch')
               : isPregnant
-                ? 'Une journée sans symptôme pour l’instant. Notez-les si quelque chose change.'
-                : `Les symptômes de ${otherName} apparaîtront ici dès qu’ils seront notés.`}
+                ? t('hub.today.symptomFreeSoFar')
+                : t('hub.today.partnerWillAppear', { name: otherName })}
           </Text>
         </View>
       )}
@@ -271,7 +276,7 @@ export function HealthTodayCard({
               className="text-[11.5px] font-bold"
               style={{ color: '#b07a12', letterSpacing: 0.8 }}
             >
-              ASTUCE DU JOUR
+              {t('hub.today.tipOfTheDay')}
             </Text>
             <Text
               className="text-[13.5px] leading-[19px]"
@@ -479,6 +484,7 @@ function SymptomTipSquare({
   /** Dans le carrousel : prend la hauteur du plus haut conseil. */
   fillHeight?: boolean;
 }) {
+  const { t } = useTranslation();
   const visual = getSymptomVisual(tip.symptom);
 
   return (
@@ -500,7 +506,9 @@ function SymptomTipSquare({
             opacity: 0.75,
           }}
         >
-          CONSEIL · {getSymptomLabel(tip.symptom).toUpperCase()}
+          {t('partner.tipFor', {
+            symptom: getSymptomLabel(tip.symptom, t).toUpperCase(),
+          })}
         </Text>
       </View>
       <Text

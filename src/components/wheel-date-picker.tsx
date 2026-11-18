@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
 import Animated, {
   Extrapolation,
@@ -13,31 +14,8 @@ import Animated, {
   useSharedValue,
 } from 'react-native-reanimated';
 import { CARD_SHADOW } from '@/features/hub/constants';
-
-const MONTH_LABELS = [
-  'janvier',
-  'février',
-  'mars',
-  'avril',
-  'mai',
-  'juin',
-  'juillet',
-  'août',
-  'septembre',
-  'octobre',
-  'novembre',
-  'décembre',
-];
-
-const WEEKDAY_LABELS = [
-  'dimanche',
-  'lundi',
-  'mardi',
-  'mercredi',
-  'jeudi',
-  'vendredi',
-  'samedi',
-];
+import { getMonthNames } from '@/i18n/format';
+import { useLocale } from '@/i18n/hooks';
 
 /**
  * Gabarits de molette. `itemHeight` est l'unité de snap de toutes les
@@ -335,6 +313,8 @@ export function WheelDatePicker({
    */
   minDate?: string;
 }) {
+  const { t } = useTranslation();
+  const locale = useLocale();
   const size = compact ? WHEEL_SIZES.compact : WHEEL_SIZES.regular;
   const wheelHeight = size.itemHeight * size.visibleItems;
   const wheelPadding = (wheelHeight - size.itemHeight) / 2;
@@ -351,7 +331,7 @@ export function WheelDatePicker({
     { length: daysInMonth(year, month) },
     (_, index) => ({ value: index + 1, label: String(index + 1) }),
   );
-  const monthItems = MONTH_LABELS.map((label, index) => ({
+  const monthItems = getMonthNames(locale).map((label, index) => ({
     value: index + 1,
     label,
   }));
@@ -370,8 +350,6 @@ export function WheelDatePicker({
   const select = (isoDate: string) => {
     onChange(minDate && isoDate < minDate ? minDate : isoDate);
   };
-
-  const weekday = WEEKDAY_LABELS[new Date(year, month - 1, day).getDay()];
 
   return (
     <View className={compact ? 'gap-1.5' : 'gap-2'}>
@@ -396,7 +374,7 @@ export function WheelDatePicker({
                 desiredDayRef.current = nextDay;
                 select(toIsoDate(year, month, nextDay));
               }}
-              accessibilityLabel="Jour"
+              accessibilityLabel={t('pickers.day')}
               flex={0.8}
               size={size}
             />
@@ -406,7 +384,7 @@ export function WheelDatePicker({
               onSelect={(nextMonth) =>
                 select(toIsoDate(year, nextMonth, desiredDayRef.current))
               }
-              accessibilityLabel="Mois"
+              accessibilityLabel={t('pickers.month')}
               flex={1.4}
               size={size}
             />
@@ -416,7 +394,7 @@ export function WheelDatePicker({
               onSelect={(nextYear) =>
                 select(toIsoDate(nextYear, month, desiredDayRef.current))
               }
-              accessibilityLabel="Année"
+              accessibilityLabel={t('pickers.year')}
               flex={1}
               size={size}
             />
@@ -430,8 +408,13 @@ export function WheelDatePicker({
           « Suivant » reste désactivé. */}
       <Text className="text-center text-[13px] text-[#9a9a9a]">
         {value === null
-          ? 'Faites défiler pour choisir la date'
-          : `${weekday} ${day} ${MONTH_LABELS[month - 1]} ${year}`}
+          ? t('pickers.scrollToChoose')
+          : new Date(year, month - 1, day).toLocaleDateString(locale, {
+              weekday: 'long',
+              day: 'numeric',
+              month: 'long',
+              year: 'numeric',
+            })}
       </Text>
     </View>
   );

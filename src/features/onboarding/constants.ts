@@ -1,6 +1,9 @@
+import type { TranslationKey } from '@/i18n/types';
+
 /**
  * Contenu des 6 étapes d'onboarding (écrans 1d, 1z, 1b, 1c, 1e, 1f du
- * Hi-Fi). Les libellés sont repris tels quels des maquettes ; les valeurs
+ * Hi-Fi). Les libellés (clés de traduction, `onboarding.*`) reprennent les
+ * maquettes ; les valeurs
  * stockées sont des slugs stables, jamais le libellé affiché, pour que le
  * texte puisse évoluer sans migration.
  */
@@ -16,46 +19,49 @@ export type AccompanimentType = 'couple' | 'coparentalite' | 'seul' | 'autre';
 
 export const ACCOMPANIMENT_OPTIONS: {
   value: AccompanimentType;
-  label: string;
+  label: TranslationKey;
 }[] = [
-  { value: 'couple', label: 'En couple' },
-  { value: 'coparentalite', label: 'Coparentalité sans vivre ensemble' },
-  { value: 'seul', label: 'Seul·e' },
+  { value: 'couple', label: 'onboarding.accompaniment.options.couple' },
+  {
+    value: 'coparentalite',
+    label: 'onboarding.accompaniment.options.coparentalite',
+  },
+  { value: 'seul', label: 'onboarding.accompaniment.options.seul' },
 ];
 
 export const PROFESSIONAL_STATUS_OPTIONS: {
   value: string;
-  label: string;
+  label: TranslationKey;
 }[] = [
-  { value: 'salarie_prive', label: 'Salarié·e secteur privé' },
-  { value: 'fonctionnaire', label: 'Fonctionnaire' },
-  { value: 'independant', label: 'Indépendant·e' },
-  { value: 'sans_emploi', label: 'Sans emploi actuellement' },
+  { value: 'salarie_prive', label: 'onboarding.status.options.salarie_prive' },
+  { value: 'fonctionnaire', label: 'onboarding.status.options.fonctionnaire' },
+  { value: 'independant', label: 'onboarding.status.options.independant' },
+  { value: 'sans_emploi', label: 'onboarding.status.options.sans_emploi' },
 ];
 
-export const PRIORITY_OPTIONS: { value: string; label: string }[] = [
-  { value: 'demarches', label: 'Démarches administratives' },
-  { value: 'sante', label: 'Suivi santé' },
-  { value: 'partage', label: 'Partage avec votre partenaire' },
-  { value: 'rendez_vous', label: 'Dates et rendez-vous importants' },
+export const PRIORITY_OPTIONS: { value: string; label: TranslationKey }[] = [
+  { value: 'demarches', label: 'onboarding.priorities.options.demarches' },
+  { value: 'sante', label: 'onboarding.priorities.options.sante' },
+  { value: 'partage', label: 'onboarding.priorities.options.partage' },
+  { value: 'rendez_vous', label: 'onboarding.priorities.options.rendez_vous' },
 ];
 
 export type ReminderFrequency = 'realtime' | 'weekly';
 
 export const REMINDER_OPTIONS: {
   value: ReminderFrequency;
-  label: string;
-  description: string;
+  label: TranslationKey;
+  description: TranslationKey;
 }[] = [
   {
     value: 'realtime',
-    label: 'Au fil de l’eau',
-    description: 'Une notification à chaque étape',
+    label: 'onboarding.reminders.options.realtime.label',
+    description: 'onboarding.reminders.options.realtime.description',
   },
   {
     value: 'weekly',
-    label: 'Résumé hebdomadaire',
-    description: 'Un récap chaque semaine',
+    label: 'onboarding.reminders.options.weekly.label',
+    description: 'onboarding.reminders.options.weekly.description',
   },
 ];
 

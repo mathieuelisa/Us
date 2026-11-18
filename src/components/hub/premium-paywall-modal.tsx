@@ -1,8 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
 import type { ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { ImageSourcePropType } from 'react-native';
 import { Modal, Pressable, ScrollView, View } from 'react-native';
-
 import { PremiumOffer } from '@/components/hub/premium-offer';
 import { GLASS_TITLE_COLOR } from '@/components/ui/glass-card';
 import { useThemeAccent } from '@/features/settings/hooks';
@@ -39,6 +39,7 @@ export function PremiumPaywallModal({
   /** Voir `PremiumOffer` : remplace `image` dans l'offre. */
   illustration?: ReactNode;
 }) {
+  const { t } = useTranslation();
   const accent = useThemeAccent();
 
   return (
@@ -93,7 +94,7 @@ export function PremiumPaywallModal({
           </View>
 
           <Pressable
-            accessibilityLabel="Fermer"
+            accessibilityLabel={t('common.close')}
             accessibilityRole="button"
             hitSlop={12}
             onPress={onClose}

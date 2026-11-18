@@ -27,7 +27,7 @@ Correspondance avec les sections du [Design Overview](../01-DESIGN-OVERVIEW.md#c
 | ✅ | 7 — Déclaration de naissance | Formulaire + recalcul des échéances de démarches |
 | ❌ | 8 — Votre bébé (premium) | **Hors MVP** — écran d'accès affiché comme "verrouillé", contenu réel reporté à [V1](./V1.md). ⚠️ Écart actuel : les 4 écrans de suivi existent, enregistrent leurs entrées dans Supabase (`baby_entries`) et s'ouvrent sans payer ([dette n°53](../05-DETTE-ET-POINTS-OUVERTS.md)) |
 | ⚠️ | 9 — Demande d'avis | Bannière + note 5 étoiles, sans intégration store review native (juste stockage du feedback). **Pas encore construit** (table `app_feedback` seule) |
-| ⚠️ | 10 — Réglages | Compte, langue FR uniquement, infos importantes, aide & support, légal. **Thème sombre et couleur d'accent hors MVP**. Construit : compte (email, changement de mot de passe, suppression du compte), 4 thèmes prédéfinis, liens légaux (textes non rédigés), déconnexion |
+| ⚠️ | 10 — Réglages | Compte, langue (FR/EN/ES depuis le 2026-11-18, en avance sur la [V2](./V2.md) — l'interface seulement), infos importantes, aide & support, légal. **Thème sombre et couleur d'accent hors MVP**. Construit : compte (email, changement de mot de passe, suppression du compte), 4 thèmes prédéfinis, liens légaux (textes non rédigés), déconnexion |
 | ➕ | Hors design — Organisation & Préparation | Valises de maternité et de salle de naissance à cocher à deux, articles personnalisés (ajout sur demande explicite, cf. [plan d'action](../02-ACTION-PLAN.md#ajouts-hors-plan-août--novembre-2026)) |
 
 ## Hors périmètre explicite (reporté)
@@ -35,7 +35,7 @@ Correspondance avec les sections du [Design Overview](../01-DESIGN-OVERVIEW.md#c
 - Paiement premium réel (IAP / RevenueCat)
 - Module "Votre bébé" (croissance, biberon, allaitement, bain, sommeil, couche, visite médecin)
 - Notifications push réelles (les écrans de notif existent en design mais le déclenchement backend est reporté)
-- Localisation anglaise, thème sombre, couleurs d'accent
+- Thème sombre, couleurs d'accent (la localisation a été avancée le 2026-11-18, cf. tableau ci-dessus)
 - Export de données
 - Intégration store review native (SKStoreReviewController / In-App Review Android)
 

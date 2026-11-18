@@ -1,5 +1,5 @@
+import { useTranslation } from 'react-i18next';
 import { Pressable, Text, View } from 'react-native';
-
 import { GLASS_TITLE_COLOR } from '@/components/ui/glass-card';
 import { useThemeAccent } from '@/features/settings/hooks';
 
@@ -14,6 +14,7 @@ export function YesNoChoice({
   value: boolean | null;
   onChange: (value: boolean) => void;
 }) {
+  const { t } = useTranslation();
   const accent = useThemeAccent();
 
   return (
@@ -51,7 +52,7 @@ export function YesNoChoice({
                 fontWeight: isSelected ? '700' : '500',
               }}
             >
-              {option ? 'Oui' : 'Non'}
+              {option ? t('common.yes') : t('common.no')}
             </Text>
           </Pressable>
         );

@@ -2,9 +2,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { router, useFocusEffect } from 'expo-router';
 import { useAtomValue } from 'jotai';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { AppState, Pressable, Text, View } from 'react-native';
 import Animated, { FadeInUp, FadeOutUp } from 'react-native-reanimated';
-
 import {
   GLASS_BODY_COLOR,
   GLASS_TITLE_COLOR,
@@ -41,6 +41,7 @@ export function MoodNudgeToast({
 }: {
   household: Household | null | undefined;
 }) {
+  const { t } = useTranslation();
   const accent = useThemeAccent();
   const userId = useAtomValue(sessionAtom)?.user.id;
   const { data: profile } = useMyProfile();
@@ -115,7 +116,7 @@ export function MoodNudgeToast({
     >
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel="Partager mon humeur du jour"
+        accessibilityLabel={t('hub.nudge.a11y')}
         accessibilityLiveRegion="polite"
         onPress={() => {
           hide();
@@ -144,17 +145,15 @@ export function MoodNudgeToast({
             className="text-[14.5px] font-bold"
             style={{ color: GLASS_TITLE_COLOR }}
           >
-            Comment vous sentez-vous ?
+            {t('hub.nudge.title')}
           </Text>
           <Text className="text-[12.5px]" style={{ color: GLASS_BODY_COLOR }}>
-            {isSolo
-              ? 'Un tap pour noter votre humeur du jour.'
-              : 'Un tap pour partager votre humeur du jour.'}
+            {isSolo ? t('hub.nudge.bodySolo') : t('hub.nudge.body')}
           </Text>
         </View>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Fermer le rappel"
+          accessibilityLabel={t('hub.nudge.close')}
           hitSlop={10}
           onPress={hide}
           className="h-8 w-8 items-center justify-center rounded-full"

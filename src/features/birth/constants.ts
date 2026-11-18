@@ -1,3 +1,5 @@
+import type { TFunction } from 'i18next';
+
 import { daysBetween, todayIso } from '@/lib/date';
 
 /**
@@ -18,19 +20,15 @@ export function getBirthDateIssue(birthDate: string | null): BirthDateIssue {
   return null;
 }
 
-export const BIRTH_DATE_ISSUE_MESSAGE: Record<
-  Exclude<BirthDateIssue, null>,
-  string
-> = {
-  future:
-    'Cette date est dans le futur — la naissance se déclare une fois le bébé arrivé.',
-  'too-old': 'Cette date remonte à plus d’un an, vérifiez l’année choisie.',
-};
+export const BIRTH_DATE_ISSUE_MESSAGE = {
+  future: 'birth.issues.future',
+  'too-old': 'birth.issues.tooOld',
+} as const satisfies Record<Exclude<BirthDateIssue, null>, string>;
 
 /** « mardi 8 septembre 2026 » — le rappel complet avant de confirmer. */
-export function formatBirthDateLong(isoDate: string): string {
+export function formatBirthDateLong(isoDate: string, locale: string): string {
   const [year, month, day] = isoDate.split('-').map(Number);
-  return new Date(year, month - 1, day).toLocaleDateString('fr-FR', {
+  return new Date(year, month - 1, day).toLocaleDateString(locale, {
     weekday: 'long',
     day: 'numeric',
     month: 'long',
@@ -39,9 +37,9 @@ export function formatBirthDateLong(isoDate: string): string {
 }
 
 /** « 8 septembre » — forme courte des cartes récapitulatives. */
-export function formatBirthDateShort(isoDate: string): string {
+export function formatBirthDateShort(isoDate: string, locale: string): string {
   const [year, month, day] = isoDate.split('-').map(Number);
-  return new Date(year, month - 1, day).toLocaleDateString('fr-FR', {
+  return new Date(year, month - 1, day).toLocaleDateString(locale, {
     day: 'numeric',
     month: 'long',
   });
@@ -52,16 +50,16 @@ export function formatBirthDateShort(isoDate: string): string {
  * ne connaît pas son sexe et ne le demande nulle part — « né il y a… »
  * trancherait à sa place.
  */
-export function formatSinceBirth(birthDate: string): string {
+export function formatSinceBirth(birthDate: string, t: TFunction): string {
   const days = -daysBetween(todayIso(), birthDate);
 
-  if (days <= 0) return 'Depuis aujourd’hui';
-  if (days === 1) return 'Depuis hier';
-  if (days < 14) return `Il y a ${days} jours`;
+  if (days <= 0) return t('birth.since.today');
+  if (days === 1) return t('birth.since.yesterday');
+  if (days < 14) return t('birth.since.days', { count: days });
 
   const weeks = Math.floor(days / 7);
-  if (weeks < 9) return `Il y a ${weeks} semaines`;
+  if (weeks < 9) return t('birth.since.weeks', { count: weeks });
 
   const months = Math.floor(days / 30);
-  return months === 1 ? 'Il y a 1 mois' : `Il y a ${months} mois`;
+  return t('birth.since.months', { count: months });
 }

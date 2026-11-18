@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
-
 import {
   WHEEL_SIZES,
   WheelColumn,
@@ -55,6 +55,7 @@ export function WheelTimePicker({
   onChange: (time: string) => void;
   compact?: boolean;
 }) {
+  const { t } = useTranslation();
   const size = compact ? WHEEL_SIZES.compact : WHEEL_SIZES.regular;
   const wheelHeight = size.itemHeight * size.visibleItems;
   const wheelPadding = (wheelHeight - size.itemHeight) / 2;
@@ -93,7 +94,7 @@ export function WheelTimePicker({
             items={HOUR_ITEMS}
             selected={hours}
             onSelect={(nextHours) => select({ hours: nextHours })}
-            accessibilityLabel="Heures"
+            accessibilityLabel={t('pickers.hours')}
             flex={1}
             size={size}
           />
@@ -107,7 +108,7 @@ export function WheelTimePicker({
             items={minuteItems(minutes)}
             selected={minutes}
             onSelect={(nextMinutes) => select({ minutes: nextMinutes })}
-            accessibilityLabel="Minutes"
+            accessibilityLabel={t('pickers.minutes')}
             flex={1}
             size={size}
           />

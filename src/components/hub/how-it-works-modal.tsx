@@ -1,13 +1,14 @@
 import { Ionicons } from '@expo/vector-icons';
 import type { ComponentProps } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Modal, Text, View } from 'react-native';
 import Animated, { SlideInDown, SlideOutDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
-
 import { GLASS_TITLE_COLOR, SparkLines } from '@/components/ui/glass-card';
 import { PillButton } from '@/components/ui/pill-button';
 import { useThemeAccent } from '@/features/settings/hooks';
+import type { TranslationKey } from '@/i18n/types';
 import { hexToRgba, lightenHex } from '@/lib/color';
 
 type IoniconName = ComponentProps<typeof Ionicons>['name'];
@@ -19,18 +20,22 @@ const HEART_PINK = '#f08aa8';
  * Étapes : texte fourni tel quel par l'utilisateur, plus une icône chacune
  * (pur repère visuel). `badge` ajoute une pastille d'accent sur l'icône.
  */
-const STEPS: { text: string; icon: IoniconName; badge?: IoniconName }[] = [
+const STEPS: {
+  text: TranslationKey;
+  icon: IoniconName;
+  badge?: IoniconName;
+}[] = [
   {
-    text: 'Cliquer sur « Ajouter votre partenaire »',
+    text: 'hub.howItWorks.steps.add',
     icon: 'person-outline',
     badge: 'add',
   },
   {
-    text: 'Partager-lui le code à 6 caractères ou le QR code',
+    text: 'hub.howItWorks.steps.share',
     icon: 'qr-code-outline',
   },
   {
-    text: 'La personne installe l’application et intègre le code à l’ouverture',
+    text: 'hub.howItWorks.steps.install',
     icon: 'phone-portrait-outline',
     badge: 'checkmark',
   },
@@ -138,6 +143,7 @@ function StepRow({
   step: (typeof STEPS)[number];
   accent: string;
 }) {
+  const { t } = useTranslation();
   return (
     <View className="flex-row items-center gap-3">
       <View
@@ -166,7 +172,7 @@ function StepRow({
         className="flex-1 text-[14.5px] leading-5"
         style={{ color: GLASS_TITLE_COLOR }}
       >
-        {step.text}
+        {t(step.text)}
       </Text>
     </View>
   );
@@ -200,6 +206,7 @@ export function HowItWorksModal({
   visible: boolean;
   onClose: () => void;
 }) {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const accent = useThemeAccent();
 
@@ -242,7 +249,7 @@ export function HowItWorksModal({
                 className="text-[26px] font-extrabold leading-8"
                 style={{ color: GLASS_TITLE_COLOR, letterSpacing: -0.5 }}
               >
-                Comment ça marche ?
+                {t('hub.howItWorks.title')}
               </Text>
               <Svg width={120} height={12} viewBox="0 0 120 12">
                 <Path
@@ -269,7 +276,7 @@ export function HowItWorksModal({
           </View>
 
           <View className="mt-1">
-            <PillButton label="Compris" onPress={onClose} />
+            <PillButton label={t('hub.howItWorks.gotIt')} onPress={onClose} />
           </View>
         </Animated.View>
       </View>

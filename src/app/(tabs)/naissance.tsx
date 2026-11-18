@@ -1,11 +1,11 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import { withUniwind } from 'uniwind';
-
 import { ConfirmBirthModal } from '@/components/birth/confirm-birth-modal';
 import { DeclareBirthButton } from '@/components/birth/declare-birth-button';
 import { useTabBarHeight } from '@/components/navigation/use-tab-bar-height';
@@ -31,6 +31,7 @@ import {
 } from '@/features/procedures/constants';
 import { useProcedures } from '@/features/procedures/hooks';
 import { useThemeAccent, useThemeBackground } from '@/features/settings/hooks';
+import { useLocale } from '@/i18n/hooks';
 import { hexToRgba } from '@/lib/color';
 import { todayIso } from '@/lib/date';
 
@@ -88,6 +89,7 @@ const tintedShadow = (accent: string) =>
  * qu'écrire la date et recalculer les échéances.
  */
 export default function BirthScreen() {
+  const { t } = useTranslation();
   // Place de la barre du bas, qui flotte au-dessus du contenu.
   // La barre d'onglets flotte au-dessus de l'écran : le pied d'action se
   // place juste au-dessus d'elle (il passait dessous, demande explicite).
@@ -151,7 +153,7 @@ export default function BirthScreen() {
         showsVerticalScrollIndicator={false}
       >
         <Pressable
-          accessibilityLabel="Revenir en arrière"
+          accessibilityLabel={t('common.goBack')}
           accessibilityRole="button"
           hitSlop={12}
           onPress={() =>
@@ -177,7 +179,7 @@ export default function BirthScreen() {
                   className="text-[16px] font-bold"
                   style={{ color: GLASS_TITLE_COLOR }}
                 >
-                  Date de naissance
+                  {t('birth.birthDate')}
                 </Text>
               </View>
               <WheelDatePicker value={draftDate} onChange={setDraftDate} />
@@ -185,7 +187,7 @@ export default function BirthScreen() {
                 <View className="flex-row items-start gap-2 px-1">
                   <Ionicons name="alert-circle" size={15} color="#c9553d" />
                   <Text className="flex-1 text-[12.5px] leading-[18px] text-[#c9553d]">
-                    {BIRTH_DATE_ISSUE_MESSAGE[dateIssue]}
+                    {t(BIRTH_DATE_ISSUE_MESSAGE[dateIssue])}
                   </Text>
                 </View>
               ) : null}
@@ -198,7 +200,7 @@ export default function BirthScreen() {
                   className="text-[16px] font-bold"
                   style={{ color: GLASS_TITLE_COLOR }}
                 >
-                  Ce que ça change
+                  {t('birth.whatChanges')}
                 </Text>
               </View>
 
@@ -222,14 +224,13 @@ export default function BirthScreen() {
                     className="text-[15.5px] font-bold"
                     style={{ color: GLASS_TITLE_COLOR }}
                   >
-                    Vos autres démarches
+                    {t('birth.otherProcedures')}
                   </Text>
                   <Text
                     className="text-[13px] leading-[18px]"
                     style={{ color: GLASS_BODY_COLOR }}
                   >
-                    Repères et rappels réalignés sur la date choisie, pour vous
-                    deux.
+                    {t('birth.realigned')}
                   </Text>
                 </View>
               </View>
@@ -250,8 +251,7 @@ export default function BirthScreen() {
                 className="flex-1 text-[13px] leading-[19px]"
                 style={{ color: GLASS_BODY_COLOR }}
               >
-                Toutes les dates et échéances de vos démarches seront
-                automatiquement mises à jour en fonction de cette date.
+                {t('birth.allUpdated')}
               </Text>
             </View>
           </>
@@ -277,7 +277,9 @@ export default function BirthScreen() {
           style={{ backgroundColor, paddingBottom: tabBarHeight + 4 }}
         >
           <DeclareBirthButton
-            label={isCorrecting ? 'Corriger la date' : 'Confirmer la naissance'}
+            label={
+              isCorrecting ? t('birth.correctDate') : t('birth.confirmBirth')
+            }
             isDisabled={!canConfirm}
             isLoading={declareBirth.isPending}
             onPress={() => setIsConfirmOpen(true)}
@@ -287,13 +289,13 @@ export default function BirthScreen() {
               affichée sous la molette. */}
           {declareBirth.isError ? (
             <Text className="px-2 text-center text-[12.5px] text-[#c9553d]">
-              L’enregistrement a échoué. Vérifiez votre connexion et réessayez.
+              {t('birth.saveFailed')}
             </Text>
           ) : dateIssue !== null ? null : (
             <Text className="px-2 text-center text-[12px] text-[#8a8a8a]">
               {draftDate === null
-                ? 'Choisissez la date pour continuer'
-                : 'Vous relirez la date avant qu’elle soit enregistrée'}
+                ? t('birth.chooseDate')
+                : t('birth.reviewBeforeSave')}
             </Text>
           )}
         </View>
@@ -311,7 +313,7 @@ export default function BirthScreen() {
             className="items-center py-2"
           >
             <Text className="text-[14px] font-medium text-accent">
-              Modifier la date de naissance
+              {t('birth.editBirthDate')}
             </Text>
           </Pressable>
         </View>
@@ -335,6 +337,7 @@ export default function BirthScreen() {
  * ouverte pendant l'onboarding.
  */
 function BirthHeader({ isDeclared }: { isDeclared: boolean }) {
+  const { t } = useTranslation();
   const accent = useThemeAccent();
 
   return (
@@ -375,7 +378,7 @@ function BirthHeader({ isDeclared }: { isDeclared: boolean }) {
           className="text-[30px] font-extrabold"
           style={{ color: GLASS_TITLE_COLOR, letterSpacing: -0.6 }}
         >
-          {isDeclared ? 'Naissance déclarée' : 'J’ai accouché'}
+          {isDeclared ? t('birth.declared') : t('birth.gaveBirth')}
         </Text>
       </View>
 
@@ -383,9 +386,7 @@ function BirthHeader({ isDeclared }: { isDeclared: boolean }) {
         className="text-center text-[15px]"
         style={{ color: GLASS_BODY_COLOR }}
       >
-        {isDeclared
-          ? 'Félicitations — tout est à jour de votre côté.'
-          : 'Le grand jour est arrivé !'}
+        {isDeclared ? t('birth.congrats') : t('birth.bigDay')}
       </Text>
       <Svg width={90} height={10} viewBox="0 0 90 10">
         <Path
@@ -415,9 +416,16 @@ function DeadlinePreviewCard({
   deadlineDaysAfterBirth: number | null;
   birthDate: string | null;
 }) {
+  const { t } = useTranslation();
+  const locale = useLocale();
   const accent = useThemeAccent();
   const iconStyle = getProcedureIconStyle(BIRTH_DECLARATION_SLUG);
-  const deadline = formatDeadlineLabel(deadlineDaysAfterBirth, birthDate);
+  const deadline = formatDeadlineLabel(
+    deadlineDaysAfterBirth,
+    birthDate,
+    t,
+    locale,
+  );
 
   return (
     <View
@@ -455,7 +463,7 @@ function DeadlinePreviewCard({
             className="text-[12px] font-bold"
             style={{ color: iconStyle.color }}
           >
-            Délai légal
+            {t('birth.legalDeadline')}
           </Text>
         </View>
       )}
@@ -475,6 +483,8 @@ function DeclaredBirthSummary({
   deadlineDaysAfterBirth: number | null;
   onOpenProcedures: () => void;
 }) {
+  const { t } = useTranslation();
+  const locale = useLocale();
   const accent = useThemeAccent();
   const iconStyle = getProcedureIconStyle(BIRTH_DECLARATION_SLUG);
 
@@ -485,20 +495,20 @@ function DeclaredBirthSummary({
         style={[tintedShadow(accent), GLASS_SURFACE]}
       >
         <Text className="text-[11.5px] font-semibold tracking-wide text-[#8a8a8a]">
-          DATE DE NAISSANCE
+          {t('birth.birthDateCaps')}
         </Text>
         <Text className="text-center text-[19px] font-semibold text-accent">
-          {formatBirthDateLong(birthDate)}
+          {formatBirthDateLong(birthDate, locale)}
         </Text>
         <Text className="text-[13px] text-[#8a8a8a]">
-          {formatSinceBirth(birthDate)}
+          {formatSinceBirth(birthDate, t)}
         </Text>
       </View>
 
       {procedureTitle ? (
         <View className="gap-2">
           <Text className="text-[11.5px] font-semibold tracking-wide text-[#8a8a8a]">
-            À FAIRE MAINTENANT
+            {t('birth.doNow')}
           </Text>
 
           <Pressable
@@ -525,7 +535,12 @@ function DeclaredBirthSummary({
                 className="text-[13px] font-medium"
                 style={{ color: iconStyle.color }}
               >
-                {formatDeadlineLabel(deadlineDaysAfterBirth, birthDate)}
+                {formatDeadlineLabel(
+                  deadlineDaysAfterBirth,
+                  birthDate,
+                  t,
+                  locale,
+                )}
               </Text>
             </View>
             <ChevronBubble accent={accent} />

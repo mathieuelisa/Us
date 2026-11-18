@@ -1,6 +1,7 @@
 import type { Ionicons } from '@expo/vector-icons';
+import type { TFunction } from 'i18next';
 import type { ComponentProps } from 'react';
-
+import { formatDayMonth } from '@/i18n/format';
 import { daysBetween, shiftIsoDate, todayIso } from '@/lib/date';
 
 type IoniconName = ComponentProps<typeof Ionicons>['name'];
@@ -84,16 +85,18 @@ export function getProcedureIconStyle(slug: string) {
   );
 }
 
-export const STATUS_OPTIONS: { value: string; label: string }[] = [
-  { value: 'a_faire', label: 'À faire' },
-  { value: 'en_cours', label: 'En cours' },
-  { value: 'fait', label: 'Fait' },
+export type ProcedureStatus = 'a_faire' | 'en_cours' | 'fait';
+
+export const STATUS_OPTIONS: { value: ProcedureStatus }[] = [
+  { value: 'a_faire' },
+  { value: 'en_cours' },
+  { value: 'fait' },
 ];
 
-export function getStatusLabel(status: string): string {
-  return (
-    STATUS_OPTIONS.find((option) => option.value === status)?.label ?? status
-  );
+export function getStatusLabel(status: string, t: TFunction): string {
+  return STATUS_OPTIONS.some((option) => option.value === status)
+    ? t(`procedures.statuses.${status as ProcedureStatus}`)
+    : status;
 }
 
 /**
@@ -113,16 +116,10 @@ export function getProcedurePregnancyMonth(procedure: {
 
 export const PREGNANCY_MONTHS = [1, 2, 3, 4, 5, 6, 7, 8, 9] as const;
 
-export function getPregnancyMonthLabel(month: number): string {
-  return month === 1 ? '1er mois de grossesse' : `${month}e mois de grossesse`;
-}
+export type PregnancyMonth = (typeof PREGNANCY_MONTHS)[number];
 
-function formatLongDate(isoDate: string): string {
-  const [year, month, day] = isoDate.split('-').map(Number);
-  return new Date(year, month - 1, day).toLocaleDateString('fr-FR', {
-    day: 'numeric',
-    month: 'long',
-  });
+export function getPregnancyMonthLabel(month: number, t: TFunction): string {
+  return t(`procedures.months.long.m${month as PregnancyMonth}`);
 }
 
 /**
@@ -139,17 +136,23 @@ function formatLongDate(isoDate: string): string {
 export function formatDeadlineLabel(
   deadlineDaysAfterBirth: number | null,
   birthDate: string | null,
+  t: TFunction,
+  locale: string,
 ): string {
-  if (deadlineDaysAfterBirth === null) return 'Le plus rapidement possible';
+  if (deadlineDaysAfterBirth === null) return t('procedures.deadline.asap');
 
   if (!birthDate) {
-    return `${deadlineDaysAfterBirth} jours à partir de la naissance`;
+    return t('procedures.deadline.daysFromBirth', {
+      count: deadlineDaysAfterBirth,
+    });
   }
 
   const dueDate = shiftIsoDate(birthDate, deadlineDaysAfterBirth);
   const daysLeft = daysBetween(todayIso(), dueDate);
 
-  if (daysLeft < 0) return 'Échéance dépassée';
-  if (daysLeft === 0) return 'Échéance aujourd’hui';
-  return `Jusqu’au ${formatLongDate(dueDate)}`;
+  if (daysLeft < 0) return t('procedures.deadline.overdue');
+  if (daysLeft === 0) return t('procedures.deadline.today');
+  return t('procedures.deadline.until', {
+    date: formatDayMonth(dueDate, locale),
+  });
 }

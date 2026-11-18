@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
@@ -43,6 +44,7 @@ const GLASS_SURFACE = {
  * et à faire valider (voir l'avertissement de ce fichier).
  */
 export default function LegalScreen() {
+  const { t } = useTranslation();
   // Place de la barre du bas, qui flotte au-dessus du contenu.
   const tabBarInset = useTabBarContentInset();
   const router = useRouter();
@@ -73,7 +75,7 @@ export default function LegalScreen() {
       >
         {router.canGoBack() ? (
           <Pressable
-            accessibilityLabel="Revenir en arrière"
+            accessibilityLabel={t('common.goBack')}
             accessibilityRole="button"
             hitSlop={12}
             onPress={() => router.back()}
@@ -138,7 +140,7 @@ export default function LegalScreen() {
               className="text-[12.5px] font-semibold"
               style={{ color: accent }}
             >
-              Dernière mise à jour : {entry.updatedAt}
+              {t('pickers.legalUpdated', { date: entry.updatedAt })}
             </Text>
           </View>
         </View>
@@ -151,7 +153,7 @@ export default function LegalScreen() {
             <View className="flex-row items-center gap-2">
               <Ionicons name="sparkles-outline" size={18} color={accent} />
               <Text className="text-[15px] font-bold" style={{ color: accent }}>
-                En bref
+                {t('pickers.legalSummary')}
               </Text>
             </View>
             {entry.summary.map((point) => (

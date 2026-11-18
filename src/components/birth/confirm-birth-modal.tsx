@@ -1,9 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { Modal, Pressable, Text, View } from 'react-native';
 import Animated, { SlideInDown, SlideOutDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
 import { formatBirthDateLong } from '@/features/birth/constants';
+import { useLocale } from '@/i18n/hooks';
 
 /**
  * Dernier palier avant l'écriture de `households.birth_date`. Une pop-up
@@ -28,6 +29,8 @@ export function ConfirmBirthModal({
   onConfirm: () => void;
   onClose: () => void;
 }) {
+  const { t } = useTranslation();
+  const locale = useLocale();
   const insets = useSafeAreaInsets();
   return (
     <Modal
@@ -49,19 +52,19 @@ export function ConfirmBirthModal({
 
           <View className="gap-1.5">
             <Text className="text-[18px] font-bold text-[#1a1a1a]">
-              Confirmer cette date ?
+              {t('birth.confirm.title')}
             </Text>
             <Text className="text-[14px] leading-5 text-[#6b6b6b]">
-              Vos échéances de démarches seront recalculées à partir d’elle.
+              {t('birth.confirm.body')}
             </Text>
           </View>
 
           <View className="items-center gap-1 rounded-2xl bg-accent/10 px-4 py-4">
             <Text className="text-[11.5px] font-semibold tracking-wide text-[#8a8a8a]">
-              DATE DE NAISSANCE
+              {t('birth.birthDateCaps')}
             </Text>
             <Text className="text-center text-[17px] font-semibold text-accent">
-              {birthDate ? formatBirthDateLong(birthDate) : '—'}
+              {birthDate ? formatBirthDateLong(birthDate, locale) : '—'}
             </Text>
           </View>
 
@@ -72,7 +75,7 @@ export function ConfirmBirthModal({
               color="#8a8a8a"
             />
             <Text className="flex-1 text-[12.5px] leading-[18px] text-[#8a8a8a]">
-              Vous pourrez la corriger depuis cet écran si vous vous trompez.
+              {t('birth.confirm.canCorrect')}
             </Text>
           </View>
 
@@ -90,7 +93,7 @@ export function ConfirmBirthModal({
               }`}
             >
               <Text className="text-[15px] font-semibold text-accent-foreground">
-                {isSubmitting ? 'Enregistrement…' : 'Oui, bébé est arrivé'}
+                {isSubmitting ? t('birth.saving') : t('birth.confirm.yes')}
               </Text>
             </Pressable>
 
@@ -101,7 +104,7 @@ export function ConfirmBirthModal({
               className="items-center py-2"
             >
               <Text className="text-[14px] text-[#6b6b6b]">
-                Modifier la date
+                {t('birth.confirm.edit')}
               </Text>
             </Pressable>
           </View>

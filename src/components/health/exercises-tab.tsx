@@ -2,9 +2,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useAtomValue } from 'jotai';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Image, Pressable, Text, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
-
 import {
   GLASS_BODY_COLOR,
   GLASS_TITLE_COLOR,
@@ -28,11 +28,11 @@ import { hexToRgba } from '@/lib/color';
 const TRIMESTERS: ExerciseTrimester[] = [1, 2, 3];
 
 /** Libellés courts du sélecteur — « 2ème trimestre » n'y tiendrait pas. */
-const TRIMESTER_SHORT_LABELS: Record<ExerciseTrimester, string> = {
-  1: '1er trim.',
-  2: '2ème trim.',
-  3: '3ème trim.',
-};
+const TRIMESTER_SHORT_LABELS = {
+  1: 'health.trimestersShort.t1',
+  2: 'health.trimestersShort.t2',
+  3: 'health.trimestersShort.t3',
+} as const satisfies Record<ExerciseTrimester, string>;
 
 /**
  * Écran 4f — exercices.
@@ -64,6 +64,7 @@ export function ExercisesTab({
 }: {
   household: Household | null | undefined;
 }) {
+  const { t } = useTranslation();
   const accent = useThemeAccent();
   // Côté partenaire (demande explicite), les mêmes exercices se lisent comme
   // une façon de l'aider : intro, pastille « À deux » et accroche dédiées.
@@ -86,15 +87,27 @@ export function ExercisesTab({
         >
           {isPartner
             ? currentTrimester === null
-              ? 'Accompagnez-la : des exercices à faire ensemble, ou pour la soutenir.'
-              : `Elle est au ${TRIMESTER_LABELS[currentTrimester].toLowerCase()}${
-                  weeks === null ? '' : ` — ${weeks} SA`
-                }. Accompagnez-la : des exercices à faire ensemble, ou pour la soutenir.`
+              ? t('health.exercises.partnerIntro')
+              : t('health.exercises.partnerCurrent', {
+                  trimester: t(
+                    TRIMESTER_LABELS[currentTrimester],
+                  ).toLowerCase(),
+                  weeks:
+                    weeks === null
+                      ? ''
+                      : t('health.exercises.weeksSuffix', { count: weeks }),
+                })
             : currentTrimester === null
-              ? 'Des séances courtes, adaptées à chaque trimestre.'
-              : `Vous êtes au ${TRIMESTER_LABELS[currentTrimester].toLowerCase()}${
-                  weeks === null ? '' : ` — ${weeks} SA`
-                }. Les autres trimestres restent consultables.`}
+              ? t('health.exercises.intro')
+              : t('health.exercises.current', {
+                  trimester: t(
+                    TRIMESTER_LABELS[currentTrimester],
+                  ).toLowerCase(),
+                  weeks:
+                    weeks === null
+                      ? ''
+                      : t('health.exercises.weeksSuffix', { count: weeks }),
+                })}
         </Text>
         <Svg width={120} height={10} viewBox="0 0 120 10">
           <Path
@@ -116,7 +129,11 @@ export function ExercisesTab({
               key={trimester}
               accessibilityRole="button"
               accessibilityState={{ selected: isActive }}
-              accessibilityLabel={`${TRIMESTER_LABELS[trimester]}${isCurrent ? (isPartner ? ', en cours' : ', le vôtre') : ''}`}
+              accessibilityLabel={`${t(TRIMESTER_LABELS[trimester])}${
+                isCurrent
+                  ? `, ${isPartner ? t('health.exercises.ongoing') : t('health.exercises.yours')}`
+                  : ''
+              }`}
               onPress={() => setSelectedTrimester(trimester)}
               className="h-12 flex-1 flex-row items-center justify-center gap-1.5 rounded-full"
               style={
@@ -147,7 +164,7 @@ export function ExercisesTab({
                     fontWeight: isActive ? '700' : '500',
                   }}
                 >
-                  {TRIMESTER_SHORT_LABELS[trimester]}
+                  {t(TRIMESTER_SHORT_LABELS[trimester])}
                 </Text>
                 {/* Repère discret du trimestre réellement en cours : sans lui,
                     rien ne distingue « le mien » de « celui que je consulte »
@@ -159,7 +176,9 @@ export function ExercisesTab({
                       color: isActive ? 'rgba(255, 255, 255, 0.8)' : '#a3a1b0',
                     }}
                   >
-                    {isPartner ? 'en cours' : 'le vôtre'}
+                    {isPartner
+                      ? t('health.exercises.ongoing')
+                      : t('health.exercises.yours')}
                   </Text>
                 ) : null}
               </View>
@@ -178,7 +197,7 @@ export function ExercisesTab({
             className="text-center text-[14px]"
             style={{ color: GLASS_BODY_COLOR }}
           >
-            Aucun exercice proposé pour cette période.
+            {t('health.exercises.none')}
           </Text>
         </View>
       ) : (
@@ -248,6 +267,7 @@ function ExerciseCard({
   accent: string;
   isPartner: boolean;
 }) {
+  const { t } = useTranslation();
   const { duration, posture } = splitDurationLabel(exercise.durationLabel);
 
   return (
@@ -313,7 +333,7 @@ function ExerciseCard({
                 className="text-[11px] font-bold"
                 style={{ color: exercise.tint.ink }}
               >
-                À deux
+                {t('health.exercises.together')}
               </Text>
             </View>
           ) : null}

@@ -1,20 +1,24 @@
 import { Ionicons } from '@expo/vector-icons';
+import type { TFunction } from 'i18next';
+import { useTranslation } from 'react-i18next';
 import { Pressable, Text, View } from 'react-native';
 
 import { formatMonthTitle } from '@/features/health/constants';
+import { formatDayMonth, getWeekdayLetters } from '@/i18n/format';
+import { useLocale } from '@/i18n/hooks';
 import { todayIso, toLocalIsoDate } from '@/lib/date';
 
 // Les initiales se répètent (M pour mardi et mercredi) : chaque colonne
 // porte donc sa propre clé, plutôt que de s'appuyer sur sa position.
-const WEEK_DAYS = [
-  { key: 'lundi', letter: 'L' },
-  { key: 'mardi', letter: 'M' },
-  { key: 'mercredi', letter: 'M' },
-  { key: 'jeudi', letter: 'J' },
-  { key: 'vendredi', letter: 'V' },
-  { key: 'samedi', letter: 'S' },
-  { key: 'dimanche', letter: 'D' },
-];
+const WEEK_DAY_KEYS = [
+  'lundi',
+  'mardi',
+  'mercredi',
+  'jeudi',
+  'vendredi',
+  'samedi',
+  'dimanche',
+] as const;
 
 type GridCell = { key: string; isoDate: string | null };
 
@@ -56,21 +60,18 @@ const INK = '#161616';
 const HOVER_BG = '#F2F2F2';
 const PILL_SIZE = 44;
 
-const MONTH_NAMES = new Intl.DateTimeFormat('fr-FR', { month: 'long' });
-
 /** « 16 novembre, 2 rendez-vous » ou « 13 novembre, aujourd'hui ». */
 function dayAccessibilityLabel(
   isoDate: string,
   appointmentCount: number,
   isToday: boolean,
+  t: TFunction,
+  locale: string,
 ): string {
-  const [year, month, day] = isoDate.split('-').map(Number);
-  const parts = [
-    `${day} ${MONTH_NAMES.format(new Date(year, month - 1, day))}`,
-  ];
-  if (isToday) parts.push('aujourd’hui');
+  const parts = [formatDayMonth(isoDate, locale)];
+  if (isToday) parts.push(t('health.calendar.today'));
   if (appointmentCount > 0) {
-    parts.push(`${appointmentCount} rendez-vous`);
+    parts.push(t('health.calendar.appointments', { count: appointmentCount }));
   }
   return parts.join(', ');
 }
@@ -100,6 +101,9 @@ export function MonthCalendar({
   onSelectDate?: (isoDate: string) => void;
   onChangeMonth: (delta: -1 | 1) => void;
 }) {
+  const { t } = useTranslation();
+  const locale = useLocale();
+  const weekdayLetters = getWeekdayLetters(locale);
   const grid = getMonthGrid(year, month);
   const today = todayIso();
   const appointmentCounts = new Map<string, number>();
@@ -121,16 +125,16 @@ export function MonthCalendar({
       <View className="flex-row items-center justify-between">
         <MonthArrow direction="previous" onPress={() => onChangeMonth(-1)} />
         <Text className="text-[15px] font-semibold" style={{ color: INK }}>
-          {formatMonthTitle(year, month)}
+          {formatMonthTitle(year, month, locale)}
         </Text>
         <MonthArrow direction="next" onPress={() => onChangeMonth(1)} />
       </View>
 
       <View className="flex-row">
-        {WEEK_DAYS.map((day) => (
-          <View key={day.key} className="flex-1 items-center">
+        {WEEK_DAY_KEYS.map((dayKey, index) => (
+          <View key={dayKey} className="flex-1 items-center">
             <Text className="text-[11px] font-medium text-[#9a9a9a]">
-              {day.letter}
+              {weekdayLetters[index]}
             </Text>
           </View>
         ))}
@@ -158,6 +162,8 @@ export function MonthCalendar({
                 isoDate,
                 appointmentCount,
                 isToday,
+                t,
+                locale,
               )}
               accessibilityState={{ selected: isSelected }}
               disabled={!onSelectDate}
@@ -222,7 +228,7 @@ export function MonthCalendar({
             style={{ backgroundColor: CALENDAR_TINT }}
           />
           <Text className="text-[13px]" style={{ color: '#6B6B6B' }}>
-            Rendez-vous
+            {t('health.tabs.appointments')}
           </Text>
         </View>
         <View className="flex-row items-center gap-2">
@@ -231,7 +237,7 @@ export function MonthCalendar({
             style={{ borderWidth: 1.5, borderColor: INK }}
           />
           <Text className="text-[13px]" style={{ color: '#6B6B6B' }}>
-            Aujourd’hui
+            {t('health.calendar.todayButton')}
           </Text>
         </View>
       </View>
@@ -247,10 +253,13 @@ function MonthArrow({
   direction: 'previous' | 'next';
   onPress: () => void;
 }) {
+  const { t } = useTranslation();
   return (
     <Pressable
       accessibilityLabel={
-        direction === 'previous' ? 'Mois précédent' : 'Mois suivant'
+        direction === 'previous'
+          ? t('health.calendar.previousMonth')
+          : t('health.calendar.nextMonth')
       }
       accessibilityRole="button"
       hitSlop={6}

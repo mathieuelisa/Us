@@ -1,8 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
 import type { ComponentProps } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Pressable, Text, View } from 'react-native';
 import Svg, { Circle, Ellipse, G, Line, Path, Rect } from 'react-native-svg';
-
 import {
   GLASS_BODY_COLOR,
   GLASS_TITLE_COLOR,
@@ -24,18 +24,13 @@ type IoniconName = ComponentProps<typeof Ionicons>['name'];
  * pluriel, fleur pour les allergies).
  */
 const SUGGESTIONS: {
-  category: InfoCategory;
-  label: string;
+  category: 'blood_type' | 'allergy' | 'phone' | 'vigilance';
   icon: IoniconName;
 }[] = [
-  { category: 'blood_type', label: 'Groupe sanguin', icon: 'water-outline' },
-  { category: 'allergy', label: 'Allergies', icon: 'flower-outline' },
-  { category: 'phone', label: 'Numéros utiles', icon: 'call-outline' },
-  {
-    category: 'vigilance',
-    label: 'Points de vigilance',
-    icon: 'medkit-outline',
-  },
+  { category: 'blood_type', icon: 'water-outline' },
+  { category: 'allergy', icon: 'flower-outline' },
+  { category: 'phone', icon: 'call-outline' },
+  { category: 'vigilance', icon: 'medkit-outline' },
 ];
 
 /**
@@ -54,6 +49,7 @@ export function EmptyInfoState({
   accent: string;
   onPickCategory: (category: InfoCategory) => void;
 }) {
+  const { t } = useTranslation();
   const isSolo = useIsSoloHousehold();
   return (
     <View
@@ -75,14 +71,14 @@ export function EmptyInfoState({
         className="mt-1 text-center text-[19px] font-extrabold"
         style={{ color: GLASS_TITLE_COLOR, letterSpacing: -0.3 }}
       >
-        Aucune information pour l’instant
+        {t('household.empty.title')}
       </Text>
       <Text
         className="mt-2 text-center text-[14px] leading-5"
         style={{ color: GLASS_BODY_COLOR }}
       >
-        Ajoutez groupe sanguin, allergies, numéros utiles…
-        {isSolo ? null : '\nElles seront partagées avec votre partenaire.'}
+        {t('household.empty.hint')}
+        {isSolo ? null : `\n${t('household.empty.shared')}`}
       </Text>
 
       <View className="mt-5 w-full flex-row items-center gap-3">
@@ -96,7 +92,7 @@ export function EmptyInfoState({
             style={{ backgroundColor: hexToRgba(accent, 0.1) }}
           >
             <Text className="text-[13px] font-bold" style={{ color: accent }}>
-              Suggestions
+              {t('household.empty.suggestions')}
             </Text>
           </View>
           <SparkLines
@@ -117,7 +113,9 @@ export function EmptyInfoState({
             <Pressable
               key={suggestion.category}
               accessibilityRole="button"
-              accessibilityLabel={`Ajouter : ${suggestion.label}`}
+              accessibilityLabel={t('household.empty.addNamed', {
+                label: t(`household.suggestions.${suggestion.category}`),
+              })}
               onPress={() => onPickCategory(suggestion.category)}
               className="h-14 flex-row items-center gap-2.5 rounded-[18px] px-2.5 active:opacity-70"
               style={{
@@ -136,7 +134,7 @@ export function EmptyInfoState({
                 className="flex-1 text-[13.5px] font-semibold leading-[17px]"
                 style={{ color: GLASS_TITLE_COLOR }}
               >
-                {suggestion.label}
+                {t(`household.suggestions.${suggestion.category}`)}
               </Text>
             </Pressable>
           );

@@ -1,5 +1,5 @@
+import { useTranslation } from 'react-i18next';
 import { NameListScreen } from '@/components/names/name-list-screen';
-import { GENDER_META } from '@/features/names/catalog';
 import { useNameMatches } from '@/features/names/hooks';
 
 /**
@@ -7,22 +7,21 @@ import { useNameMatches } from '@/features/names/hooks';
  * droite) par les deux parents.
  */
 export default function NameMatchesScreen() {
+  const { t } = useTranslation();
   const { matches, isLoading } = useNameMatches();
 
   return (
     <NameListScreen
-      title="Vos matchs"
-      subtitle="Les prénoms que vous avez gardés tous les deux."
+      title={t('names.modules.matches')}
+      subtitle={t('names.matches.subtitle')}
       icon="heart-circle-outline"
       items={matches}
       isLoading={isLoading}
-      emptyTitle="Pas encore de match"
-      emptyText="Swipez chacun de votre côté : un prénom gardé par vous deux apparaîtra ici."
+      emptyTitle={t('names.noMatchYet')}
+      emptyText={t('names.matches.emptyText')}
       image={require('@/assets/images/Prenoms_matchs.png')}
-      itemNoun={{ singular: 'match', plural: 'matchs' }}
-      sectionSubtitle={(gender) =>
-        `Les prénoms ${GENDER_META[gender].label}s gardés par vous deux.`
-      }
+      formatCount={(count) => t('names.matchCount', { count })}
+      sectionSubtitle={(gender) => t(`names.matches.section.${gender}`)}
     />
   );
 }

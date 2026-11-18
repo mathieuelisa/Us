@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Image,
   Pressable,
@@ -18,14 +19,6 @@ import {
   SparkLines,
 } from '@/components/ui/glass-card';
 import { darkenHex, hexToRgba, lightenHex } from '@/lib/color';
-
-/**
- * ⚠️ Pas encore de lien de téléchargement : l'app n'est publiée sur aucun
- * store. Le message partagé ne contient que le nom de l'app ; ajouter le
- * lien ici dès qu'il existe.
- */
-const SHARE_MESSAGE =
-  'Je te conseille US, l’application pour vivre la grossesse et les premiers mois de bébé à deux.';
 
 /**
  * Illustration fournie (fond transparent) : téléphone avec l'icône de l'app,
@@ -54,6 +47,7 @@ export function ShareAppCard({
   accent: string;
   cardStyle: StyleProp<ViewStyle>;
 }) {
+  const { t } = useTranslation();
   const [shareError, setShareError] = useState<string | null>(null);
   const { width } = useWindowDimensions();
   const isWide = width >= WIDE_LAYOUT_MIN_WIDTH;
@@ -61,9 +55,12 @@ export function ShareAppCard({
   const share = async () => {
     setShareError(null);
     try {
-      await Share.share({ message: SHARE_MESSAGE });
+      // ⚠️ Pas encore de lien de téléchargement : l'app n'est publiée sur
+      // aucun store. Le message ne contient que le nom de l'app ; ajouter le
+      // lien dès qu'il existe.
+      await Share.share({ message: t('settings.share.message') });
     } catch {
-      setShareError('Le partage n’est pas disponible sur cet appareil.');
+      setShareError(t('settings.share.unavailable'));
     }
   };
 
@@ -117,13 +114,14 @@ export function ShareAppCard({
               className="text-[23px] font-extrabold leading-7"
               style={{ color: GLASS_TITLE_COLOR, letterSpacing: -0.5 }}
             >
-              Partagez <Text style={{ color: accent }}>US</Text>
+              {t('settings.share.titleBefore')}{' '}
+              <Text style={{ color: accent }}>US</Text>
             </Text>
             <Text
               className="text-[13.5px] leading-[19px]"
               style={{ color: GLASS_BODY_COLOR }}
             >
-              Un proche attend un bébé ? Faites-lui découvrir l’application.
+              {t('settings.share.description')}
             </Text>
             {isWide ? <View className="mt-2">{button}</View> : null}
           </View>
@@ -149,11 +147,12 @@ function ShareButton({
   accent: string;
   onPress: () => void;
 }) {
+  const { t } = useTranslation();
   return (
     <View>
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel="Partager l’application"
+        accessibilityLabel={t('settings.share.button')}
         onPress={onPress}
         className="h-14 overflow-hidden rounded-full"
         style={({ pressed }) => ({
@@ -188,7 +187,7 @@ function ShareButton({
         <View className="flex-1 flex-row items-center px-5">
           <Ionicons name="share-social-outline" size={21} color="#ffffff" />
           <Text className="flex-1 text-center text-[16px] font-bold text-white">
-            Partager l’application
+            {t('settings.share.button')}
           </Text>
           <Ionicons name="arrow-forward" size={20} color="#ffffff" />
         </View>

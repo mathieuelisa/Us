@@ -926,6 +926,7 @@ export type Database = {
           has_seen_home_tour: boolean;
           id: string;
           is_partner: boolean;
+          language: string | null;
           notify_appointments: boolean;
           notify_mood_reminder: boolean;
           notify_partner: boolean;
@@ -941,6 +942,7 @@ export type Database = {
           has_seen_home_tour?: boolean;
           id: string;
           is_partner?: boolean;
+          language?: string | null;
           notify_appointments?: boolean;
           notify_mood_reminder?: boolean;
           notify_partner?: boolean;
@@ -956,6 +958,7 @@ export type Database = {
           has_seen_home_tour?: boolean;
           id?: string;
           is_partner?: boolean;
+          language?: string | null;
           notify_appointments?: boolean;
           notify_mood_reminder?: boolean;
           notify_partner?: boolean;

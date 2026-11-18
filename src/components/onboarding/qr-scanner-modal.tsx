@@ -1,9 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Modal, Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
 import { PillButton } from '@/components/ui/pill-button';
 import { parseJoinCode } from '@/features/household/api';
 
@@ -24,6 +24,7 @@ export function QrScannerModal({
   onScanned: (code: string) => void;
   onClose: () => void;
 }) {
+  const { t } = useTranslation();
   const [permission, requestPermission] = useCameraPermissions();
   // Un QR reste dans le champ plusieurs images de suite : on ne remonte que
   // le premier code lu.
@@ -62,10 +63,10 @@ export function QrScannerModal({
         >
           <View className="w-full flex-row items-center justify-between">
             <Text className="text-[17px] font-bold text-white">
-              Scanner le QR code
+              {t('onboarding.qr.title')}
             </Text>
             <Pressable
-              accessibilityLabel="Fermer le scanner"
+              accessibilityLabel={t('onboarding.qr.close')}
               accessibilityRole="button"
               hitSlop={10}
               onPress={onClose}
@@ -87,7 +88,7 @@ export function QrScannerModal({
                 }}
               />
               <Text className="text-center text-[14.5px] leading-5 text-white">
-                Visez le QR code affiché dans l’application de votre partenaire.
+                {t('onboarding.qr.aim')}
               </Text>
             </View>
           ) : (
@@ -96,17 +97,17 @@ export function QrScannerModal({
                 <Ionicons name="camera-outline" size={28} color="#1c1a2e" />
               </View>
               <Text className="text-center text-[17px] font-extrabold text-[#1c1a2e]">
-                Accès à l’appareil photo
+                {t('onboarding.qr.cameraAccess')}
               </Text>
               <Text className="text-center text-[14px] leading-5 text-[#6b6b78]">
                 {permission && !permission.canAskAgain
-                  ? 'L’accès a été refusé. Autorisez-le dans les réglages du téléphone, ou saisissez le code à la main.'
-                  : 'US en a besoin pour lire le QR code de votre partenaire. Rien n’est enregistré.'}
+                  ? t('onboarding.qr.denied')
+                  : t('onboarding.qr.why')}
               </Text>
               {permission && !permission.canAskAgain ? null : (
                 <View className="w-full">
                   <PillButton
-                    label="Autoriser l’appareil photo"
+                    label={t('onboarding.qr.allow')}
                     icon="camera-outline"
                     size="compact"
                     onPress={requestPermission}

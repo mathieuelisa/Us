@@ -1,4 +1,5 @@
 import type { ImageSourcePropType } from 'react-native';
+import type { TranslationKey } from '@/i18n/types';
 import type { ChecklistItem } from './api';
 
 /**
@@ -10,7 +11,7 @@ import type { ChecklistItem } from './api';
 export const CHECKLIST_META: Record<
   string,
   {
-    title: string;
+    titleKey: TranslationKey;
     emoji: string;
     bg: string;
     /**
@@ -21,13 +22,13 @@ export const CHECKLIST_META: Record<
   }
 > = {
   'valise-maternite': {
-    title: 'La Valise de maternité',
+    titleKey: 'organisation.checklists.maternity',
     emoji: '🧳',
     bg: '#DCEAFB',
     image: require('@/assets/images/Valise_maternite.png'),
   },
   'sac-naissance': {
-    title: 'La valise en salle de naissance',
+    titleKey: 'organisation.checklists.birthRoom',
     emoji: '🎒',
     bg: '#FBE4D8',
     image: require('@/assets/images/Valise_maternite.png'),
@@ -42,10 +43,13 @@ export const CHECKLIST_ORDER = ['valise-maternite', 'sac-naissance'];
  * (demande explicite) — chaque article porte une `category`
  * (cf. `groupChecklistItemsByCategory`).
  */
-export const CHECKLIST_CATEGORY_META: Record<string, { title: string }> = {
-  maman: { title: 'Maman' },
-  bebe: { title: 'Bébé' },
-  co_parent: { title: 'Partenaire' },
+export const CHECKLIST_CATEGORY_META: Record<
+  string,
+  { titleKey: TranslationKey }
+> = {
+  maman: { titleKey: 'organisation.categories.maman' },
+  bebe: { titleKey: 'organisation.categories.bebe' },
+  co_parent: { titleKey: 'organisation.categories.co_parent' },
 };
 
 export const CHECKLIST_CATEGORY_ORDER = ['maman', 'bebe', 'co_parent'];

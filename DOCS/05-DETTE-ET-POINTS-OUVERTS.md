@@ -75,6 +75,11 @@ Décisions prises par défaut, à confirmer ou corriger.
 
 | # | Question | Choix actuel |
 |---|---|---|
+| 63 | **Traduction (fr/en/es, 2026-11-18) : contenus restés en français.** L'interface est traduite (cf. [Architecture](./04-ARCHITECTURE.md#langues-i18n)), pas les contenus : gestes du jour, démarches, tailles du bébé et articles des valises (en base) ; astuces, conseils de symptômes, exercices (`features/partner/constants.ts`, `features/health/symptom-tips.ts`, `exercise-catalog.ts`) ; textes légaux ; push envoyées par la base ; noms de pays du match des prénoms. Les contenus de santé ne doivent être traduits qu'avec une relecture par une sage-femme. | Français pour tous. |
+| 64 | **Signes d'urgence de l'assistant contractions** (« Partez sans attendre si… », `UrgentSignsCard`) laissés en français dans les trois langues : contenu médical non relu. Un utilisateur qui ne lit pas le français ne les comprend pas. | Français, en attendant une traduction relue. |
+| 65 | **Suggestions des Infos importantes** (« Maman », « Terme », allergies, points de vigilance) : ce sont des **valeurs enregistrées** et partagées entre les deux parents, et « Terme » / « Début de grossesse » servent de libellés uniques. Les traduire mélangerait les langues dans les données du foyer. | Suggestions en français ; seuls les intitulés de l'écran sont traduits. |
+| 66 | **Module « Votre bébé » (premium, hors MVP) non traduit** : écrans `bebe*`, `components/baby`, `features/baby/constants.ts`. Les segments (« Fait », « Sieste », « Sein gauche »…) sont stockés tels quels en base et comparés dans le code : il faudra les afficher via des clés sans changer la valeur stockée. | Français. |
+
 | 14 | **Bouton « J'ai accouché »** : `CONCEPT.md` dit « uniquement sur le hub », les maquettes Hi-Fi le montrent sur presque tous les écrans. | Hub uniquement (le concept écrit fait foi). |
 | 15 | **Position du bouton retour** de l'onboarding : demandé en haut à droite, implémenté en haut à **gauche** — convention des deux plateformes, et côté d'où part le swipe de retour. | Gauche. |
 | 16 | **Prénom du co-parent** : obligatoire selon `CONCEPT.md`, « facultatif » avec une option « Passer cette étape » dans la maquette 1z. | Obligatoire, et uniquement quand il y a effectivement un co-parent. |

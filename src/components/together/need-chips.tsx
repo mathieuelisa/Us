@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
-
 import { NEED_ICONS, parseNeedNote } from '@/features/together/constants';
 import { hexToRgba } from '@/lib/color';
 
@@ -22,6 +22,7 @@ export function NeedChips({
   tone: 'onColor' | 'light';
   color: string;
 }) {
+  const { t } = useTranslation();
   const { needs, freeText } = parseNeedNote(note);
   const onColor = tone === 'onColor';
   const textColor = onColor ? '#ffffff' : color;
@@ -70,7 +71,7 @@ export function NeedChips({
             className="text-[12.5px] font-semibold"
             style={{ color: textColor }}
           >
-            {need.label}
+            {t(`together.needs.${need.value}`)}
           </Text>
         </View>
       ))}

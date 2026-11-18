@@ -57,7 +57,13 @@
           "color": "#2D5E5A"
         }
       ],
-      ["@stripe/stripe-react-native", { "enableGooglePay": false }]
+      [
+        "@stripe/stripe-react-native",
+        {
+          "enableGooglePay": false
+        }
+      ],
+      "expo-localization"
     ],
     "experiments": {
       "typedRoutes": true,

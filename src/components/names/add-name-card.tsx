@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Pressable, Text, View } from 'react-native';
-
 import {
   GLASS_BODY_COLOR,
   GLASS_TITLE_COLOR,
@@ -19,9 +19,9 @@ const ERROR_RED = '#c9553d';
 /** Durée d'affichage de la confirmation sous le champ. */
 const MESSAGE_MS = 2600;
 
-const GENDER_CHOICES: { value: NameGender; label: string }[] = [
-  { value: 'girl', label: 'Fille' },
-  { value: 'boy', label: 'Garçon' },
+const GENDER_CHOICES: { value: NameGender }[] = [
+  { value: 'girl' },
+  { value: 'boy' },
 ];
 
 type Message = { tone: 'success' | 'error'; text: string };
@@ -52,6 +52,7 @@ export function AddNameCard({
   existingNames: { gender: NameGender; name: string }[];
   onAdd: (gender: NameGender, name: string) => Promise<void>;
 }) {
+  const { t } = useTranslation();
   const [value, setValue] = useState('');
   const [isPending, setIsPending] = useState(false);
   const [message, setMessage] = useState<Message | null>(null);
@@ -84,7 +85,7 @@ export function AddNameCard({
     if (!NAME_PATTERN.test(name)) {
       showMessage({
         tone: 'error',
-        text: 'Seulement des lettres, espaces, traits d’union ou apostrophes.',
+        text: t('names.add.invalid'),
       });
       return;
     }
@@ -96,7 +97,7 @@ export function AddNameCard({
     if (isDuplicate) {
       showMessage({
         tone: 'error',
-        text: `${name} est déjà dans vos favoris.`,
+        text: t('names.add.duplicate', { name }),
       });
       return;
     }
@@ -105,11 +106,14 @@ export function AddNameCard({
     try {
       await onAdd(gender, name);
       setValue('');
-      showMessage({ tone: 'success', text: `${name} ajouté à vos favoris` });
+      showMessage({
+        tone: 'success',
+        text: t('names.add.added', { name }),
+      });
     } catch {
       showMessage({
         tone: 'error',
-        text: 'Le prénom n’a pas pu être ajouté. Réessayez.',
+        text: t('names.add.error'),
       });
     } finally {
       setIsPending(false);
@@ -149,10 +153,10 @@ export function AddNameCard({
             className="text-[17px] font-extrabold"
             style={{ color: GLASS_TITLE_COLOR, letterSpacing: -0.3 }}
           >
-            Ajouter un prénom
+            {t('names.add.title')}
           </Text>
           <Text className="text-[13px]" style={{ color: GLASS_BODY_COLOR }}>
-            Un coup de cœur absent du jeu ?
+            {t('names.add.hint')}
           </Text>
         </View>
 
@@ -165,7 +169,7 @@ export function AddNameCard({
                 key={choice.value}
                 accessibilityRole="radio"
                 accessibilityState={{ selected: isActive }}
-                accessibilityLabel={choice.label}
+                accessibilityLabel={t(`names.genders.${choice.value}`)}
                 onPress={() => onGenderChange(choice.value)}
                 className="flex-row items-center gap-1 rounded-full px-3 py-1.5"
                 style={{
@@ -181,7 +185,7 @@ export function AddNameCard({
                   className="text-[13px] font-bold"
                   style={{ color: isActive ? '#ffffff' : meta.color }}
                 >
-                  {choice.label}
+                  {t(`names.genders.${choice.value}`)}
                 </Text>
               </Pressable>
             );
@@ -191,7 +195,11 @@ export function AddNameCard({
 
       <IconInput
         icon="create-outline"
-        placeholder={gender === 'girl' ? 'Ex. Capucine' : 'Ex. Gaspard'}
+        placeholder={
+          gender === 'girl'
+            ? t('names.add.girlPlaceholder')
+            : t('names.add.boyPlaceholder')
+        }
         value={value}
         onChangeText={(text) => {
           setValue(text.slice(0, MAX_NAME_LENGTH));
@@ -205,7 +213,7 @@ export function AddNameCard({
         trailing={
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="Ajouter le prénom aux favoris"
+            accessibilityLabel={t('names.add.submit')}
             accessibilityState={{ disabled: !canSubmit, busy: isPending }}
             disabled={!canSubmit}
             onPress={submit}

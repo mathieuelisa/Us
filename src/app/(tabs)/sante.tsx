@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useAtomValue } from 'jotai';
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Image, Pressable, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
@@ -29,6 +30,7 @@ import { ScreenCornerShapes } from '@/components/ui/screen-corner-shapes';
 import { usePullToRefresh } from '@/components/ui/use-pull-to-refresh';
 import { useMyHousehold } from '@/features/household/hooks';
 import { useThemeAccent, useThemeBackground } from '@/features/settings/hooks';
+import type { TranslationKey } from '@/i18n/types';
 import { currentRoleAtom } from '@/lib/atoms/role';
 import { hexToRgba } from '@/lib/color';
 
@@ -50,16 +52,16 @@ const HEART_PINK = '#e8739a';
  * Sous-titre de l'en-tête, propre à l'onglet actif : une phrase simple qui
  * dit quoi faire ici (demande explicite : moderne mais compréhensible).
  */
-const TAB_SUBTITLES: Record<HealthTab, string> = {
-  journal: 'Sélectionnez la journée et les symptômes que vous ressentez.',
-  appointments: 'Vos rendez-vous du mois et ceux à venir.',
-  contacts: 'Les numéros utiles, à portée de main.',
-  exercises: 'Bouger en douceur, à votre rythme.',
+const TAB_SUBTITLES: Record<HealthTab, TranslationKey> = {
+  journal: 'health.subtitles.journal',
+  appointments: 'health.subtitles.appointments',
+  contacts: 'health.subtitles.contacts',
+  exercises: 'health.subtitles.exercises',
 };
 
 /** Côté partenaire, les exercices se lisent comme une façon de l'aider. */
-const PARTNER_EXERCISES_SUBTITLE =
-  'Bouger en douceur à son rythme — et à deux.';
+const PARTNER_EXERCISES_SUBTITLE: TranslationKey =
+  'health.subtitles.partnerExercises';
 
 function isHealthTab(value: string | undefined): value is HealthTab {
   return HEALTH_TABS.includes(value as HealthTab);
@@ -79,6 +81,7 @@ function isHealthTab(value: string | undefined): value is HealthTab {
  * premier onglet par défaut.
  */
 export default function HealthScreen() {
+  const { t } = useTranslation();
   // Tirer vers le bas recharge les données affichées.
   const refresh = usePullToRefresh();
   // Place de la barre du bas, qui flotte au-dessus du contenu.
@@ -93,28 +96,28 @@ export default function HealthScreen() {
   const tabs = useMemo(() => {
     const journalTab = {
       value: 'journal' as const,
-      label: 'Journal',
+      label: t('health.tabs.journal'),
       icon: 'book-outline' as const,
     };
     const sharedTabs = [
       {
         value: 'appointments' as const,
-        label: 'Rendez-vous',
+        label: t('health.tabs.appointments'),
         icon: 'calendar-outline' as const,
       },
       {
         value: 'contacts' as const,
-        label: 'Contacts',
+        label: t('health.tabs.contacts'),
         icon: 'call-outline' as const,
       },
       {
         value: 'exercises' as const,
-        label: 'Exercices',
+        label: t('health.tabs.exercises'),
         icon: 'barbell-outline' as const,
       },
     ];
     return isPregnant ? [journalTab, ...sharedTabs] : sharedTabs;
-  }, [isPregnant]);
+  }, [isPregnant, t]);
 
   const [activeTab, setActiveTab] = useState<HealthTab>(
     isHealthTab(tabParam) ? tabParam : isPregnant ? 'journal' : 'appointments',
@@ -194,7 +197,7 @@ export default function HealthScreen() {
               aussi par lien direct (`/sante?tab=…`) : sans historique, le
               retour ramène à l'accueil. */}
           <Pressable
-            accessibilityLabel="Revenir en arrière"
+            accessibilityLabel={t('common.goBack')}
             accessibilityRole="button"
             hitSlop={12}
             onPress={() =>
@@ -229,7 +232,7 @@ export default function HealthScreen() {
               className="text-[30px] font-extrabold leading-9"
               style={{ color: GLASS_TITLE_COLOR, letterSpacing: -0.6 }}
             >
-              Suivi santé
+              {t('health.title')}
             </Text>
             <Svg width={120} height={12} viewBox="0 0 120 12">
               <Path
@@ -245,8 +248,8 @@ export default function HealthScreen() {
               style={{ color: GLASS_BODY_COLOR }}
             >
               {activeTab === 'exercises' && !isPregnant
-                ? PARTNER_EXERCISES_SUBTITLE
-                : TAB_SUBTITLES[activeTab]}
+                ? t(PARTNER_EXERCISES_SUBTITLE)
+                : t(TAB_SUBTITLES[activeTab])}
             </Text>
           </View>
         </View>
@@ -286,7 +289,7 @@ export default function HealthScreen() {
         <BlobFab
           icon="person-add"
           iconSize={26}
-          accessibilityLabel="Ajouter un contact"
+          accessibilityLabel={t('health.addContact')}
           onPress={() => setIsAddingContact(true)}
           className="absolute right-6"
           // Juste au-dessus de la barre du bas, qui flotte sur le contenu.

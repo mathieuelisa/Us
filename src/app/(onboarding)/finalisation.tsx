@@ -1,10 +1,10 @@
 import { Button } from 'heroui-native';
 import { useAtom } from 'jotai';
 import { useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Text, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import { withUniwind } from 'uniwind';
-
 import { useSubmitOnboarding } from '@/features/onboarding/hooks';
 import { useThemeBackground } from '@/features/settings/hooks';
 import {
@@ -21,6 +21,7 @@ const SafeAreaView = withUniwind(RNSafeAreaView);
  * cet écran n'a pas besoin de naviguer lui-même.
  */
 export default function FinalisationScreen() {
+  const { t } = useTranslation();
   const [draft, setDraft] = useAtom(onboardingDraftAtom);
   const submitOnboarding = useSubmitOnboarding();
   const backgroundColor = useThemeBackground();
@@ -48,25 +49,24 @@ export default function FinalisationScreen() {
         {submitOnboarding.isError ? (
           <>
             <Text className="text-center text-[18px] font-bold text-[#1a1a1a]">
-              La création de votre espace a échoué
+              {t('onboarding.finalising.failed')}
             </Text>
             <Text className="text-center text-[14px] leading-5 text-[#6b6b6b]">
-              Vos réponses sont conservées. Vérifiez votre connexion, puis
-              réessayez.
+              {t('onboarding.finalising.failedHint')}
             </Text>
             <Button
               isDisabled={submitOnboarding.isPending}
               onPress={retry}
               className="w-full"
             >
-              <Button.Label>Réessayer</Button.Label>
+              <Button.Label>{t('common.retry')}</Button.Label>
             </Button>
           </>
         ) : (
           <>
             <ActivityIndicator color="#2D5E5A" size="large" />
             <Text className="text-center text-[16px] font-medium text-[#1a1a1a]">
-              Nous préparons votre espace…
+              {t('onboarding.finalising.preparing')}
             </Text>
           </>
         )}

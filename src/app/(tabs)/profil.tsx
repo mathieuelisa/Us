@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useAtomValue } from 'jotai';
 import { type ComponentProps, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Pressable, Text, TextInput, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
@@ -29,6 +30,7 @@ import {
   useUpdateMyProfile,
 } from '@/features/profile/hooks';
 import { useThemeAccent, useThemeBackground } from '@/features/settings/hooks';
+import { useLocale } from '@/i18n/hooks';
 import { currentRoleAtom } from '@/lib/atoms/role';
 import { sessionAtom } from '@/lib/atoms/session';
 import { hexToRgba, lightenHex } from '@/lib/color';
@@ -65,6 +67,8 @@ type IoniconName = ComponentProps<typeof Ionicons>['name'];
  * plus).
  */
 export default function ProfileScreen() {
+  const { t } = useTranslation();
+  const locale = useLocale();
   // Place de la barre du bas, qui flotte au-dessus du contenu.
   const tabBarInset = useTabBarContentInset();
   const session = useAtomValue(sessionAtom);
@@ -87,13 +91,9 @@ export default function ProfileScreen() {
     updateDueDate.mutate(nextDueDate, {
       onSuccess: () => {
         setIsDueDateOpen(false);
-        showFeedback('success', 'Votre date du terme est à jour.');
+        showFeedback('success', t('profile.dueDateUpdated'));
       },
-      onError: () =>
-        showFeedback(
-          'error',
-          'Impossible d’enregistrer la date du terme. Réessayez.',
-        ),
+      onError: () => showFeedback('error', t('profile.dueDateError')),
     });
   };
 
@@ -106,10 +106,9 @@ export default function ProfileScreen() {
       onSuccess: () => {
         setLastSaved('avatar');
         setIsAvatarPickerOpen(false);
-        showFeedback('success', 'Votre avatar est à jour.');
+        showFeedback('success', t('profile.avatarUpdated'));
       },
-      onError: () =>
-        showFeedback('error', 'Impossible d’enregistrer votre avatar.'),
+      onError: () => showFeedback('error', t('profile.avatarError')),
     });
   };
   const backgroundColor = useThemeBackground();
@@ -146,14 +145,10 @@ export default function ProfileScreen() {
         // explicite).
         showFeedback(
           'success',
-          `${newFirstName}, c’est joli ! Votre prénom est à jour.`,
+          t('profile.nameUpdated', { name: newFirstName }),
         );
       },
-      onError: () =>
-        showFeedback(
-          'error',
-          'Impossible d’enregistrer votre prénom. Réessayez.',
-        ),
+      onError: () => showFeedback('error', t('profile.nameError')),
     });
   };
 
@@ -175,10 +170,10 @@ export default function ProfileScreen() {
             className="text-[32px] font-extrabold leading-[38px]"
             style={{ color: GLASS_TITLE_COLOR, letterSpacing: -0.7 }}
           >
-            Mon profil
+            {t('profile.title')}
           </Text>
           <Text className="text-[15px]" style={{ color: GLASS_BODY_COLOR }}>
-            Gérez vos informations personnelles.
+            {t('profile.subtitle')}
           </Text>
           {/* Même trait dessiné que sous l'en-tête de Réglages. */}
           <Svg width={110} height={12} viewBox="0 0 110 12">
@@ -200,7 +195,7 @@ export default function ProfileScreen() {
             onPress={() => setIsAvatarPickerOpen(true)}
           />
           <Text className="text-[13px]" style={{ color: GLASS_BODY_COLOR }}>
-            Touchez pour choisir un avatar
+            {t('profile.tapToChooseAvatar')}
           </Text>
         </View>
 
@@ -218,7 +213,7 @@ export default function ProfileScreen() {
           }}
         >
           <Pressable
-            accessibilityLabel="Modifier le prénom affiché"
+            accessibilityLabel={t('profile.editDisplayedName')}
             onPress={() => nameInputRef.current?.focus()}
             className="flex-row items-center gap-3.5 px-4 py-4"
             style={{
@@ -230,11 +225,11 @@ export default function ProfileScreen() {
             <InfoTile icon="person-outline" accent={accent} />
             <View className="flex-1 gap-0.5">
               <Text className="text-[13px]" style={{ color: GLASS_BODY_COLOR }}>
-                Prénom affiché
+                {t('profile.displayedName')}
               </Text>
               <TextInput
                 ref={nameInputRef}
-                accessibilityLabel="Prénom affiché"
+                accessibilityLabel={t('profile.displayedName')}
                 value={firstName}
                 onChangeText={setFirstName}
                 onFocus={() => setIsEditingName(true)}
@@ -243,7 +238,7 @@ export default function ProfileScreen() {
                 returnKeyType="done"
                 editable={!isLoading}
                 autoCapitalize="words"
-                placeholder="Votre prénom"
+                placeholder={t('profile.yourFirstName')}
                 placeholderTextColor="#a3a1b0"
                 className="text-[17px] font-bold"
                 // Pas de contour de focus du navigateur (web) : la ligne
@@ -267,7 +262,7 @@ export default function ProfileScreen() {
             <InfoTile icon="mail-outline" accent={accent} />
             <View className="flex-1 gap-0.5">
               <Text className="text-[13px]" style={{ color: GLASS_BODY_COLOR }}>
-                Email
+                {t('profile.email')}
               </Text>
               <Text
                 className="text-[17px] font-bold"
@@ -284,7 +279,13 @@ export default function ProfileScreen() {
               <View className="mx-4 h-px bg-black/5" />
               <Pressable
                 accessibilityRole="button"
-                accessibilityLabel={`Modifier la date du terme${dueDate ? `, actuellement le ${formatDueDate(dueDate)}` : ''}`}
+                accessibilityLabel={
+                  dueDate
+                    ? t('profile.editDueDateCurrent', {
+                        date: formatDueDate(dueDate, locale),
+                      })
+                    : t('profile.editDueDate')
+                }
                 onPress={() => setIsDueDateOpen(true)}
                 className="flex-row items-center gap-3.5 px-4 py-4 active:opacity-70"
               >
@@ -294,14 +295,16 @@ export default function ProfileScreen() {
                     className="text-[13px]"
                     style={{ color: GLASS_BODY_COLOR }}
                   >
-                    Date du terme
+                    {t('profile.dueDate')}
                   </Text>
                   <View className="flex-row flex-wrap items-center gap-x-2 gap-y-1">
                     <Text
                       className="text-[17px] font-bold"
                       style={{ color: GLASS_TITLE_COLOR }}
                     >
-                      {dueDate ? formatDueDate(dueDate) : 'À renseigner'}
+                      {dueDate
+                        ? formatDueDate(dueDate, locale)
+                        : t('profile.toFill')}
                     </Text>
                     {dueDateWeeks !== null ? (
                       <View
@@ -329,10 +332,10 @@ export default function ProfileScreen() {
         <PillButton
           label={
             updateProfile.isPending
-              ? 'Enregistrement…'
+              ? t('profile.saving')
               : justSaved
-                ? 'Enregistré'
-                : 'Enregistrer'
+                ? t('profile.saved')
+                : t('profile.save')
           }
           icon={justSaved ? 'checkmark-circle' : 'save-outline'}
           isDisabled={
@@ -390,12 +393,17 @@ function ProfileAvatar({
   accent: string;
   onPress: () => void;
 }) {
+  const { t } = useTranslation();
   const avatar = getProfileAvatar(avatarKey);
 
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`Changer d’avatar${avatar ? `, actuellement ${avatar.label}` : ''}`}
+      accessibilityLabel={
+        avatar
+          ? t('profile.changeAvatarCurrent', { avatar: t(avatar.label) })
+          : t('profile.changeAvatar')
+      }
       onPress={onPress}
       className="h-[156px] w-[156px] items-center justify-center active:opacity-85"
     >
@@ -462,9 +470,9 @@ function InfoTile({ icon, accent }: { icon: IoniconName; accent: string }) {
 }
 
 /** « 15 juin 2027 ». */
-function formatDueDate(isoDate: string): string {
+function formatDueDate(isoDate: string, locale: string): string {
   const [year, month, day] = isoDate.split('-').map(Number);
-  return new Date(year, month - 1, day).toLocaleDateString('fr-FR', {
+  return new Date(year, month - 1, day).toLocaleDateString(locale, {
     day: 'numeric',
     month: 'long',
     year: 'numeric',

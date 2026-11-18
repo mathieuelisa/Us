@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useIsFocused } from 'expo-router';
 import { type ComponentProps, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Pressable, Text, View } from 'react-native';
 import Animated, {
   cancelAnimation,
@@ -13,7 +14,6 @@ import Animated, {
   withRepeat,
   withTiming,
 } from 'react-native-reanimated';
-
 import { DepartureModal } from '@/components/contractions/departure-modal';
 import { ProgressBar } from '@/components/organisation/progress-bar';
 import {
@@ -77,6 +77,7 @@ export function ContractionAssistant({
   /** Faux tant que le paywall premium couvre l'écran. */
   canShowDeparture: boolean;
 }) {
+  const { t } = useTranslation();
   // Les écrans restent montés entre deux visites (`Tabs`) : la modale ne
   // doit s'ouvrir que sur cet écran, pas par-dessus un autre.
   const isFocused = useIsFocused();
@@ -122,7 +123,7 @@ export function ContractionAssistant({
       end.mutate(
         { id: current.id, endedAt: at },
         {
-          onError: onError('La fin de la contraction n’a pas été enregistrée.'),
+          onError: onError(t('contractions.errors.end')),
         },
       );
       return;
@@ -133,23 +134,27 @@ export function ContractionAssistant({
         sessionId:
           session && isOpen && !isTempId(session.id) ? session.id : null,
       },
-      { onError: onError('La contraction n’a pas été enregistrée.') },
+      { onError: onError(t('contractions.errors.start')) },
     );
   };
 
   const finishSession = () =>
     finish.mutate(
       { endedAt: new Date().toISOString() },
-      { onError: onError('Le suivi n’a pas pu être terminé.') },
+      { onError: onError(t('contractions.errors.finish')) },
     );
 
   const removeContraction = (contraction: Contraction) =>
     remove.mutate(contraction.id, {
-      onError: onError('La contraction n’a pas pu être supprimée.'),
+      onError: onError(t('contractions.errors.delete')),
     });
 
   if (isLoading) {
-    return <Text className="text-[13px] text-[#9a9a9a]">Chargement…</Text>;
+    return (
+      <Text className="text-[13px] text-[#9a9a9a]">
+        {t('contractions.loading')}
+      </Text>
+    );
   }
 
   return (
@@ -189,10 +194,10 @@ export function ContractionAssistant({
           style={{ color: GLASS_BODY_COLOR }}
         >
           {current
-            ? 'Touchez de nouveau quand la contraction s’arrête.'
+            ? t('contractions.hint.stop')
             : isOpen
-              ? 'Touchez dès que la prochaine contraction commence.'
-              : 'Touchez dès qu’une contraction commence :\nle suivi démarre avec elle.'}
+              ? t('contractions.hint.next')
+              : t('contractions.hint.first', { br: '\n' })}
         </Text>
       </View>
 
@@ -200,13 +205,13 @@ export function ContractionAssistant({
         <StatTile
           accent={accent}
           icon="pulse"
-          label="Contractions"
+          label={t('contractions.stats.count')}
           value={String(analysis.count)}
         />
         <StatTile
           accent={accent}
           icon="hourglass-outline"
-          label="Durée moy."
+          label={t('contractions.stats.avgDuration')}
           value={
             analysis.averageDurationMs === null
               ? '—'
@@ -216,7 +221,7 @@ export function ContractionAssistant({
         <StatTile
           accent={accent}
           icon="swap-horizontal"
-          label="Écart moyen"
+          label={t('contractions.stats.avgInterval')}
           value={
             analysis.averageIntervalMs === null
               ? '—'
@@ -278,6 +283,7 @@ function SessionCard({
   lastSession: { durationMs: number; count: number } | null;
   onFinish: () => void;
 }) {
+  const { t } = useTranslation();
   return (
     <View
       className="flex-row items-center gap-3 rounded-[24px] px-4 py-3.5"
@@ -308,10 +314,10 @@ function SessionCard({
             style={{ color: GLASS_BODY_COLOR, letterSpacing: 1 }}
           >
             {isOpen
-              ? 'SUIVI EN COURS'
+              ? t('contractions.session.ongoing')
               : lastSession
-                ? 'DERNIER SUIVI'
-                : 'AUCUN SUIVI EN COURS'}
+                ? t('contractions.session.last')
+                : t('contractions.session.none')}
           </Text>
         </View>
         {isOpen ? (
@@ -331,15 +337,18 @@ function SessionCard({
             style={{ color: GLASS_TITLE_COLOR }}
           >
             {lastSession
-              ? `${formatDuration(lastSession.durationMs)} · ${lastSession.count} contraction${lastSession.count > 1 ? 's' : ''}`
-              : 'Il démarre à la première contraction'}
+              ? t('contractions.session.summary', {
+                  duration: formatDuration(lastSession.durationMs),
+                  count: lastSession.count,
+                })
+              : t('contractions.session.startsWithFirst')}
           </Text>
         )}
       </View>
       {isOpen ? (
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Terminer le suivi des contractions"
+          accessibilityLabel={t('contractions.session.finishA11y')}
           hitSlop={8}
           onPress={onFinish}
           className="flex-row items-center gap-1 rounded-full px-3 py-2 active:opacity-70"
@@ -347,7 +356,7 @@ function SessionCard({
         >
           <Ionicons name="stop-circle-outline" size={15} color={accent} />
           <Text className="text-[12.5px] font-bold" style={{ color: accent }}>
-            Terminer
+            {t('contractions.session.finish')}
           </Text>
         </Pressable>
       ) : null}
@@ -396,6 +405,7 @@ function ContractionButton({
   elapsedMs: number;
   onPress: () => void;
 }) {
+  const { t } = useTranslation();
   const breath = useSharedValue(0);
 
   useEffect(() => {
@@ -451,8 +461,10 @@ function ContractionButton({
         accessibilityRole="button"
         accessibilityLabel={
           isActive
-            ? `Fin de la contraction, en cours depuis ${formatDuration(elapsedMs)}`
-            : 'Début de contraction'
+            ? t('contractions.button.endA11y', {
+                duration: formatDuration(elapsedMs),
+              })
+            : t('contractions.button.startA11y')
         }
         onPress={onPress}
         className="items-center justify-center overflow-hidden active:opacity-90"
@@ -492,7 +504,7 @@ function ContractionButton({
               className="text-[11.5px] font-bold"
               style={{ color: accent, letterSpacing: 1.2 }}
             >
-              CONTRACTION
+              {t('contractions.button.endCaps')}
             </Text>
             <Text
               className="text-[46px] font-extrabold"
@@ -513,7 +525,7 @@ function ContractionButton({
                 className="text-[12.5px] font-bold"
                 style={{ color: accent }}
               >
-                Fin
+                {t('contractions.button.end')}
               </Text>
             </View>
           </View>
@@ -523,7 +535,7 @@ function ContractionButton({
               <Ionicons name="play" size={26} color="#ffffff" />
             </View>
             <Text className="text-center text-[17px] font-extrabold leading-[22px] text-white">
-              Début de{'\n'}contraction
+              {t('contractions.button.start', { br: '\n' })}
             </Text>
           </View>
         )}
@@ -599,13 +611,17 @@ function DepartureRuleCard({
   shouldLeave: boolean;
   onOpenDeparture: () => void;
 }) {
-  const ruleText = `Contractions toutes les ${formatDuration(DEPARTURE_INTERVAL_MS)} ou moins depuis ${formatDuration(windowMs)}${
-    isFirstChild === true
-      ? ' (premier bébé)'
-      : isFirstChild === false
-        ? ' (bébés suivants)'
-        : ''
-  }.`;
+  const { t } = useTranslation();
+  const ruleText = t('contractions.rule.text', {
+    interval: formatDuration(DEPARTURE_INTERVAL_MS),
+    window: formatDuration(windowMs),
+    who:
+      isFirstChild === true
+        ? t('contractions.rule.firstChild')
+        : isFirstChild === false
+          ? t('contractions.rule.nextChild')
+          : '',
+  });
 
   return (
     <View
@@ -629,7 +645,7 @@ function DepartureRuleCard({
           className="flex-1 text-[16px] font-bold"
           style={{ color: GLASS_TITLE_COLOR }}
         >
-          Quand partir à la maternité ?
+          {t('contractions.rule.title')}
         </Text>
       </View>
       <Text
@@ -645,10 +661,12 @@ function DepartureRuleCard({
           style={{ color: shouldLeave ? accent : GLASS_TITLE_COLOR }}
         >
           {shouldLeave
-            ? 'C’est le moment de partir.'
+            ? t('contractions.rule.timeToGo')
             : regularForMs > 0
-              ? `Régulières depuis ${formatDuration(regularForMs)}`
-              : 'Pas encore de rythme régulier'}
+              ? t('contractions.rule.regularFor', {
+                  duration: formatDuration(regularForMs),
+                })
+              : t('contractions.rule.notRegular')}
         </Text>
         {shouldLeave ? (
           <Pressable
@@ -658,7 +676,7 @@ function DepartureRuleCard({
             className="flex-row items-center gap-0.5 rounded-full bg-white px-3 py-1.5"
           >
             <Text className="text-[12.5px] font-bold" style={{ color: accent }}>
-              Voir
+              {t('contractions.rule.see')}
             </Text>
             <Ionicons name="chevron-forward" size={13} color={accent} />
           </Pressable>
@@ -684,6 +702,7 @@ function ContractionHistory({
   now: number;
   onRemove: (contraction: Contraction) => void;
 }) {
+  const { t } = useTranslation();
   const rows = contractions
     .map((contraction, index) => ({
       contraction,
@@ -702,7 +721,7 @@ function ContractionHistory({
         className="px-1 text-[12.5px] font-bold"
         style={{ color: GLASS_BODY_COLOR, letterSpacing: 1.1 }}
       >
-        HISTORIQUE
+        {t('contractions.history.title')}
       </Text>
       {rows.map(({ contraction, number, intervalMs }) => {
         const isRunning = contraction.endedAt === null;
@@ -736,7 +755,9 @@ function ContractionHistory({
                 className="text-[15px] font-bold"
                 style={{ color: GLASS_TITLE_COLOR }}
               >
-                {isRunning ? 'En cours' : formatDuration(durationMs)}
+                {isRunning
+                  ? t('contractions.history.ongoing')
+                  : formatDuration(durationMs)}
                 <Text
                   className="text-[13px] font-normal"
                   style={{ color: GLASS_BODY_COLOR }}
@@ -750,14 +771,18 @@ function ContractionHistory({
                 style={{ color: GLASS_BODY_COLOR }}
               >
                 {intervalMs === null
-                  ? 'Première contraction'
-                  : `${formatDuration(intervalMs)} après la précédente`}
+                  ? t('contractions.history.first')
+                  : t('contractions.history.after', {
+                      duration: formatDuration(intervalMs),
+                    })}
               </Text>
             </View>
             {isRunning || isTempId(contraction.id) ? null : (
               <Pressable
                 accessibilityRole="button"
-                accessibilityLabel={`Supprimer la contraction ${number}`}
+                accessibilityLabel={t('contractions.history.delete', {
+                  number,
+                })}
                 hitSlop={8}
                 onPress={() => onRemove(contraction)}
                 className="h-9 w-9 items-center justify-center rounded-full active:opacity-60"

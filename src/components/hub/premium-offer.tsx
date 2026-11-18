@@ -1,9 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
 import type { ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { ImageSourcePropType } from 'react-native';
 import { Image, Text, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
-
 import { PremiumPurchaseButton } from '@/components/hub/premium-purchase-button';
 import { PREMIUM_FEATURES } from '@/components/onboarding/paywall-modal';
 import {
@@ -44,6 +44,7 @@ export function PremiumOffer({
    */
   compact?: boolean;
 }) {
+  const { t } = useTranslation();
   const accent = useThemeAccent();
   const size = compact ? COMPACT : REGULAR;
   // Espace « Seul·e » : pas de partenaire, donc rien à préciser.
@@ -125,7 +126,7 @@ export function PremiumOffer({
           />
         </Svg>
         <Text style={{ color: GLASS_BODY_COLOR, fontSize: compact ? 13 : 14 }}>
-          Un seul paiement, accès à vie
+          {t('premium.paywall.oneTime')}
         </Text>
       </View>
 
@@ -161,10 +162,10 @@ export function PremiumOffer({
                 fontSize: compact ? 15.5 : 17,
               }}
             >
-              14,99 € — paiement unique
+              {t('premium.paywall.price')}
             </Text>
             <Text className="text-[12.5px]" style={{ color: GLASS_BODY_COLOR }}>
-              Pas d’abonnement, pas de renouvellement
+              {t('premium.paywall.noSubscription')}
             </Text>
           </View>
         </View>
@@ -213,7 +214,7 @@ export function PremiumOffer({
                 lineHeight: size.featureSize + 4.5,
               }}
             >
-              {feature}
+              {t(feature)}
             </Text>
           </View>
         ))}
@@ -236,6 +237,7 @@ function SharedPurchaseNote({
   accent: string;
   compact: boolean;
 }) {
+  const { t } = useTranslation();
   return (
     <View
       className={`flex-row items-center gap-2.5 border-t pt-2 ${compact ? '' : 'pt-3'}`}
@@ -251,8 +253,8 @@ function SharedPurchaseNote({
         className="flex-1 leading-[17px]"
         style={{ color: GLASS_TITLE_COLOR, fontSize: compact ? 12.5 : 13 }}
       >
-        <Text className="font-bold">Valable pour vous deux</Text> : votre
-        partenaire n’a rien à payer.
+        <Text className="font-bold">{t('premium.paywall.forBoth')}</Text>
+        {t('premium.paywall.partnerFree')}
       </Text>
     </View>
   );

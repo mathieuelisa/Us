@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { Pressable, Text, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
-
 import {
   GLASS_BODY_COLOR,
   GLASS_TITLE_COLOR,
@@ -140,6 +140,7 @@ export function ShareInviteCard({
   onAddPartner: () => void;
   onHowItWorks: () => void;
 }) {
+  const { t } = useTranslation();
   const accent = useThemeAccent();
 
   return (
@@ -167,20 +168,19 @@ export function ShareInviteCard({
             className="text-[17px] font-extrabold leading-[22px]"
             style={{ color: GLASS_TITLE_COLOR, letterSpacing: -0.3 }}
           >
-            Partager vos infos à deux
+            {t('hub.invite.cardTitle')}
           </Text>
           <Text
             className="text-[13px] leading-[18px]"
             style={{ color: GLASS_BODY_COLOR }}
           >
-            Ajoutez votre partenaire ou un proche, tout se synchronisera en
-            temps réel.
+            {t('hub.invite.cardBody')}
           </Text>
         </View>
       </View>
 
       <PillButton
-        label="Ajouter votre partenaire"
+        label={t('hub.invite.addPartner')}
         icon="people-outline"
         size="compact"
         onPress={onAddPartner}
@@ -192,7 +192,7 @@ export function ShareInviteCard({
         className="flex-row items-center justify-center gap-1 py-1"
       >
         <Text className="text-[14px] font-semibold" style={{ color: accent }}>
-          Comment ça marche ?
+          {t('hub.howItWorks.title')}
         </Text>
         <Ionicons name="chevron-forward" size={15} color={accent} />
       </Pressable>

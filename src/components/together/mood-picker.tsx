@@ -1,5 +1,5 @@
+import { useTranslation } from 'react-i18next';
 import { Image, Pressable, Text, View } from 'react-native';
-
 import type { MoodValue } from '@/features/hub/api';
 import {
   CARD_SHADOW,
@@ -15,6 +15,7 @@ export function MoodPicker({
   selectedMood: MoodValue | null;
   onSelect: (mood: MoodValue) => void;
 }) {
+  const { t } = useTranslation();
   return (
     <View className="flex-row justify-between">
       {MOOD_ORDER.map((mood) => {
@@ -24,7 +25,7 @@ export function MoodPicker({
             <Pressable
               accessibilityRole="button"
               style={CARD_SHADOW}
-              accessibilityLabel={MOOD_PRESENTATION[mood].phrase}
+              accessibilityLabel={t(MOOD_PRESENTATION[mood].labelKey)}
               accessibilityState={{ selected: isSelected }}
               onPress={() => onSelect(mood)}
               className={`h-20 w-20 items-center justify-center rounded-full border-2 ${
@@ -45,7 +46,7 @@ export function MoodPicker({
                 isSelected ? 'font-medium text-accent' : 'text-[#6b6b6b]'
               }`}
             >
-              {MOOD_PRESENTATION[mood].label}
+              {t(MOOD_PRESENTATION[mood].labelKey)}
             </Text>
           </View>
         );

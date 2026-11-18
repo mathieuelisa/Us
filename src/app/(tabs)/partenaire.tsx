@@ -1,7 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import type { TFunction } from 'i18next';
 import { useAtomValue } from 'jotai';
 import type { ComponentProps, ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Image,
   type ImageSourcePropType,
@@ -37,6 +39,7 @@ import {
 } from '@/features/partner/constants';
 import { getCurrentWeekIsoDates } from '@/features/together/api';
 import { useWeekCheckinsFor } from '@/features/together/hooks';
+import { useLocale } from '@/i18n/hooks';
 import { currentRoleAtom } from '@/lib/atoms/role';
 import { sessionAtom } from '@/lib/atoms/session';
 import { hexToRgba } from '@/lib/color';
@@ -216,7 +219,8 @@ function PartnerStateCard({
   partnerName: string | null;
   partnerMood: HubSummary['partnerMood'];
 }) {
-  const who = partnerName || 'Votre partenaire';
+  const { t } = useTranslation();
+  const who = partnerName || t('partner.yourPartner');
   const mood = partnerMood ? MOOD_PRESENTATION[partnerMood.mood] : null;
 
   return (
@@ -263,21 +267,21 @@ function PartnerStateCard({
               className="text-[12px] font-semibold"
               style={{ color: PINK.tagText }}
             >
-              {mood ? mood.label : 'Aujourd’hui'}
+              {mood ? t(mood.labelKey) : t('common.today')}
             </Text>
           </View>
           <Text
             className="text-[16px] font-bold leading-[21px]"
             style={{ color: GLASS_TITLE_COLOR }}
           >
-            {mood ? `${who} ${mood.phrase}` : 'Pas encore de nouvelles'}
+            {mood ? `${who} ${t(mood.phraseKey)}` : t('partner.noNewsYet')}
           </Text>
           {mood ? null : (
             <Text
               className="text-[13px] leading-[18px]"
               style={{ color: GLASS_BODY_COLOR }}
             >
-              {`Son humeur apparaîtra ici dès que ${who} l’aura notée dans Ensemble.`}
+              {t('partner.moodWillAppear', { name: who })}
             </Text>
           )}
         </View>
@@ -289,7 +293,7 @@ function PartnerStateCard({
             className="text-[11.5px] font-bold"
             style={{ color: PINK.heading, letterSpacing: 1 }}
           >
-            SES BESOINS DU JOUR
+            {t('partner.needsToday')}
           </Text>
           {partnerMood?.needNote?.trim() ? (
             <NeedChips
@@ -299,7 +303,7 @@ function PartnerStateCard({
             />
           ) : (
             <Text className="text-[13px]" style={{ color: GLASS_BODY_COLOR }}>
-              Aucun besoin particulier précisé aujourd’hui.
+              {t('partner.noNeeds')}
             </Text>
           )}
         </View>
@@ -334,6 +338,8 @@ function PartnerStateCard({
  * Journal — sa seule porte d'entrée vers cette donnée de santé.
  */
 export default function PartnerScreen() {
+  const { t } = useTranslation();
+  const locale = useLocale();
   // Tirer vers le bas recharge les données affichées.
   const refresh = usePullToRefresh();
   // Place de la barre du bas, qui flotte au-dessus du contenu.
@@ -381,8 +387,8 @@ export default function PartnerScreen() {
   const isSolo = household?.accompaniment_type === 'seul';
 
   const notJoinedText = partnerName
-    ? `${partnerName} n’a pas encore rejoint votre espace. Sa tendance d’humeur apparaîtra ici dès qu’il ou elle aura créé son compte.`
-    : 'Votre partenaire n’a pas encore rejoint votre espace.';
+    ? t('partner.notJoinedNamed', { name: partnerName })
+    : t('partner.notJoined');
 
   return (
     <SafeAreaView
@@ -441,7 +447,7 @@ export default function PartnerScreen() {
 
           {router.canGoBack() ? (
             <Pressable
-              accessibilityLabel="Revenir en arrière"
+              accessibilityLabel={t('common.goBack')}
               accessibilityRole="button"
               hitSlop={12}
               onPress={() => router.back()}
@@ -462,10 +468,10 @@ export default function PartnerScreen() {
               style={{ color: GLASS_TITLE_COLOR, letterSpacing: -0.6 }}
             >
               {isSolo
-                ? 'Cette semaine'
+                ? t('partner.thisWeek')
                 : partnerName
-                  ? `Avec ${partnerName}`
-                  : 'Mon partenaire'}
+                  ? t('partner.withName', { name: partnerName })
+                  : t('partner.title')}
             </Text>
             <Svg width={140} height={12} viewBox="0 0 140 12">
               <Path
@@ -489,7 +495,10 @@ export default function PartnerScreen() {
 
         {partnerUserId ? (
           <View className="gap-3.5">
-            <SectionHeading icon="sunny-outline" label="SON ÉTAT AUJOURD’HUI" />
+            <SectionHeading
+              icon="sunny-outline"
+              label={t('partner.stateToday')}
+            />
             <PartnerStateCard
               partnerName={partnerName ?? null}
               partnerMood={summary?.partnerMood ?? null}
@@ -501,7 +510,7 @@ export default function PartnerScreen() {
           <View className="gap-3.5">
             <SectionHeading
               icon="happy-outline"
-              label="SON HUMEUR CETTE SEMAINE"
+              label={t('partner.moodThisWeek')}
             />
             <View
               style={[
@@ -528,7 +537,7 @@ export default function PartnerScreen() {
           <View className="gap-3.5">
             <SectionHeading
               icon="pulse-outline"
-              label="SES SYMPTÔMES CETTE SEMAINE"
+              label={t('partner.symptomsThisWeek')}
             />
             <WeekSymptomsCard
               weekDates={weekDates}
@@ -541,7 +550,7 @@ export default function PartnerScreen() {
         <View className="gap-3.5">
           <SectionHeading
             icon="heart-outline"
-            label="VOTRE BÉBÉ CETTE SEMAINE"
+            label={t('partner.babyThisWeek')}
           />
           <PinkCard>
             {/* Fruit ou légume de la semaine (demande explicite) : la taille
@@ -562,7 +571,9 @@ export default function PartnerScreen() {
                     className="text-[12px] font-semibold"
                     style={{ color: PINK.tagText }}
                   >
-                    {`Environ ${String(babySize.length_cm).replace('.', ',')} cm`}
+                    {t('partner.aboutCm', {
+                      size: babySize.length_cm.toLocaleString(locale),
+                    })}
                   </Text>
                 </View>
               ) : null}
@@ -572,18 +583,20 @@ export default function PartnerScreen() {
               >
                 {babySize?.fruit_label ??
                   (isBeforeFirstSize
-                    ? 'Plus petit qu’une framboise'
-                    : 'Taille bientôt disponible')}
+                    ? t('partner.smallerThanRaspberry')
+                    : t('partner.sizeSoon'))}
               </Text>
               <Text
                 className="text-[13px] leading-[18px]"
                 style={{ color: GLASS_BODY_COLOR }}
               >
                 {weeks === null
-                  ? 'Renseignez la date de terme pour suivre la croissance.'
+                  ? t('partner.enterDueDate')
                   : isBeforeFirstSize
-                    ? `${formatWeeks(weeks)} · la comparaison commence à 8 SA`
-                    : formatWeeks(weeks)}
+                    ? t('partner.comparisonFrom8', {
+                        weeks: formatWeeks(weeks, t),
+                      })
+                    : formatWeeks(weeks, t)}
               </Text>
             </View>
           </PinkCard>
@@ -594,15 +607,18 @@ export default function PartnerScreen() {
             compagne, ou du couple — voir `getRelationTipOfTheDay`. */}
         {myTip || (relationTip && !isSolo) ? (
           <View className="gap-3.5">
-            <SectionHeading icon="calendar-outline" label="ASTUCES DU JOUR" />
+            <SectionHeading
+              icon="calendar-outline"
+              label={t('partner.tipsToday')}
+            />
             {myTip ? (
-              <TipCard emoji="💡" recipient="Pour vous" tip={myTip} />
+              <TipCard emoji="💡" recipient={t('partner.forYou')} tip={myTip} />
             ) : null}
             {relationTip && !isSolo ? (
               <TipCard
                 emoji="💞"
                 image={COPARENT_TIP_ICON}
-                recipient={relationTipLabel(relationTip, role)}
+                recipient={t(relationTipLabel(relationTip, role))}
                 tip={relationTip.text}
               />
             ) : null}
@@ -616,6 +632,6 @@ export default function PartnerScreen() {
 }
 
 /** « 1 semaine d'aménorrhée », « 12 semaines d'aménorrhée ». */
-function formatWeeks(weeks: number): string {
-  return `${weeks} semaine${weeks > 1 ? 's' : ''} d’aménorrhée`;
+function formatWeeks(weeks: number, t: TFunction): string {
+  return t('partner.weeks', { count: weeks });
 }

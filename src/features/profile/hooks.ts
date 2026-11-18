@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAtomValue } from 'jotai';
 
+import type { AppLanguage } from '@/i18n/languages';
 import { sessionAtom } from '@/lib/atoms/session';
 import { queryKeys } from '@/lib/query/keys';
 import {
@@ -10,6 +11,7 @@ import {
   type ProfilePronoun,
   updateMyAvatar,
   updateMyIsPartner,
+  updateMyLanguage,
   updateMyPartnerIntro,
   updateMyProfile,
   updateMyTheme,
@@ -57,6 +59,27 @@ export function useUpdateMyTheme() {
     mutationFn: (theme: string) => {
       if (!userId) throw new Error('No authenticated user');
       return updateMyTheme(userId, theme);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.profile.all });
+    },
+  });
+}
+
+/**
+ * Enregistre la langue choisie dans Réglages. Comme le thème, elle
+ * s'applique d'abord côté client (`setAppLanguage`) : l'écriture ne sert
+ * qu'à la retrouver sur un autre téléphone ou après réinstallation.
+ */
+export function useUpdateMyLanguage() {
+  const session = useAtomValue(sessionAtom);
+  const userId = session?.user.id;
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (language: AppLanguage | null) => {
+      if (!userId) throw new Error('No authenticated user');
+      return updateMyLanguage(userId, language);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.profile.all });

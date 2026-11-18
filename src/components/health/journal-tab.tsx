@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Pressable, Text, View } from 'react-native';
 import type {
   Feedback,
@@ -16,10 +17,10 @@ import { IconInput } from '@/components/ui/icon-input';
 import { PillButton } from '@/components/ui/pill-button';
 import {
   CUSTOM_SYMPTOM_MAX_LENGTH,
+  getSymptomLabel,
   getSymptomVisual,
   isCustomSymptom,
   NO_SYMPTOM,
-  NO_SYMPTOM_LABEL,
   resolveSymptomInput,
   SYMPTOM_OPTIONS,
   withoutNoSymptom,
@@ -33,10 +34,11 @@ import type { Household } from '@/features/household/api';
 import { useHubSummary } from '@/features/hub/hooks';
 import { useThemeAccent } from '@/features/settings/hooks';
 import { getCurrentWeekIsoDates } from '@/features/together/api';
+import { getWeekdayLetters } from '@/i18n/format';
+import { useLocale } from '@/i18n/hooks';
 import { hexToRgba } from '@/lib/color';
 import { todayIso } from '@/lib/date';
 
-const DAY_LETTERS = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
 const HEART_PINK = '#e8739a';
 const MUTED = '#8f8f99';
 const FUTURE = '#c9c9cf';
@@ -77,6 +79,8 @@ export function JournalTab({
   feedback: Feedback | null;
   onFeedback: (tone: FeedbackBannerTone, message: string) => void;
 }) {
+  const weekdayLetters = getWeekdayLetters(useLocale());
+  const { t } = useTranslation();
   const accent = useThemeAccent();
   const weekDates = getCurrentWeekIsoDates();
   const today = todayIso();
@@ -91,7 +95,8 @@ export function JournalTab({
   const isSharedWithPartner =
     Boolean(household?.partner_user_id) &&
     household?.accompaniment_type !== 'seul';
-  const partnerName = summary?.partnerFirstName?.trim() || 'votre partenaire';
+  const partnerName =
+    summary?.partnerFirstName?.trim() || t('health.yourPartner');
 
   const [selected, setSelected] = useState<string[]>([]);
   // Saisie d'un symptôme hors liste (demande explicite).
@@ -147,16 +152,10 @@ export function JournalTab({
           onFeedback(
             'success',
             count === 0
-              ? 'Journée enregistrée sans symptôme'
-              : `${count} symptôme${count > 1 ? 's' : ''} enregistré${
-                  count > 1 ? 's' : ''
-                }`,
+              ? t('health.journal.savedNoSymptom')
+              : t('health.journal.saved', { count }),
           ),
-        onError: () =>
-          onFeedback(
-            'error',
-            'Impossible d’enregistrer vos symptômes. Réessayez.',
-          ),
+        onError: () => onFeedback('error', t('health.journal.saveError')),
       },
     );
   };
@@ -173,7 +172,7 @@ export function JournalTab({
         {weekDates.map((date, index) => (
           <DayPill
             key={date}
-            letter={DAY_LETTERS[index]}
+            letter={weekdayLetters[index]}
             dayNumber={Number(date.slice(-2))}
             isSelected={date === selectedDate}
             // On ne déclare pas un état à venir : les jours après
@@ -194,14 +193,18 @@ export function JournalTab({
             className="text-[18px] font-bold"
             style={{ color: GLASS_TITLE_COLOR }}
           >
-            Des symptômes{' '}
-            {selectedDate === today ? 'aujourd’hui' : 'ce jour-là'} ?
+            {t('health.journal.question', {
+              when:
+                selectedDate === today
+                  ? t('health.journal.today')
+                  : t('health.journal.thatDay'),
+            })}
           </Text>
         </View>
 
         <View className="flex-row flex-wrap gap-2.5">
           <SymptomChip
-            label={NO_SYMPTOM_LABEL}
+            label={getSymptomLabel(NO_SYMPTOM, t)}
             visual={getSymptomVisual(NO_SYMPTOM)}
             isSelected={selected.includes(NO_SYMPTOM)}
             accent={accent}
@@ -210,7 +213,7 @@ export function JournalTab({
           {SYMPTOM_OPTIONS.map((option) => (
             <SymptomChip
               key={option.value}
-              label={option.label}
+              label={getSymptomLabel(option.value, t)}
               visual={getSymptomVisual(option.value)}
               isSelected={selected.includes(option.value)}
               accent={accent}
@@ -232,7 +235,7 @@ export function JournalTab({
           {isAddingCustom ? null : (
             <Pressable
               accessibilityRole="button"
-              accessibilityLabel="Ajouter un autre symptôme"
+              accessibilityLabel={t('health.journal.addOther')}
               onPress={() => setIsAddingCustom(true)}
               className="flex-row items-center gap-2.5 rounded-full py-1.5 pl-1.5 pr-4 active:opacity-70"
               style={{
@@ -252,7 +255,7 @@ export function JournalTab({
                 className="text-[14.5px] font-semibold"
                 style={{ color: accent }}
               >
-                Autre symptôme
+                {t('health.journal.other')}
               </Text>
             </Pressable>
           )}
@@ -263,7 +266,7 @@ export function JournalTab({
             <View className="flex-1">
               <IconInput
                 icon="create-outline"
-                placeholder="Ex. crampes, migraine…"
+                placeholder={t('health.journal.otherPlaceholder')}
                 value={customText}
                 onChangeText={(text) =>
                   setCustomText(text.slice(0, CUSTOM_SYMPTOM_MAX_LENGTH))
@@ -276,7 +279,7 @@ export function JournalTab({
             </View>
             <Pressable
               accessibilityRole="button"
-              accessibilityLabel="Ajouter ce symptôme"
+              accessibilityLabel={t('health.journal.addThis')}
               accessibilityState={{ disabled: customText.trim() === '' }}
               disabled={customText.trim() === ''}
               onPress={addCustomSymptom}
@@ -290,7 +293,7 @@ export function JournalTab({
             </Pressable>
             <Pressable
               accessibilityRole="button"
-              accessibilityLabel="Annuler l'ajout"
+              accessibilityLabel={t('health.journal.cancelAdd')}
               hitSlop={6}
               onPress={() => {
                 setCustomText('');
@@ -309,10 +312,10 @@ export function JournalTab({
       <PillButton
         label={
           saveSymptoms.isPending
-            ? 'Enregistrement…'
+            ? t('health.journal.saving')
             : justSaved
-              ? 'Enregistré'
-              : 'Enregistrer'
+              ? t('health.journal.saved')
+              : t('health.journal.save')
         }
         icon={justSaved ? 'checkmark-circle' : 'save-outline'}
         isDisabled={!justSaved && isSaveDisabled}
@@ -326,7 +329,7 @@ export function JournalTab({
             className="text-center text-[12.5px]"
             style={{ color: GLASS_BODY_COLOR }}
           >
-            Visibles par {partnerName} dans « Mon partenaire »
+            {t('health.journal.visibleTo', { name: partnerName })}
           </Text>
         </View>
       ) : null}

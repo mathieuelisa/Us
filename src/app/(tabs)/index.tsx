@@ -1,7 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
+import type { TFunction } from 'i18next';
 import { useAtomValue } from 'jotai';
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Image,
   Pressable,
@@ -15,7 +17,6 @@ import {
   useSafeAreaInsets,
 } from 'react-native-safe-area-context';
 import { withUniwind } from 'uniwind';
-
 import { AppointmentDetailModal } from '@/components/health/appointment-detail-modal';
 import { AppointmentFormModal } from '@/components/health/appointment-form-modal';
 import { HealthTodayCard } from '@/components/hub/health-today-card';
@@ -51,7 +52,7 @@ import {
   formatAppointmentDayMonth,
   formatAppointmentTime,
   MOOD_PRESENTATION,
-  PARTNER_MOOD_PHRASES,
+  type MoodLevel,
 } from '@/features/hub/constants';
 import { useHubSummary } from '@/features/hub/hooks';
 import { useMarkHomeTourSeen, useMyProfile } from '@/features/profile/hooks';
@@ -65,6 +66,7 @@ import {
   measureTourTarget,
   useTourTarget,
 } from '@/features/tour/targets';
+import { useLocale } from '@/i18n/hooks';
 import { currentRoleAtom } from '@/lib/atoms/role';
 import { sessionAtom } from '@/lib/atoms/session';
 import { darkenHex, hexToRgba, lightenHex } from '@/lib/color';
@@ -101,6 +103,8 @@ const COPARENT_ICON = require('@/assets/images/Icon_coparent.png');
  * écrans (`sante.tsx`, `demarches.tsx`, `ensemble.tsx`, `partenaire.tsx`).
  */
 export default function HubScreen() {
+  const { t } = useTranslation();
+  const locale = useLocale();
   // Place de la barre du bas, qui flotte au-dessus du contenu.
   const tabBarInset = useTabBarContentInset();
   const { data: profile } = useMyProfile();
@@ -261,17 +265,19 @@ export default function HubScreen() {
   // Jamais de chiffre inventé en repli.
   const proceduresState = summary
     ? summary.proceduresTodo === 0
-      ? 'Tout est à jour'
-      : `${summary.proceduresTodo} en attente`
-    : 'Vos démarches administratives';
+      ? t('hub.state.proceduresUpToDate')
+      : t('hub.state.proceduresPending', { count: summary.proceduresTodo })
+    : t('hub.state.proceduresIdle');
 
   const togetherState = summary?.hasCheckedInToday
-    ? 'Humeur partagée aujourd’hui'
-    : 'Check-in du jour';
+    ? t('hub.state.moodShared')
+    : t('hub.state.checkIn');
 
   const healthState = summary?.nextAppointment
-    ? `Prochain rendez-vous le ${formatAppointmentDate(summary.nextAppointment.date)}`
-    : 'Journal du jour';
+    ? t('hub.state.nextAppointment', {
+        date: formatAppointmentDate(summary.nextAppointment.date, locale),
+      })
+    : t('hub.state.journal');
   // La veille et le jour du prochain rendez-vous, l'état passe en rouge
   // pour le rappeler (demande explicite).
   const daysToAppointment = summary?.nextAppointment
@@ -284,11 +290,14 @@ export default function HubScreen() {
 
   const organisationState = summary?.checklistProgress
     ? summary.checklistProgress.total === 0
-      ? 'Vos listes avant le grand jour'
+      ? t('hub.state.listsIdle')
       : summary.checklistProgress.checked === summary.checklistProgress.total
-        ? 'Tout est prêt'
-        : `${summary.checklistProgress.checked} sur ${summary.checklistProgress.total} complétés`
-    : 'Valises de naissance et jeux des prénoms';
+        ? t('hub.state.allReady')
+        : t('hub.state.listsProgress', {
+            checked: summary.checklistProgress.checked,
+            total: summary.checklistProgress.total,
+          })
+    : t('hub.state.organisationIdle');
 
   return (
     <SafeAreaView
@@ -310,7 +319,9 @@ export default function HubScreen() {
       >
         <View className="flex-row items-center justify-between gap-3">
           <Text className="flex-1 text-[26px] font-bold text-[#1a1a1a]">
-            {greetingName ? `Bonjour ${greetingName}` : 'Bonjour'}
+            {greetingName
+              ? t('hub.greetingName', { name: greetingName })
+              : t('hub.greeting')}
           </Text>
 
           {/* Gélule d'accent avec cœur, reflet et petits traits, d'après une
@@ -357,7 +368,7 @@ export default function HubScreen() {
                 />
                 <Ionicons name="heart" size={17} color="#ffffff" />
                 <Text className="text-[14px] font-bold text-white">
-                  J’ai accouché
+                  {t('hub.gaveBirth')}
                 </Text>
               </Pressable>
             </View>
@@ -395,7 +406,7 @@ export default function HubScreen() {
             Seul le sous-titre s'adapte. */}
         <View className="gap-2">
           <Text className="text-[11.5px] font-semibold tracking-wide text-[#8a8a8a]">
-            {isSolo ? 'CETTE SEMAINE' : 'MON PARTENAIRE'}
+            {isSolo ? t('hub.thisWeekSection') : t('hub.partnerSection')}
           </Text>
           <Pressable
             ref={partnerTargetRef}
@@ -441,17 +452,24 @@ export default function HubScreen() {
                 <View className="flex-1 gap-0.5">
                   <Text className="text-[16px] font-semibold text-white">
                     {isSolo
-                      ? 'Cette semaine'
+                      ? t('hub.thisWeek')
                       : partnerName
-                        ? `Avec ${partnerName}`
-                        : 'Avec votre partenaire'}
+                        ? t('hub.withPartnerName', { name: partnerName })
+                        : t('hub.withYourPartner')}
                   </Text>
                   <Text className="text-[13px] text-white/80">
                     {!hasPartnerJoined
-                      ? 'Taille du bébé et astuces du jour'
+                      ? t('hub.babySizeAndTips')
                       : partnerMood
-                        ? `${partnerName || 'Votre partenaire'} ${PARTNER_MOOD_PHRASES[partnerMood.mood]}`
-                        : `${partnerName || 'Votre partenaire'} n’a pas encore donné de nouvelles aujourd’hui`}
+                        ? t(
+                            `hub.partnerMood.${partnerMood.mood as MoodLevel}`,
+                            {
+                              name: partnerName || t('hub.yourPartner'),
+                            },
+                          )
+                        : t('hub.partnerNoNews', {
+                            name: partnerName || t('hub.yourPartner'),
+                          })}
                   </Text>
                 </View>
                 <Text className="text-[20px] text-white/60">›</Text>
@@ -460,7 +478,7 @@ export default function HubScreen() {
               {hasPartnerJoined && partnerMood?.needNote ? (
                 <View className="gap-1.5">
                   <Text className="text-[11px] font-bold tracking-wide text-white/75">
-                    POUR L’AIDER AUJOURD’HUI
+                    {t('hub.helpToday')}
                   </Text>
                   <NeedChips
                     note={partnerMood.needNote}
@@ -475,7 +493,7 @@ export default function HubScreen() {
 
         <View className="gap-2">
           <Text className="text-[11.5px] font-semibold tracking-wide text-[#8a8a8a]">
-            VOS SECTIONS
+            {t('hub.sectionsTitle')}
           </Text>
           {/* Les 4 sections, présentées ensemble par la visite guidée. */}
           <View ref={sectionsTargetRef} collapsable={false} className="gap-2">
@@ -485,7 +503,7 @@ export default function HubScreen() {
                 emoji="📋"
                 image={DEMARCHES_ICON}
                 imageFillsTile
-                title="Démarches"
+                title={t('hub.pillars.procedures')}
                 state={proceduresState}
                 waveColor={WAVE_PEACH}
                 onPress={() => router.push('/demarches')}
@@ -495,7 +513,7 @@ export default function HubScreen() {
                 emoji="💬"
                 image={ENSEMBLE_ICON}
                 imageFillsTile
-                title="Ensemble"
+                title={t('hub.pillars.together')}
                 state={togetherState}
                 waveColor={WAVE_PINK}
                 onPress={() => router.push('/ensemble')}
@@ -505,7 +523,7 @@ export default function HubScreen() {
                 emoji="🩺"
                 image={SANTE_ICON}
                 imageFillsTile
-                title="Suivi santé"
+                title={t('hub.pillars.health')}
                 state={healthState}
                 isStateUrgent={isAppointmentSoon}
                 waveColor={WAVE_MINT}
@@ -522,7 +540,7 @@ export default function HubScreen() {
                 emoji="🧳"
                 image={ORGANISATION_ICON}
                 imageFillsTile
-                title="Organisation & Préparation"
+                title={t('hub.pillars.organisation')}
                 state={organisationState}
                 waveColor={WAVE_LILAC}
                 onPress={() => router.push('/organisation')}
@@ -543,8 +561,8 @@ export default function HubScreen() {
                   resizeMode="contain"
                 />
               }
-              title="Votre bébé"
-              subtitle="Courbe de croissance"
+              title={t('hub.baby.title')}
+              subtitle={t('hub.baby.subtitle')}
               onPress={() => router.push('/bebe')}
             />
           </View>
@@ -554,20 +572,21 @@ export default function HubScreen() {
           {/* Seul intitulé de section aligné à droite (demande explicite),
               pour détacher les rendez-vous des sections qui le précèdent. */}
           <Text className="text-right text-[11.5px] font-semibold tracking-wide text-[#8a8a8a]">
-            {isSolo ? 'VOS PROCHAINS RENDEZ-VOUS' : 'NOS PROCHAINS RENDEZ-VOUS'}
+            {isSolo ? t('hub.appointments.mine') : t('hub.appointments.ours')}
           </Text>
 
           <View className="gap-2">
             {displayedAppointments.length === 0 ? (
               <Text className="text-right text-[13px] text-[#9a9a9a]">
-                Aucun rendez-vous à venir.
+                {t('hub.appointments.none')}
               </Text>
             ) : null}
             {displayedAppointments.map((appointment) => {
               const { weekday, day, month } = formatAppointmentDayMonth(
                 appointment.date,
+                locale,
               );
-              const time = formatAppointmentTime(appointment.time);
+              const time = formatAppointmentTime(appointment.time, locale);
               const subtitle = [appointment.address, time]
                 .filter(Boolean)
                 .join(' · ');
@@ -576,7 +595,9 @@ export default function HubScreen() {
                 <Pressable
                   key={appointment.id}
                   accessibilityRole="button"
-                  accessibilityLabel={`Voir le rendez-vous ${appointment.title}`}
+                  accessibilityLabel={t('hub.appointments.view', {
+                    title: appointment.title,
+                  })}
                   onPress={() => setDetailAppointmentId(appointment.id)}
                   style={CARD_SHADOW}
                   className="flex-row items-center justify-between gap-3 rounded-2xl border border-[#e0e0e0] bg-white px-4 py-5"
@@ -601,7 +622,7 @@ export default function HubScreen() {
                           color="#a3a1b0"
                         />
                         <Text className="text-[11.5px] text-[#a3a1b0]">
-                          Non partagé · visible par vous seul·e
+                          {t('hub.appointments.private')}
                         </Text>
                       </View>
                     ) : null}
@@ -694,6 +715,7 @@ export default function HubScreen() {
       {isTourOpen ? (
         <HomeTour
           steps={buildHomeTourSteps({
+            t,
             isPregnant,
             isSolo,
             hasPartnerJoined,
@@ -717,12 +739,14 @@ export default function HubScreen() {
  * puis l'onglet « Infos ».
  */
 function buildHomeTourSteps({
+  t,
   isPregnant,
   isSolo,
   hasPartnerJoined,
   hasMoodToday,
   partnerName,
 }: {
+  t: TFunction;
   isPregnant: boolean;
   isSolo: boolean;
   hasPartnerJoined: boolean;
@@ -730,7 +754,7 @@ function buildHomeTourSteps({
   hasMoodToday: boolean;
   partnerName: string | null;
 }): TourStep[] {
-  const other = partnerName ?? 'votre partenaire';
+  const other = partnerName ?? t('hub.yourPartnerLower');
   const steps: TourStep[] = [];
 
   if (isPregnant) {
@@ -738,14 +762,14 @@ function buildHomeTourSteps({
     // noté, l'ourson de l'humeur ensuite.
     steps.push({
       targetId: 'home-mood',
-      title: 'Votre humeur du jour',
+      title: t('hub.tour.mood.title'),
       body: hasMoodToday
         ? isSolo
-          ? 'Touchez votre ourson pour changer votre humeur du jour.'
-          : `Touchez votre ourson pour partager ou changer votre humeur du jour avec ${other}.`
+          ? t('hub.tour.mood.changeSolo')
+          : t('hub.tour.mood.change', { name: other })
         : isSolo
-          ? 'Touchez le cœur pour noter comment vous vous sentez aujourd’hui.'
-          : `Touchez le cœur pour partager votre humeur du jour avec ${other}.`,
+          ? t('hub.tour.mood.noteSolo')
+          : t('hub.tour.mood.note', { name: other }),
       radius: 999,
     });
   }
@@ -753,64 +777,64 @@ function buildHomeTourSteps({
   if (!isSolo) {
     steps.push({
       targetId: 'home-partner',
-      title: 'Mon partenaire',
+      title: t('hub.tour.partner.title'),
       body: hasPartnerJoined
-        ? `Voyez comment ${other} se sent aujourd’hui et au fil de la semaine, et ce qui pourrait l’aider.`
-        : 'Taille de bébé et astuces du jour — puis, dès que votre partenaire vous aura rejoint, son humeur de la journée et de la semaine.',
+        ? t('hub.tour.partner.joined', { name: other })
+        : t('hub.tour.partner.notJoined'),
       radius: 20,
     });
   }
 
   steps.push({
     targetId: 'home-sections',
-    title: 'Vos sections',
-    body: 'L’essentiel de la grossesse, rangé en quatre espaces.',
+    title: t('hub.tour.sections.title'),
+    body: t('hub.tour.sections.body'),
     radius: 24,
     items: [
       {
         image: DEMARCHES_ICON,
-        label: 'Démarches',
-        text: 'toutes vos démarches, mois par mois de grossesse',
+        label: t('hub.pillars.procedures'),
+        text: t('hub.tour.sections.procedures'),
       },
       {
         image: ENSEMBLE_ICON,
-        label: 'Ensemble',
+        label: t('hub.pillars.together'),
         text: isSolo
-          ? 'votre humeur du jour et votre semaine'
-          : 'votre humeur du jour et la semaine de chacun',
+          ? t('hub.tour.sections.togetherSolo')
+          : t('hub.tour.sections.together'),
       },
       {
         image: SANTE_ICON,
-        label: 'Suivi santé',
-        text: 'rendez-vous, numéros utiles et exercices',
+        label: t('hub.pillars.health'),
+        text: t('hub.tour.sections.health'),
       },
       {
         image: ORGANISATION_ICON,
-        label: 'Organisation',
-        text: 'valises, assistant contractions et match des prénoms',
+        label: t('hub.pillars.organisationShort'),
+        text: t('hub.tour.sections.organisation'),
       },
     ],
   });
 
   steps.push({
     targetId: 'home-baby',
-    title: 'Votre bébé',
-    body: 'Biberons, allaitement, sommeil, croissance, vaccins… toutes les données de bébé au même endroit, pour vous simplifier le quotidien.',
-    badge: 'Premium',
+    title: t('hub.baby.title'),
+    body: t('hub.tour.baby.body'),
+    badge: t('hub.tabs.premium'),
     radius: 20,
   });
 
   steps.push({
     targetId: 'home-appointments',
-    title: 'Vos prochains rendez-vous',
-    body: 'Ils s’affichent ici. Touchez-en un pour voir le détail ; un rappel vous prévient la veille.',
+    title: t('hub.tour.appointments.title'),
+    body: t('hub.tour.appointments.body'),
     radius: 20,
   });
 
   steps.push({
     targetId: 'tab-informations',
-    title: 'Infos',
-    body: 'Les informations importantes de la grossesse : allergies, n° de sécurité sociale, groupe sanguin, points de vigilance…',
+    title: t('hub.tabs.info'),
+    body: t('hub.tour.info.body'),
     radius: 24,
     scroll: false,
   });

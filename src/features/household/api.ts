@@ -1,3 +1,4 @@
+import i18n from '@/i18n';
 import { supabase } from '@/lib/supabase/client';
 import type { Database } from '@/lib/supabase/database.types';
 
@@ -135,25 +136,22 @@ export async function createHouseholdJoinCode(): Promise<{
   return { code: row.code, expiresAt: row.expires_at };
 }
 
-const JOIN_ERROR_MESSAGES: Record<string, string> = {
-  invalid_code: 'Ce code ne correspond à aucun espace. Vérifiez-le.',
-  expired_code: 'Ce code a expiré. Demandez-en un nouveau à votre partenaire.',
-  household_full: 'Cet espace a déjà un ou une partenaire.',
-  household_solo:
-    'Cet espace est configuré pour une personne seule : il ne peut pas accueillir de partenaire.',
-  already_in_household: 'Votre compte fait déjà partie d’un espace.',
-};
+const JOIN_ERROR_CODES = [
+  'invalid_code',
+  'expired_code',
+  'household_full',
+  'household_solo',
+  'already_in_household',
+] as const;
 
 export function getJoinErrorMessage(error: unknown): string {
   const message = (error as { message?: string } | null)?.message ?? '';
-  const key = Object.keys(JOIN_ERROR_MESSAGES).find((code) =>
-    message.includes(code),
-  );
-  if (key) return JOIN_ERROR_MESSAGES[key];
+  const code = JOIN_ERROR_CODES.find((c) => message.includes(c));
+  if (code) return i18n.t(`hub.invite.joinErrors.${code}`);
   if (/network|fetch/i.test(message)) {
-    return 'Connexion impossible. Vérifiez votre réseau.';
+    return i18n.t('hub.invite.joinErrors.network');
   }
-  return 'Impossible de rejoindre l’espace. Réessayez.';
+  return i18n.t('hub.invite.joinErrors.unknown');
 }
 
 /** Longueur du code d'espace (`generate_household_join_code`). */
