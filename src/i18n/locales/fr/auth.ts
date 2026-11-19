@@ -1,5 +1,10 @@
 /** Connexion / inscription et messages d’erreur d’authentification. */
 export const auth = {
+  /** Accroche en deux parties autour du logo + « US ». */
+  tagline: {
+    top: 'Grandir ensemble',
+    bottom: 'tout simplement.',
+  },
   mode: {
     signIn: {
       title: 'Bon retour parmi nous',

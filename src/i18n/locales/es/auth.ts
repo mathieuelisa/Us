@@ -1,6 +1,10 @@
 import type { Messages } from '../fr';
 
 export const auth: Messages['auth'] = {
+  tagline: {
+    top: 'Crecer juntos',
+    bottom: 'así de simple.',
+  },
   mode: {
     signIn: {
       title: 'Qué bien verte de nuevo',

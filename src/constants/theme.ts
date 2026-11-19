@@ -31,9 +31,13 @@ export type ThemeColor = keyof typeof Colors.light & keyof typeof Colors.dark;
  *
  * `brandTitle` : vert sauge profond tiré du vert du logo cœur, pour le
  * titre « US » sous le logo de l'écran de connexion.
+ * `taglineText` / `taglineRule` : accroche « Grandir ensemble … tout
+ * simplement. » autour du logo (texte gris-vert, traits sauge clair).
  */
 export const BrandColors = {
   brandTitle: '#4E7A6C',
+  taglineText: '#56625F',
+  taglineRule: '#9DB5A8',
 } as const;
 
 export const Fonts = Platform.select({

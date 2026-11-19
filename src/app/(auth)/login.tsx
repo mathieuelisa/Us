@@ -208,18 +208,33 @@ export default function LoginScreen() {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <View className="items-center gap-1">
-            <AnimatedLogo width={224} />
+          {/* Marge basse en plus de l'écart commun : détache l'accroche
+              des boutons Connexion / Inscription (demande explicite). */}
+          <View className="mb-5 items-center">
+            <TaglineTop label={t('auth.tagline.top')} />
+            <View className="items-center gap-1">
+              <AnimatedLogo width={224} />
+              <Text
+                accessibilityRole="header"
+                className="text-[64px] leading-[70px]"
+                style={{
+                  color: BrandColors.brandTitle,
+                  fontWeight: '900',
+                  letterSpacing: -1.5,
+                }}
+              >
+                US
+              </Text>
+            </View>
             <Text
-              accessibilityRole="header"
-              className="text-[64px] leading-[70px]"
               style={{
-                color: BrandColors.brandTitle,
-                fontWeight: '900',
-                letterSpacing: -1.5,
+                marginTop: 6,
+                fontSize: 14,
+                fontWeight: '400',
+                color: BrandColors.taglineText,
               }}
             >
-              US
+              {t('auth.tagline.bottom')}
             </Text>
           </View>
 
@@ -467,6 +482,43 @@ export default function LoginScreen() {
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
+  );
+}
+
+/**
+ * Accroche haute « — GRANDIR ENSEMBLE — » au-dessus du logo (demande
+ * explicite) : deux traits décoratifs, ignorés par les lecteurs d'écran.
+ */
+function TaglineTop({ label }: { label: string }) {
+  return (
+    <View
+      className="flex-row items-center"
+      style={{ gap: 10, marginBottom: 18 }}
+    >
+      <TaglineRule />
+      <Text
+        style={{
+          textTransform: 'uppercase',
+          fontSize: 12,
+          fontWeight: '600',
+          letterSpacing: 2,
+          color: BrandColors.taglineText,
+        }}
+      >
+        {label}
+      </Text>
+      <TaglineRule />
+    </View>
+  );
+}
+
+function TaglineRule() {
+  return (
+    <View
+      accessible={false}
+      importantForAccessibility="no"
+      style={{ width: 24, height: 1, backgroundColor: BrandColors.taglineRule }}
+    />
   );
 }
 
