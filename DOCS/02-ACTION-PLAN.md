@@ -566,7 +566,25 @@ le plan.
       (5c), geste du jour **avec règle de déclenchement sur humeur
       difficile répétée** (3f), réassurance symptôme (4d)
 
-**Livrable de fin de Phase 4 : [V1](./versions/V1.md) prêt à shipper.**
+## Phase 4 bis — Trophées & badges (→ V1)
+
+Ajoutée le 2026-11-19 (demande explicite). Spec complète, règles et
+catalogue initial : [V1 — Trophées & badges](./versions/V1.md#trophées--badges).
+
+- [ ] Valider le catalogue initial et les points ouverts (gratuit/premium,
+      rétroactivité, point d'entrée de la page)
+- [ ] Obtenir une capture de référence pour la page et les célébrations
+      (aucune maquette Hi-Fi)
+- [ ] Table `household_achievements` + RLS par foyer + déblocage côté
+      serveur (triggers sur les tables sources) — cf.
+      [Plan Supabase, Lot 5 bis](./06-PLAN-SUPABASE.md#lot-5-bis--trophées--badges)
+- [ ] Page « Nos trophées » (obtenus + à venir en silhouette)
+- [ ] Célébrations : toast pour un badge, modale pour un trophée, vues une
+      seule fois par parent
+- [ ] Interrupteur « Trophées & badges » dans Réglages (masque tout)
+- [ ] Traductions FR/EN/ES
+
+**Livrable de fin de Phase 4 bis : [V1](./versions/V1.md) prêt à shipper.**
 
 ## Phase 5 — Finitions & rétention (→ V2)
 
@@ -587,7 +605,7 @@ le plan.
 |---|---|
 | 0 | — (socle) |
 | 1, 2 | [MVP](./versions/MVP.md) |
-| 3, 4 | [V1](./versions/V1.md) |
+| 3, 4, 4 bis | [V1](./versions/V1.md) |
 | 5 | [V2](./versions/V2.md) |
 
 ## Recommandation de séquencement pour l'agent qui implémente

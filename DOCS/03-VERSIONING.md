@@ -17,7 +17,7 @@ title: Plan de versionning — US
 ```
 DOCS/versions/
   MVP.md   — première version livrée (parcours gratuit complet)
-  V1.md    — premier palier payant (premium + module bébé)
+  V1.md    — premier palier payant (premium + module bébé + trophées & badges)
   V2.md    — finitions & rétention (i18n, thèmes, reviews natives)
   V3.md, V4.md, ... — versions suivantes, même gabarit (pattern "VX.md")
 ```
@@ -65,6 +65,7 @@ Le [Plan d'action](./02-ACTION-PLAN.md) est organisé en phases techniques
 | Phase 2 — Déclaration de naissance & finitions MVP | [MVP](./versions/MVP.md) |
 | Phase 3 — Paiement & module bébé | [V1](./versions/V1.md) |
 | Phase 4 — Notifications push réelles | [V1](./versions/V1.md) |
+| Phase 4 bis — Trophées & badges | [V1](./versions/V1.md) |
 | Phase 5 — i18n, thèmes, reviews natives, export | [V2](./versions/V2.md) |
 
 Concrètement : quand la Phase 1 et la Phase 2 du plan d'action sont

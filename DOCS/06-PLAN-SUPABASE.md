@@ -134,6 +134,7 @@ configurer le SMTP. Détail dans l'[architecture](./04-ARCHITECTURE.md#connexion
 | [3](#lot-3--compléments-mvp) | Compléments MVP (rendez-vous à deux, invitation, avis, RGPD, suppression de compte) | MVP | Lots 1 et 2 |
 | [4](#lot-4--premium-par-foyer-et-module-votre-bébé) | Premium par foyer, module « Votre bébé », match des prénoms | V1 | Lot 3 |
 | [5](#lot-5--notifications-push) | Notifications push | V1 | Lot 3 |
+| [5 bis](#lot-5-bis--trophées--badges) | Trophées & badges (déblocage côté serveur) | V1 | Lot 3 |
 | [6](#lot-6--plus-tard) | Plus tard : exercices et astuces en base, Realtime, export, photos | V1/V2 | — |
 
 Les lots 1 et 2 peuvent avancer en parallèle une fois le lot 0 fait.
@@ -507,6 +508,29 @@ Plan d'origine :
 
 **Terminé quand** : une notification de rappel de démarche arrive sur un
 appareil réel, et aucune n'est envoyée en double.
+
+## Lot 5 bis — Trophées & badges
+
+Ajouté le 2026-11-19 (demande explicite). Règles produit et catalogue :
+[V1 — Trophées & badges](./versions/V1.md#trophées--badges).
+
+- [ ] Table `household_achievements` : `household_id`, `achievement_key`,
+      `unlocked_at`, `unlocked_by` (parent à l'origine, nullable pour les
+      étapes de foyer), unicité `(household_id, achievement_key)`.
+- [ ] Table ou colonne « déjà vu » par parent (célébrer une seule fois
+      chacun), par exemple `achievement_views (user_id, achievement_key)`.
+- [ ] RLS : lecture par les membres du foyer ; **aucune écriture client**
+      sur `household_achievements` (déblocage serveur uniquement) ;
+      écriture de « déjà vu » limitée à soi. Policy revue explicitement,
+      avec tests (Lot 2).
+- [ ] Déblocage par fonctions `security definer` déclenchées par des
+      triggers sur les tables sources (`mood_checkins`, `appointments`,
+      `household_procedures`, `household_checklist_items`,
+      `name_favorites`, foyer/invitations, naissance). Jamais sur
+      `symptoms_log` ni `important_info`.
+- [ ] Rétroactivité : script de rattrapage unique pour les foyers existants.
+- [ ] Notification au déblocage d'un trophée seulement (via l'outbox du
+      Lot 5), désactivée si le foyer a masqué les trophées.
 
 ## Lot 6 — Plus tard
 
