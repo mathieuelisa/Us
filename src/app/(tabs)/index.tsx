@@ -55,6 +55,7 @@ import {
   type MoodLevel,
 } from '@/features/hub/constants';
 import { useHubSummary } from '@/features/hub/hooks';
+import { getProfileAvatar } from '@/features/profile/avatars';
 import { useMarkHomeTourSeen, useMyProfile } from '@/features/profile/hooks';
 import { useThemeAccent, useThemeBackground } from '@/features/settings/hooks';
 import {
@@ -318,11 +319,14 @@ export default function HubScreen() {
         refreshControl={refresh}
       >
         <View className="flex-row items-center justify-between gap-3">
-          <Text className="flex-1 text-[26px] font-bold text-[#1a1a1a]">
-            {greetingName
-              ? t('hub.greetingName', { name: greetingName })
-              : t('hub.greeting')}
-          </Text>
+          <View className="flex-1 flex-row items-center gap-2.5">
+            <Text className="shrink text-[26px] font-bold text-[#1a1a1a]">
+              {greetingName
+                ? t('hub.greetingName', { name: greetingName })
+                : t('hub.greeting')}
+            </Text>
+            <GreetingAvatar avatarKey={profile?.avatar ?? null} />
+          </View>
 
           {/* Gélule d'accent avec cœur, reflet et petits traits, d'après une
               capture de référence (demande explicite) — remplace l'or
@@ -845,4 +849,36 @@ function buildHomeTourSteps({
 /** « lun. » → « Lun. » */
 function capitalize(text: string): string {
   return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+/**
+ * Petit avatar à côté du prénom de l'accueil (demande explicite : « pas
+ * besoin de mettre un gros avatar ») : l'animal choisi dans le profil sur
+ * son rond pastel, cerclé de blanc. Rien si aucun avatar n'est choisi —
+ * pas d'initiale ici, le prénom est déjà écrit à côté.
+ */
+function GreetingAvatar({ avatarKey }: { avatarKey: string | null }) {
+  const { t } = useTranslation();
+  const avatar = getProfileAvatar(avatarKey);
+  if (!avatar) return null;
+
+  return (
+    <View
+      accessibilityRole="image"
+      accessibilityLabel={t(avatar.label)}
+      className="h-12 w-12 items-center justify-center rounded-full"
+      style={{
+        backgroundColor: avatar.bg,
+        borderWidth: 2,
+        borderColor: '#ffffff',
+        shadowColor: '#000000',
+        shadowOffset: { width: 0, height: 3 },
+        shadowOpacity: 0.08,
+        shadowRadius: 6,
+        elevation: 2,
+      }}
+    >
+      <Text style={{ fontSize: 27, lineHeight: 32 }}>{avatar.emoji}</Text>
+    </View>
+  );
 }
