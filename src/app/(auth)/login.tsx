@@ -20,6 +20,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import { withUniwind } from 'uniwind';
+import { AnimatedLogo } from '@/components/auth/animated-logo';
 import { PasswordStrengthMeter } from '@/components/auth/password-strength-meter';
 import { SignupRoleCard } from '@/components/auth/signup-role-card';
 import {
@@ -28,6 +29,7 @@ import {
 } from '@/components/ui/glass-card';
 import { IconInput } from '@/components/ui/icon-input';
 import { PillButton } from '@/components/ui/pill-button';
+import { BrandColors } from '@/constants/theme';
 import {
   getAuthErrorMessage,
   PASSWORD_MIN_LENGTH,
@@ -206,17 +208,18 @@ export default function LoginScreen() {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <View className="items-center gap-2">
-            <Image
-              source={require('@/assets/images/Father_feelings_mother.png')}
-              className="h-56 w-56"
-              resizeMode="contain"
-            />
+          <View className="items-center gap-1">
+            <AnimatedLogo width={224} />
             <Text
-              className="max-w-64 text-center text-[15px] leading-5"
-              style={{ color: GLASS_BODY_COLOR }}
+              accessibilityRole="header"
+              className="text-[64px] leading-[70px]"
+              style={{
+                color: BrandColors.brandTitle,
+                fontWeight: '900',
+                letterSpacing: -1.5,
+              }}
             >
-              {t('auth.tagline')}
+              US
             </Text>
           </View>
 

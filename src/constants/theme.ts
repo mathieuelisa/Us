@@ -24,6 +24,18 @@ export const Colors = {
 
 export type ThemeColor = keyof typeof Colors.light & keyof typeof Colors.dark;
 
+/**
+ * Couleurs de marque, hors mode clair/sombre : les écrans d'auth et
+ * d'onboarding imposent leur propre thème pastel (cf. `Uniwind.setTheme` dans
+ * `src/app/_layout.tsx`), ils ne suivent pas le réglage système.
+ *
+ * `brandTitle` : vert sauge profond tiré du vert du logo cœur, pour le
+ * titre « US » sous le logo de l'écran de connexion.
+ */
+export const BrandColors = {
+  brandTitle: '#4E7A6C',
+} as const;
+
 export const Fonts = Platform.select({
   ios: {
     /** iOS `UIFontDescriptorSystemDesignDefault` */

@@ -15,7 +15,6 @@ export const auth: Messages['auth'] = {
     signIn: 'Sign in',
     signUp: 'Sign up',
   },
-  tagline: 'Your baby has a health record. You have US.',
   accountCreated:
     'Account created! Confirm your address with the link we emailed you, then sign in.',
   enterEmailFirst: 'Enter your email above first to receive the link.',

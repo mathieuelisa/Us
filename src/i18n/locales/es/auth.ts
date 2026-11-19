@@ -15,7 +15,6 @@ export const auth: Messages['auth'] = {
     signIn: 'Iniciar sesión',
     signUp: 'Registrarse',
   },
-  tagline: 'Tu bebé tiene su cartilla de salud. Vosotros tenéis US.',
   accountCreated:
     '¡Cuenta creada! Confirma tu dirección con el enlace que te hemos enviado por email y luego inicia sesión.',
   enterEmailFirst: 'Escribe primero tu email arriba para recibir el enlace.',

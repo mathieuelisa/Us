@@ -14,7 +14,6 @@ export const auth = {
     signIn: 'Connexion',
     signUp: 'Inscription',
   },
-  tagline: 'Votre bébé a son carnet de santé. Vous, vous avez US.',
   accountCreated:
     'Compte créé ! Confirmez votre adresse avec le lien reçu par email, puis connectez-vous.',
   enterEmailFirst:
