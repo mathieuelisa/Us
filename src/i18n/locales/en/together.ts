@@ -12,6 +12,8 @@ export const together: Messages['together'] = {
   },
   need: {
     prompt: 'Tell us what you need,{{br}}we’re here for you ✨',
+    promptCoParent:
+      'Share what you need,{{br}}{{name}} can take care of you ✨',
     title: 'Anything in particular?',
     placeholder: 'Or write your own need…',
   },

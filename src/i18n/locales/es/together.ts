@@ -12,6 +12,8 @@ export const together: Messages['together'] = {
   },
   need: {
     prompt: 'Dinos qué necesitas,{{br}}estamos aquí para ti ✨',
+    promptCoParent:
+      'Comparte lo que necesitas,{{br}}{{name}} podrá cuidar de ti ✨',
     title: '¿Algún deseo en particular?',
     placeholder: 'O escribe tu propia necesidad…',
   },

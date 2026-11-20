@@ -48,11 +48,18 @@ const HEART_PINK = '#e8739a';
 export function NeedNoteOverlay({
   visible,
   moodEmoji,
+  coParentPartnerName,
   onSubmit,
   onSkip,
 }: {
   visible: boolean;
   moodEmoji?: ImageSourcePropType;
+  /**
+   * Renseigné côté co-parent : la phrase d'invite parle alors de la personne
+   * enceinte (« Camille pourra prendre soin de vous ») plutôt que de l'app.
+   * `null` côté co-parent si son prénom est inconnu.
+   */
+  coParentPartnerName?: string | null;
   onSubmit: (note: string) => void;
   onSkip: () => void;
 }) {
@@ -165,7 +172,12 @@ export function NeedNoteOverlay({
                   className="text-center text-[14px] leading-5"
                   style={{ color: GLASS_BODY_COLOR }}
                 >
-                  {t('together.need.prompt', { br: '\n' })}
+                  {coParentPartnerName === undefined
+                    ? t('together.need.prompt', { br: '\n' })
+                    : t('together.need.promptCoParent', {
+                        br: '\n',
+                        name: coParentPartnerName || t('hub.yourPartner'),
+                      })}
                 </Text>
               </View>
             </View>

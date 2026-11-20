@@ -11,6 +11,12 @@ export const together = {
   },
   need: {
     prompt: 'Dites-nous ce dont vous avez besoin,{{br}}on est là pour vous ✨',
+    /**
+     * Côté co-parent : c'est la personne enceinte qui pourra répondre au
+     * besoin, pas l'app (demande explicite).
+     */
+    promptCoParent:
+      'Partagez ce dont vous avez besoin,{{br}}{{name}} pourra prendre soin de vous ✨',
     title: 'Une envie particulière ?',
     placeholder: 'Ou écrivez votre propre besoin…',
   },

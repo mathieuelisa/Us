@@ -22,6 +22,7 @@ import { usePullToRefresh } from '@/components/ui/use-pull-to-refresh';
 import { useMyHousehold } from '@/features/household/hooks';
 import type { MoodValue } from '@/features/hub/api';
 import { getMoodImage } from '@/features/hub/constants';
+import { useHubSummary } from '@/features/hub/hooks';
 import { useMyProfile } from '@/features/profile/hooks';
 import { useThemeAccent, useThemeBackground } from '@/features/settings/hooks';
 import { getCurrentWeekIsoDates } from '@/features/together/api';
@@ -68,6 +69,8 @@ export default function TogetherScreen() {
   // Ours ou ourse selon la façon dont on veut qu'on parle de soi.
   const { data: profile } = useMyProfile();
   const pronoun = profile?.pronoun ?? null;
+  // Prénom de la personne enceinte, pour l'invite du besoin côté co-parent.
+  const { data: summary } = useHubSummary(household);
   // Gestes « après la naissance » dès qu'elle est déclarée.
   const { data: gesture } = useGestureOfTheDay(
     role,
@@ -192,6 +195,11 @@ export default function TogetherScreen() {
       <NeedNoteOverlay
         visible={isOverlayOpen}
         moodEmoji={pendingMood ? getMoodImage(pendingMood, pronoun) : undefined}
+        coParentPartnerName={
+          role === 'partner'
+            ? (summary?.partnerFirstName?.trim() ?? null)
+            : undefined
+        }
         onSubmit={submitNeed}
         onSkip={closeOverlay}
       />
