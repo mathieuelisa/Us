@@ -28,7 +28,7 @@ export const auth = {
   passwordMismatch: 'Les deux mots de passe ne correspondent pas.',
   hidePassword: 'Masquer le mot de passe',
   showPassword: 'Afficher le mot de passe',
-  youAre: 'Vous êtes…',
+  youAre: 'Votre aventure commence ici',
   role: {
     pregnantTitle: 'J’attends un bébé',
     pregnantSubtitle: 'Je crée notre espace',

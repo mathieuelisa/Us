@@ -27,7 +27,7 @@ export const auth: Messages['auth'] = {
   passwordMismatch: 'The two passwords don’t match.',
   hidePassword: 'Hide password',
   showPassword: 'Show password',
-  youAre: 'You are…',
+  youAre: 'Your adventure starts here',
   role: {
     pregnantTitle: 'I’m expecting a baby',
     pregnantSubtitle: 'I create our space',
