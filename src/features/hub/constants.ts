@@ -13,32 +13,39 @@ export const MOOD_PRESENTATION: Record<
   {
     emoji: string;
     phraseKey: TranslationKey;
+    /** La même phrase au passé, pour un jour antérieur à aujourd'hui. */
+    pastPhraseKey: TranslationKey;
     labelKey: TranslationKey;
   }
 > = {
   great: {
     emoji: '😄',
     phraseKey: 'mood.phrases.great',
+    pastPhraseKey: 'mood.phrasesPast.great',
     labelKey: 'mood.labels.great',
   },
   good: {
     emoji: '🙂',
     phraseKey: 'mood.phrases.good',
+    pastPhraseKey: 'mood.phrasesPast.good',
     labelKey: 'mood.labels.good',
   },
   neutral: {
     emoji: '😐',
     phraseKey: 'mood.phrases.neutral',
+    pastPhraseKey: 'mood.phrasesPast.neutral',
     labelKey: 'mood.labels.neutral',
   },
   bad: {
     emoji: '😩',
     phraseKey: 'mood.phrases.bad',
+    pastPhraseKey: 'mood.phrasesPast.bad',
     labelKey: 'mood.labels.bad',
   },
   terrible: {
     emoji: '😢',
     phraseKey: 'mood.phrases.terrible',
+    pastPhraseKey: 'mood.phrasesPast.terrible',
     labelKey: 'mood.labels.terrible',
   },
 };

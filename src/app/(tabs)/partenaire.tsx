@@ -16,9 +16,9 @@ import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import { withUniwind } from 'uniwind';
 import { useTabBarContentInset } from '@/components/navigation/use-tab-bar-height';
+import { WeekMoodCard } from '@/components/partner/week-mood-card';
 import { WeekSymptomsCard } from '@/components/partner/week-symptoms-card';
 import { NeedChips } from '@/components/together/need-chips';
-import { WeekMoodDays } from '@/components/together/week-mood-strip';
 import {
   DashedLoopDoodle,
   GLASS_BODY_COLOR,
@@ -518,25 +518,12 @@ export default function PartnerScreen() {
               icon="happy-outline"
               label={t('partner.moodThisWeek')}
             />
-            <View
-              style={[
-                PINK_SHADOW,
-                {
-                  borderRadius: 28,
-                  backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                },
-              ]}
-              className="px-4 py-4"
-            >
-              <View className="pt-4">
-                <WeekMoodDays
-                  weekDates={weekDates}
-                  checkinsByDate={partnerCheckins}
-                  pronoun={summary?.partnerPronoun ?? null}
-                  accent={PINK.accent}
-                />
-              </View>
-            </View>
+            <WeekMoodCard
+              weekDates={weekDates}
+              checkinsByDate={partnerCheckins}
+              pronoun={summary?.partnerPronoun ?? null}
+              partnerName={partnerName ?? null}
+            />
           </View>
         ) : null}
 

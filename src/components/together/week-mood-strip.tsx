@@ -100,9 +100,9 @@ export function WeekMoodStrip({
 }
 
 /**
- * La rangée des 7 jours seule, sans carte ni titre — pour un écran qui a
- * déjà les siens (« Mon partenaire », dans son rose). Mêmes règles :
+ * La rangée des 7 jours seule, sans carte ni titre. Mêmes règles :
  * qualitatif, aujourd'hui en gélule d'accent, jours à venir estompés.
+ * (« Mon partenaire » a sa propre carte, touchable : `WeekMoodCard`.)
  */
 export function WeekMoodDays({
   weekDates,

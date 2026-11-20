@@ -14,4 +14,12 @@ export const mood = {
     bad: 'traverse une journée difficile',
     terrible: 'traverse une journée très difficile',
   },
+  /** Même phrase pour un jour passé (semaine de « Mon partenaire »). */
+  phrasesPast: {
+    great: 'semblait être au top',
+    good: 'semblait se sentir bien',
+    neutral: 'passait une journée ordinaire',
+    bad: 'traversait une journée difficile',
+    terrible: 'traversait une journée très difficile',
+  },
 };

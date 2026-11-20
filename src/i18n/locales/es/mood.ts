@@ -15,4 +15,11 @@ export const mood: Messages['mood'] = {
     bad: 'está pasando un día difícil',
     terrible: 'está pasando un día muy difícil',
   },
+  phrasesPast: {
+    great: 'parecía estar genial',
+    good: 'parecía sentirse bien',
+    neutral: 'tenía un día normal',
+    bad: 'estaba pasando un día difícil',
+    terrible: 'estaba pasando un día muy difícil',
+  },
 };

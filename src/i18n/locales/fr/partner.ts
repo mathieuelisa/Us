@@ -37,6 +37,7 @@ export const partner = {
   toHelp: 'POUR L’AIDER · {{symptom}}',
   symptomFreeDay: '{{name}} a noté une journée sans symptôme.',
   nothingThatDay: '{{name}} n’a rien noté ce jour-là.',
+  moodWeekEmpty: '{{name}} n’a pas encore partagé son humeur cette semaine.',
   recurring: 'Revient souvent : ',
   recurringDays: ' · {{count}} jours',
   tipFor: 'CONSEIL · {{symptom}}',

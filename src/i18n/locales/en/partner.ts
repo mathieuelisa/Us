@@ -38,6 +38,7 @@ export const partner: Messages['partner'] = {
   toHelp: 'TO HELP HER · {{symptom}}',
   symptomFreeDay: '{{name}} noted a symptom-free day.',
   nothingThatDay: '{{name}} didn’t note anything that day.',
+  moodWeekEmpty: '{{name}} hasn’t shared a mood yet this week.',
   recurring: 'Keeps coming back: ',
   recurringDays: ' · {{count}} days',
   tipFor: 'TIP · {{symptom}}',
