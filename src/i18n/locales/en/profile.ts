@@ -42,5 +42,6 @@ export const profile: Messages['profile'] = {
     panda: 'Panda',
     koala: 'Koala',
     lion: 'Lion',
+    chat: 'Cat',
   },
 };

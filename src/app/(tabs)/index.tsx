@@ -853,8 +853,8 @@ function capitalize(text: string): string {
 
 /**
  * Petit avatar à côté du prénom de l'accueil (demande explicite : « pas
- * besoin de mettre un gros avatar ») : l'animal choisi dans le profil sur
- * son rond pastel, cerclé de blanc. Rien si aucun avatar n'est choisi —
+ * besoin de mettre un gros avatar ») : l'illustration choisie dans le
+ * profil, cerclée de blanc. Rien si aucun avatar n'est choisi —
  * pas d'initiale ici, le prénom est déjà écrit à côté.
  */
 function GreetingAvatar({ avatarKey }: { avatarKey: string | null }) {
@@ -866,7 +866,7 @@ function GreetingAvatar({ avatarKey }: { avatarKey: string | null }) {
     <View
       accessibilityRole="image"
       accessibilityLabel={t(avatar.label)}
-      className="h-12 w-12 items-center justify-center rounded-full"
+      className="h-12 w-12 items-center justify-center overflow-hidden rounded-full"
       style={{
         backgroundColor: avatar.bg,
         borderWidth: 2,
@@ -878,7 +878,11 @@ function GreetingAvatar({ avatarKey }: { avatarKey: string | null }) {
         elevation: 2,
       }}
     >
-      <Text style={{ fontSize: 27, lineHeight: 32 }}>{avatar.emoji}</Text>
+      <Image
+        source={avatar.image}
+        style={{ width: 44, height: 44, borderRadius: 22 }}
+        resizeMode="cover"
+      />
     </View>
   );
 }

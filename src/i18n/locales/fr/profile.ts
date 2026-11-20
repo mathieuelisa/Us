@@ -41,5 +41,6 @@ export const profile = {
     panda: 'Panda',
     koala: 'Koala',
     lion: 'Lion',
+    chat: 'Chat',
   },
 };

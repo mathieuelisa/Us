@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAtomValue } from 'jotai';
 import { type ComponentProps, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, Text, TextInput, View } from 'react-native';
+import { Image, Pressable, Text, TextInput, View } from 'react-native';
 import { SafeAreaView as RNSafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import { withUniwind } from 'uniwind';
@@ -412,7 +412,7 @@ function ProfileAvatar({
         style={{ backgroundColor: hexToRgba(accent, 0.1) }}
       />
       <View
-        className="h-[132px] w-[132px] items-center justify-center rounded-full"
+        className="h-[132px] w-[132px] items-center justify-center overflow-hidden rounded-full"
         style={{
           backgroundColor: avatar ? avatar.bg : accent,
           borderWidth: 4,
@@ -425,7 +425,11 @@ function ProfileAvatar({
         }}
       >
         {avatar ? (
-          <Text style={{ fontSize: 70, lineHeight: 82 }}>{avatar.emoji}</Text>
+          <Image
+            source={avatar.image}
+            style={{ width: 124, height: 124, borderRadius: 62 }}
+            resizeMode="cover"
+          />
         ) : (
           <Text
             className="text-[54px] font-extrabold text-white"

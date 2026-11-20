@@ -1,6 +1,13 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
-import { Modal, Pressable, Text, View } from 'react-native';
+import {
+  Image,
+  type ImageSourcePropType,
+  Modal,
+  Pressable,
+  Text,
+  View,
+} from 'react-native';
 import Animated, { SlideInDown, SlideOutDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
@@ -19,8 +26,8 @@ const TILE_SIZE = 84;
  * l'avatar de la page Profil. Même feuille que les autres modales de l'app
  * (`InfoItemFormModal`, modale de départ des contractions) : fond opaque
  * immédiat, carte qui glisse, tache d'accent, titre souligné, bouton de
- * fermeture. Grille de 7 ronds : l'initiale du prénom (sans avatar), puis
- * les 6 animaux. Le choix s'applique au toucher, comme le thème.
+ * fermeture. Grille de 8 ronds : l'initiale du prénom (sans avatar), puis
+ * les 7 animaux illustrés. Le choix s'applique au toucher, comme le thème.
  */
 export function AvatarPickerModal({
   visible,
@@ -46,19 +53,19 @@ export function AvatarPickerModal({
     key: string | null;
     label: string;
     bg: string;
-    content: string;
+    image: ImageSourcePropType | null;
   }[] = [
     {
       key: null,
       label: t('profile.avatarPicker.initial'),
       bg: accent,
-      content: initials,
+      image: null,
     },
     ...PROFILE_AVATARS.map((avatar) => ({
       key: avatar.key,
       label: t(avatar.label),
       bg: avatar.bg,
-      content: avatar.emoji,
+      image: avatar.image,
     })),
   ];
 
@@ -177,20 +184,24 @@ export function AvatarPickerModal({
                       elevation: isSelected ? 5 : 2,
                     }}
                   >
-                    <Text
-                      className={
-                        option.key === null
-                          ? 'text-[32px] font-extrabold text-white'
-                          : ''
-                      }
-                      style={
-                        option.key === null
-                          ? { letterSpacing: -0.6 }
-                          : { fontSize: 40, lineHeight: 48 }
-                      }
-                    >
-                      {option.content}
-                    </Text>
+                    {option.image ? (
+                      <Image
+                        source={option.image}
+                        style={{
+                          width: TILE_SIZE - 6,
+                          height: TILE_SIZE - 6,
+                          borderRadius: (TILE_SIZE - 6) / 2,
+                        }}
+                        resizeMode="cover"
+                      />
+                    ) : (
+                      <Text
+                        className="text-[32px] font-extrabold text-white"
+                        style={{ letterSpacing: -0.6 }}
+                      >
+                        {initials}
+                      </Text>
+                    )}
                     {isSelected ? (
                       <View
                         className="absolute h-6 w-6 items-center justify-center rounded-full"
