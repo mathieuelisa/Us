@@ -56,6 +56,8 @@ const HEADER_IMAGE = require('@/assets/images/Father_feelings_mother.png');
  * place de l'émoji 💞.
  */
 const COPARENT_TIP_ICON = require('@/assets/images/Icon_astuce_coparent.png');
+/** Personne enceinte qui n'a pas encore noté son humeur du jour. */
+const NO_NEWS_IMAGE = require('@/assets/images/Mother_no_news.png');
 
 const PINK_SHADOW = {
   shadowColor: PINK.accent,
@@ -216,10 +218,13 @@ function PartnerStateCard({
   partnerName,
   partnerPronoun,
   partnerMood,
+  isPartnerPregnant,
 }: {
   partnerName: string | null;
   partnerPronoun: string | null;
   partnerMood: HubSummary['partnerMood'];
+  /** L'autre parent est la personne enceinte (on est le co-parent). */
+  isPartnerPregnant: boolean;
 }) {
   const { t } = useTranslation();
   const who = partnerName || t('partner.yourPartner');
@@ -256,6 +261,15 @@ function PartnerStateCard({
             <Image
               source={moodImage}
               style={{ width: 66, height: 66 }}
+              resizeMode="contain"
+            />
+          ) : // Personne enceinte sans humeur du jour : l'ourse qui hausse les
+          // épaules (illustration fournie, demande explicite) ; sinon la
+          // pousse, comme avant.
+          isPartnerPregnant ? (
+            <Image
+              source={NO_NEWS_IMAGE}
+              style={{ width: 70, height: 56 }}
               resizeMode="contain"
             />
           ) : (
@@ -508,6 +522,7 @@ export default function PartnerScreen() {
               partnerName={partnerName ?? null}
               partnerPronoun={summary?.partnerPronoun ?? null}
               partnerMood={summary?.partnerMood ?? null}
+              isPartnerPregnant={role !== 'pregnant'}
             />
           </View>
         ) : null}
