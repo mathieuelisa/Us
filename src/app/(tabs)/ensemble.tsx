@@ -21,7 +21,8 @@ import { ScreenCornerShapes } from '@/components/ui/screen-corner-shapes';
 import { usePullToRefresh } from '@/components/ui/use-pull-to-refresh';
 import { useMyHousehold } from '@/features/household/hooks';
 import type { MoodValue } from '@/features/hub/api';
-import { MOOD_PRESENTATION } from '@/features/hub/constants';
+import { getMoodImage } from '@/features/hub/constants';
+import { useMyProfile } from '@/features/profile/hooks';
 import { useThemeAccent, useThemeBackground } from '@/features/settings/hooks';
 import { getCurrentWeekIsoDates } from '@/features/together/api';
 import {
@@ -64,6 +65,9 @@ export default function TogetherScreen() {
   const weekDates = getCurrentWeekIsoDates();
 
   const { data: checkinsByDate = {} } = useMyWeekCheckins(household);
+  // Ours ou ourse selon la façon dont on veut qu'on parle de soi.
+  const { data: profile } = useMyProfile();
+  const pronoun = profile?.pronoun ?? null;
   // Gestes « après la naissance » dès qu'elle est déclarée.
   const { data: gesture } = useGestureOfTheDay(
     role,
@@ -164,12 +168,17 @@ export default function TogetherScreen() {
               {t('together.howDoYouFeel')}
             </Text>
           </View>
-          <MoodPicker selectedMood={todayMood} onSelect={handleSelectMood} />
+          <MoodPicker
+            selectedMood={todayMood}
+            pronoun={pronoun}
+            onSelect={handleSelectMood}
+          />
         </View>
 
         <WeekMoodStrip
           weekDates={weekDates}
           checkinsByDate={checkinsByDate}
+          pronoun={pronoun}
           accent={accent}
         />
 
@@ -182,9 +191,7 @@ export default function TogetherScreen() {
 
       <NeedNoteOverlay
         visible={isOverlayOpen}
-        moodEmoji={
-          pendingMood ? MOOD_PRESENTATION[pendingMood].imgUrl : undefined
-        }
+        moodEmoji={pendingMood ? getMoodImage(pendingMood, pronoun) : undefined}
         onSubmit={submitNeed}
         onSkip={closeOverlay}
       />

@@ -3,6 +3,7 @@ import { Image, Pressable, Text, View } from 'react-native';
 import type { MoodValue } from '@/features/hub/api';
 import {
   CARD_SHADOW,
+  getMoodImage,
   MOOD_ORDER,
   MOOD_PRESENTATION,
 } from '@/features/hub/constants';
@@ -10,9 +11,12 @@ import {
 /** Les 5 emoji du check-in (écrans 3a/3g) — un tap suffit à enregistrer. */
 export function MoodPicker({
   selectedMood,
+  pronoun,
   onSelect,
 }: {
   selectedMood: MoodValue | null;
+  /** Pronom de qui choisit : ours (« il », prénom seul) ou ourse. */
+  pronoun: string | null;
   onSelect: (mood: MoodValue) => void;
 }) {
   const { t } = useTranslation();
@@ -36,7 +40,7 @@ export function MoodPicker({
             >
               {/* <Text className="text-[26px]">{MOOD_PRESENTATION[mood].emoji}</Text> */}
               <Image
-                source={MOOD_PRESENTATION[mood].imgUrl}
+                source={getMoodImage(mood, pronoun)}
                 className="w-16 h-40"
                 resizeMode="contain"
               />

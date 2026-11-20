@@ -14,40 +14,69 @@ export const MOOD_PRESENTATION: Record<
     emoji: string;
     phraseKey: TranslationKey;
     labelKey: TranslationKey;
-    imgUrl: ImageSourcePropType;
   }
 > = {
   great: {
     emoji: '😄',
-    imgUrl: require('@/assets/images/Mother_happy.png'),
     phraseKey: 'mood.phrases.great',
     labelKey: 'mood.labels.great',
   },
   good: {
     emoji: '🙂',
-    imgUrl: require('@/assets/images/Mother_smile.png'),
     phraseKey: 'mood.phrases.good',
     labelKey: 'mood.labels.good',
   },
   neutral: {
     emoji: '😐',
-    imgUrl: require('@/assets/images/Mother_neutral.png'),
     phraseKey: 'mood.phrases.neutral',
     labelKey: 'mood.labels.neutral',
   },
   bad: {
     emoji: '😩',
-    imgUrl: require('@/assets/images/Mother_sad.png'),
     phraseKey: 'mood.phrases.bad',
     labelKey: 'mood.labels.bad',
   },
   terrible: {
     emoji: '😢',
-    imgUrl: require('@/assets/images/Mother_cry.png'),
     phraseKey: 'mood.phrases.terrible',
     labelKey: 'mood.labels.terrible',
   },
 };
+
+/** Ourse des humeurs, pour qui a choisi « elle » (et la personne enceinte). */
+const MOOD_IMAGES_ELLE: Record<MoodValue, ImageSourcePropType> = {
+  great: require('@/assets/images/Mother_happy.png'),
+  good: require('@/assets/images/Mother_smile.png'),
+  neutral: require('@/assets/images/Mother_neutral.png'),
+  bad: require('@/assets/images/Mother_sad.png'),
+  terrible: require('@/assets/images/Mother_cry.png'),
+};
+
+/** Ours des humeurs, pour « il » et « avec mon prénom seulement ». */
+const MOOD_IMAGES_IL: Record<MoodValue, ImageSourcePropType> = {
+  great: require('@/assets/images/Father_great.png'),
+  good: require('@/assets/images/Father_good.png'),
+  neutral: require('@/assets/images/Father_neutral.png'),
+  bad: require('@/assets/images/Father_bad.png'),
+  terrible: require('@/assets/images/Father_terrible.png'),
+};
+
+/**
+ * Illustration d'une humeur selon la façon dont **la personne qui l'a
+ * donnée** veut qu'on parle d'elle (`profiles.pronoun`, choisi dans
+ * « Faisons connaissance » — demande explicite du 2026-11-20) : « il » et
+ * « avec mon prénom seulement » → ours ; « elle » → ourse. Sans pronom
+ * (la personne enceinte, qui ne passe pas par cet écran), l'ourse reste
+ * le rendu par défaut, comme avant.
+ */
+export function getMoodImage(
+  mood: MoodValue,
+  pronoun: string | null | undefined,
+): ImageSourcePropType {
+  return pronoun === 'il' || pronoun === 'neutre'
+    ? MOOD_IMAGES_IL[mood]
+    : MOOD_IMAGES_ELLE[mood];
+}
 
 /** Les 5 niveaux d'humeur (la colonne en base est un simple `text`). */
 export type MoodLevel = 'great' | 'good' | 'neutral' | 'bad' | 'terrible';

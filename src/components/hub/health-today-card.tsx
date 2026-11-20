@@ -31,7 +31,7 @@ import { usePregnantSymptomsForDate } from '@/features/health/hooks';
 import { getSymptomTips } from '@/features/health/symptom-tips';
 import type { Household } from '@/features/household/api';
 import type { MoodValue } from '@/features/hub/api';
-import { MOOD_PRESENTATION } from '@/features/hub/constants';
+import { getMoodImage, MOOD_PRESENTATION } from '@/features/hub/constants';
 import { getTipOfTheDay } from '@/features/partner/constants';
 import { useThemeAccent } from '@/features/settings/hooks';
 import type { HouseholdRole } from '@/lib/atoms/role';
@@ -70,12 +70,15 @@ export function HealthTodayCard({
   role,
   partnerName,
   pregnantMood = null,
+  pregnantPronoun = null,
   moodTargetRef,
 }: {
   household: Household | null | undefined;
   role: HouseholdRole;
   /** Humeur du jour de la personne enceinte (résumé du hub), ou `null`. */
   pregnantMood?: MoodValue | null;
+  /** Son pronom, qui choisit ours ou ourse (`getMoodImage`). */
+  pregnantPronoun?: string | null;
   /** Prénom de l'autre parent, pour le titre côté co-parent. */
   partnerName: string | null;
   /** Pastille cœur / ourson, mise en surbrillance par la visite guidée. */
@@ -165,7 +168,7 @@ export function HealthTodayCard({
         >
           {pregnantMood ? (
             <Image
-              source={MOOD_PRESENTATION[pregnantMood].imgUrl}
+              source={getMoodImage(pregnantMood, pregnantPronoun)}
               style={{ width: 56, height: 56 }}
               resizeMode="contain"
             />

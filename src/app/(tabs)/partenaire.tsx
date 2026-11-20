@@ -29,7 +29,7 @@ import { getWeeksOfAmenorrhea } from '@/features/health/constants';
 import { useBabySize, useWeekSymptomsFor } from '@/features/health/hooks';
 import { useMyHousehold } from '@/features/household/hooks';
 import { getPartnerUserId, type HubSummary } from '@/features/hub/api';
-import { MOOD_PRESENTATION } from '@/features/hub/constants';
+import { getMoodImage, MOOD_PRESENTATION } from '@/features/hub/constants';
 import { useHubSummary } from '@/features/hub/hooks';
 import {
   getRelationTipOfTheDay,
@@ -214,14 +214,19 @@ function TipCard({
  */
 function PartnerStateCard({
   partnerName,
+  partnerPronoun,
   partnerMood,
 }: {
   partnerName: string | null;
+  partnerPronoun: string | null;
   partnerMood: HubSummary['partnerMood'];
 }) {
   const { t } = useTranslation();
   const who = partnerName || t('partner.yourPartner');
   const mood = partnerMood ? MOOD_PRESENTATION[partnerMood.mood] : null;
+  const moodImage = partnerMood
+    ? getMoodImage(partnerMood.mood, partnerPronoun)
+    : null;
 
   return (
     <View
@@ -247,9 +252,9 @@ function PartnerStateCard({
             borderBottomLeftRadius: 24,
           }}
         >
-          {mood ? (
+          {moodImage ? (
             <Image
-              source={mood.imgUrl}
+              source={moodImage}
               style={{ width: 66, height: 66 }}
               resizeMode="contain"
             />
@@ -501,6 +506,7 @@ export default function PartnerScreen() {
             />
             <PartnerStateCard
               partnerName={partnerName ?? null}
+              partnerPronoun={summary?.partnerPronoun ?? null}
               partnerMood={summary?.partnerMood ?? null}
             />
           </View>
@@ -526,6 +532,7 @@ export default function PartnerScreen() {
                 <WeekMoodDays
                   weekDates={weekDates}
                   checkinsByDate={partnerCheckins}
+                  pronoun={summary?.partnerPronoun ?? null}
                   accent={PINK.accent}
                 />
               </View>

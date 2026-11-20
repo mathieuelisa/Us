@@ -8,7 +8,7 @@ import {
   SparkLines,
 } from '@/components/ui/glass-card';
 import type { MoodValue } from '@/features/hub/api';
-import { MOOD_PRESENTATION } from '@/features/hub/constants';
+import { getMoodImage, MOOD_PRESENTATION } from '@/features/hub/constants';
 import { getWeekdayLetters } from '@/i18n/format';
 import { useLocale } from '@/i18n/hooks';
 import { hexToRgba } from '@/lib/color';
@@ -36,10 +36,13 @@ const FUTURE = '#c9c9cf';
 export function WeekMoodStrip({
   weekDates,
   checkinsByDate,
+  pronoun,
   accent,
 }: {
   weekDates: string[];
   checkinsByDate: Record<string, MoodValue>;
+  /** Pronom de la personne dont ce sont les humeurs (`getMoodImage`). */
+  pronoun: string | null;
   accent: string;
 }) {
   const { t } = useTranslation();
@@ -88,6 +91,7 @@ export function WeekMoodStrip({
         <WeekMoodDays
           weekDates={weekDates}
           checkinsByDate={checkinsByDate}
+          pronoun={pronoun}
           accent={accent}
         />
       </View>
@@ -103,10 +107,13 @@ export function WeekMoodStrip({
 export function WeekMoodDays({
   weekDates,
   checkinsByDate,
+  pronoun,
   accent,
 }: {
   weekDates: string[];
   checkinsByDate: Record<string, MoodValue>;
+  /** Pronom de la personne dont ce sont les humeurs (`getMoodImage`). */
+  pronoun: string | null;
   accent: string;
 }) {
   const weekdayLetters = getWeekdayLetters(useLocale());
@@ -120,6 +127,7 @@ export function WeekMoodDays({
           letter={weekdayLetters[index]}
           dayNumber={Number(date.slice(-2))}
           mood={checkinsByDate[date]}
+          pronoun={pronoun}
           isToday={date === today}
           isFuture={date > today}
           accent={accent}
@@ -133,6 +141,7 @@ function DayColumn({
   letter,
   dayNumber,
   mood,
+  pronoun,
   isToday,
   isFuture,
   accent,
@@ -140,6 +149,7 @@ function DayColumn({
   letter: string;
   dayNumber: number;
   mood: MoodValue | undefined;
+  pronoun: string | null;
   isToday: boolean;
   isFuture: boolean;
   accent: string;
@@ -197,7 +207,7 @@ function DayColumn({
             }}
           >
             <Image
-              source={MOOD_PRESENTATION[mood].imgUrl}
+              source={getMoodImage(mood, pronoun)}
               style={{ width: 32, height: 32 }}
               resizeMode="contain"
             />

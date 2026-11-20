@@ -15,6 +15,11 @@ export type HubSummary = {
   proceduresTodo: number;
   hasCheckedInToday: boolean;
   partnerFirstName: string | null;
+  /**
+   * Façon dont le co-parent veut qu'on parle de lui (`profiles.pronoun`) :
+   * choisit les illustrations de son humeur (`getMoodImage`).
+   */
+  partnerPronoun: string | null;
   partnerMood: { mood: MoodValue; needNote: string | null } | null;
   /**
    * Humeur du jour de la personne enceinte, quel que soit le parent
@@ -67,7 +72,7 @@ export async function fetchHubSummary(
       partnerUserId
         ? supabase
             .from('profiles')
-            .select('first_name')
+            .select('first_name, pronoun')
             .eq('id', partnerUserId)
             .maybeSingle()
         : Promise.resolve({ data: null, error: null }),
@@ -99,6 +104,7 @@ export async function fetchHubSummary(
     // on retombe sur celui saisi pendant l'onboarding.
     partnerFirstName:
       partnerProfile.data?.first_name ?? household.partner_first_name ?? null,
+    partnerPronoun: partnerProfile.data?.pronoun ?? null,
     partnerMood: partnerCheckin
       ? { mood: partnerCheckin.mood, needNote: partnerCheckin.need_note }
       : null,

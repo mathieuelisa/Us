@@ -51,7 +51,7 @@ import {
   formatAppointmentDate,
   formatAppointmentDayMonth,
   formatAppointmentTime,
-  MOOD_PRESENTATION,
+  getMoodImage,
   type MoodLevel,
 } from '@/features/hub/constants';
 import { useHubSummary } from '@/features/hub/hooks';
@@ -399,6 +399,11 @@ export default function HubScreen() {
           role={role}
           partnerName={partnerName ?? null}
           pregnantMood={summary?.pregnantMood ?? null}
+          pregnantPronoun={
+            isPregnant
+              ? (profile?.pronoun ?? null)
+              : (summary?.partnerPronoun ?? null)
+          }
         />
 
         {/* Juste au-dessus de « Vos sections » (demande explicite) : chacun
@@ -436,7 +441,10 @@ export default function HubScreen() {
                 {partnerMood ? (
                   <View className="h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-white/25">
                     <Image
-                      source={MOOD_PRESENTATION[partnerMood.mood].imgUrl}
+                      source={getMoodImage(
+                        partnerMood.mood,
+                        summary?.partnerPronoun,
+                      )}
                       style={{ width: 44, height: 44 }}
                       resizeMode="contain"
                     />
